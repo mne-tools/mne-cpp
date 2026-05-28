@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_ttest.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Frequentist Student's t-tests with exact p-values via the regularised incomplete beta function.
  *
  * Provides the three single-sample / paired / two-sample independent

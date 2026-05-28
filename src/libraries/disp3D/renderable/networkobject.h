@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file networkobject.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Instanced connectivity-graph renderable: node spheres and edge cylinders coloured by weight through a named colormap.
  *
  * NetworkObject mirrors the @ref DipoleObject instancing pattern

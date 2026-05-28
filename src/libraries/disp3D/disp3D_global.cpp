@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ * Copyright (c) 2021-2026 MNE-CPP Authors
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file disp3D_global.cpp
- * @since 2022
- * @date  March 2026
+ * @since August 2021
  * @brief Library-version stamp for the disp3D 3-D visualisation library.
  */
 

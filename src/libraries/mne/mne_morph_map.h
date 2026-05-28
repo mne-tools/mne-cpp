@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_morph_map.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Sparse linear operator that morphs a source estimate between two subjects.
  *
  * @ref MNELIB::MNEMorphMap composes a left and a right @ref MNECorticalMap

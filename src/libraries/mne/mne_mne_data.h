@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_mne_data.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Container for the working tensors of an MNE inverse computation (whitened residuals, source-time matrices).
  *
  * @ref MNELIB::MNEMneData ports the @c mneMneDataRec struct and is the

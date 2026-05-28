@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file standard_montage.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Embedded 10-20 / 10-10 electrode tables and the densification routine that yields the 10-05 system.
  *
  * The coordinate tables are anonymous @c constexpr arrays

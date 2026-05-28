@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_cluster.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of the cluster permutation tests and TFCE enhancement declared in sts_cluster.h.
  *
  * Each permutation entry point first computes the observed statistic map

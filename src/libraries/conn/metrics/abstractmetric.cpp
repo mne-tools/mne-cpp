@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file abstractmetric.cpp
- * @since 2026
- * @date  March 2026
+ * @since January 2018
  * @brief Implementation of @ref CONNLIB::AbstractMetric - holds the static control knobs (storage-mode flag and band-averaging window) shared by every CONNLIB estimator.
  */
 

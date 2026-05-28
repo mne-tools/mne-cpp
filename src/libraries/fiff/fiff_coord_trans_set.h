@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_coord_trans_set.h
- * @since 2026
- * @date  March 2026
+ * @since February 2026
  * @brief Ordered set of FIFF coordinate transforms, the on-disk content of a FIFFB_MRI / FIFFB_HPI_MEAS block.
  *
  * Container that owns multiple @ref FiffCoordTrans instances along with the

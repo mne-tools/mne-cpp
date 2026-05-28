@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file dpss.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Discrete Prolate Spheroidal Sequences (Slepian tapers) for multitaper spectral estimation.
  *
  * The DPSS family is the unique set of sequences that maximise the energy

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_mxne.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of the MxNE (mixed-norm) sparse solver via IRLS.
  *
  * Implements the iteratively-reweighted least-squares loop: solve a

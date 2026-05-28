@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_surface.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Reader and in-memory representation of a single FreeSurfer triangular surface (e.g. lh.pial, rh.white, lh.inflated).
  *
  * A FreeSurfer surface file stores one cortical hemisphere as a closed

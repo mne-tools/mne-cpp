@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file averageselectionview.cpp
- * @since 2022
- * @date  October 2022
+ * @since July 2018
  * @brief Implementation of the AverageSelectionView picker.
  */
 

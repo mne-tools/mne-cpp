@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_events.h
- * @since 2026
- * @date  March 2026
+ * @since February 2026
  * @brief Stim-channel event list (sample, previous value, new value triples) with FIFF read/write helpers.
  *
  * FIFF events are the standard integer representation of trigger / stim

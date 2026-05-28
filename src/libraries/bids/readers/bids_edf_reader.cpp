@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_edf_reader.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref BIDSLIB::EDFReader — European Data Format (EDF / EDF+) parser behind @ref BIDSLIB::AbstractFormatReader.
  */
 

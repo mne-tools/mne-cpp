@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file granger_causality.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Spectral Granger Causality (Geweke 1982, Bressler & Seth 2011) between every channel pair, computed from a fitted MVAR model.
  *
  * Granger's idea (Granger, Econometrica 1969) is that a process @c X_j

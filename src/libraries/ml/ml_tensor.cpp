@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file ml_tensor.cpp
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Implementation of @ref MLLIB::MlTensor including row-major/Eigen interop and shared-buffer reshape.
  *
  * The translation unit keeps the storage rule in one place: every

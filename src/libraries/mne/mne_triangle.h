@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_triangle.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Triangle descriptor with cached centroid, area and normal vectors.
  *
  * @ref MNELIB::MNETriangle is the per-face record produced by

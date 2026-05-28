@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_surface.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref FSLIB::FsSurface: reads FreeSurfer triangle / quad surface files into vertex+face matrices.
  */
 

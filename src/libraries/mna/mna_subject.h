@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_subject.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief One participant in an MNA project — owner of measurement sessions and link to the FreeSurfer anatomy.
  *
  * @ref MnaSubject is the root of the per-participant subtree in an

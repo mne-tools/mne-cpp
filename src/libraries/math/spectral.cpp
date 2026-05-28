@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file spectral.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief FFT, multi-taper combination and PSD/CSD assembly kernels.
  *
  * Implements the static estimators declared in @ref spectral.h. Each

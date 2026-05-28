@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_gamma_map.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Gamma-MAP sparse Bayesian inverse solver — automatic-relevance-determination prior on per-source variance hyperparameters.
  *
  * @ref INVLIB::InvGammaMap implements the Gamma-MAP / sparse Bayesian

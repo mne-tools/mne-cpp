@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file conn_global.h
- * @since 2026
- * @date  March 2026
+ * @since July 2016
  * @brief Export/import macros for the @c CONNLIB functional-connectivity library.
  *
  * @c CONNLIB implements the spectral and time-domain functional-connectivity

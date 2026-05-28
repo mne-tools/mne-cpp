@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_sss_data.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref MNELIB::MNESssData.
  *
  * Implements FIFF read of the @c FIFFB_SSS_INFO sub-blocks, parsing the

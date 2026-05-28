@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_cortical_map.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Vertex-to-vertex map between two cortical surfaces (e.g. subject -> fsaverage).
  *
  * @ref MNELIB::MNECorticalMap stores the resampling weights used by

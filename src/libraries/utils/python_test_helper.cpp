@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file python_test_helper.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of @ref UTILSLIB::PythonTestHelper — availability cache, package probes and scalar @c eval helpers.
  *
  * The interpreter availability check and the package probe

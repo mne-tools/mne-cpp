@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_rap_music.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Recursively Applied and Projected MUSIC (RAP-MUSIC) source-localisation algorithm.
  *
  * @ref INVLIB::InvRapMusic implements the RAP-MUSIC scanning algorithm

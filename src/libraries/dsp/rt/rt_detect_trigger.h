@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_detect_trigger.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Threshold and edge-based trigger detection on streaming stim channels.
  *
  * The functions in this header scan the rows of an incoming data matrix —

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_minimum_norm.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of the linear minimum-norm solver including the eLORETA weight-iteration loop.
  *
  * Implements @c doInverseSetup (whitener × SSP × whitened-leadfield

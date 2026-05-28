@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_mgh_tag_group.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of @ref MNELIB::MNEMghTagGroup.
  *
  * Implements iteration over the tag stream until EOF and the lookup

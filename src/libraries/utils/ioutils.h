@@ -1,15 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2013-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Ricky <rickytjen@yahoo.com>
+ *   liminsun <liminsun@nmr.mgh.harvard.edu>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
  *
  * @file ioutils.h
- * @since 2022
- * @date  March 2026
+ * @since March 2013
  * @brief Header-only Eigen matrix text I/O — round-trips dense matrices to whitespace-separated ASCII for cross-validation against MNE-Python.
  *
  * @ref UTILSLIB::IOUtils provides a single, overload-rich API

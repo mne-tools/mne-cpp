@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_annotationset.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Bi-hemispheric pair of FreeSurfer annotations (lh + rh) for one parcellation atlas.
  *
  * Whole-brain parcellation analyses load one annotation file per

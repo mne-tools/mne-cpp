@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file ml_types.h
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Strongly typed enumerations describing the ML backend, tensor element type and inference task.
  *
  * The three @c enum @c class definitions in this header are the shared

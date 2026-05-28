@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_surfaceset.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of @ref FSLIB::FsSurfaceSet: bundles the lh + rh @ref FSLIB::FsSurface for one subject and surface kind.
  */
 

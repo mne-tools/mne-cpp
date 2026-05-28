@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_gamma_map.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of the Gamma-MAP / SBL solver.
  *
  * Implements the EM / fixed-point update loop for the per-source

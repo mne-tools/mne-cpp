@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file command_manager.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Per-component registry of @ref COMLIB::Command schemas; receives @ref COMLIB::RawCommand from the parser and dispatches matching @c Command instances.
  *
  * @ref COMLIB::CommandManager is the receiver half of the observer

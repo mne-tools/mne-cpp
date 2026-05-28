@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2013-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
  *
  * @file ioutils.cpp
- * @since 2022
- * @date  March 2026
+ * @since March 2013
  * @brief Out-of-line implementations for the non-templated overloads of @ref UTILSLIB::IOUtils.
  *
  * The bulk of the read/write logic lives inline in the header

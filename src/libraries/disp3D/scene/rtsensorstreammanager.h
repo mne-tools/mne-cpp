@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsensorstreammanager.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Manager that wires real-time sensor data into the scene: owns the data controller, the field mapper and the target surface.
  *
  * RtSensorStreamManager bridges the streaming side (sensor packets

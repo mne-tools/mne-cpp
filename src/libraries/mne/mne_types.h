@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_types.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Legacy MNE-C constants and shared typedefs used across MNELIB structures.
  *
  * Mirrors a curated subset of the @c mne_types.h shipped with the

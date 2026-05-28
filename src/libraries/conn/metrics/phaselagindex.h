@@ -1,12 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Daniel Strohmeier <daniel.strohmeier@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file phaselagindex.h
- * @since 2026
- * @date  March 2026
+ * @since January 2018
  * @brief Phase Lag Index (Stam, Nolte & Daffertshofer 2007) between every channel pair.
  *
  * The Phase Lag Index measures the asymmetry of the cross-spectral phase

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_ecd_set.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref INVLIB::InvEcdSet including the @c .dip and @c .bdip readers/writers.
  *
  * Implements the dipole list management plus the file-format

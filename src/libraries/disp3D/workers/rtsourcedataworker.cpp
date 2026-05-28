@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsourcedataworker.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Per-tick sparse source-to-vertex mat-vec, colormap mapping and ABGR colour packing per hemisphere.
  */
 

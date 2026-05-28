@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_file_ref.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Reference to a file inside an MNA project — relative path, semantic role, SHA-256 hash, and optional embedded payload.
  *
  * @ref MnaFileRef is the leaf node of an MNA project tree. Every raw

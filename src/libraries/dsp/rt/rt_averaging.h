@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_averaging.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Real-time stimulus-locked averaging worker producing running evoked responses.
  *
  * RtAveragingWorker accumulates fixed-length epochs around trigger events

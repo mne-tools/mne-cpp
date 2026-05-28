@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_types.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Shared enumerations describing tail direction and multiple-comparison correction strategy.
  *
  * Centralising the @ref STSLIB::StatsTailType (left / right / both) and

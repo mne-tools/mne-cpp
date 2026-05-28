@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file standard_montage.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Built-in 10-20 / 10-10 / 10-05 EEG electrode position tables in MNI head coordinates.
  *
  * @ref UTILSLIB::StandardMontage provides hard-coded, vendor-

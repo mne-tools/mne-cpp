@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_types.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Strongly-typed enumerations that tag a source estimate with the inverse method, source-space type, and orientation constraint that produced it.
  *
  * Defines @ref INVLIB::InvEstimateMethod (MNE, dSPM, sLORETA, eLORETA,

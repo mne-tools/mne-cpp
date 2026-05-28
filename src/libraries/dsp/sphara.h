@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sphara.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief SPatial HARmonic Analysis (SPHARA) spatial-filter projector assembly.
  *
  * SPHARA represents a discrete EEG / MEG sensor montage as a triangulated

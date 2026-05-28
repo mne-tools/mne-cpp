@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_connectivity.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Lightweight pairwise source-connectivity container that travels alongside a source estimate.
  *
  * @ref INVLIB::InvConnectivity stores one @c N×N connectivity matrix

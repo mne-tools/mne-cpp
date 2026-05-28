@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file raypicker.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Mouse-ray vs scene-object intersection for picking dipoles, electrodes and surfaces.
  *
  * RayPicker unprojects the current mouse position through the

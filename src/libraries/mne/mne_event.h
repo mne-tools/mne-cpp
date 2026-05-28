@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_event.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Single recorded event (sample, previous and new trigger code).
  *
  * @ref MNELIB::MNEEvent is the per-event record used by the legacy

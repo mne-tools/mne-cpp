@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file python_runner.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Embedding-free launcher that runs MNE-Python (or any user) scripts as a child process and streams their output back to the C++ caller.
  *
  * @ref UTILSLIB::PythonRunner wraps @c QProcess with the boilerplate

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_registry_loader.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Declarative loader for @ref MnaOpRegistry contents — ingests @c mna-registry.json manifests and overrides them with drop-ins under @c mna-registry.d/.
  *
  * @ref MnaRegistryLoader is the bridge between the on-disk

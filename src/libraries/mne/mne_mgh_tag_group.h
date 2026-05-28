@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_mgh_tag_group.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Ordered group of @ref MNELIB::MNEMghTag entries appended to an MGH/MGZ file.
  *
  * @ref MNELIB::MNEMghTagGroup gathers every tag present at the tail of

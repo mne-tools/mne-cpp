@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_source_space.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Single-hemisphere source space (cortical surface or volume grid) loaded from FIFF.
  *
  * @ref MNELIB::MNESourceSpace replaces the @c mneSourceSpace typedef of

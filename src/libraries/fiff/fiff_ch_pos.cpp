@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_ch_pos.cpp
- * @since 2022
- * @date  October 2022
+ * @since October 2012
  * @brief Implementation of @ref FiffChPos: streaming of the coil-frame origin and (ex, ey, ez) orientation triad sub-record.
  *
  * Twelve floats on disk (r0, ex, ey, ez), matching the legacy

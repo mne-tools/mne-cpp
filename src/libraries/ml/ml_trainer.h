@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file ml_trainer.h
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief @ref MLLIB::MLTrainer convenience wrapper that drives Python training scripts via @ref UTILSLIB::PythonRunner.
  *
  * Inference in mne-cpp goes through ONNX Runtime, but training itself

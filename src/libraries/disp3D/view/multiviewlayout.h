@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file multiviewlayout.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Viewport geometry, splitter logic and per-pane preset assignment for the disp3D multi-view grid.
  *
  * MultiViewLayout computes the four sub-viewports (Top-left

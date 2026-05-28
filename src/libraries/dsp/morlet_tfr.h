@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file morlet_tfr.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Complex Morlet wavelet time-frequency representation (TFR).
  *
  * The complex Morlet wavelet ψ(t) = π^{-1/4} · e^{i2πf₀t} · e^{-t²/2σ²}

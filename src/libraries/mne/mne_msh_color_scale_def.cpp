@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_msh_color_scale_def.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of @ref MNELIB::MNEMshColorScaleDef.
  *
  * Implements the constructors, defaults and ASCII-config read used by

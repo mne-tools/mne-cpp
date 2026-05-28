@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sensorfieldmapper.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Dense MEG / EEG field-map matrix construction plus iso-contour line-strip generation on the target surface.
  */
 

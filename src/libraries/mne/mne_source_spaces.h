@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_source_spaces.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Container pairing the left and right cortical source spaces of a subject.
  *
  * @ref MNELIB::MNESourceSpaces wraps the @c QList of

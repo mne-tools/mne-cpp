@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_vector_source_estimate.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of @ref INVLIB::InvVectorSourceEstimate.
  *
  * Implements the constructors, the L2-norm magnitude collapse, the

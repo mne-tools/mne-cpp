@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file lsl_stream_info.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Declares stream_info, the LSL metadata descriptor that identifies and routes a stream on the network.
  *
  * A @ref LSLLIB::stream_info is the handshake object of the Lab

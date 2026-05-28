@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_surface_or_volume.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Discriminated geometry container that can represent either a triangulated surface or a discrete/volume source space.
  *
  * @ref MNELIB::MNESurfaceOrVolume is the direct port of the

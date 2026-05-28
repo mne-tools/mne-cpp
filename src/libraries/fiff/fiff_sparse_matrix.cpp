@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_sparse_matrix.cpp
- * @since 2026
- * @date  April 2026
+ * @since February 2026
  * @brief Implementation of @ref FiffSparseMatrix: CCS / RCS storage matching the FIFF sparse-matrix tag layout, with Eigen conversion.
  *
  * Stores values, inner indices and outer pointers exactly as the FIFF

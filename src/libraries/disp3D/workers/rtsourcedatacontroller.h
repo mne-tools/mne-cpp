@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsourcedatacontroller.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Real-time source-estimate streaming controller that owns the data worker and the per-hemisphere interpolation workers.
  *
  * RtSourceDataController bundles a @ref RtSourceDataWorker (queue,

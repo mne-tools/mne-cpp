@@ -1,13 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ * Copyright (c) 2019-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Wayne F. Mead <isk@imsorrykun.com>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtfiffrawviewdelegate.h
- * @since 2022
- * @date  January 2024
+ * @since November 2019
  * @brief QAbstractItemDelegate painting one FIFF channel's signal trace inside @ref RtFiffRawView.
  *
  * RtFiffRawViewDelegate transforms each visible row of the

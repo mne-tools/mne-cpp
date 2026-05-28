@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_source_estimate.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref INVLIB::InvSourceEstimate including STC / W binary I/O and label-based subset access.
  *
  * Provides the constructors, assignment operators, deep-copy helpers and

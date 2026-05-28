@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file decoding_ica_label.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of the static ICA component labeller.
  *
  * For each row of the ICA-source matrix the implementation scores the

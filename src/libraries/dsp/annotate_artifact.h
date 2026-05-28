@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file annotate_artifact.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Continuous-data annotation of muscle and amplitude artefacts.
  *
  * The detectors in this header scan continuous MEG / EEG data and emit

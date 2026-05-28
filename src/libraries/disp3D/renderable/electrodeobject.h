@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file electrodeobject.h
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief ECoG / sEEG electrode model: shaft cylinders, contact spheres and grid layouts mapped to a colour-bar overlay.
  *
  * ElectrodeObject describes one or more electrode arrays in three

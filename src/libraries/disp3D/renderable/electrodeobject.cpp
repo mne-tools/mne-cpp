@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file electrodeobject.cpp
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Cylinder-shaft and contact-sphere geometry generation plus contact-value colour mapping for sEEG / ECoG arrays.
  */
 

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_icp.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of the ICP rigid alignment in @ref MNELIB::MNEIcp.
  *
  * Implements the per-iteration nearest-triangle search, the Horn / SVD

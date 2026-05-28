@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_mgh_io.h
- * @since 2026
- * @date  May 2026
+ * @since February 2026
  * @brief FreeSurfer MGH / MGZ volume reader: byte-level decoder for the 284-byte fixed header, voxel buffer, and optional tag footer.
  *
  * MGH is FreeSurfer's native volume container --- a fixed 284-byte

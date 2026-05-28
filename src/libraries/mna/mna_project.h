@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_project.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Top-level MNA container binding subjects, processing pipeline, schema version and project metadata.
  *
  * @ref MnaProject is the in-memory representation of one @c .mna

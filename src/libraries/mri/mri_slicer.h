@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_slicer.h
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Orthogonal-plane resampler that turns a 3D @ref MriVolData into the 2D textures consumed by the slice viewer.
  *
  * The slicer is the bridge between the format-specific MRI

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file source_morph.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of @ref INVLIB::SourceMorph (matrix caching and apply step).
  *
  * Implements @c compute (caches the from/to vertex lists and the

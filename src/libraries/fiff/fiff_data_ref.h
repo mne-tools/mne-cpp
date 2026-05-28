@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_data_ref.h
- * @since 2026
- * @date  February 2026
+ * @since February 2026
  * @brief External-data reference record describing type, endianness, size and offset of an out-of-file FIFF payload.
  *
  * A @c FIFF_REF_ROLE / @c FIFF_DATA_REF tag carries a small fixed-size

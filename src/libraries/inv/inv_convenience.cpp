@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_convenience.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of the apply-inverse / compute-PSD convenience helpers declared in @c inv_convenience.h.
  *
  * Implements the streaming epoch / raw loops by constructing a single

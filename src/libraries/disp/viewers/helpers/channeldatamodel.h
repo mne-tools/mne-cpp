@@ -1,12 +1,12 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file channeldatamodel.h
- * @since 2026
- * @date  April 2026
+ * @since July 2018
  * @brief Circular-buffer Qt model exposing a rolling window of the live FIFF stream as a table.
  *
  * ChannelDataModel keeps a per-channel @c Eigen::MatrixXd ring buffer

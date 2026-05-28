@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_slicer.cpp
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Implementation of @ref MRILIB::MriSlicer: per-orientation extraction with on-the-fly type promotion and per-volume normalisation.
  *
  * Implements the three jobs the header advertises: (1) pick the

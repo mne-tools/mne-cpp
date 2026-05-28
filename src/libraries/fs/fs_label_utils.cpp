@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_label_utils.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of @ref FSLIB::FsLabelUtils: grow / split labels on the surface mesh and convert between source-estimate matrices and labels.
  */
 

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_io.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of the @ref MnaIO codecs — UTF-8 JSON for @c .mna files and CBOR (prefixed with the @c "MNX1" four-byte magic) for @c .mnx files.
  *
  * The @ref read / @ref write entry points dispatch on the file

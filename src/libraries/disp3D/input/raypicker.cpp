@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file raypicker.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Mouse-ray unprojection plus Moller-Trumbore triangle and sphere / cylinder intersection over all selectable scene primitives.
  */
 

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file maxwell_movement_comp.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Maxwell movement compensation for MEG.
  *
  * Implements head movement compensation via SSS. Equivalent to

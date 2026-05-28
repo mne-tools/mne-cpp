@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_cmd_client.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Translation unit for @ref COMLIB::RtCmdClient: command-port (4217) I/O and reply accumulation.
  *
  * Owns the wire-level encoding of outbound requests (CLI string vs.

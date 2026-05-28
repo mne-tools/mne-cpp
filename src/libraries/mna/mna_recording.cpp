@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_recording.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief JSON and CBOR codecs for @ref MnaRecording — ordered @ref MnaFileRef list plus opaque id and forward-compatible @c extras.
  *
  * The implementation defers to @ref MnaFileRef::toJson and the

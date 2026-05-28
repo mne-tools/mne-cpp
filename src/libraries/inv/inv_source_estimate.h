@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_source_estimate.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief InvSourceEstimate value type — central source-space data container produced by every INVLIB inverse solver.
  *
  * @ref INVLIB::InvSourceEstimate replaces the legacy MNE-C

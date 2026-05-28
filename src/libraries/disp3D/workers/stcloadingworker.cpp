@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file stcloadingworker.cpp
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Background STC file parse plus per-hemisphere sparse interpolation matrix construction.
  */
 

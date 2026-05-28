@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2017-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   1DIce <lars.debor@tu-ilmenau.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Andreas Griesshammer <ag@fieldlineinc.com>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fwd_eeg_sphere_model.cpp
- * @since 2022
- * @date  April 2026
+ * @since March 2017
  * @brief FwdEegSphereModel implementation — de Munck Legendre-series EEG potential, Berg-Scherg equivalent-source least-squares fit, and Sarvas analytic MEG field for spherically-symmetric volume conductors.
  */
 

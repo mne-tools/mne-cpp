@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bemtreeitem.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Tree item wrapping a single @ref MNELIB::MNEBemSurface (brain / inner-skull / outer-skull / scalp shell).
  *
  * BEM surfaces are triangulated boundary meshes produced by

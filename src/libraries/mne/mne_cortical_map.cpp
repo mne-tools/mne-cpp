@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_cortical_map.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of @ref MNELIB::MNECorticalMap.
  *
  * Implements binary read of the FreeSurfer @c .map file and the

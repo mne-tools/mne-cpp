@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_global.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief STSLIB shared-library export macro and build-info accessors for the statistical-tests library.
  *
  * STSLIB is the mne-cpp library that performs frequentist inference on

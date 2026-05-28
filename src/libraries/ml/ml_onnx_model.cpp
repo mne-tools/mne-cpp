@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file ml_onnx_model.cpp
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Implementation of @ref MLLIB::MlOnnxModel including session creation, IO-binding cache and zero-copy predict.
  *
  * The translation unit isolates every direct dependency on the ONNX

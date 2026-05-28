@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2013-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Florian Schlembach <fschlembach@web.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Andreas Griesshammer <ag@fieldlineinc.com>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_evoked_set.cpp
- * @since 2022
- * @date  April 2026
+ * @since March 2013
  * @brief Implementation of @ref FiffEvokedSet: read / write of multi-condition ``*-ave.fif'' files and the ave-description parser.
  *
  * Owns one @ref FiffInfo and one @ref FiffEvoked per @c FIFFB_EVOKED

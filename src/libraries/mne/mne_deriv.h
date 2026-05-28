@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_deriv.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Single channel derivation (linear combination of physical channels exposed as a virtual channel).
  *
  * @ref MNELIB::MNEDeriv stores one row of a derivation matrix together

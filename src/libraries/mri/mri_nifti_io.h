@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_nifti_io.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief NIfTI-1 single-file (.nii / .nii.gz) volume reader producing the same per-slice layout as the MGH reader.
  *
  * NIfTI-1 is the standard exchange container used by FSL, AFNI, SPM,

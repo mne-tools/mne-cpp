@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_ecd.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of @ref INVLIB::InvEcd (default/copy ctors, destructor, debug print).
  *
  * Provides the field initialisers and the human-readable debug print

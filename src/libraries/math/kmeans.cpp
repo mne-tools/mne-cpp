@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file kmeans.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief K-means batch/online update kernels, replicate driver and empty-cluster handling.
  *
  * This translation unit implements the inner loop of @ref UTILSLIB::KMeans:

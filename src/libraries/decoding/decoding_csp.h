@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file decoding_csp.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Common Spatial Patterns (CSP) for two-class discriminative spatial filtering of band-passed M/EEG.
  *
  * CSP finds spatial filters @f$w@f$ that maximise the variance of

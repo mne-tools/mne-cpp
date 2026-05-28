@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_vol_data.h
- * @since 2026
- * @date  May 2026
+ * @since February 2026
  * @brief Format-agnostic in-memory representation of a 3D MRI volume plus its slice decomposition.
  *
  * Two cooperating types live in this header:

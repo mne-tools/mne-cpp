@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file brainsurface.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief CPU mesh build, per-vertex colour packing and QRhi vertex / index buffer management for cortical and BEM surfaces.
  */
 

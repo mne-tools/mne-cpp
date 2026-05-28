@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_annotation_event_utils.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Conversion helpers between FIFF annotations and the integer stim-channel event list used by epoching / averaging.
  *
  * Two representations coexist in MNE workflows: free-text @ref

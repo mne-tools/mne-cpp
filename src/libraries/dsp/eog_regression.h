@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file eog_regression.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Declaration of EogRegression — EOG artifact removal via linear regression.
  *
  * Fits a least-squares model from EOG channels to all other channels and subtracts the

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_label_utils.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Surface-mesh label manipulation: grow, split into connected components, STC ↔ label conversion.
  *
  * Algorithmic counterpart to @ref FsLabel I/O. Operates on labels in the

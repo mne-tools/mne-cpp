@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2017-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file circularbuffer.h
- * @since 2022
- * @date  March 2026
+ * @since September 2017
  * @brief Bounded single-producer / single-consumer ring buffer used to decouple acquisition threads from processing threads.
  *
  * The template @ref UTILSLIB::CircularBuffer wraps a fixed-size

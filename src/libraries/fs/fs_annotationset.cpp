@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_annotationset.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of @ref FSLIB::FsAnnotationSet: pairs lh and rh @ref FSLIB::FsAnnotation for whole-brain parcellations.
  */
 

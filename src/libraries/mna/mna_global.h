@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_global.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Export/import macros, build-info accessors, and MNALIB namespace anchor for the MNE Analysis Container Format.
  *
  * MNALIB implements the @c .mna (JSON) and @c .mnx (CBOR) project

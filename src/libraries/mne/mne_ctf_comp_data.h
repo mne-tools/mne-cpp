@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_ctf_comp_data.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Single CTF reference-sensor compensation matrix labelled by kind.
  *
  * @ref MNELIB::MNECTFCompData stores one entry of the CTF software

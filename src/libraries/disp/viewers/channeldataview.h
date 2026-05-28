@@ -1,12 +1,12 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file channeldataview.h
- * @since 2026
- * @date  April 2026
+ * @since July 2018
  * @brief Composite real-time multi-channel time-series scroller (label panel, table view, time ruler, scrollbars).
  *
  * ChannelDataView assembles the four widgets that make up the rolling

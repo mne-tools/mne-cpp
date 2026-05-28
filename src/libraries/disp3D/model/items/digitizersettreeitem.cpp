@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file digitizersettreeitem.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief FIFF digitizer-point fan-out into per-category DigitizerTreeItem children with the canonical colour / radius scheme.
  */
 

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file decoding_csp.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of the Common Spatial Patterns decoder.
  *
  * Estimates the per-class covariance matrices from a list of labelled,

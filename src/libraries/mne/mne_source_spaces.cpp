@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_source_spaces.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref MNELIB::MNESourceSpaces.
  *
  * Defines whole-file FIFF readers that iterate every

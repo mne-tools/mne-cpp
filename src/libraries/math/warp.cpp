@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file warp.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Thin-plate-spline fit and evaluation kernels and the landmark-file reader.
  *
  * Implements the TPS solver declared in @ref warp.h. Fitting assembles

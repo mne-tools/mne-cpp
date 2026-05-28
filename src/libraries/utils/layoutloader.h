@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ * Copyright (c) 2014-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file layoutloader.h
- * @since 2022
- * @date  January 2024
+ * @since September 2014
  * @brief Reader for ANT @c .elc electrode files and MNE @c .lout 2-D channel layouts used by the topographic plotting widgets.
  *
  * @ref UTILSLIB::LayoutLoader parses two complementary layout

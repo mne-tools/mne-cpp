@@ -1,13 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2013-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Florian Schlembach <fschlembach@web.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *
  * @file fiff_evoked_set.h
- * @since 2022
- * @date  March 2026
+ * @since March 2013
  * @brief Set of averaged evoked responses sharing a FiffInfo, plus the ave-style category / rejection descriptors for batch averaging.
  *
  * A single ``*-ave.fif`` typically contains several @c FIFFB_EVOKED

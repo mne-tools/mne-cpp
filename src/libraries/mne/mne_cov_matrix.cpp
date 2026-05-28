@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_cov_matrix.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref MNELIB::MNECovMatrix.
  *
  * Provides the constructors, eigen-decomposition cache and FIFF read/write

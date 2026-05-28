@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2017-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Daniel Strohmeier <daniel.strohmeier@gmail.com>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file connectivitysettings.h
- * @since 2026
- * @date  March 2026
+ * @since March 2017
  * @brief Input-data and parameter container shared by every functional-connectivity metric in @c CONNLIB.
  *
  * @ref ConnectivitySettings carries the per-trial time-domain matrices, the

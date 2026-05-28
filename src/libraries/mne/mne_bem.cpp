@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2015-2026 MNE-CPP Authors
+ *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Ruben Doerfel <doerfelruben@aol.com>
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
  *
  * @file mne_bem.cpp
- * @since 2022
- * @date  April 2026
+ * @since June 2015
  * @brief Implementation of @ref MNELIB::MNEBem.
  *
  * Implements FIFF read/write of the @c FIFFB_BEM block, dispatching the

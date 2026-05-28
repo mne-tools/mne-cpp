@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bridged_electrodes.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Bridged electrode detection implementation.
  */
 

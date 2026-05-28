@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file granger_causality.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of @ref CONNLIB::GrangerCausality - spectral Granger Causality (Geweke 1982 formulation) between every ordered channel pair, computed from the shared @ref CONNLIB::MvarModel fit.
  */
 

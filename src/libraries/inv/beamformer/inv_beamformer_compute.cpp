@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_beamformer_compute.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of the shared LCMV / DICS math kernels declared in @c inv_beamformer_compute.h.
  *
  * Implements eigen-decomposition based regularised pseudo-inverse of

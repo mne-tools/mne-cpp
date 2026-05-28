@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_source_estimate_io.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Text-based and FIFF-based export/import for @ref INVLIB::InvSourceEstimate that complement the binary STC / W format.
  *
  * @ref INVLIB::InvSourceEstimateIO adds CSV and tab-separated matrix

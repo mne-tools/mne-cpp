@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_guess_data.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of the initial-guess grid generation and forward-field pre-computation.
  *
  * Implements the constructors that either load a precomputed guess

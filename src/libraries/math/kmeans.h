@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file kmeans.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief K-means partitional clustering with multiple distance metrics, initialisations and empty-cluster policies.
  *
  * Lloyd-style K-means partitions @c n p-dimensional samples into @c k

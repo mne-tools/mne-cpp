@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file decoding_spoc.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Source Power Comodulation (SPoC) for regressing continuous targets onto narrowband M/EEG power.
  *
  * SPoC is the regression analogue of CSP: instead of two class

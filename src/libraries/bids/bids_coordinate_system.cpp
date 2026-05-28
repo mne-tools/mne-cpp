@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_coordinate_system.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref BIDSLIB::BidsCoordinateSystem — JSON I/O and @c FiffCoordTrans bridge for ``_coordsystem.json``.
  */
 

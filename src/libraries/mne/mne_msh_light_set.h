@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_msh_light_set.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Collection of @ref MNELIB::MNEMshLight sources making up the viewer lighting rig.
  *
  * @ref MNELIB::MNEMshLightSet aggregates the lights (typically a key /

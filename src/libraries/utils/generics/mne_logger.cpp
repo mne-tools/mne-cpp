@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_logger.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Out-of-line definition of the colourised, thread-safe @c qInstallMessageHandler installed by @ref UTILSLIB::MNELogger.
  *
  * Holds the @c std::mutex used to serialise the writes to

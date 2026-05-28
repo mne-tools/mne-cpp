@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2020-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file covariancesettingsview.cpp
- * @since 2022
- * @date  October 2022
+ * @since June 2020
  * @brief Implementation of the CovarianceSettingsView covariance-length panel.
  */
 

@@ -1,13 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file mne_hemisphere.h
- * @since 2022
- * @date  April 2026
+ * @since August 2012
  * @brief Per-hemisphere cortical surface bundle with decimation, patch info and rendering buffers.
  *
  * @ref MNELIB::MNEHemisphere is the visualisation-friendly counterpart

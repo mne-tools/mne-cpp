@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_edf_reader.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief @ref BIDSLIB::AbstractFormatReader implementation for European Data Format (EDF / EDF+) files.
  *
  * EDF stores a recording as a fixed-size ASCII header followed by a

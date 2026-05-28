@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bad_channels_maxwell.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Bad channel detection via SSS reconstruction residuals.
  *
  * Channels whose SSS reconstruction error is anomalously high are flagged

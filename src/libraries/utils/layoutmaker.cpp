@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
  *
  * @file layoutmaker.cpp
- * @since 2022
- * @date  April 2026
+ * @since November 2014
  * @brief Implementation of @ref UTILSLIB::LayoutMaker — sphere fit, azimuthal projection and @c .lout writer.
  *
  * The non-linear sphere fit uses a fixed-step gradient descent

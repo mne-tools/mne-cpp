@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_source_coupling.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Container for an N-tuple of correlated grid sources discovered by RAP-/TRAP-MUSIC.
  *
  * Sub-space scanning algorithms (RAP-MUSIC, TRAP-MUSIC, PWL-RAP-MUSIC)

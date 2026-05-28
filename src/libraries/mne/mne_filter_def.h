@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_filter_def.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Lightweight filter specification (kind, cutoff frequencies, length).
  *
  * @ref MNELIB::MNEFilterDef captures the parameters needed by the

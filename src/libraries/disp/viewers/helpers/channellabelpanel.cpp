@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file channellabelpanel.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of the ChannelLabelPanel label column widget.
  */
 

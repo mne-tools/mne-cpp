@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_global.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Build-info free-function definitions for the MNE-CPP BIDS shared library.
  */
 

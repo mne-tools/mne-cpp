@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_dipole_forward.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of the @ref INVLIB::InvDipoleForward forward-field cache.
  *
  * Provides the trivial constructor / destructor for the cache; the

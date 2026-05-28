@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file quickcontrolview.h
- * @since 2022
- * @date  March 2023
+ * @since July 2018
  * @brief Floating frameless container hosting the modular Quick-Control settings tabs.
  *
  * QuickControlView is a @ref DraggableFramelessWidget that owns a

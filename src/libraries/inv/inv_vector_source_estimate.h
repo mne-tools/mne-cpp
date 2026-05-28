@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_vector_source_estimate.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Free-orientation surface source estimate carrying a 3-component vector per vertex.
  *
  * @ref INVLIB::InvVectorSourceEstimate extends

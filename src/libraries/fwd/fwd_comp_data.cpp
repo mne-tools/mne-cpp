@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2017-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Johannes Behrens <behrens@neoscan-solutions.com>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fwd_comp_data.cpp
- * @since 2022
- * @date  March 2026
+ * @since March 2017
  * @brief FwdCompData implementation — wraps a base field/grad function pair, evaluates it on both primary and reference coils, and emits the CTF/4D software-gradiometer compensated result.
  */
 

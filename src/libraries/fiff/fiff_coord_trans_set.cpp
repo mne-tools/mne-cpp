@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_coord_trans_set.cpp
- * @since 2026
- * @date  February 2026
+ * @since February 2026
  * @brief Implementation of @ref FiffCoordTransSet: container management plus lookup of transforms by (from, to) frame pair.
  *
  * Used by @ref FiffStream::read_meas_info to return every device→head /

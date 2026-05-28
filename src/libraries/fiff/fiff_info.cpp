@@ -1,13 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Florian Schlembach <fschlembach@web.de>
+ *   Limin Sun <liminsun@nmr.mgh.harvard.edu>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Ruben Doerfel <doerfelruben@aol.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_info.cpp
- * @since 2022
- * @date  March 2026
+ * @since October 2012
  * @brief Implementation of @ref FiffInfo: read / write of FIFFB_MEAS / FIFFB_MEAS_INFO and the channel-picking, projector and compensator surgery.
  *
  * Drop-in counterpart of @c mne.Info; carries everything needed to

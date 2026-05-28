@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file channellabelpanel.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Vertical column of channel-name labels synced with @ref ChannelDataView's row geometry.
  *
  * ChannelLabelPanel listens to the same @ref ChannelDataModel as the

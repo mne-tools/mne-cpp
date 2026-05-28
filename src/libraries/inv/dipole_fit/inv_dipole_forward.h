@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_dipole_forward.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Per-iteration forward-field cache (forward matrix, SVD, column normalisation) used by the dipole-fit cost function.
  *
  * @ref INVLIB::InvDipoleForward replaces the @c dipoleForwardRec record

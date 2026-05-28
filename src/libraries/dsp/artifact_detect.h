@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file artifact_detect.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Declaration of ArtifactDetect — ECG and EOG physiological artifact event detection.
  *
  * ECG detection finds cardiac R-peak events via bandpass filtering (5–40 Hz) followed by

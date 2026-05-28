@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file colormap.h
- * @since 2022
- * @date  March 2026
+ * @since July 2018
  * @brief Static scalar-to-colour lookup helpers (Jet, Hot, Bone, Viridis, Cool, RedBlue, MNE) used by every plot widget.
  *
  * ColorMap stores the 256-row RGB tables that back all DISPLIB heat

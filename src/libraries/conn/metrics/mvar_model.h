@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mvar_model.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Multivariate autoregressive (MVAR) model fit and its frequency-domain decomposition; backbone of the directed connectivity metrics.
  *
  * The MVAR(p) model expresses each channel as a linear combination of the

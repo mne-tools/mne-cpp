@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file firfilter.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Discoverable design / apply façade over the @ref FilterKernel FIR engine.
  *
  * FirFilter mirrors the @ref IirFilter API surface (design, apply,

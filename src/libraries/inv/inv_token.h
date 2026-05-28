@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_token.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Token vocabulary, value-carrier struct and tokenisation options for the foundation-model serialisation of @ref INVLIB::InvSourceEstimate.
  *
  * Defines @ref INVLIB::InvTokenId — the integer vocabulary used by the

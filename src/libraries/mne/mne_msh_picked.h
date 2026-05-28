@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_msh_picked.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Picked vertices / triangles on a mesh display surface.
  *
  * @ref MNELIB::MNEMshPicked stores the indices selected by the user in

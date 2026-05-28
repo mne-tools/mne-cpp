@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_client.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Translation unit for @ref COMLIB::RtClient: the worker-thread loop that pulls raw buffers from @c mne_rt_server.
  *
  * Implements the initial handshake (alias registration on the command

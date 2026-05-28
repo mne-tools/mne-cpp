@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file disp_global.h
- * @since 2022
- * @date  March 2026
+ * @since August 2012
  * @brief Export macros and build-info hooks for the DISPLIB shared library.
  *
  * Defines @c DISPSHARED_EXPORT / @c DISPSHARED_IMPORT for Windows DLL

@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
+ *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Ruben Doerfel <doerfelruben@aol.com>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
  *
  * @file fiff_dig_point_set.cpp
- * @since 2022
- * @date  May 2026
+ * @since July 2016
  * @brief Implementation of @ref FiffDigPointSet: parses an entire FIFFB_ISOTRAK block into a list of @ref FiffDigPoint records.
  *
  * Mirrors the @c info['dig'] list in MNE-Python. Used by the

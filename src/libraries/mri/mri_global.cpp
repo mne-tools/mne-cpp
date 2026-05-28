@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_global.cpp
- * @since 2026
- * @date  May 2026
+ * @since February 2026
  * @brief Out-of-line definitions of the MRILIB build-info accessors declared in @ref mri_global.h.
  *
  * Pulls the build timestamp and short git hash from

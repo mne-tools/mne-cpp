@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file multitaper_psd.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Thomson multitaper power-spectral-density estimator.
  *
  * The multitaper estimator (Thomson, 1982) computes @c K independent

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file dataloader.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Loader implementations for FreeSurfer / MNE source-space, BEM and FIFF inputs feeding the disp3D scene.
  */
 

@@ -1,13 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_dir_entry.h
- * @since 2022
- * @date  March 2026
+ * @since September 2012
  * @brief Single entry of the FIFF tag directory: kind, type, byte size and absolute file position.
  *
  * After the last tag of a FIFF file the writer appends a @c FIFF_DIR tag

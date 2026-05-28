@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *
  * @file fs_global.h
- * @since 2022
- * @date  March 2026
+ * @since December 2012
  * @brief Export/import macros and build-info accessors for the FSLIB FreeSurfer I/O library.
  *
  * Defines the @c FSSHARED_EXPORT visibility macro used by every public

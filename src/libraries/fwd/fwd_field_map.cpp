@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fwd_field_map.cpp
- * @since 2026
- * @date  March 2026
+ * @since February 2026
  * @brief Sphere-model field mapping.
  *
  * The computations in this file are a C++ port of the MNE-Python field

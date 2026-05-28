@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_types.h
- * @since 2026
- * @date  May 2026
+ * @since February 2026
  * @brief Numeric type codes, layout constants, and sentinel values shared by every MRI reader.
  *
  * Centralises the four magic-number families that show up in every

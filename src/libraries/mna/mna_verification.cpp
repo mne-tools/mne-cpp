@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_verification.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief JSON and CBOR codecs for @ref MnaVerificationCheck, @ref MnaVerificationResult, @ref MnaProvenance and the top-level @ref MnaVerification aggregator.
  *
  * The implementation serialises each struct field-for-field and

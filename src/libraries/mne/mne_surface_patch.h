@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_surface_patch.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Local surface patch (neighbours-of-neighbours) used by patch-based source priors.
  *
  * @ref MNELIB::MNESurfacePatch stores the vertex set, triangle subset

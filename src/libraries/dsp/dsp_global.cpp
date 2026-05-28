@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file dsp_global.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief dsp library global functions.
  */
 

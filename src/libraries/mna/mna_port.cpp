@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_port.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief JSON and CBOR codecs for @ref MnaPort including data-kind enum mapping, optional stream binding fields and cached-result references.
  *
  * The implementation converts @ref MnaDataKind and

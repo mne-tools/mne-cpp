@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_event.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Reader/writer for the BIDS ``_events.tsv`` sidecar — discrete annotations on the time axis of a recording.
  *
  * BIDS events live in a @c _events.tsv sibling of every electrophysiology

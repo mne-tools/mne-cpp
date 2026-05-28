@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_param_tree.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of the hierarchical parameter store: path-keyed value access, binding management, formula evaluation and JSON round-trip.
  *
  * The implementation keeps two parallel @c QMap members — one

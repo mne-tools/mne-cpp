@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file multiviewlayout.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Splitter-driven sub-viewport geometry and preset assignment for the disp3D multi-view grid.
  */
 

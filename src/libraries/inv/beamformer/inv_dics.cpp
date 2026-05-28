@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_dics.cpp
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Implementation of the DICS beamformer pipeline (per-frequency filter design + application paths).
  *
  * For each frequency bin in the CSD stack the implementation extracts

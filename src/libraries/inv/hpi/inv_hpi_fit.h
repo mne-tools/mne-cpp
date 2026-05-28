@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_hpi_fit.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief HPI (Head Position Indicator) fitting — estimates the MEG dewar-to-head transform from coil-current signals.
  *
  * @ref INVLIB::InvHpiFit fits a magnetic dipole to each HPI coil from

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file ml_onnx_model.h
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief ONNX Runtime backed @ref MLLIB::MlModel implementation for loading and evaluating @c .onnx graphs.
  *
  * @ref MLLIB::MlOnnxModel is the default inference backend in MLLIB:

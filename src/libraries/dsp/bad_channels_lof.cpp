@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bad_channels_lof.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief LOF-based bad channel detection implementation.
  */
 

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file polhemus_coregistration.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of @ref UTILSLIB::PolhemusCoregistration — fiducial-based head→device rigid alignment.
  *
  * The three cardinal fiducials (LPA, NAS, RPA) define an

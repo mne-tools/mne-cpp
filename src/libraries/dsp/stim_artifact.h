@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file stim_artifact.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Declaration of fixStimArtifact — stimulus artifact repair by interpolation or zeroing.
  *
  * Repairs stimulus artifacts in continuous data by replacing samples in a window around each

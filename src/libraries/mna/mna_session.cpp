@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_session.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief JSON and CBOR codecs for @ref MnaSession — ordered @ref MnaRecording list plus opaque id and forward-compatible @c extras.
  *
  * Implementation mirrors the rest of the project tree: each

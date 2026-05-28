@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_epochs.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of the static epoch-cutting helpers declared in @ref fiff_epochs.h.
  *
  * Slices a @ref FiffRawData into fixed-length, event-aligned epochs

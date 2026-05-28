@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file digitizertreeitem.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Storage of one digitizer-point category and its batched-sphere render parameters.
  */
 

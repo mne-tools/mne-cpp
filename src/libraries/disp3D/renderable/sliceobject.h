@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sliceobject.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Single MRI volume slice rendered as a textured quad with adjustable axis, position, contrast and colormap.
  *
  * SliceObject mounts one orthogonal slice (axial, sagittal or

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_tf_mxne.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of the TF-MxNE solver including the Gabor-dictionary builder.
  *
  * Implements the Gabor tight-frame dictionary @c buildGaborDictionary

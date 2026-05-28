@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsensordatacontroller.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Real-time MEG / EEG sensor streaming controller that orchestrates the data and field-mapping workers.
  *
  * RtSensorDataController spins up a background @ref

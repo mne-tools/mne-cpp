@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file surfacetreeitem.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Tree-item wrapping an FsSurface + FsAnnotation pair with shader-mode storage.
  */
 

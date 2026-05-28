@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sensortreeitem.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Tree item for a single MEG / EEG sensor with position, optional coil orientation and rendered scale.
  *
  * A sensor item couples a 3-D position with an optional 3x3

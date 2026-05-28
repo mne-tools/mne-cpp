@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_tsv.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref BIDSLIB::BidsTsv — generic UTF-8 / LF / @c n/a TSV reader and writer for BIDS sidecars.
  */
 

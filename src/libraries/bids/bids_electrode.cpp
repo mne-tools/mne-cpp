@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_electrode.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref BIDSLIB::BidsElectrode — TSV I/O and FIFF digitizer-point conversion for ``_electrodes.tsv``.
  */
 

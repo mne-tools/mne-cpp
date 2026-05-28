@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_cov.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Real-time noise covariance estimation from streaming MEG / EEG data blocks.
  *
  * RtCov maintains a running unbiased estimate of the channel–channel

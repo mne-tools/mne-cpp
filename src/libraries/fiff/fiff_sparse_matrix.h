@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_sparse_matrix.h
- * @since 2026
- * @date  April 2026
+ * @since February 2026
  * @brief FIFF sparse matrix: column / row-compressed sparse storage backed by Eigen::SparseMatrix.
  *
  * The FIFF matrix tag format supports three storage modes encoded in the

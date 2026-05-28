@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file brainrenderer.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Qt-RHI scene renderer: shader pipelines, lighting, dual render targets and per-frame draw orchestration for disp3D.
  *
  * BrainRenderer is the only object in disp3D that talks directly to

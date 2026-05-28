@@ -1,13 +1,18 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   doerfelruben@aol.com <rdorfel@mgh.harvard.edu>
+ *   Ruben Doerfel <doerfelruben@aol.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_dig_point.h
- * @since 2022
- * @date  March 2026
+ * @since October 2012
  * @brief Single digitization point (FIFF_DIG_POINT) with kind (cardinal/HPI/EEG/extra), identifier and 3D coordinates.
  *
  * The Polhemus / optical digitizer used for MEG/EEG coregistration writes

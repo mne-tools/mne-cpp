@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_annotation.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref FSLIB::FsAnnotation: parses FreeSurfer .annot per-vertex parcellation files and their embedded colortable.
  */
 

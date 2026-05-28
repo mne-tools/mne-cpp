@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file viewstate.cpp
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Implementation of per-viewport SubView / ViewVisibilityProfile state and QSettings round-trip.
  */
 

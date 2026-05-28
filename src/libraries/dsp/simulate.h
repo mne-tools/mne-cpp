@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file simulate.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Simulation utilities for source estimates and evoked data.
  *
  * Provides functions equivalent to MNE-Python's mne.simulation module:

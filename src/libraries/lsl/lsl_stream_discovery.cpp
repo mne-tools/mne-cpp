@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file lsl_stream_discovery.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implements the UDP multicast listener that turns LSL outlet announcements on 239.255.172.215:16571 into stream_info results.
  *
  * @ref LSLLIB::resolve_streams binds a @c QUdpSocket on the LSL

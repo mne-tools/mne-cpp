@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_vol_data.cpp
- * @since 2026
- * @date  May 2026
+ * @since February 2026
  * @brief Implementation of @ref MRILIB::MriVolData: header-driven geometry computations and the suffix-dispatch loader.
  *
  * Houses the non-trivial methods @ref MriVolData declares:

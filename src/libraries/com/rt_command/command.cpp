@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file command.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Translation unit for @ref COMLIB::Command: constructors, JSON/CLI serialisation, parameter access and dispatch glue.
  *
  * Defines the five constructor overloads (default, JSON-object,

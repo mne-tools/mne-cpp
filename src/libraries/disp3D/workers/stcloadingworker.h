@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file stcloadingworker.h
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Background worker that loads source-time-course (.stc) files and prepares per-hemisphere interpolation matrices.
  *
  * StcLoadingWorker pulls the LH and RH @c .stc files from disk in a

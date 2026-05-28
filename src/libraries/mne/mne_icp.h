@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_icp.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Iterative Closest Point alignment between MEG digitiser points and an MRI head surface.
  *
  * @ref MNELIB::MNEIcp wraps the classical point-to-surface ICP used by

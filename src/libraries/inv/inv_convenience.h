@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_convenience.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Top-level convenience entry points that mirror MNE-Python's @c apply_inverse_* / @c compute_source_psd helpers.
  *
  * Free functions in this header glue together the lower-level INVLIB

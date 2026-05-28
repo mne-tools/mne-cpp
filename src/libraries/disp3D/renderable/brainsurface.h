@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file brainsurface.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Renderable cortical / BEM mesh with interleaved vertex attributes and Qt-RHI buffer management.
  *
  * BrainSurface is the core 3-D primitive of disp3D. It owns the

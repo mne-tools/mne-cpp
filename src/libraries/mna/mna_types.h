@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_types.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Enums and string-conversion helpers for the MNA container vocabulary (file roles, data kinds, port directions, exec modes).
  *
  * Every MNA file, port and node is tagged with a small set of

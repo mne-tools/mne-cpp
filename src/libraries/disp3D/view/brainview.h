@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file brainview.h
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Top-level QRhiWidget that hosts the 3-D scene, drives camera interaction and exposes the multi-view + live-marker API.
  *
  * BrainView is the public face of disp3D &mdash; the QWidget that

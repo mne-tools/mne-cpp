@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file graph.h
- * @since 2022
- * @date  October 2022
+ * @since July 2018
  * @brief Abstract base widget providing title, axis labels and resize handling for the in-house 2-D plots.
  *
  * Graph centralises the boilerplate shared by @ref Plot, @ref ImageSc

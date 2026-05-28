@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_deriv_set.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of @ref MNELIB::MNEDerivSet.
  *
  * Implements FIFF I/O of the @c FIFFB_MNE_DERIVATIONS block and the

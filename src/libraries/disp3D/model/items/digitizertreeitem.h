@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file digitizertreeitem.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Tree item holding a single category of digitizer points rendered as a batched-sphere mesh.
  *
  * All points in a category share colour and radius, so the renderer

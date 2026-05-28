@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_noise.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Real-time noise power-spectral-density estimation from streaming data blocks.
  *
  * RtNoiseWorker accumulates a configurable number of contiguous data blocks,

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_graph.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of @ref MnaGraph: node management, port connectivity, schema-aware validation, Kahn topological sort and JSON/CBOR round-trip.
  *
  * The implementation backs the graph with a single @c QList of

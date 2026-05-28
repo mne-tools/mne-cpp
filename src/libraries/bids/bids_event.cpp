@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_event.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref BIDSLIB::BidsEvent — TSV I/O for the BIDS ``_events.tsv`` annotation sidecar.
  */
 

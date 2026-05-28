@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_proj_op.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Composite SSP projection operator P = I - U U^T assembled from a list of @ref MNELIB::MNEProjItem.
  *
  * @ref MNELIB::MNEProjOp is the operator form of the SSP machinery: it

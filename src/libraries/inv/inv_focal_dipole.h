@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_focal_dipole.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Single off-grid focal dipole result with free position, moment and fit-quality metrics.
  *
  * @ref INVLIB::InvFocalDipole captures one equivalent current dipole that

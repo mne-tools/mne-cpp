@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsensorinterpolationmatworker.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Background worker that recomputes the dense MEG / EEG sensor-to-surface mapping matrix off the GUI thread.
  *
  * Owns the inputs to the field-map kernel &mdash; evoked info, head

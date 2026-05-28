@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file command.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Typed, parameter-bearing command object that round-trips between mne-cpp clients and @c mne_rt_server.
  *
  * @ref COMLIB::Command is the unit of conversation on the

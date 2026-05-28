@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_signal_model.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of the basic / advanced HPI signal-model builders and the cached pseudo-inverse.
  *
  * Implements the basic model (sin/cos pairs for the HPI drive

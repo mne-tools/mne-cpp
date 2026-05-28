@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sensortreeitem.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Per-sensor position, coil orientation and render-scale storage for the sensor layer.
  */
 

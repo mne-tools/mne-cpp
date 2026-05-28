@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_ctf_comp_data_set.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Set of CTF compensation matrices plus the currently active grade.
  *
  * @ref MNELIB::MNECTFCompDataSet aggregates the @ref MNECTFCompData

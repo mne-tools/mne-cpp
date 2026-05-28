@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file geometryinfo.cpp
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Multi-source Dijkstra (SCDC), sensor-to-mesh projection and sparse-matrix fusion implementations.
  */
 

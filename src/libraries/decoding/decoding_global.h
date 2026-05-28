@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file decoding_global.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Export/import macros and build-info entry points for DECODINGLIB.
  *
  * DECODINGLIB groups the supervised- and unsupervised-decomposition

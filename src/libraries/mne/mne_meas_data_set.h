@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_meas_data_set.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief One condition / averaging slice within a legacy @ref MNELIB::MNEMeasData.
  *
  * @ref MNELIB::MNEMeasDataSet represents either a single average or a

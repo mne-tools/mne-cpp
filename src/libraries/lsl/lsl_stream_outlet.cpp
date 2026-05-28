@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file lsl_stream_outlet.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implements the TCP-server / UDP-announcer worker that publishes pushed samples to every connected LSL inlet.
  *
  * The PIMPL class @c StreamOutletPrivate spawns a dedicated

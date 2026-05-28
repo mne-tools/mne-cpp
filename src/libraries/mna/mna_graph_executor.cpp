@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_graph_executor.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of @ref MnaGraphExecutor — batch / incremental graph walk plus MNE-Scan-friendly stream-mode plugin wiring.
  *
  * @ref MnaGraphExecutor::execute first validates the graph, then

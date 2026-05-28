@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_volume_source_estimate.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of @ref INVLIB::InvVolumeSourceEstimate.
  *
  * Implements the shape setter, the inactive-voxel-zero-fill volume

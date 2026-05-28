@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_dipole.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Template definitions for @ref INVLIB::InvDipole<T> (included from the matching header).
  *
  * Provides the explicit ctor / dtor and the @c clean reset method for

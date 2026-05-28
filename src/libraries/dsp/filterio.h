@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file filterio.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Plain-text serialisation of @ref FilterKernel coefficient sets.
  *
  * FilterIO reads and writes the simple human-readable text format used by

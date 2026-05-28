@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file decoding_ssd.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Spatio-Spectral Decomposition (SSD) for noise-aware narrowband enhancement of continuous M/EEG.
  *
  * SSD extracts spatial filters that maximise variance in a narrow

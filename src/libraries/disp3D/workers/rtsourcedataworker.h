@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsourcedataworker.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Background worker that converts streaming source vectors into smoothed per-vertex ABGR colour buffers.
  *
  * Holds the sparse interpolation matrices for the left and right

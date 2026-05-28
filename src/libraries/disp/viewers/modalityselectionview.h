@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file modalityselectionview.h
- * @since 2022
- * @date  February 2026
+ * @since July 2018
  * @brief Per-modality visibility / activation checkbox panel (MEG-MAG, MEG-GRAD, EEG, EOG, …).
  *
  * ModalitySelectionView builds one @c QCheckBox per channel-modality

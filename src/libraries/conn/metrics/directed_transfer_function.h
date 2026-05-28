@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file directed_transfer_function.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Directed Transfer Function (Kaminski & Blinowska 1991) between every channel pair, derived from a fitted MVAR transfer function.
  *
  * The DTF normalises each row of the squared MVAR transfer matrix to a

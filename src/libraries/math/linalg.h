@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file linalg.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Static linear-algebra helpers: SVD-based conditioning, block-diagonal assembly, sorted index pairs.
  *
  * @ref UTILSLIB::Linalg collects the dense / sparse Eigen primitives

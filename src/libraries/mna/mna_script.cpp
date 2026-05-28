@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_script.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief JSON and CBOR codecs for @ref MnaScript including code body, interpreter selection, integrity hash and optional source URI.
  *
  * The implementation writes the script @c code verbatim (after

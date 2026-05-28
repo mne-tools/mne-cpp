@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file multitaper_tfr.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of MultitaperTfr.
  */
 

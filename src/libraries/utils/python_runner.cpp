@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file python_runner.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of @ref UTILSLIB::PythonRunner — @c QProcess plumbing, line buffering and @c [progress] tag parsing.
  *
  * Output from the child interpreter is read on every

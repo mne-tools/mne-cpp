@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_dipole_fit.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of the sequential ECD-fit driver.
  *
  * Implements the time-bin loop that calls into the Nelder-Mead /

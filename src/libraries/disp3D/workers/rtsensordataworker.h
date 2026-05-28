@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsensordataworker.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Background worker that turns queued sensor packets into per-vertex ABGR colour buffers via a dense mapping matrix.
  *
  * On every timer tick the worker pops the next packet (or averages

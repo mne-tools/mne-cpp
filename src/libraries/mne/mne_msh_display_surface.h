@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_msh_display_surface.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief One renderable surface (cortex / pial / inflated / BEM) inside an MSH display set.
  *
  * @ref MNELIB::MNEMshDisplaySurface attaches an @ref MNESurface to a

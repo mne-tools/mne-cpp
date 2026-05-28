@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_correction.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of Bonferroni, Holm-Bonferroni and Benjamini-Hochberg FDR corrections declared in sts_correction.h.
  *
  * Bonferroni is a constant rescale by @c n followed by a @c cwiseMin(1).

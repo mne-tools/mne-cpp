@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sourcespacetreeitem.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Tree item holding one hemisphere of source-space dipole positions rendered as batched spheres.
  *
  * Source-space points come from @ref MNELIB::MNESourceSpaces (the

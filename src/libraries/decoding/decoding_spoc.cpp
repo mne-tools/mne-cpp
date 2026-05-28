@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file decoding_spoc.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of the Source Power Comodulation regression decoder.
  *
  * Builds the unweighted trial-mean covariance @f$\Sigma@f$ and the

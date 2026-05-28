@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_types.h
- * @since 2022
- * @date  February 2026
+ * @since August 2012
  * @brief Primitive scalar typedefs and forward-compatible aliases backing the FIFF type system.
  *
  * Defines the fixed-width FIFFLIB primitives (@c fiff_int_t,

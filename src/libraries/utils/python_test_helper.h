@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file python_test_helper.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief QtTest convenience layer on top of @ref UTILSLIB::PythonRunner for cross-validating MNE-CPP results against MNE-Python.
  *
  * Built on @ref UTILSLIB::PythonRunner, this helper adds the

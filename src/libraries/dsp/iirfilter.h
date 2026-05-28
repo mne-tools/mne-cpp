@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file iirfilter.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Butterworth IIR filter design and application via numerically stable second-order sections.
  *
  * Direct-form realisations of high-order IIR filters are numerically

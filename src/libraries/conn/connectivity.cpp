@@ -1,12 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2017-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   mfarisyahya <mfarisyahya@gmail.com>
+ *   Daniel Strohmeier <daniel.strohmeier@gmail.com>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file connectivity.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2017
  * @brief Implementation of @ref CONNLIB::Connectivity - the dispatcher that runs the requested functional-connectivity metrics over a @ref CONNLIB::ConnectivitySettings batch.
  *
  * The single entry point @ref CONNLIB::Connectivity::calculate inspects the

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_cmne.cpp
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Implementation of the CMNE solver (dSPM kernel, z-score rectification, LSTM inference, optional training driver).
  *
  * Implements the dSPM kernel assembly, the per-source z-score

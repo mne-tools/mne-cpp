@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_signal_model.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Sinusoidal HPI signal model — builds and inverts the regressor matrix that extracts coil amplitudes from MEG data.
  *
  * @ref INVLIB::InvSignalModel builds the model matrix that pairs the

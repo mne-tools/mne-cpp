@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_meas_data.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Legacy MNE-C measurement-data container assembling raw/evoked sets and their projection state.
  *
  * @ref MNELIB::MNEMeasData mirrors @c mneMeasDataRec from the original

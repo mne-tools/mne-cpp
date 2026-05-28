@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file dsp_global.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Export/import macros and namespace declaration for the DSP library.
  *
  * The DSP library bundles every digital-signal-processing component shipped

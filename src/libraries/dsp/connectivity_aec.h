@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file connectivity_aec.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief ConnectivityAec — Amplitude Envelope Correlation connectivity metric.
  *
  * Implements both standard AEC and orthogonalized AEC (AEC-c / corrected) as described in:

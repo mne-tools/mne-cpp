@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_raw_buf_def.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Descriptor of a single @c FIFF_DATA_BUFFER block (file offset, sample range, type).
  *
  * @ref MNELIB::MNERawBufDef is the C++ port of @c mneRawBufDefRec. It

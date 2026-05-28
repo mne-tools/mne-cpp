@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_annotations.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief FIFF / MNE annotations: time-tagged textual marks (BAD_*, EDGE, custom) with onset, duration and description.
  *
  * Annotations are time-localized comments attached to a continuous

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_source_metrics.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of the peak localisation error and spatial dispersion metrics declared in sts_source_metrics.h.
  *
  * Peak localisation error is the Euclidean norm of the difference

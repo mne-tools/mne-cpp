@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_cor_fif_io.h
- * @since 2026
- * @date  May 2026
+ * @since February 2026
  * @brief Writer for the COR.fif FIFF representation of an MRI volume (Neuromag/MNE convention used by all mne-c source-space tooling).
  *
  * COR.fif is the canonical FIFF wrapper for MRI volume data used

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bridged_electrodes.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Detection of electrically bridged EEG electrodes via the Electrical Distance metric.
  *
  * Two EEG electrodes are said to be bridged when conductive paste, sweat or

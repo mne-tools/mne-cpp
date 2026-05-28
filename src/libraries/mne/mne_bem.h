@@ -1,13 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2015-2026 MNE-CPP Authors
+ *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Ruben Doerfel <doerfelruben@aol.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *
  * @file mne_bem.h
- * @since 2022
- * @date  March 2026
+ * @since June 2015
  * @brief Boundary element model bundle (inner skull, outer skull, outer skin) loaded from -bem.fif.
  *
  * @ref MNELIB::MNEBem aggregates the @ref MNEBemSurface objects that

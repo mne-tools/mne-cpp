@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file braintreemodel.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief QStandardItemModel hierarchy that organises every 3-D scene object (surfaces, sensors, sources, networks) for a QTreeView.
  *
  * BrainTreeModel is the single source of truth for what is in the

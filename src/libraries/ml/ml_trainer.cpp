@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file ml_trainer.cpp
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Implementation of @ref MLLIB::MLTrainer that dispatches training scripts through @ref UTILSLIB::PythonRunner.
  *
  * The class is a few-line orchestrator on top of

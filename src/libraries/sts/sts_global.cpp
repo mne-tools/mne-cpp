@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_global.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Definitions of the STSLIB build-info accessors declared in sts_global.h.
  *
  * The three thin wrappers forward to UTILSLIB so the build timestamp and

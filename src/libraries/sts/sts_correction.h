@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_correction.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Family-wise error and false-discovery-rate corrections for mass-univariate p-value maps.
  *
  * Provides the three multiple-comparison adjustments most commonly

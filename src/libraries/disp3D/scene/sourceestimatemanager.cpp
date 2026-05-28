@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sourceestimatemanager.cpp
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Ownership glue between StcLoadingWorker, SourceEstimateOverlay and RtSourceDataController for static and streaming STC.
  */
 

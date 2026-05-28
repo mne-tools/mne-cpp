@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file meshfactory.cpp
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Procedural construction of icosahedron spheres, oriented plates, barbells, cylinders and batched point clouds used by disp3D.
  */
 

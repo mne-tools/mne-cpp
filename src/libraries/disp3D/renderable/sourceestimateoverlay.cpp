@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sourceestimateoverlay.cpp
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief STC file loading, per-vertex activation interpolation and colormap packing onto the target cortical mesh.
  */
 

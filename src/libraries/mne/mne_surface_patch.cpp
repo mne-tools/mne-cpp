@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_surface_patch.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of @ref MNELIB::MNESurfacePatch.
  *
  * Implements patch growth from a seed using triangle adjacency, geodesic

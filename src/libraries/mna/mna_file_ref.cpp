@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_file_ref.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief JSON and CBOR codecs for @ref MnaFileRef, including base64 framing of embedded payloads and preservation of unknown keys in @c extras.
  *
  * The implementation is symmetric: every field declared in the

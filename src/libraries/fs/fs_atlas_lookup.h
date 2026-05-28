@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_atlas_lookup.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief RAS-coordinate lookup against a FreeSurfer volumetric parcellation (e.g. aparc+aseg.mgz / wmparc.mgz).
  *
  * FreeSurfer’s @c recon-all writes the joint cortical+subcortical

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_hpi_model_parameters.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of @ref INVLIB::InvHpiModelParameters (value semantics, equality, coil-count computation).
  *
  * Implements the parameter-list constructor, the copy / assignment /

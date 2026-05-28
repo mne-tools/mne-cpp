@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_cor_io.cpp
- * @since 2026
- * @date  May 2026
+ * @since February 2026
  * @brief Implementation of @ref MRILIB::MriCorIO: per-file COR-NNN reader with coronal-orientation slice transform synthesis.
  *
  * Walks the 256 @c COR-001 \u2026 @c COR-256 files in the supplied

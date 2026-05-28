@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_raw_data.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Legacy MNE-C raw-recording container with per-file buffer descriptors.
  *
  * @ref MNELIB::MNERawData mirrors @c mneRawDataRec: it pairs an

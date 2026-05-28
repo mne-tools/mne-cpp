@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_cmne_settings.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Settings record for the @ref INVLIB::InvCMNE solver (model path, sliding-window length, regularisation, base method).
  *
  * @ref INVLIB::InvCMNESettings collects every knob that

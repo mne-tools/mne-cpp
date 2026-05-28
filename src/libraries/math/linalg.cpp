@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file linalg.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Jacobi-SVD condition metrics, block-diagonal sparse builder and xyz reduction.
  *
  * Implements the static helpers declared in @ref linalg.h. Conditioning

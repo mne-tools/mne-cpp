@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sliceobject.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Textured-quad geometry and slice-texture upload for orthogonal MRI slice rendering.
  */
 

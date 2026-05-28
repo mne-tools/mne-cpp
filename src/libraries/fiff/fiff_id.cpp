@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_id.cpp
- * @since 2022
- * @date  April 2026
+ * @since October 2012
  * @brief Implementation of @ref FiffId: streaming of the 20-byte FIFF identifier record (version + machid + creation time).
  *
  * The @c machid is filled from the host MAC address when generating new

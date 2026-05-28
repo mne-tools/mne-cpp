@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_label.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Reader and in-memory representation of a FreeSurfer/MNE surface label (.label).
  *
  * A FreeSurfer @c .label file describes a region of interest on a cortical

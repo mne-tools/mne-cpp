@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bad_channel_detect.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Declaration of BadChannelDetect — automated detection of bad MEG/EEG channels.
  *
  * Three complementary detection strategies are provided:

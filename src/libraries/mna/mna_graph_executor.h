@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_graph_executor.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Stateless executor that runs an @ref MnaGraph in topological order, in batch or stream mode, and reports progress.
  *
  * @ref MnaGraphExecutor is the bridge between the declarative

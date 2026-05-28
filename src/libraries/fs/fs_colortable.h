@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_colortable.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief In-memory representation of a FreeSurfer colour/structure lookup table (FreeSurferColorLUT / embedded .annot ctab).
  *
  * FreeSurfer ships a global colour lookup table at

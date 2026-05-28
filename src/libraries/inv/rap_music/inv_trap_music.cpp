@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_trap_music.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of the TRAP-MUSIC scanning algorithm.
  *
  * Implements the SVD-based signal-subspace estimator, the per-grid-

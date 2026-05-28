@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file digitizersettreeitem.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Container item that groups raw FIFF digitizer points by category (Cardinal, HPI, EEG, Extra).
  *
  * Takes a flat @c QList<FiffDigPoint> from the FIFF info block

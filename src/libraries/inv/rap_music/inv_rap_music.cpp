@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_rap_music.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of the RAP-MUSIC scanning algorithm.
  *
  * Implements the signal-subspace estimator @c calcPhi_s, the dual

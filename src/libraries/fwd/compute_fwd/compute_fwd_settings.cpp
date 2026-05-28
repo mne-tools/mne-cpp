@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file compute_fwd_settings.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief ComputeFwdSettings implementation — default initialisation and @c checkIntegrity validation of the @c mne_forward_solution parameter set consumed by ComputeFwd.
  */
 

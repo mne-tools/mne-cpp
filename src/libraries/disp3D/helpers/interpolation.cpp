@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file interpolation.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Distance-based sparse interpolation kernels (linear / gaussian / square / cubic) and per-frame mat-vec.
  */
 

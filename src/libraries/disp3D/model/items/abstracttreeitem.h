@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file abstracttreeitem.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Base @ref QStandardItem with check-state, visibility, transform, colour and alpha roles shared by every disp3D scene item.
  *
  * AbstractTreeItem centralises the data roles every scene object

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file stim_artifact.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of fixStimArtifact.
  */
 

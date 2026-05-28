@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file overviewbarwidget.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Minimap thumbnail of the entire recording shown above the raw browser.
  *
  * OverviewBarWidget paints a compressed amplitude-overview of the

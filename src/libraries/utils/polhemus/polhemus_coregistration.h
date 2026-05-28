@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file polhemus_coregistration.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Head–device coregistration using the Polhemus Fastrak.
  *
  *           Two Polhemus stations work together:

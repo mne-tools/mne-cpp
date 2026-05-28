@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_source_estimate_io.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of the CSV / matrix exporters and importer in @ref INVLIB::InvSourceEstimateIO.
  *
  * Implements buffered streaming readers and writers that walk the

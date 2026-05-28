@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file networkedge.cpp
- * @since 2026
- * @date  March 2026
+ * @since August 2016
  * @brief Implementation of @ref CONNLIB::NetworkEdge - directional weighted edge with per-frequency weight matrix and configurable band-averaging window.
  */
 

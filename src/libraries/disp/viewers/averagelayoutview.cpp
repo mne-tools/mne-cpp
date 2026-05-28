@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file averagelayoutview.cpp
- * @since 2022
- * @date  April 2026
+ * @since July 2018
  * @brief Implementation of the AverageLayoutView sensor-layout evoked viewer.
  */
 

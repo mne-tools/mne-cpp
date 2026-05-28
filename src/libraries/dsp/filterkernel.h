@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file filterkernel.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Linear-phase FIR filter kernel with overlap-add FFT convolution back-end.
  *
  * FilterKernel is the core FIR engine of the DSP library: it owns the impulse

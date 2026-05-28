@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_source_metrics.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Peak localisation error and spatial dispersion metrics for evaluating distributed M/EEG inverse solutions.
  *
  * Distributed source estimators (MNE, dSPM, sLORETA, eLORETA, CMNE)

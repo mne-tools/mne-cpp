@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_msh_color_scale_def.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Mesh-display colour scale definition (FreeSurfer @c mri_glm style).
  *
  * @ref MNELIB::MNEMshColorScaleDef holds the threshold / fmid / fmax

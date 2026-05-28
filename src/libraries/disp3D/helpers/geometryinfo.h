@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file geometryinfo.h
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Surface-constrained geodesic distance and sensor-to-mesh projection helpers.
  *
  * GeometryInfo provides the geometric kernels that drive every

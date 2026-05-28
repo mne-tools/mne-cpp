@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_global.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Definitions for the MNALIB build-info accessors declared in @ref mna_global.h.
  *
  * The two functions implemented here simply forward to the

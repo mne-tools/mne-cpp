@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file mne_hemisphere.cpp
- * @since 2022
- * @date  April 2026
+ * @since October 2012
  * @brief Implementation of @ref MNELIB::MNEHemisphere.
  *
  * Implements FIFF read of one @c FIFFB_MNE_SOURCE_SPACE block into the

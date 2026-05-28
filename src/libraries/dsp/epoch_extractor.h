@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file epoch_extractor.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Declaration of EpochExtractor — segments continuous MEG/EEG data into trials.
  *
  * EpochExtractor turns a continuous raw recording into a set of fixed-length trials

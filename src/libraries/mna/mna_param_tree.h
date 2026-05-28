@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_param_tree.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Hierarchical parameter store with formula-driven dynamic bindings shared across an MNA graph.
  *
  * @ref MnaParamTree is the second authoritative source of node

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_layout.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief 2D sensor layout (channel name -> [x,y,w,h]) used by topographic plots.
  *
  * @ref MNELIB::MNELayout mirrors the @c .lay files distributed with the

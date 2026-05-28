@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_recording.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Grouping of every file that belongs to one continuous measurement run inside an MNA project.
  *
  * An @ref MnaRecording is the second tier of the

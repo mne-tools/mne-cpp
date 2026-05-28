@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_const.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Centralised BIDS vocabulary: datatype / suffix / extension whitelists, FIFF↔BIDS channel-type and coordinate-frame maps, and entity ordering.
  *
  * Every other translation unit in BIDSLIB derives its allowed values from

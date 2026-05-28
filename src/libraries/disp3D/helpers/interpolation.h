@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file interpolation.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Distance-based sparse interpolation weights and per-frame signal smoothing on triangulated meshes.
  *
  * Given the geodesic distance table produced by @ref GeometryInfo,

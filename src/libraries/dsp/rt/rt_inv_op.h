@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_inv_op.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Real-time recomputation of the linear inverse operator from updated noise covariance.
  *
  * RtInvOp recomputes a regularised @ref MNELIB::MNEInverseOperator whenever

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file dataloader.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Static helpers for loading FreeSurfer / MNE source-space and BEM data into the disp3D model tree.
  *
  * DataLoader is a thin facade over @ref FSLIB and @ref MNELIB readers

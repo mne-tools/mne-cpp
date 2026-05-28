@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_node.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief JSON and CBOR codecs for @ref MnaNode covering ports, attributes, IPC/Script configuration, verification, provenance and execution metadata.
  *
  * The implementation serialises every field declared in

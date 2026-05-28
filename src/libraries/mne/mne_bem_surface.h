@@ -1,13 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * Copyright (c) 2015-2026 MNE-CPP Authors
+ *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   sheinke <simon.j.w.heinke@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_bem_surface.h
- * @since 2022
- * @date  April 2026
+ * @since June 2015
  * @brief Single closed BEM surface (triangulation, normals, conductivity).
  *
  * @ref MNELIB::MNEBemSurface stores one of the head-model boundary

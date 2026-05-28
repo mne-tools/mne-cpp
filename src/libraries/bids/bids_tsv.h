@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_tsv.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Generic tab-separated-value reader/writer for BIDS sidecars (UTF-8, LF, ``n/a`` for missing values, mandatory header row).
  *
  * BIDS standardises a strict TSV dialect for every tabular sidecar: a

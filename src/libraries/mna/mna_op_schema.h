@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_op_schema.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Declarative contract for an MNA operation — expected input/output ports, attributes, binding kind and validation against a concrete @ref MnaNode.
  *
  * @ref MnaOpSchema is the type information an MNA operation

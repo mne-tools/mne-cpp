@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_proj_data.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Legacy MNE-C aggregator for SSP projections plus the channel list they apply to.
  *
  * @ref MNELIB::MNEProjData ports @c mneProjDataRec - the cached state

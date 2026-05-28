@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *
  * @file fwd_global.h
- * @since 2022
- * @date  March 2026
+ * @since December 2012
  * @brief Symbol-visibility macro and build-info entry points for the FWDLIB (MEG/EEG forward-modelling) library.
  *
  * FWDLIB implements the forward problem of bioelectromagnetism: given a

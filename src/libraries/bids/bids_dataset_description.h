@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_dataset_description.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Reader/writer for ``dataset_description.json`` — the REQUIRED root sidecar of every BIDS dataset.
  *
  * Every BIDS validator refuses to walk a tree that does not have a

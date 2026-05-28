@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file lsl_global.h
- * @since 2026
- * @date  March 2026
+ * @since February 2026
  * @brief LSLLIB shared-library export macro and build-stamp accessors used by every public LSL symbol.
  *
  * This header defines the @c LSLSHARED_EXPORT decoration that every

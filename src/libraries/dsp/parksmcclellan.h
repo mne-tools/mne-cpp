@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file parksmcclellan.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Parks–McClellan equiripple FIR design via the Remez exchange algorithm.
  *
  * The Parks–McClellan algorithm computes the optimal linear-phase FIR filter

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsourceinterpolationmatworker.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Off-thread SCDC + interpolation-matrix build for one hemisphere with interpolation- or annotation-based modes.
  */
 

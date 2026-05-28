@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sphere.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Closed-form (Jennings) and Nelder–Mead implementations of sphere fitting.
  *
  * Implements the two static factories declared in @ref sphere.h. The

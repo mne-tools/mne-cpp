@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_deriv_set.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Collection of @ref MNELIB::MNEDeriv objects forming a derivation montage.
  *
  * @ref MNELIB::MNEDerivSet wraps a list of channel derivations together

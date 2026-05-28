@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file welch_psd.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Welch's averaged-periodogram power-spectral-density estimator.
  *
  * Welch's method (1967) splits the signal into overlapping segments,

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file multimodalscene.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Host-agnostic controller that owns the ordered scene-layer stack (MRI slice, BEM, cortex, sensors, dipoles, networks, overlays).
  *
  * MultimodalScene composes the disp3D primitives into a single

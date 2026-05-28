@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_hpi_data_updater.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Pre-processing front-end for HPI fitting — re-shapes raw MEG data, projectors and digitised coils into per-fit inputs.
  *
  * @ref INVLIB::InvHpiDataUpdater isolates everything that has to

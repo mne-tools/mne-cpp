@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_atlas_lookup.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of @ref FSLIB::FsAtlasLookup: RAS → region-name resolver over a FreeSurfer volumetric parcellation.
  */
 

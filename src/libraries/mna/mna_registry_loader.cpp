@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_registry_loader.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of the @c mna-registry.json manifest reader, drop-in directory merger and registry-to-manifest serialiser.
  *
  * @ref MnaRegistryLoader::loadFile parses one manifest JSON, walks

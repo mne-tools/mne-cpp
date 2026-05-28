@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file dipoleobject.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Instanced-arrow renderable for fitted equivalent current dipoles, driven by QRhi instancing.
  *
  * DipoleObject converts an @ref INVLIB::InvEcdSet into a single

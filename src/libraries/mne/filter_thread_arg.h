@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file filter_thread_arg.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Argument record passed to a background raw-data filter worker.
  *
  * @ref MNELIB::FilterThreadArg bundles the input buffer, an

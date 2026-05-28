@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file command_parser.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Front-end tokeniser that turns incoming JSON or CLI payloads into @ref COMLIB::RawCommand objects and notifies attached managers.
  *
  * @ref COMLIB::CommandParser owns the @c Subject side of the observer

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_filter.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Real-time FIR / IIR filtering of streaming MEG / EEG data blocks.
  *
  * The functions in this header wrap @ref UTILSLIB::FilterKernel and the

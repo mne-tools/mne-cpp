@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file ml_global.cpp
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Implementation of MLLIB build-stamp accessors that forward to UTILSLIB::buildinfo.
  *
  * Each of @ref MLLIB::buildDateTime, @ref MLLIB::buildHash and

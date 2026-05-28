@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2017-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fwd_eeg_sphere_layer.cpp
- * @since 2022
- * @date  April 2026
+ * @since March 2017
  * @brief FwdEegSphereLayer implementation — trivial storage for one concentric shell (@c rad, @c sigma) of the layered de Munck / Berg-Scherg EEG head model, plus the inner-to-outer radius comparator used by the model setup.
  */
 

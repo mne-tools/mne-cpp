@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file ica.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief FastICA-based independent component analysis for MEG / EEG artifact removal.
  *
  * Independent Component Analysis recovers a set of statistically independent

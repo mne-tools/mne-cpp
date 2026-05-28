@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_dipole_fit_data.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Dipole-fit workspace bundling sensor geometry, forward-model function pointers, noise covariance and SSP projection.
  *
  * @ref INVLIB::InvDipoleFitData replaces the @c dipoleFitDataRec record

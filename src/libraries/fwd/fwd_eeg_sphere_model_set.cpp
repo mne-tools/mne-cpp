@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2017-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fwd_eeg_sphere_model_set.cpp
- * @since 2022
- * @date  March 2026
+ * @since March 2017
  * @brief FwdEegSphereModelSet implementation — @c mne_setup_eeg_sphere_model parameter-file parser plus name-based lookup over the resulting FwdEegSphereModel instances.
  */
 

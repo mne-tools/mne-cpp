@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file decoding_global.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Build-stamp accessors for the DECODINGLIB shared library.
  *
  * Exposes the embedded build date, abbreviated git hash and full git

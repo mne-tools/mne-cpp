@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_proj_item.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Single SSP projection vector with kind/active flag and channel labels.
  *
  * @ref MNELIB::MNEProjItem corresponds to one @c FIFFB_PROJ_ITEM block:

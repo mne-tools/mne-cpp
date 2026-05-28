@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file ml_global.h
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Export/import macros, build-stamp accessors and namespace anchor for the MLLIB machine-learning library.
  *
  * MLLIB is the thin C++ surface mne-cpp puts around third-party ML

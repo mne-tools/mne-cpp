@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file multimodalscene.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Ordered scene-layer iteration, draw orchestration and picking routing across all disp3D modalities.
  */
 

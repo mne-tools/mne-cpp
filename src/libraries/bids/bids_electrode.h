@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_electrode.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Reader/writer for the BIDS ``_electrodes.tsv`` sidecar plus a bridge into FIFF digitizer-point space.
  *
  * @c _electrodes.tsv lists one row per implanted/positioned electrode

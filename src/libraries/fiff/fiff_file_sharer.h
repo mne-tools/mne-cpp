@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_file_sharer.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Memory-mapped FIFF file handle shared between cooperating processes / threads to avoid duplicate reads of large raw recordings.
  *
  * Large continuous FIFF recordings (multi-GB) are routinely opened by

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file dipoletreeitem.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Tree-item holding a fitted InvEcdSet for the DipoleObject instancing pipeline.
  */
 

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_named_matrix.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Row/column-labelled dense matrix used wherever FIFF stores per-channel data.
  *
  * @ref MNELIB::MNENamedMatrix is the C++ port of @c fiff_named_matrix:

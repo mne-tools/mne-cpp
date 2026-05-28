@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_cmd_client.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief TCP client for the @c mne_rt_server command port (4217): negotiates session state via line- or JSON-encoded messages.
  *
  * @ref COMLIB::RtCmdClient is a @c QTcpSocket subclass that drives the

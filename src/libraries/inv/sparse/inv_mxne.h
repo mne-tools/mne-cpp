@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_mxne.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Mixed-Norm Estimate (MxNE) sparse inverse solver — block-sparse L21 minimisation for focal source recovery.
  *
  * @ref INVLIB::InvMxne implements the MxNE solver of Gramfort et al.,

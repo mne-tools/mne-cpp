@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_client.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Self-contained worker thread that owns the command and data sockets to a running @c mne_rt_server.
  *
  * @ref COMLIB::RtClient is the high-level convenience wrapper around the

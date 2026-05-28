@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_cov_estimators.h
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Regularised covariance estimators for M/EEG noise covariances, matching MNE-Python's compute_covariance() API.
  *
  * M/EEG sensor counts routinely exceed the number of clean baseline

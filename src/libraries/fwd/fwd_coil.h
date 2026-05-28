@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2017-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fwd_coil.h
- * @since 2022
- * @date  March 2026
+ * @since March 2017
  * @brief Single MEG sensor coil or EEG electrode described by a set of weighted integration points in its own coordinate frame.
  *
  * In the Biot-Savart formulation used for MEG, the signal a coil records

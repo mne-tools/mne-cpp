@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_data_client.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Translation unit for @ref COMLIB::RtDataClient: FIFF-tag parsing on the @c mne_rt_server data port (4218).
  *
  * Implements the three reads the rest of @ref COMLIB depends on:

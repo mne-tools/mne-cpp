@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_sss_data.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Signal Space Separation (Maxwell filter) basis metadata stored alongside MEG raw data.
  *
  * @ref MNELIB::MNESssData captures the inside/outside basis orders

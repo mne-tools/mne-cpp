@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_ch_selection.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Named subset of channels (e.g. @c "Left-temporal") loaded from an MNE @c .sel file.
  *
  * @ref MNELIB::MNEChSelection represents one entry of the channel

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file source_morph.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Sparse morph operator that re-samples an @ref INVLIB::InvSourceEstimate from one subject's source space onto another.
  *
  * @ref INVLIB::SourceMorph is the C++ peer of mne-python's

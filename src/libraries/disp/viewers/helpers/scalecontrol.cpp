@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2021-2026 MNE-CPP Authors
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file scalecontrol.cpp
- * @since 2022
- * @date  October 2022
+ * @since March 2021
  * @brief Implementation of the ScaleControl slider + spinbox composite.
  */
 

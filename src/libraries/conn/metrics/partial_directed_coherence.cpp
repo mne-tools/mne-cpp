@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file partial_directed_coherence.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of @ref CONNLIB::PartialDirectedCoherence - column-normalised |A(f)| directional connectivity (Baccala & Sameshima 2001), direct paths only.
  */
 

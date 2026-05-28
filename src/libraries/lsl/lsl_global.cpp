@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file lsl_global.cpp
- * @since 2026
- * @date  February 2026
+ * @since February 2026
  * @brief Trivial out-of-line definitions for the LSLLIB build-stamp accessors declared in lsl_global.h.
  *
  * The three @c buildDateTime / @c buildHash / @c buildHashLong

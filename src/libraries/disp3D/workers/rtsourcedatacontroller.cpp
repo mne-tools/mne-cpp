@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsourcedatacontroller.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Thread / timer plumbing tying the source data worker and per-hemisphere interpolation workers together.
  */
 

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_beamformer_compute.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Shared math kernels (filter derivation, source power, regularised pseudo-inverse) used by both the LCMV and DICS beamformers.
  *
  * @ref INVLIB::InvBeamformerCompute is a stateless helper that holds

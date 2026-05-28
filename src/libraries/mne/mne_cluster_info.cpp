@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2013-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file mne_cluster_info.cpp
- * @since 2022
- * @date  March 2026
+ * @since March 2013
  * @brief Implementation of @ref MNELIB::MNEClusterInfo.
  *
  * Implements constructors and the helpers that group source vertices

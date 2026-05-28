@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_label_time_course.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of the label-aggregation modes and sign-flip computation declared in @c inv_label_time_course.h.
  *
  * Implements per-label slicing of the vertex index list, the four

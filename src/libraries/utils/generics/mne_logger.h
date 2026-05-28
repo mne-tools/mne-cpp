@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_logger.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Custom Qt message handler that adds ANSI colour, timestamps and source-location tags to qDebug/qWarning output.
  *
  * @ref UTILSLIB::MNELogger installs a single @c QtMessageHandler

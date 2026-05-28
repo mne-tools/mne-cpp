@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
+ * Copyright (c) 2015-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
  *
  * @file selectionio.h
- * @since 2022
- * @date  January 2024
+ * @since May 2015
  * @brief Reader / writer for MNE @c .sel channel-selection files and Brainstorm @c .mon montage files.
  *
  * @ref UTILSLIB::SelectionIO converts between two text-based

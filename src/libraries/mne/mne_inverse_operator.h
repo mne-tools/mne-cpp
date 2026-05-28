@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
+ *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
  *
  * @file mne_inverse_operator.h
- * @since 2022
- * @date  March 2026
+ * @since October 2012
  * @brief Pre-computed inverse operator (whitened SVD of the forward model) for MNE/dSPM/sLORETA.
  *
  * @ref MNELIB::MNEInverseOperator is the C++ port of @c -inv.fif: it

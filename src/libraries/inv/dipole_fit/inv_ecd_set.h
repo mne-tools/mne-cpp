@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_ecd_set.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Ordered set of @ref INVLIB::InvEcd records — the result of a sequential dipole-fit run.
  *
  * @ref INVLIB::InvEcdSet collects one @ref InvEcd per fitted time bin

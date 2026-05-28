@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_lcmv.cpp
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Implementation of the LCMV beamformer pipeline (filter design + multiple application paths).
  *
  * Builds the leadfield ↔ data-covariance pipeline, delegates the

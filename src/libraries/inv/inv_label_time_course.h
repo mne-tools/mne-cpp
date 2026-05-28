@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_label_time_course.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief ROI-level aggregation of vertex-wise source estimates — the C++ peer of MNE-Python's @c extract_label_time_course.
  *
  * @ref INVLIB::InvLabelTimeCourse provides the five standard aggregation

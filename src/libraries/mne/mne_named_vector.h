@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_named_vector.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Named one-dimensional counterpart of @ref MNELIB::MNENamedMatrix.
  *
  * Stores a vector whose entries are tagged with a @c QStringList of

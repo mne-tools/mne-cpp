@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_global.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief MNE-CPP BIDS library entry point: Qt symbol-visibility plumbing and the @ref BIDSLIB namespace documentation.
  *
  * Every public symbol in the BIDS library is annotated with

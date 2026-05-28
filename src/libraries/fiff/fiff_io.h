@@ -1,13 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2013-2026 MNE-CPP Authors
+ *   Florian Schlembach <fschlembach@web.de>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_io.h
- * @since 2022
- * @date  March 2026
+ * @since November 2013
  * @brief High-level convenience reader/writer that loads a whole FIFF measurement file into FIFFLIB containers in one call.
  *
  * Most callers want to open a FIFF file and immediately get back a

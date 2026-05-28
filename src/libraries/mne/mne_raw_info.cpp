@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_raw_info.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref MNELIB::MNERawInfo.
  *
  * Reads the measurement header (@c FIFFB_MEAS_INFO) and the

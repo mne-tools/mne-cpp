@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file picard_ica.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief PicardIca class implementation.
  */
 

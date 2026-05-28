@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_adjacency.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Construction of the sensor- and source-space neighbourhood graphs that define the cluster support for permutation testing.
  *
  * Cluster-based inference (@ref STSLIB::StatsCluster) reduces the

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_process_description.h
- * @since 2026
- * @date  March 2026
+ * @since February 2026
  * @brief Plain-old-data record describing one MNE-C @c .ave / @c .cov processing entry.
  *
  * Mirrors the description entries used by @c mne_process_raw to declare

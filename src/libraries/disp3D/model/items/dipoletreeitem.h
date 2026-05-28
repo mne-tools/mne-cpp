@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file dipoletreeitem.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Tree item wrapping a fitted @ref INVLIB::InvEcdSet of equivalent current dipoles.
  *
  * Each dipole becomes one instance in the @ref DipoleObject arrow

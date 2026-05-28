@@ -1,13 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2013-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file mne_surface.h
- * @since 2022
- * @date  April 2026
+ * @since August 2013
  * @brief Lightweight triangulated surface (vertices, triangles, normals) used by surface-based routines.
  *
  * @ref MNELIB::MNESurface is the minimal geometric surface object that

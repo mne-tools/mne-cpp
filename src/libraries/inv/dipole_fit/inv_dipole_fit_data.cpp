@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_dipole_fit_data.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of the dipole-fit workspace setup, noise-covariance scaling and forward-function selection.
  *
  * Implements @c setup_dipole_fit_data (read forward model, channel

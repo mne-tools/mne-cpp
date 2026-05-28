@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sourceestimatemanager.h
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Owns the source-time-course overlay together with its loader, real-time controller and target cortical surfaces.
  *
  * SourceEstimateManager couples @ref SourceEstimateOverlay (the

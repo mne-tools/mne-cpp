@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_named_matrix.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref MNELIB::MNENamedMatrix.
  *
  * Implements FIFF read/write of the @c FIFF_MNE_ROW_NAMES,

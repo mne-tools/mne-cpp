@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_file_sharer.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of @ref FiffFileSharer: refcounted memory-mapped view of a FIFF file shared across consumers.
  *
  * Backs zero-copy access for the realtime pipeline, the GUI viewer and

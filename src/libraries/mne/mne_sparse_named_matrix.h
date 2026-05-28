@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_sparse_named_matrix.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Sparse variant of @ref MNELIB::MNENamedMatrix backed by an Eigen @c SparseMatrix.
  *
  * Used by inverse operators and clustering machinery where the gain or

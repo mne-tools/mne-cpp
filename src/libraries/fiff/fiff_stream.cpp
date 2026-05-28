@@ -1,14 +1,19 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
+ *   Florian Schlembach <fschlembach@web.de>
+ *   Limin Sun <liminsun@nmr.mgh.harvard.edu>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Eric Larson <larson.eric.d@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Ruben Doerfel <doerfelruben@aol.com>
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
  *
  * @file fiff_stream.cpp
- * @since 2022
- * @date  May 2026
+ * @since October 2012
  * @brief Implementation of @ref FiffStream: FIFF tag I/O, directory and block-tree construction, and the typed read_* / write_* methods.
  *
  * Owns one @c QIODevice. Builds the directory and @ref FiffDirNode tree

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_digitizer_data.h
- * @since 2026
- * @date  March 2026
+ * @since February 2026
  * @brief High-level digitization data: dig points plus the device→head transform and fitting metadata that together define a coregistration source.
  *
  * Where @ref FiffDigPointSet is a flat point list, @ref FiffDigitizerData

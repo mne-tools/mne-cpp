@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_adjacency.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of the sensor- and source-space adjacency builders declared in sts_adjacency.h.
  *
  * The channel-position constructor extracts the @c r0 entries from

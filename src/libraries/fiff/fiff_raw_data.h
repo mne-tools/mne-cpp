@@ -1,13 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *
  * @file fiff_raw_data.h
- * @since 2022
- * @date  March 2026
+ * @since September 2012
  * @brief FIFF continuous raw recording: FiffInfo plus a directory of FIFF_DATA_BUFFER tags for random-access sample reads.
  *
  * @ref FiffRawData represents a continuous (``raw'') Neuromag recording

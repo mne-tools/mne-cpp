@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file crosscorrelation.cpp
- * @since 2026
- * @date  March 2026
+ * @since January 2018
  * @brief Implementation of @ref CONNLIB::CrossCorrelation - lag-resolved cross-correlation between every channel pair, computed via the inverse FFT of the DPSS-tapered cross-spectrum.
  */
 

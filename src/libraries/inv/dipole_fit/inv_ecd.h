@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_ecd.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Single equivalent current dipole (ECD) with position, moment and per-fit goodness/χ² metrics.
  *
  * @ref INVLIB::InvEcd represents one ECD record produced by the dipole-

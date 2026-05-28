@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_raw_info.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Subset of FIFF measurement info needed by the legacy raw-data path.
  *
  * @ref MNELIB::MNERawInfo captures the sampling frequency, channel list,

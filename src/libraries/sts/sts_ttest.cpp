@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_ttest.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of one-sample, paired and independent two-sample t-tests declared in sts_ttest.h.
  *
  * One-sample and paired variants compute the column-wise sample mean and

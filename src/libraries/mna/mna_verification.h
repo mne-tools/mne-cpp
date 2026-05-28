@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_verification.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Verification, declarative checks, evaluation results and provenance snapshot attached to every @ref MnaNode for reproducible execution.
  *
  * This header carries the four structs that turn an MNA graph from

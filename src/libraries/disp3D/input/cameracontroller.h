@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file cameracontroller.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Camera state and projection / view / model matrix computation for single- and multi-view layouts.
  *
  * CameraController is widget-agnostic: it takes the visible scene

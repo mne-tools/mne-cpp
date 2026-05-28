@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_dipole_fit_settings.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Command-line and programmatic settings struct for the @c mne_dipole_fit driver.
  *
  * @ref INVLIB::InvDipoleFitSettings collects every option that the

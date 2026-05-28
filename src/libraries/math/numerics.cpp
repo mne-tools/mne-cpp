@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file numerics.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementations of GCD, sparsity test, histogram binning and baseline rescaling.
  *
  * Implements the static helpers declared in @ref numerics.h. The GCD

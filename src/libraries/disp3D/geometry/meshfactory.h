@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file meshfactory.h
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Static factory for procedural Qt-RHI meshes (spheres, plates, barbells, cylinders, batched point clouds).
  *
  * MeshFactory builds the small primitive geometries used throughout

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file channelrhiview.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief QRhi-based GPU-accelerated channel time-series renderer used by the modern raw browser.
  *
  * ChannelRhiView replaces the legacy @c QPainter raw-trace painter

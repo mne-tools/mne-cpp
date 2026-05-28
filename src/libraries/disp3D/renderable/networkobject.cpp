@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file networkobject.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Node-sphere and edge-cylinder instanced geometry construction with colormap-driven weight encoding.
  */
 

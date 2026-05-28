@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_beamformer.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief InvBeamformer value type — container for pre-computed LCMV / DICS spatial filters and associated metadata.
  *
  * @ref INVLIB::InvBeamformer stores the spatial filter weights produced

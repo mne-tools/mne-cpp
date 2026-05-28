@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_sensor_set.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of @ref INVLIB::InvSensorSet and the @c FwdCoilSet → @c InvSensorSet builder.
  *
  * Implements the @c FwdCoilSet → @c InvSensorSet conversion (sizing

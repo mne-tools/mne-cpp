@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsourceinterpolationmatworker.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Background worker that builds the sparse source-to-vertex interpolation matrix for one hemisphere.
  *
  * Encapsulates the heavy-weight @ref GeometryInfo::scdc (geodesic

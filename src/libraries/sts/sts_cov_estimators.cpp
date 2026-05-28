@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_cov_estimators.cpp
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Implementation of the regularised covariance estimators declared in sts_cov_estimators.h.
  *
  * Ledoit-Wolf and OAS forward to @c Skigen::LedoitWolf and @c Skigen::OAS

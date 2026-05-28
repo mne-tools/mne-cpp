@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file eeg_reference.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief EEG re-referencing operators — common-average, single-electrode and REST.
  *
  * Every EEG measurement is implicitly a potential difference between an

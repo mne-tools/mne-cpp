@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file viewstate.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Per-viewport state (camera preset, zoom, pan, visibility filter) and serialisation helpers.
  *
  * A disp3D scene can be displayed either in a single interactive

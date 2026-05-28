@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file selectionsceneitem.h
- * @since 2022
- * @date  February 2026
+ * @since July 2018
  * @brief Channel-selection group descriptor (@ref SelectionItem) and the matching @c QGraphicsItem (@ref SelectionSceneItem).
  *
  * SelectionItem is a value type holding a named list of channel names

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_description_parser.h
- * @since 2026
- * @date  February 2026
+ * @since February 2026
  * @brief Parser for the legacy MNE-C @c .ave / @c .cov plain-text description files.
  *
  * @ref MNELIB::MNEDescriptionParser tokenises the @c "average { ... }"

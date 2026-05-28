@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file peak_finder.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Local-maxima peak detection in 1-D signals with prominence filtering.
  *
  * A peak is defined as a sample that is strictly larger than its two direct

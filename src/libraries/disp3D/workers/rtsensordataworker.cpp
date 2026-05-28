@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsensordataworker.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Per-tick dense sensor-to-vertex mat-vec, symmetric normalisation and ABGR colour packing.
  */
 

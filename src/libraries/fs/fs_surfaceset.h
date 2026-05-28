@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_surfaceset.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Bi-hemispheric grouping of FreeSurfer surfaces (lh + rh) loaded as a single object.
  *
  * Cortical analyses in FreeSurfer/MNE typically operate on a pair of

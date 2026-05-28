@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bad_channels_lof.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Bad-channel detection via the Local Outlier Factor (LOF) algorithm.
  *
  * LOF (Breunig et al., SIGMOD 2000) scores each channel by the ratio between

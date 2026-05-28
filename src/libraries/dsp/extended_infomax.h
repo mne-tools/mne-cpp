@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file extended_infomax.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Extended Infomax independent component analysis (super- and sub-Gaussian sources).
  *
  * Extended Infomax (Lee, Girolami & Sejnowski, 1999) is a maximum-likelihood

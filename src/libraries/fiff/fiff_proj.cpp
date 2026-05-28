@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Florian Schlembach <fschlembach@web.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Andreas Griesshammer <ag@fieldlineinc.com>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_proj.cpp
- * @since 2022
- * @date  April 2026
+ * @since October 2012
  * @brief Implementation of @ref FiffProj: read / write of one FIFFB_PROJ_ITEM block and the projector-combination helpers.
  *
  * Multiple @ref FiffProj instances form @c info['projs'] and are

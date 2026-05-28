@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_events.cpp
- * @since 2026
- * @date  March 2026
+ * @since February 2026
  * @brief Implementation of @ref FiffEvents: FIFFB_MNE_EVENTS read / write and the stim-channel event-detection path.
  *
  * Detection follows @c mne.find_events; the (sample, prev, new) triples

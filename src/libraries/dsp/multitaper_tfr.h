@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file multitaper_tfr.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Sliding-window multitaper time-frequency representation.
  *
  * MultitaperTfr applies the multitaper PSD estimator (@ref MultitaperPsd)

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_sensor_set.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Compact MEG sensor-geometry container (positions, orientations, integration weights) used by the HPI fitter.
  *
  * @ref INVLIB::InvSensorSet replaces the verbose

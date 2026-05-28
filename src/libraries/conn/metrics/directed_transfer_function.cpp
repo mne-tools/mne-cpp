@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file directed_transfer_function.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of @ref CONNLIB::DirectedTransferFunction - row-normalised |H(f)|^2 directional connectivity (Kaminski & Blinowska 1991), driven by the shared @ref CONNLIB::MvarModel fit.
  */
 

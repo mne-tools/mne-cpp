@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsensorinterpolationmatworker.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Off-thread dense MEG / EEG field-mapping matrix recomputation triggered by configuration changes.
  */
 

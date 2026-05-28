@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file networkedge.h
- * @since 2026
- * @date  March 2026
+ * @since August 2016
  * @brief Weighted edge between two @ref NetworkNode instances; stores the full per-frequency weight matrix and the scalar band-averaged weight.
  *
  * Every functional-connectivity estimator in @c CONNLIB produces one

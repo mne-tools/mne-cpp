@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   johaenns <j.vorw01@gmail.com>
+ * Copyright (c) 2020-2026 MNE-CPP Authors
+ *   Ruben Doerfel <doerfelruben@aol.com>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   johaenns <j.vorw01@gmail.com>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fwdsettingsview.h
- * @since 2022
- * @date  March 2026
+ * @since May 2020
  * @brief Forward-solution computation controls (BEM / source space / EEG sphere model selectors).
  *
  * FwdSettingsView exposes the parameters needed by the @c FWDLIB

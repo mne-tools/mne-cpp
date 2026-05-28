@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file simplex_algorithm.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Header-only Nelder–Mead simplex minimiser with pluggable cost and report callables.
  *
  * Nelder–Mead is a derivative-free direct-search minimiser that

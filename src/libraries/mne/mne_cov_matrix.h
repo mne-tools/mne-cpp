@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_cov_matrix.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Legacy MNE-C noise covariance container preserved for cross-toolchain compatibility.
  *
  * @ref MNELIB::MNECovMatrix mirrors the @c mneCovMatrixRec struct of the

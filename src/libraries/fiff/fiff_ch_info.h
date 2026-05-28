@@ -1,13 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_ch_info.h
- * @since 2022
- * @date  April 2026
+ * @since September 2012
  * @brief FIFF channel descriptor record (FIFF_CH_INFO): per-channel logical/scanner numbers, kind, calibration, coil type, unit, location and orientation.
  *
  * A @c FIFF_CH_INFO tag stores everything needed to interpret one column

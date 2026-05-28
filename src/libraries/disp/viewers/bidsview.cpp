@@ -1,14 +1,12 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ * Copyright (c) 2020-2026 MNE-CPP Authors
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bidsview.cpp
- * @since 2022
- * @date  February 2026
+ * @since October 2020
  * @brief Implementation of the BidsView BIDS tree viewer.
  */
 

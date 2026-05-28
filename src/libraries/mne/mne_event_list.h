@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_event_list.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Ordered list of @ref MNELIB::MNEEvent records.
  *
  * @ref MNELIB::MNEEventList wraps the per-recording event list with the

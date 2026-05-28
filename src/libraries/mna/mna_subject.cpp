@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_subject.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief JSON and CBOR codecs for @ref MnaSubject — subject id, FreeSurfer @c $SUBJECTS_DIR link, ordered session list and forward-compatible @c extras.
  *
  * The implementation walks the @ref MnaSession list with the

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_brain_vision_reader.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief @ref BIDSLIB::AbstractFormatReader implementation for the BrainVision ``.vhdr / .vmrk / .eeg`` triplet.
  *
  * BrainVision is the de-facto wire format for sEEG / ECoG / scalp-EEG

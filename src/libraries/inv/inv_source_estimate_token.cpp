@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_source_estimate_token.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of the @ref INVLIB::tokenize / @ref INVLIB::fromTokens free functions.
  *
  * Walks the @ref InvSourceEstimate in canonical order — metadata,

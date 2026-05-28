@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file videooverlay.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Generic live-RGB video texture overlay rendered as a screen-aligned quad with chroma keying.
  *
  * VideoOverlay accepts a stream of QImage frames (e.g. from a

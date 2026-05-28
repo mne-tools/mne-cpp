@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_beamformer_settings.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Strongly-typed enumerations shared by the LCMV and DICS beamformer pipelines.
  *
  * Defines @ref INVLIB::BeamformerWeightNorm (none / unit-noise-gain /

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file report.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief HTML report builder — mne-cpp's equivalent of @c mne.Report for summarising analysis pipelines.
  *
  * @ref UTILSLIB::Report collects titled sections (free text,

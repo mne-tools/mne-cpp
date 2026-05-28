@@ -1,12 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Daniel Strohmeier <daniel.strohmeier@gmail.com>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file phaselockingvalue.h
- * @since 2026
- * @date  March 2026
+ * @since April 2018
  * @brief Phase Locking Value (Lachaux, Rodriguez, Martinerie & Varela 1999) between every channel pair.
  *
  * The Phase Locking Value is the resultant length of the unit-modulus

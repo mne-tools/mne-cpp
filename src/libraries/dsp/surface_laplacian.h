@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file surface_laplacian.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Spherical-spline surface Laplacian (Current Source Density) for EEG.
  *
  * The surface Laplacian ∇²V approximates the radial current density at

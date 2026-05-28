@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_epochs.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Static epoching utilities: cut a FiffRawData stream into fixed-length, event-aligned epochs.
  *
  * Implements the equivalent of @c mne.Epochs construction from a

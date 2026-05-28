@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file lsl_stream_info.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implements stream_info construction, accessors and the wire serialisation used by LSL discovery datagrams.
  *
  * The constructors populate the two transport-identity fields that

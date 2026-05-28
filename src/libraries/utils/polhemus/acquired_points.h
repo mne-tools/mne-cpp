@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file acquired_points.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Shared digitised-point store for Polhemus digitizer sessions.
  *
  *           Plain Qt model object passed by reference between the wizard,

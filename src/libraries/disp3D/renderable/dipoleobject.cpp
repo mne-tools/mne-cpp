@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file dipoleobject.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Instanced-arrow geometry and per-dipole instance buffer construction with goodness-of-fit colour mapping.
  */
 

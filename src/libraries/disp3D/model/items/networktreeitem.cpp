@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file networktreeitem.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Tree-item identifying a connectivity network for the instanced node / edge renderer.
  */
 

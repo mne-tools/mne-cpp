@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file math_global.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Thin forwarders that surface UTILSLIB build-info into MATHLIB.
  *
  * The three accessors declared in @ref math_global.h simply delegate to

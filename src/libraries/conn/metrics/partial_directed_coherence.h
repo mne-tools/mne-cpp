@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file partial_directed_coherence.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Partial Directed Coherence (Baccala & Sameshima 2001) between every channel pair, derived from a fitted MVAR model.
  *
  * PDC works in the @c z-domain on the inverse of the MVAR transfer

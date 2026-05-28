@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_volume_source_estimate.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Volume (voxel-grid) source estimate that augments @ref InvSourceEstimate with 3-D grid shape information.
  *
  * @ref INVLIB::InvVolumeSourceEstimate represents an inverse solution

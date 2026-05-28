@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_op_registry.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of the @ref MnaOpRegistry singleton, including the upward search for @c resources/mna/ and the drop-in registry merge logic.
  *
  * The registry stores schemas and op functions in two

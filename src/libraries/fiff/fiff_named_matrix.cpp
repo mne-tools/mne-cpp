@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_named_matrix.cpp
- * @since 2022
- * @date  October 2022
+ * @since October 2012
  * @brief Implementation of @ref FiffNamedMatrix: FIFF-serializable matrix paired with row / column name lists.
  *
  * Used by SSP projectors, CTF compensators, forward gain matrices and

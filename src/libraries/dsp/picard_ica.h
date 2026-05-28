@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file picard_ica.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Declaration of the PicardIca class — Preconditioned ICA for Real Data.
  *
  * Algorithm: P. Ablin, J.-F. Cardoso, A. Gramfort (2018). "Faster Independent Component

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_mgh_tag.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Single FreeSurfer MGH/MGZ tag (key, length, opaque payload).
  *
  * @ref MNELIB::MNEMghTag mirrors the trailing tag stream of an MGH file

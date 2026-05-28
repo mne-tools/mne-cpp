@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file ml_tensor.h
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief N-dimensional, row-major, reference-counted float32 tensor used as the universal MLLIB data carrier.
  *
  * @ref MLLIB::MlTensor is the interchange type that crosses every

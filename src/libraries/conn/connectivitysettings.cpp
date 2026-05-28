@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2017-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file connectivitysettings.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2017
  * @brief Implementation of @ref CONNLIB::ConnectivitySettings - the input/parameter container shared by every functional-connectivity metric in @c CONNLIB.
  *
  * Defines the trial append/clear/remove bookkeeping, the lazy invalidation

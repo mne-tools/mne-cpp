@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file networktreeitem.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Tree item identifying a connectivity network rendered as instanced nodes and edges.
  *
  * Holds only the unique object key that maps the item back to its

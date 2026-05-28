@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file extended_infomax.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief ExtendedInfomax class definition.
  */
 

@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ * Copyright (c) 2021-2026 MNE-CPP Authors
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file buildinfo.h
- * @since 2022
- * @date  January 2024
+ * @since August 2021
  * @brief Compile-time helpers that capture the build date, time and git commit hash into the binary.
  *
  * Every accessor is a header-only @c constexpr function so the

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_cor_fif_io.cpp
- * @since 2026
- * @date  May 2026
+ * @since February 2026
  * @brief Implementation of @ref MRILIB::MriCorFifIO: block-and-tag serialiser that emits a FIFF MRI set from an in-memory @ref MriVolData.
  *
  * Drives a @ref FIFFLIB::FiffStream through the nested

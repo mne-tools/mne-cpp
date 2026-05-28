@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file polhemus_connection.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Polhemus digitizer connection abstraction.
  *
  *           Two backends share one signal interface:

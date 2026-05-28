@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_dipole_fit_settings.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref INVLIB::InvDipoleFitSettings (default values, argv parsing, integrity check, usage banner).
  *
  * Implements the default-value initialiser, the

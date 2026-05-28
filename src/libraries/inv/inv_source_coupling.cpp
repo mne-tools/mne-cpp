@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_source_coupling.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Definition of the @ref INVLIB::InvSourceCoupling default constructor.
  *
  * Initialises the empty grid-index and moment vectors plus the time

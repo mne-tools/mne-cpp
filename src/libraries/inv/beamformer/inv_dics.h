@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_dics.h
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Dynamic Imaging of Coherent Sources (DICS) beamformer — frequency-domain source-power and source-time-course estimation.
  *
  * @ref INVLIB::InvDICS implements the DICS beamformer of Gross et al.,

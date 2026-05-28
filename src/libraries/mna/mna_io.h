@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_io.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Reader and writer for MNA project containers — @c .mna (JSON, human-editable) and @c .mnx (CBOR, compact binary with @c "MNX1" magic).
  *
  * @ref MnaIO is the single dispatch point between an on-disk

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_hpis.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Real-time continuous Head-Position-Indicator (cHPI) coil-localisation worker.
  *
  * RtHpi runs the inverse-library HPI fitter (@ref INVLIB::InvHpiFit) on each

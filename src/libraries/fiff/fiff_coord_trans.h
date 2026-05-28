@@ -1,13 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Ruben Doerfel <doerfelruben@aol.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_coord_trans.h
- * @since 2022
- * @date  April 2026
+ * @since August 2012
  * @brief 4x4 affine FIFF coordinate transform (FIFF_COORD_TRANS) annotated with source/destination coordinate-frame IDs.
  *
  * The FIFF coordinate-frame world is a small zoo (@c FIFFV_COORD_DEVICE,

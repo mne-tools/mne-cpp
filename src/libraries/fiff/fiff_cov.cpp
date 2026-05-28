@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Florian Schlembach <fschlembach@web.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_cov.cpp
- * @since 2022
- * @date  April 2026
+ * @since October 2012
  * @brief Implementation of @ref FiffCov: read / write of ``*-cov.fif`` files, projector application, regularization and whitening eigendecomposition.
  *
  * Round-trips with @c mne.Covariance in MNE-Python. Carries the matrix,

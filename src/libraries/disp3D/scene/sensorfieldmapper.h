@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sensorfieldmapper.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Builds the dense sensor-to-surface mapping matrix and the iso-contour overlay for MEG / EEG evoked data.
  *
  * SensorFieldMapper holds the loaded @ref FIFFLIB::FiffEvoked, the

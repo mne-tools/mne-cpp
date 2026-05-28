@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_global.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of the INVLIB build-info accessors.
  *
  * Defines @ref INVLIB::buildDateTime and @ref INVLIB::buildHash using

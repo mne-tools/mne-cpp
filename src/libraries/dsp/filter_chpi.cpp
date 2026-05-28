@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file filter_chpi.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of filterChpi — cHPI signal removal by notch filtering.
  */
 

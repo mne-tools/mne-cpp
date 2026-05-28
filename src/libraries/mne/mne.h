@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *
  * @file mne.h
- * @since 2022
- * @date  March 2026
+ * @since August 2012
  * @brief Static MNE facade providing matlab-toolbox-compatible high-level helpers across MNELIB.
  *
  * @ref MNELIB::MNE is a thin collection of @c static utilities that mirror

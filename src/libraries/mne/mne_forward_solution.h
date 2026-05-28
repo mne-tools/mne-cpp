@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_forward_solution.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Forward solution (gain matrix mapping source dipoles to sensor measurements).
  *
  * @ref MNELIB::MNEForwardSolution is the in-memory representation of an

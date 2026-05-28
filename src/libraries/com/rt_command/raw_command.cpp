@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file raw_command.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Translation unit for @ref COMLIB::RawCommand: storage of the untyped keyword/argument pair before schema binding.
  *
  * Implements the trivial constructors, copy-assignment and the

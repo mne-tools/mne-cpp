@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_msh_display_surface_set.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref MNELIB::MNEMshDisplaySurfaceSet.
  *
  * Implements addition / lookup of named surfaces, the per-set apply of

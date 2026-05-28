@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file surfacekeys.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief String key constants for surfaces in the @ref DISP3DLIB scene map.
  *
  * BrainView and the scene controllers store all renderable surfaces

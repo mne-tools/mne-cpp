@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file math_global.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Export/import macros and build-stamp accessors for MATHLIB.
  *
  * MATHLIB is the numerical-helpers layer of mne-cpp: linear algebra

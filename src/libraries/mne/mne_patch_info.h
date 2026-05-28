@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_patch_info.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Patch information (cluster of cortex vertices around each decimated source) used by orientation priors.
  *
  * @ref MNELIB::MNEPatchInfo stores, for every decimated source vertex,

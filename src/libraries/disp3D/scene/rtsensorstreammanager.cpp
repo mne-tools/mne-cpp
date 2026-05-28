@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rtsensorstreammanager.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Wiring between the real-time sensor data controller, the field mapper and the bound surface colour buffer.
  */
 

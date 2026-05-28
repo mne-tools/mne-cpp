@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ *   Limin Sun <liminsun@nmr.mgh.harvard.edu>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Andreas Griesshammer <ag@fieldlineinc.com>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_ch_info.cpp
- * @since 2022
- * @date  March 2026
+ * @since October 2012
  * @brief Implementation of @ref FiffChInfo: read / write of the FIFF_CH_INFO record and the conversion helpers used by the channel-picking path.
  *
  * Field layout matches the on-disk @c fiffChInfoRec; the helpers here

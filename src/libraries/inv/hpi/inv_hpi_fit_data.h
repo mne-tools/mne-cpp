@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_hpi_fit_data.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Per-coil magnetic-dipole fitting workspace — Nelder-Mead optimiser plus leadfield computation for HPI coil localisation.
  *
  * @ref INVLIB::InvHpiFitData implements the inner loop of

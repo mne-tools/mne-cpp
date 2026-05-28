@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_brain_vision_reader.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref BIDSLIB::BrainVisionReader — parses the BrainVision @c .vhdr / @c .vmrk / @c .eeg triplet behind @ref BIDSLIB::AbstractFormatReader.
  */
 

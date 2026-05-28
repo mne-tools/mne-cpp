@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2020-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file multiview.h
- * @since 2022
- * @date  October 2022
+ * @since February 2020
  * @brief QMainWindow container hosting an arbitrary number of @ref MultiViewWindow dock widgets.
  *
  * MultiView is the top-level layout primitive used by every MNE-Scan

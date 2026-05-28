@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_data_client.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief TCP client for the @c mne_rt_server raw-data port (4218): pulls @c FiffInfo, digitizer points and streamed sample buffers.
  *
  * @ref COMLIB::RtDataClient is a thin @c QTcpSocket subclass that speaks

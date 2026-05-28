@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_source_estimate_token.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Tokeniser and de-tokeniser that turn an @ref INVLIB::InvSourceEstimate into a flat sequence consumable by foundation-model architectures.
  *
  * Declares the free functions @ref INVLIB::tokenize and

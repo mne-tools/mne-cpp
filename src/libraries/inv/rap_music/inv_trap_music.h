@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_trap_music.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Truncated RAP-MUSIC (TRAP-MUSIC) source-localisation algorithm — sub-space truncation per iteration for robust correlated-source resolution.
  *
  * @ref INVLIB::InvTrapMusic implements the TRAP-MUSIC algorithm of

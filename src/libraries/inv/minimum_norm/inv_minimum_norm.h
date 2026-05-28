@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_minimum_norm.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Linear minimum-norm inverse solver — MNE, dSPM, sLORETA and eLORETA from a precomputed @c MNEInverseOperator.
  *
  * @ref INVLIB::InvMinimumNorm wraps an @c MNELIB::MNEInverseOperator

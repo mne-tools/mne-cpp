@@ -1,13 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Ruben Doerfel <doerfelruben@aol.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_info.h
- * @since 2022
- * @date  March 2026
+ * @since September 2012
  * @brief Full FIFF measurement metadata: everything from FIFFB_MEAS / FIFFB_MEAS_INFO needed to interpret a recording.
  *
  * @ref FiffInfo is the C++ counterpart of MNE-Python's

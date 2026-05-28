@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_guess_data.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Initial-guess grid for the dipole-fit optimiser, with per-guess forward fields pre-computed.
  *
  * @ref INVLIB::InvGuessData generates and stores the regular grid of

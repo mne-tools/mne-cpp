@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file channel_derivation.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Linear channel derivations — bipolar montages and arbitrary weighted recombinations.
  *
  * ChannelDerivation builds an explicit derivation matrix @c D so that

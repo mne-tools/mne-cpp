@@ -1,12 +1,11 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fwd.h
- * @since 2026
- * @date  March 2026
+ * @since December 2012
  * @brief Thin static-wrapper façade exposing the MNE Matlab-toolbox forward-solution entry points (e.g. mne_read_forward_solution).
  *
  * The MNE Matlab toolbox defines a flat set of top-level functions

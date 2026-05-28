@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file com_global.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Export macros, build-info entry points and namespace anchor for the @c COMLIB communication library.
  *
  * @c COMLIB is the transport layer that connects mne-cpp acquisition and

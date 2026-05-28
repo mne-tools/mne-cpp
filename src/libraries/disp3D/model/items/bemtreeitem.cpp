@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bemtreeitem.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Tree-item wrapping a single MNEBemSurface compartment for the BEM layer stack.
  */
 

@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2019-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file artifactsettingsview.h
- * @since 2022
- * @date  October 2022
+ * @since January 2019
  * @brief Per-modality artefact-rejection threshold panel (mag, grad, EEG, ECG, EOG).
  *
  * ArtifactSettingsView wires a @c QCheckBox + @c QDoubleSpinBox pair

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_byte_swap.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Endianness swap helpers for the FIFF binary tag I/O layer (FIFF is always written big-endian on disk).
  *
  * FIFF tags are stored in network (big-endian) byte order on disk while

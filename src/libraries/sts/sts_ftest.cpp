@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_ftest.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of the one-way ANOVA F-test declared in sts_ftest.h.
  *
  * Computes the grand mean across all groups, then per group adds

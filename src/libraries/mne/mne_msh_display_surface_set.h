@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_msh_display_surface_set.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Set of @ref MNELIB::MNEMshDisplaySurface objects sharing a camera, lights and selection.
  *
  * @ref MNELIB::MNEMshDisplaySurfaceSet aggregates one or more renderable

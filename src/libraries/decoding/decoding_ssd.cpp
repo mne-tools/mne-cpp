@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file decoding_ssd.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of the Spatio-Spectral Decomposition narrowband enhancer.
  *
  * Internally band-passes the input continuous data twice — once for the

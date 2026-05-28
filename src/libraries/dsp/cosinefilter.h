@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file cosinefilter.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Frequency-domain cosine-tapered (raised-cosine) FIR filter design.
  *
  * CosineFilter assembles an FIR magnitude response directly in the frequency

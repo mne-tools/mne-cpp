@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_global.h
- * @since 2026
- * @date  May 2026
+ * @since February 2026
  * @brief Export/import macros and build-info accessors for MRILIB.
  *
  * Provides the @c MRISHARED_EXPORT decorator used by every public

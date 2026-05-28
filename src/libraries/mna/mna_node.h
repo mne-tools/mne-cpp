@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_node.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief One operation in an MNA graph — opType, typed I/O ports, attributes, execution mode (Batch / Stream / IPC / Script) and provenance.
  *
  * @ref MnaNode is the executable counterpart to a @ref MnaFileRef:

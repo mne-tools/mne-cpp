@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file report.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of @ref UTILSLIB::Report — builds the HTML scaffolding, escapes user content and writes the file to disk.
  *
  * HTML is assembled by streaming @c QString concatenations

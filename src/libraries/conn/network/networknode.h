@@ -1,12 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Daniel Strohmeier <daniel.strohmeier@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file networknode.h
- * @since 2026
- * @date  March 2026
+ * @since August 2016
  * @brief Node of a connectivity @ref Network; carries a 3D position and the lists of incident (in / out, full / thresholded) edges.
  *
  * One @ref NetworkNode is created per sensor (in sensor-space connectivity)

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file com_global.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Translation unit for the @c COMLIB build-info entry points declared in @ref com_global.h.
  *
  * Provides the three out-of-line definitions of @ref COMLIB::buildDateTime,

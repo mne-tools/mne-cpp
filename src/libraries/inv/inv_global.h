@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_global.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief INVLIB library export/import macros, build-info accessors, and namespace docstring for the inverse-solver library.
  *
  * The INVLIB library bundles every inverse-method, beamformer and HPI-fit

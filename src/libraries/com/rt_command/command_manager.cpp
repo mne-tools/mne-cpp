@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file command_manager.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Translation unit for @ref COMLIB::CommandManager: schema storage, observer-side dispatch and JSON bulk-load.
  *
  * Implements the @c init() helper that wires the inbound

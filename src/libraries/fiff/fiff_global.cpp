@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ * Copyright (c) 2021-2026 MNE-CPP Authors
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_global.cpp
- * @since 2022
- * @date  January 2024
+ * @since August 2021
  * @brief Definitions for the FIFFLIB build-info accessors declared in @ref fiff_global.h.
  *
  * Each accessor forwards to the matching macro defined by

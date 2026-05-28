@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_abstract_format_reader.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Strategy interface for format-specific raw-data readers (BrainVision, EDF, …) consumed by @ref BIDSLIB::BidsRawData.
  *
  * BIDS allows several wire formats for electrophysiology raw data

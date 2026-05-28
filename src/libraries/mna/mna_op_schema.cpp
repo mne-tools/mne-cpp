@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_op_schema.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of @ref MnaOpSchema::validate — checks a concrete @ref MnaNode against its declared port and attribute contract.
  *
  * The validator walks the schema's input and output port lists

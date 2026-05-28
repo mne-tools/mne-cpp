@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fastrak_parser.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Polhemus Fastrak / FastSCAN ASCII record parser.
  *
  *           Supported ASCII record formats:

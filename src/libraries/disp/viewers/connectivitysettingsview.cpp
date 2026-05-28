@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   johaenns <j.vorw01@gmail.com>
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   johaenns <j.vorw01@gmail.com>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file connectivitysettingsview.cpp
- * @since 2022
- * @date  November 2023
+ * @since July 2018
  * @brief Implementation of the ConnectivitySettingsView connectivity-metric panel.
  */
 

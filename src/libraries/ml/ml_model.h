@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file ml_model.h
- * @since 2026
- * @date  May 2026
+ * @since April 2026
  * @brief Pure-virtual @ref MLLIB::MlModel interface that every MLLIB inference backend implements.
  *
  * @ref MLLIB::MlModel is the polymorphic seam between mne-cpp

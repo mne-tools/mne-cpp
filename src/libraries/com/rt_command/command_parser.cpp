@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file command_parser.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Translation unit for @ref COMLIB::CommandParser: JSON/CLI tokenisation and fan-out to attached managers.
  *
  * Implements the dual-dialect @c parse() entry point. CLI input is

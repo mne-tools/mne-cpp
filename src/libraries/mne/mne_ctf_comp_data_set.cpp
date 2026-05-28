@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_ctf_comp_data_set.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref MNELIB::MNECTFCompDataSet.
  *
  * Implements set-level FIFF I/O, the search for the currently active

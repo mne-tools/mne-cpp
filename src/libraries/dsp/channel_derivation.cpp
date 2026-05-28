@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file channel_derivation.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief ChannelDerivation class implementation.
  */
 

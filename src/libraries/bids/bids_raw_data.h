@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_raw_data.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Central container for a BIDS raw recording — the BIDS-side analogue of @c FIFFLIB::FiffRawData, bundling raw signal I/O with every electrophysiology sidecar.
  *
  * @ref BidsRawData is the top-level object exposed by BIDSLIB: a single

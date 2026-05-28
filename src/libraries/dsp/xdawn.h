@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file xdawn.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Declaration of the Xdawn class for event-related response enhancement.
  *
  * xDAWN estimates spatial filters that maximise the signal-to-noise ratio of a target

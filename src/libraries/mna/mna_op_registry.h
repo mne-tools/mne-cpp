@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_op_registry.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Process-wide singleton catalog mapping @c opType strings to their @ref MnaOpSchema and (for built-in ops) executable implementation.
  *
  * @ref MnaOpRegistry is the lookup table that the rest of the

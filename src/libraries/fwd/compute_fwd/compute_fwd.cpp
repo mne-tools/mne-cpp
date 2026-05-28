@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file compute_fwd.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief ComputeFwd implementation — orchestrates source-space, BEM/sphere model, coil-set and compensation initialisation, then assembles the lead-field matrix @c G column by column via the parallel dipole loop.
  */
 

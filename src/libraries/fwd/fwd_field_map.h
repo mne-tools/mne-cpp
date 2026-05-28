@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fwd_field_map.h
- * @since 2026
- * @date  March 2026
+ * @since February 2026
  * @brief Sphere-model field interpolator that maps measured MEG/EEG values onto a dense scalp or cortical surface.
  *
  * Field mapping is the dual of source estimation: instead of recovering

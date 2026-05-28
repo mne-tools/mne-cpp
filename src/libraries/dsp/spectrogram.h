@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file spectrogram.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Gaussian-windowed short-time Fourier transform (STFT) spectrogram.
  *
  * Spectrogram slides a Gaussian window of user-defined size along a 1-D

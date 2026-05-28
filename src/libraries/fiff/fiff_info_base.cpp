@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2013-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Florian Schlembach <fschlembach@web.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_info_base.cpp
- * @since 2022
- * @date  April 2026
+ * @since February 2013
  * @brief Implementation of @ref FiffInfoBase: stripped measurement info (channels, sfreq, bads, dev_head_t) shared by every FIFF container.
  *
  * Used directly by realtime streams and by trimmed evoked / epoched

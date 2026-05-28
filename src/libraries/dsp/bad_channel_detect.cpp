@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bad_channel_detect.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of BadChannelDetect.
  */
 

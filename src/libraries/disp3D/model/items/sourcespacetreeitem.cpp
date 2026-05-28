@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sourcespacetreeitem.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Per-hemisphere source-space point storage feeding the batched-sphere renderer.
  */
 

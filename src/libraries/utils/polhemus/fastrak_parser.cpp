@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fastrak_parser.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Streaming ASCII record decoder that converts Polhemus Fastrak / FastSCAN bytes into @ref UTILSLIB::FastrakSample values.
  *
  * Bytes are accumulated in an internal buffer; complete

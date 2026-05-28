@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file raw_command.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Untyped intermediate produced by @ref COMLIB::CommandParser before type information is bound to parameters.
  *
  * @ref COMLIB::RawCommand is the first object the parser builds when a

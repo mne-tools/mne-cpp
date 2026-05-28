@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file layoutmaker.h
- * @since 2022
- * @date  April 2026
+ * @since November 2014
  * @brief Generator that projects 3-D electrode positions onto a 2-D @c .lout topographic layout via least-squares sphere fitting.
  *
  * @ref UTILSLIB::LayoutMaker is the counterpart of

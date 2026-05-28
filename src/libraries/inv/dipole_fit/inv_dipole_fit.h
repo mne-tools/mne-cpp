@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_dipole_fit.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief High-level driver for sequential equivalent-current-dipole (ECD) fitting at every time point of an evoked or raw recording.
  *
  * @ref INVLIB::InvDipoleFit orchestrates the full mne-c

@@ -1,13 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff_named_matrix.h
- * @since 2022
- * @date  March 2026
+ * @since September 2012
  * @brief Matrix paired with row and column name lists, the on-disk form of FIFFB_PROJ_ITEM / FIFFB_MNE_NAMED_MATRIX payloads.
  *
  * Several FIFF blocks store a matrix whose rows and columns refer to

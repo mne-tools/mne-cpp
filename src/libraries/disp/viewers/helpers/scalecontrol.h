@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2021-2026 MNE-CPP Authors
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file scalecontrol.h
- * @since 2022
- * @date  March 2023
+ * @since March 2021
  * @brief Composite slider + spinbox widget for picking a (possibly logarithmic) scale value.
  *
  * ScaleControl pairs a horizontal @c QSlider with a synchronised

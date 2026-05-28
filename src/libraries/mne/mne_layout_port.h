@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_layout_port.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Port-level companion structure to @ref MNELIB::MNELayout for split-channel sensors.
  *
  * Some Neuromag systems expose paired gradiometers as two ports of one

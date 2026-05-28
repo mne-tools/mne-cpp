@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_script.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Inline source code carried by a Script-mode graph node — language, interpreter command, code body, optional authoring URI and integrity hash.
  *
  * @ref MnaScript is the payload that turns a generic @ref MnaNode

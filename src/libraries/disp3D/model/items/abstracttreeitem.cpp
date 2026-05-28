@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file abstracttreeitem.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Type-safe accessors backing the shared visibility / transform / colour / alpha roles on every disp3D tree item.
  */
 

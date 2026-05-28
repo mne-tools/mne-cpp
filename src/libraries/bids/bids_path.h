@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_path.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Programmatic construction and matching of BIDS-compliant directories, filenames and sidecar paths.
  *
  * The BIDS specification fixes both the directory layout

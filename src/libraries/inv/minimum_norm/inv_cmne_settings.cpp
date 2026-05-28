@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_cmne_settings.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Definition of the @ref INVLIB::InvCMNESettings aggregate (default values).
  *
  * Provides storage for the @ref InvCMNESettings defaults; the struct

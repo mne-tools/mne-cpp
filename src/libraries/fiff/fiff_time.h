@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_time.h
- * @since 2026
- * @date  February 2026
+ * @since February 2026
  * @brief Compact seconds + microseconds time record used by FIFF measurement, event and HPI tags.
  *
  * Replaces the legacy @c fiffTimeRec struct from MNE-C with a small C++

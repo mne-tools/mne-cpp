@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file compute_fwd.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Top-level driver that assembles the MEG/EEG lead-field matrix G from a source space, sensor array and volume-conductor model.
  *
  * ComputeFwd is the C++ analogue of the @c mne_forward_solution

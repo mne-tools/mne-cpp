@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_param_binding.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Formula-driven binding that recomputes one MNA parameter from an expression whenever its triggers fire.
  *
  * @ref MnaParamBinding turns the otherwise static @ref MnaParamTree

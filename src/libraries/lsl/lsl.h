@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file lsl.h
- * @since 2026
- * @date  March 2026
+ * @since February 2026
  * @brief Umbrella include header that exposes the full LSLLIB public surface in a single import.
  *
  * LSLLIB is mne-cpp's in-tree, Qt-based reimplementation of the Lab

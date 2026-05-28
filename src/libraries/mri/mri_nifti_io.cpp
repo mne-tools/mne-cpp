@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_nifti_io.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of @ref MRILIB::MriNiftiIO: 348-byte header parse, byte-order auto-detect, sform/qform/pixdim transform reconstruction.
  *
  * Implements the three pieces the header documents: (1) a

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file parksmcclellan.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief TODO: describe this file in one substantive sentence.
  */
 

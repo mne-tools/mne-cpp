@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_graph.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief In-memory directed acyclic graph of @ref MnaNode operations — connectivity, validation, topological sort and serialization.
  *
  * @ref MnaGraph is the executable spine of an MNA project: a

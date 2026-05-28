@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fs_annotation.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Reader for FreeSurfer per-vertex annotation (parcellation) files such as lh.aparc.annot.
  *
  * A FreeSurfer @c .annot file assigns one parcellation label to each surface

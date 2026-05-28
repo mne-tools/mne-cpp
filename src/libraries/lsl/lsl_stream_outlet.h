@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file lsl_stream_outlet.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Declares stream_outlet, the server side of an LSL stream that publishes samples over TCP and advertises itself via UDP multicast.
  *
  * A @ref LSLLIB::stream_outlet is the producer counterpart of

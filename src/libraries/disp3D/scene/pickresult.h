@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file pickresult.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Uniform pick payload (object identity, sub-index, world hit point, distance) for multimodal 3-D scenes.
  *
  * Every renderable that supports picking (BrainSurface triangles,

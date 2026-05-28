@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
  * @file fiff.cpp
- * @since 2022
- * @date  October 2022
+ * @since August 2012
  * @brief Definitions for the static MATLAB-style FIFF facade declared in @ref fiff.h.
  *
  * Each method forwards to the matching method on the underlying class

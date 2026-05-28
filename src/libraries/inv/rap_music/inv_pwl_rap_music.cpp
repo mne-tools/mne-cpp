@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_pwl_rap_music.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of the Powell-accelerated RAP-MUSIC variant.
  *
  * Implements the Powell direction-set search over the leadfield grid,

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_connectivity.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Real-time worker that re-estimates a connectivity network from incoming data epochs.
  *
  * RtConnectivity drives the CONNLIB connectivity estimators (coherence,

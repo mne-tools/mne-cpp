@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ * Copyright (c) 2020-2026 MNE-CPP Authors
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bidsview.h
- * @since 2022
- * @date  January 2024
+ * @since October 2020
  * @brief Tree view of the BIDS dataset hierarchy backed by @ref BidsViewModel.
  *
  * BidsView wraps a @c QTreeView around a @ref BidsViewModel so the

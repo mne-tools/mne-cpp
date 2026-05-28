@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_param_binding.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief JSON and CBOR codecs for @ref MnaParamBinding — target path, expression, trigger, period and dependency list.
  *
  * The implementation is a straightforward field-for-field codec

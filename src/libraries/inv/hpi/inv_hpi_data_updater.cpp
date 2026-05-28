@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_hpi_data_updater.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Implementation of the HPI pre-processing front-end.
  *
  * Implements the cached state machine: detect @c FiffInfo changes

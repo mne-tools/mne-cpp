@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rt_connectivity.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Definition of the RtConnectivity Class.
  */
 

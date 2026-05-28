@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file rendertypes.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Lightweight render-related enums (ShaderMode, VisualizationMode) shared across disp3D.
  *
  * Kept QRhi-free and free of heavy Qt includes so it can be pulled in

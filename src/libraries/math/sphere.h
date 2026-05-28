@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sphere.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Best-fit sphere from a 3-D point cloud with closed-form and Nelder–Mead solvers.
  *
  * @ref UTILSLIB::Sphere fits a single sphere

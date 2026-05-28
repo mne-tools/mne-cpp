@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file bids_raw_data.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of @ref BIDSLIB::BidsRawData — end-to-end BIDS raw-dataset read / write orchestration including all electrophysiology sidecars.
  */
 

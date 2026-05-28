@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mne_msh_light.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Single directional / positional light source for the mesh viewer.
  *
  * @ref MNELIB::MNEMshLight stores direction or position, RGB colour,

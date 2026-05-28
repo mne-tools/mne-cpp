@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Daniel Strohmeier <daniel.strohmeier@gmail.com>
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file coherency.cpp
- * @since 2026
- * @date  March 2026
+ * @since April 2018
  * @brief Implementation of @ref CONNLIB::Coherency - shared cross/auto-spectral core for magnitude-squared coherence and the volume-conduction-robust imaginary coherence of Nolte et al. (2004).
  */
 

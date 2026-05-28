@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file decoding_ica_label.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Automatic ICA component labelling for artefact identification on M/EEG.
  *
  * After an independent-component analysis decomposition of an M/EEG

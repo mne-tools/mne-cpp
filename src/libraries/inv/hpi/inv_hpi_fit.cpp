@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_hpi_fit.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Implementation of the per-fit HPI pipeline (coil localisation, ordering, transform estimation).
  *
  * Implements the per-coil dipole fit using @ref InvHpiFitData, the

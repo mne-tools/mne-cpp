@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file surfacetreeitem.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Tree item wrapping a FreeSurfer @ref FSLIB::FsSurface plus optional @ref FSLIB::FsAnnotation parcellation.
  *
  * Carries the per-surface shader mode (Standard / Holographic /

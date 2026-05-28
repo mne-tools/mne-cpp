@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mri_cor_io.h
- * @since 2026
- * @date  May 2026
+ * @since February 2026
  * @brief Reader for the legacy FreeSurfer COR-NNN per-slice volume layout (256 unsigned-char coronal slices on a 1 mm isotropic grid).
  *
  * COR is the directory-based volume format used by FreeSurfer

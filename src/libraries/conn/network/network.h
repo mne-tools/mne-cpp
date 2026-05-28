@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file network.h
- * @since 2026
- * @date  March 2026
+ * @since August 2016
  * @brief Graph container that stores the result of one functional-connectivity metric as nodes (sources/sensors) and weighted edges (channel-pair couplings).
  *
  * @ref Network is the common output type returned by every estimator in

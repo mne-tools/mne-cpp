@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ * Copyright (c) 2018-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file frequencyspectrummodel.h
- * @since 2022
- * @date  March 2023
+ * @since July 2018
  * @brief QAbstractTableModel storing per-channel FFT magnitudes for @ref SpectrumView.
  *
  * FrequencySpectrumModel maintains an @c Eigen::MatrixXd of channels

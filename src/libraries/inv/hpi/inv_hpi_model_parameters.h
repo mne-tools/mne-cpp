@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_hpi_model_parameters.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Immutable configuration for the HPI signal model — coil drive frequencies, sample rate, line frequency and model variant.
  *
  * @ref INVLIB::InvHpiModelParameters captures the four quantities that

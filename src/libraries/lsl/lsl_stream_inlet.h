@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file lsl_stream_inlet.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Declares stream_inlet, the client side of an LSL connection that pulls multichannel sample chunks from a remote outlet.
  *
  * A @ref LSLLIB::stream_inlet is constructed from a resolved

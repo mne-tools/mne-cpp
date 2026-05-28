@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file braintreemodel.cpp
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Population helpers (addSurface / addBemSurface / addSensors / addDipoles / addSourceSpace / addNetwork / addDigitizerData) for the disp3D scene model.
  */
 

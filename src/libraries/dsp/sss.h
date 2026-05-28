@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sss.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Signal-Space Separation (SSS) and temporal SSS (tSSS) for MEG data.
  *
  * SSS represents the magnetic field measured by an array of MEG sensors as

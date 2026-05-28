@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_annotation_event_utils.cpp
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Implementation of the annotation ↔ event conversion helpers declared in @ref fiff_annotation_event_utils.h.
  *
  * Mirrors @c mne.events_from_annotations / @c mne.annotations_from_events

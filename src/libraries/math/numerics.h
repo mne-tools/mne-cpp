@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file numerics.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief General numerical helpers: GCD, log2, histogram binning, baseline rescaling, sparsity tests.
  *
  * @ref UTILSLIB::Numerics groups the scalar / per-vector numerical

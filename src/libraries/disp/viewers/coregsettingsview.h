@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * Copyright (c) 2020-2026 MNE-CPP Authors
+ *   Ruben Doerfel <doerfelruben@aol.com>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file coregsettingsview.h
- * @since 2022
- * @date  March 2026
+ * @since August 2020
  * @brief Co-registration parameter panel driving the MRI ↔ head fiducial alignment dialog.
  *
  * CoregSettingsView exposes the inputs needed by the ICP-based

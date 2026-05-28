@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_cluster.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Maris-Oostenveld cluster-mass permutation tests and Threshold-Free Cluster Enhancement for M/EEG inference.
  *
  * Mass-univariate t- or F-tests on dense (channel, time) or (vertex, time)

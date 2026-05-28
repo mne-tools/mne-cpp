@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_project.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief JSON and CBOR codecs for @ref MnaProject plus @ref read / @ref write thin façades that delegate to @ref MnaIO.
  *
  * The implementation serialises the project metadata

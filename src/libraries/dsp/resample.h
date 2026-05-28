@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file resample.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Declaration of Resample — polyphase anti-aliased rational resampling for MEG/EEG data.
  *
  * Algorithm:

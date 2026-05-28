@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file timerulerwidget.h
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Horizontal time-axis ruler displayed beneath @ref ChannelDataView with sample / second ticks.
  *
  * TimeRulerWidget paints the time axis aligned with the central raw

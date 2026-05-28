@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file field_map.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Forwarding header &mdash; field-map computation moved to the fwd library.
  *
  * Kept as a stub so legacy includes continue to compile. New code

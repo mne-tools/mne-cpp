@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_pwl_rap_music.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Powell-accelerated RAP-MUSIC variant — replaces the exhaustive pair scan with a Powell line-search refinement.
  *
  * @ref INVLIB::InvPwlRapMusic derives from @ref InvRapMusic and

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_cmne.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Contextual Minimum-Norm Estimate (CMNE) inverse solver — deep-learning-corrected dSPM (Dinh et al. 2021).
  *
  * @ref INVLIB::InvCMNE implements the CMNE algorithm of Dinh et al.,

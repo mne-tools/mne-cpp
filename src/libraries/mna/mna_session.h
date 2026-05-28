@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_session.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Container for all recordings collected within a single experimental session for one subject.
  *
  * @ref MnaSession sits between @ref MnaSubject and @ref MnaRecording

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file inv_resolution_matrix.h
- * @since 2026
- * @date  May 2026
+ * @since May 2026
  * @brief Resolution-matrix analysis for linear inverse operators — point-spread and cross-talk functions.
  *
  * @ref INVLIB::InvResolutionMatrix computes

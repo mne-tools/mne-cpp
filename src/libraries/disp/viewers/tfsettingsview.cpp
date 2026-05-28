@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2022-2026 MNE-CPP Authors
- *   Gabriel B Motta <gbmotta@mgh.harvard.edu>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
+ * Copyright (c) 2019-2026 MNE-CPP Authors
+ *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  *   Gabriel Motta <gabrielbenmotta@gmail.com>
+ *   Andreas Griesshammer <ag@fieldlineinc.com>
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file tfsettingsview.cpp
- * @since 2022
- * @date  March 2023
+ * @since July 2019
  * @brief Implementation of the TfSettingsView TF-analysis configuration panel.
  */
 

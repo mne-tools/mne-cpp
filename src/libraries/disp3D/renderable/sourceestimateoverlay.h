@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sourceestimateoverlay.h
- * @since 2026
- * @date  May 2026
+ * @since March 2026
  * @brief Colour-mapped source-time-course overlay that interpolates STC activation onto a cortical mesh and uploads per-vertex RGBA.
  *
  * SourceEstimateOverlay loads a pair of @c .stc files (one per

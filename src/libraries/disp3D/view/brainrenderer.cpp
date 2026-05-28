@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file brainrenderer.cpp
- * @since 2026
- * @date  April 2026
+ * @since March 2026
  * @brief Shader pipeline creation, dual-render-target setup and per-frame QRhi draw orchestration for the disp3D scene.
  */
 

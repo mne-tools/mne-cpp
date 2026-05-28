@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file mna_port.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Typed input or output slot on a graph node — carries an @ref MnaDataKind, an upstream link, an optional real-time stream binding and a cached-result reference.
  *
  * @ref MnaPort is the unit of connectivity in an MNA graph: every

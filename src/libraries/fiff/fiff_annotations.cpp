@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file fiff_annotations.cpp
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief Implementation of @ref FiffAnnotation / @ref FiffAnnotations, including the FIFF, JSON and CSV serializers.
  *
  * FIFF I/O reads and writes under @c FIFFB_MNE_ANNOTATIONS. The JSON and

@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file warp.h
- * @since 2026
- * @date  March 2026
+ * @since March 2026
  * @brief Thin-plate-spline 3-D warp from landmark correspondences.
  *
  * @ref UTILSLIB::Warp implements Bookstein's thin-plate spline (TPS), the

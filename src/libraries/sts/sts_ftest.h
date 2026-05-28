@@ -5,8 +5,7 @@
  *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
  * @file sts_ftest.h
- * @since 2026
- * @date  April 2026
+ * @since April 2026
  * @brief One-way ANOVA F-test with exact p-values for comparing two or more independent groups.
  *
  * Provides a one-way ANOVA on a list of @c k matrices, each holding
