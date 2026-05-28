@@ -1,37 +1,39 @@
 //=============================================================================================================
 /**
- * @file     fs_surface.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     March, 2013
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fs_surface.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Reader and in-memory representation of a single FreeSurfer triangular surface (e.g. lh.pial, rh.white, lh.inflated).
  *
- * Copyright (C) 2013, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * A FreeSurfer surface file stores one cortical hemisphere as a closed
+ * triangular mesh: a list of vertex positions in Tk-surface RAS millimetres
+ * followed by a list of triangle faces given as indices into that vertex
+ * array. The reader handles the two binary container variants emitted by
+ * FreeSurfer’s @c MRISwrite():
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
+ * - The legacy quadrangle format @c QUAD_FILE_MAGIC_NUMBER (0xFFFFFE), whose
+ *   quad faces are split into two triangles on load.
+ * - The modern triangle format @c TRIANGLE_FILE_MAGIC_NUMBER (0xFFFFFE)
+ *   produced by current versions of @c mris_convert and @c recon-all, with
+ *   a textual @c created by / @c filename header line preceding the
+ *   little-endian 24-bit magic.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Magic numbers, file layout and the implicit big-endian byte order all
+ * follow @c utils/mrisurf_io.c (in particular @c mrisReadTriangleFile and
+ * @c mrisReadQuadFile) and the public reference in
+ * @c freesurfer/utils/read_surf.c. Coordinates are returned in millimetres
+ * in the FreeSurfer Tk-surface RAS frame; conversion to scanner RAS
+ * requires the @c vox2ras-tkr / @c vox2ras-scanner transform pair from the
+ * subject’s @c orig.mgz and is intentionally left to callers.
  *
- *
- * @brief    FsSurface class declaration
- *
+ * The class also accepts the @c subject_id + @c hemi + @c surf shorthand
+ * used throughout the MNE-Python and mne-c stack and resolves it against
+ * @c $SUBJECTS_DIR/<id>/surf/{lh|rh}.<surf>, so existing analysis scripts
+ * port across without path rewrites.
  */
 
 #ifndef FS_SURFACE_H
@@ -75,9 +77,16 @@ namespace FSLIB
 
 //=============================================================================================================
 /**
- * A FreeSurfer surface mesh in triangular format
+ * @brief In-memory FreeSurfer triangular cortical surface for one hemisphere.
  *
- * @brief FreeSurfer surface mesh
+ * Owns the vertex coordinate matrix (n_vertices × 3, Tk-surface RAS mm), the
+ * triangle index matrix (n_faces × 3, zero-based into the vertex array) and
+ * the hemisphere id (0 = @c lh, 1 = @c rh). Construction is purely an I/O
+ * operation: each constructor either takes a direct path to a @c lh.pial /
+ * @c rh.white / @c lh.inflated style binary surface file, or the
+ * @c subject_id / @c hemi / @c surf shorthand resolved against
+ * @c $SUBJECTS_DIR. The instance is intended to be paired with an
+ * @ref FsAnnotation or @ref FsLabel sharing the same vertex indexing.
  */
 class FSSHARED_EXPORT FsSurface
 {

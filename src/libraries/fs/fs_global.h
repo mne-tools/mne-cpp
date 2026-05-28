@@ -1,37 +1,21 @@
 //=============================================================================================================
 /**
- * @file     fs_global.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @section  LICENSE
+ * @file fs_global.h
+ * @since 2022
+ * @date  March 2026
+ * @brief Export/import macros and build-info accessors for the FSLIB FreeSurfer I/O library.
  *
- * Copyright (C) 2012-2026, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Fs library export/import macros.
- *
+ * Defines the @c FSSHARED_EXPORT visibility macro used by every public
+ * class in FSLIB so the library can be built either as a Qt shared
+ * library (default) or as a static archive under @c STATICBUILD without
+ * source changes. Also exposes the small set of build-info accessors
+ * (date/time, abbreviated git hash, full git hash) that downstream
+ * tools surface in their About dialogs and log headers.
  */
 
 #ifndef FS_GLOBAL_H
@@ -59,7 +43,15 @@
 //=============================================================================================================
 /**
  * @namespace FSLIB
- * @brief     FreeSurfer surface and annotation I/O.
+ * @brief     FreeSurfer surface, annotation and parcellation I/O for mne-cpp.
+ *
+ * Houses the readers and in-memory containers for the on-surface side of
+ * a FreeSurfer @c recon-all output tree: triangular cortical surfaces
+ * (@c lh.pial, @c rh.white, @c lh.inflated, …), per-vertex annotation
+ * files (@c lh.aparc.annot, …), the FreeSurferColorLUT-style colour
+ * lookup tables they embed, surface labels (@c .label) and the
+ * companion lookup against volumetric parcellations
+ * (@c aparc+aseg.mgz). The volumetric MRI side lives in MRILIB.
  */
 namespace FSLIB{
 

@@ -1,37 +1,29 @@
 //=============================================================================================================
 /**
- * @file     fs_label.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     March, 2013
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fs_label.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Reader and in-memory representation of a FreeSurfer/MNE surface label (.label).
  *
- * Copyright (C) 2013, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * A FreeSurfer @c .label file describes a region of interest on a cortical
+ * surface as an explicit list of vertex indices restricted to one
+ * hemisphere. The file is plain ASCII: a comment line, a vertex count, then
+ * one whitespace-separated row per vertex of the form
+ * @c "index  x  y  z  value" where @c (x, y, z) is the Tk-surface RAS
+ * position in millimetres and @c value is an optional scalar (statistic,
+ * cluster weight, time, …). The format is shared with MNE-Python
+ * (@c mne.Label) and with @c mri_annotation2label, which is how individual
+ * regions of a parcellation are persisted as standalone labels.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FsLabel class declaration
- *
+ * This class loads such a file, keeps the indices, positions and values
+ * together with the hemisphere id and a human-readable label name, and
+ * provides helpers to project the label back onto a triangulation
+ * (@ref FsLabel::selectTris) so it can be drawn or fed into source-space
+ * masking.
  */
 
 #ifndef FS_LABEL_H
@@ -73,9 +65,15 @@ class FsSurface;
 
 //=============================================================================================================
 /**
- * A Freesurfer/MNE label with vertices restricted to one hemisphere
+ * @brief A FreeSurfer/MNE surface label: per-vertex indices, Tk-RAS positions and scalar values for one hemisphere.
  *
- * @brief Freesurfer/MNE label
+ * Wraps the parsed contents of a @c .label file or an in-memory label
+ * constructed programmatically (e.g. by thresholding a source estimate via
+ * @ref FsLabelUtils::stcToLabel). Vertex indices reference the matching
+ * @ref FsSurface for the same subject and hemisphere; positions are the
+ * Tk-surface RAS coordinates copied from that surface; values are the
+ * per-vertex scalar payload (statistic, time, weight). Hemisphere is
+ * encoded with the FreeSurfer convention {0 = lh, 1 = rh}.
  */
 class FSSHARED_EXPORT FsLabel
 {

@@ -1,35 +1,28 @@
 //=============================================================================================================
 /**
- * @file     fs_atlas_lookup.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.2.0
- * @date     April, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fs_atlas_lookup.h
+ * @since 2026
+ * @date  April 2026
+ * @brief RAS-coordinate lookup against a FreeSurfer volumetric parcellation (e.g. aparc+aseg.mgz / wmparc.mgz).
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * FreeSurfer’s @c recon-all writes the joint cortical+subcortical
+ * parcellation @c mri/aparc+aseg.mgz and the white-matter counterpart
+ * @c mri/wmparc.mgz: each voxel carries a single integer label whose
+ * meaning is fixed by @c $FREESURFER_HOME/FreeSurferColorLUT.txt (e.g.
+ * @c 17 = Left-Hippocampus, @c 1023 = ctx-lh-posteriorcingulate). The
+ * embedded MGH/MGZ @c vox2ras affine ties those voxel indices to scanner
+ * RAS millimetres.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FsAtlasLookup class — FreeSurfer volume parcellation atlas lookup.
- *
+ * This class loads such a volume, inverts the @c vox2ras matrix to obtain
+ * @c ras2vox, and exposes @c labelAtRas() / @c labelsForPositions() so any
+ * point in scanner RAS (typically dipole positions, electrode locations or
+ * sampled fibre tracks) can be tagged with the FreeSurfer region name it
+ * falls into. Out-of-bounds or unlabeled voxels resolve to @c "Unknown",
+ * matching @c mri_label2vol convention.
  */
 
 #ifndef FS_ATLAS_LOOKUP_H
@@ -65,9 +58,12 @@ namespace FSLIB
 
 //=============================================================================================================
 /**
- * @brief Atlas lookup for FreeSurfer volume parcellations (e.g. aparc+aseg.mgz).
+ * @brief RAS-point → anatomical-region resolver backed by a FreeSurfer volumetric parcellation.
  *
- * Loads a FreeSurfer MGH/MGZ volume and provides label lookup at RAS coordinates.
+ * Owns the parcellation voxel grid, its inverse RAS-to-voxel affine, and a
+ * label-id → region-name map seeded from FreeSurferColorLUT. Designed for
+ * cheap per-point queries: a @c labelAtRas() call is an affine
+ * transform, three bound checks and an @c int → @c QString hash lookup.
  */
 class FSSHARED_EXPORT FsAtlasLookup
 {

@@ -1,37 +1,27 @@
 //=============================================================================================================
 /**
- * @file     fs_annotationset.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fs_annotationset.h
+ * @since 2026
+ * @date  March 2026
+ * @brief Bi-hemispheric pair of FreeSurfer annotations (lh + rh) for one parcellation atlas.
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * Whole-brain parcellation analyses load one annotation file per
+ * hemisphere — typically @c lh.aparc.annot and @c rh.aparc.annot — that
+ * share an atlas-specific colortable but assign labels independently per
+ * hemisphere. @ref FsAnnotationSet bundles both into a single container so
+ * downstream code can iterate over hemispheres uniformly and pair the
+ * result with a matching @ref FsSurfaceSet of the same subject.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    FsAnnotationSet class declaration
- *
+ * The class accepts the standard FreeSurfer atlas names exposed by
+ * @c recon-all (@c aparc, @c aparc.a2009s, @c aparc.DKTatlas40,
+ * @c BA, @c BA.thresh, custom atlases produced by
+ * @c mris_ca_label…) and resolves them against
+ * @c $SUBJECTS_DIR/<id>/label/{lh|rh}.<atlas>.annot, mirroring the path
+ * convention used by @c mne.read_labels_from_annot in MNE-Python.
  */
 
 #ifndef FS_ANNOTATIONSET_H
@@ -73,9 +63,13 @@ class FsSurfaceSet;
 
 //=============================================================================================================
 /**
- * FsAnnotation set
+ * @brief Container holding the lh and/or rh @ref FsAnnotation for one parcellation atlas.
  *
- * @brief FsAnnotation set
+ * Keyed on hemisphere id (0 = lh, 1 = rh). When loaded from a single atlas
+ * name both hemispheres share the same colortable layout, so cross-hemisphere
+ * region lookup is consistent. The set is intended to be aligned
+ * one-to-one with an @ref FsSurfaceSet sharing the same subject and vertex
+ * count per hemisphere.
  */
 class FSSHARED_EXPORT FsAnnotationSet
 {

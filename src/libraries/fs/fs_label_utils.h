@@ -1,37 +1,27 @@
 //=============================================================================================================
 /**
- * @file     fs_label_utils.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.3.0
- * @date     May, 2026
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fs_label_utils.h
+ * @since 2026
+ * @date  May 2026
+ * @brief Surface-mesh label manipulation: grow, split into connected components, STC ↔ label conversion.
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ * Algorithmic counterpart to @ref FsLabel I/O. Operates on labels in the
+ * frame of an accompanying @ref FsSurface, using the surface’s triangle
+ * connectivity as the vertex adjacency graph (one breadth-first hop per
+ * @c step in @c growLabel; connectivity-component flood-fill in
+ * @c splitLabel).
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief    Label manipulation utilities: grow, split, STC↔label conversion.
- *
- * Equivalent to MNE-Python's mne.grow_labels, mne.split_label,
- * mne.stc_to_label, mne.labels_to_stc.
+ * The @c stcToLabel / @c labelsToStc pair converts between source-time-course
+ * matrices indexed on a sparse subset of cortical vertices and the explicit
+ * vertex-list label form. This is the mne-cpp equivalent of
+ * @c mne.grow_labels, @c mne.split_label, @c mne.stc_to_label and
+ * @c mne.labels_to_stc in MNE-Python; the surface metric and indexing
+ * conventions are kept identical so round-tripping data between the two
+ * stacks does not require resampling.
  */
 
 #ifndef FS_LABEL_UTILS_H
@@ -68,7 +58,12 @@ namespace FSLIB
 
 //=============================================================================================================
 /**
- * @brief Static utilities for label manipulation on FreeSurfer surfaces.
+ * @brief Stateless utilities that grow, split and convert @ref FsLabel objects on a FreeSurfer triangular surface.
+ *
+ * All operations take an @ref FsSurface as the topology source and treat
+ * its triangle faces as the vertex adjacency graph. The helpers are static
+ * because labels carry their own state and the surface is supplied
+ * per call, mirroring the function-based API used by MNE-Python.
  */
 class FSSHARED_EXPORT FsLabelUtils
 {

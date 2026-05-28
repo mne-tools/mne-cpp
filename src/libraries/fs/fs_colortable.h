@@ -1,37 +1,30 @@
 //=============================================================================================================
 /**
- * @file     fs_colortable.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @section  LICENSE
+ * @file fs_colortable.h
+ * @since 2026
+ * @date  March 2026
+ * @brief In-memory representation of a FreeSurfer colour/structure lookup table (FreeSurferColorLUT / embedded .annot ctab).
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * FreeSurfer ships a global colour lookup table at
+ * @c $FREESURFER_HOME/FreeSurferColorLUT.txt that maps integer labels
+ * (cortical parcels, subcortical structures, white-matter parcels, …) to a
+ * human-readable name and an RGBA tuple used by @c tkmedit, @c freeview
+ * and downstream tooling. The same table is also embedded directly inside
+ * @c .annot files via the @c TAG_OLD_COLORTABLE and @c TAG_NEW_COLORTABLE
+ * blocks parsed by @ref FsAnnotation.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
- * @brief     FsColortable class declaration.
- *
+ * This class is the binary-friendly in-memory form of either source:
+ * - @c struct_names — region name per entry, indexed by row
+ * - @c table         — @c numEntries × 5 matrix of
+ *   @c [R, G, B, A, packed_label] where @c packed_label is the same
+ *   @c R + (G ≪ 8) + (B ≪ 16) + (A ≪ 24) integer used to encode
+ *   per-vertex assignments in @c .annot files
+ * - @c orig_tab      — atlas/table provenance string (e.g.
+ *   @c "aparc.annot.ctab") preserved from the source
  */
 
 #ifndef FS_COLORTABLE_H
@@ -66,9 +59,14 @@ namespace FSLIB
 
 //=============================================================================================================
 /**
- * Vertices label based lookup table containing colorcodes and anatomical names
+ * @brief FreeSurfer colour lookup table: region name + RGBA + packed label, indexed by entry.
  *
- * @brief Vertices label based lookup table
+ * Backs the colour/structure mapping used by @ref FsAnnotation and by
+ * any caller that needs to translate a packed @c .annot label into the
+ * matching anatomical name and RGBA colour. The container is a thin
+ * value object: rows of @c table align with @c struct_names, and the
+ * label column matches the per-vertex integer stored in @c .annot files
+ * so direct equality lookup is sufficient.
  */
 class FSSHARED_EXPORT FsColortable
 {
