@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_convenience.h
- * @since May 2026
- * @brief Top-level convenience entry points that mirror MNE-Python's @c apply_inverse_* / @c compute_source_psd helpers.
+ * @file     inv_convenience.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Top-level convenience entry points that mirror MNE-Python's @c apply_inverse_* / @c compute_source_psd helpers.
  *
  * Free functions in this header glue together the lower-level INVLIB
  * classes so users can match the MNE-Python ergonomics:

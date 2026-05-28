@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2017-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file observerpattern.h
- * @since September 2017
- * @brief Classical GoF observer pattern (@c Subject + @c IObserver) used by MNE-CPP's non-QObject model classes.
+ * @file     observerpattern.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     September 2017
+ * @brief    Classical GoF observer pattern (@c Subject + @c IObserver) used by MNE-CPP's non-QObject model classes.
  *
  * Qt's @c QObject signal/slot machinery is the preferred change
  * notification mechanism, but a number of model classes in

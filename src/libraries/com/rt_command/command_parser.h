@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file command_parser.h
- * @since March 2026
- * @brief Front-end tokeniser that turns incoming JSON or CLI payloads into @ref COMLIB::RawCommand objects and notifies attached managers.
+ * @file     command_parser.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Front-end tokeniser that turns incoming JSON or CLI payloads into @ref COMLIB::RawCommand objects and notifies attached managers.
  *
  * @ref COMLIB::CommandParser owns the @c Subject side of the observer
  * pattern in @c utils/generics: every @ref COMLIB::CommandManager that

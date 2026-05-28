@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2021-2026 MNE-CPP Authors
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file scalecontrol.cpp
- * @since March 2021
- * @brief Implementation of the ScaleControl slider + spinbox composite.
+ * @file     scalecontrol.cpp
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.9
+ * @date     March 2021
+ * @brief    Implementation of the ScaleControl slider + spinbox composite.
  */
 
 #include "scalecontrol.h"

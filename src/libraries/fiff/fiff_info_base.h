@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2013-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Florian Schlembach <fschlembach@web.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_info_base.h
- * @since February 2013
- * @brief Minimal measurement-info subset (channel list, sampling rate, basic transforms) shared by FIFF readers that do not need the full FiffInfo.
+ * @file     fiff_info_base.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Florian Schlembach <fschlembach@web.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     February 2013
+ * @brief    Minimal measurement-info subset (channel list, sampling rate, basic transforms) shared by FIFF readers that do not need the full FiffInfo.
  *
  * @ref FiffInfoBase carries only what every downstream component needs to
  * interpret a data matrix: the channel list (@c chs / @c ch_names /

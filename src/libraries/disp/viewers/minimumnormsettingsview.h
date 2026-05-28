@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   johaenns <j.vorw01@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file minimumnormsettingsview.h
- * @since September 2018
- * @brief Minimum-norm inverse-solution method / regularisation panel (MNE, dSPM, sLORETA).
+ * @file     minimumnormsettingsview.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   johaenns <j.vorw01@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     September 2018
+ * @brief    Minimum-norm inverse-solution method / regularisation panel (MNE, dSPM, sLORETA).
  *
  * MinimumNormSettingsView selects the inverse-operator method (MNE,
  * dSPM, sLORETA), the SNR lambda regularisation and the time-frame

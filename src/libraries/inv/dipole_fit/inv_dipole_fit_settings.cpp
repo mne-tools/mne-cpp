@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_dipole_fit_settings.cpp
- * @since March 2026
- * @brief Implementation of @ref INVLIB::InvDipoleFitSettings (default values, argv parsing, integrity check, usage banner).
+ * @file     inv_dipole_fit_settings.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref INVLIB::InvDipoleFitSettings (default values, argv parsing, integrity check, usage banner).
  *
  * Implements the default-value initialiser, the
  * @c mne_dipole_fit-compatible argv parser, the per-option validator

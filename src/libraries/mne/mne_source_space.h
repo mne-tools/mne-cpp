@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_source_space.h
- * @since March 2026
- * @brief Single-hemisphere source space (cortical surface or volume grid) loaded from FIFF.
+ * @file     mne_source_space.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Single-hemisphere source space (cortical surface or volume grid) loaded from FIFF.
  *
  * @ref MNELIB::MNESourceSpace replaces the @c mneSourceSpace typedef of
  * @c mne_types.h and is the C++ representation of one decimated source

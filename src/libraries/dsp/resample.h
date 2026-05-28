@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file resample.h
- * @since March 2026
- * @brief Declaration of Resample — polyphase anti-aliased rational resampling for MEG/EEG data.
+ * @file     resample.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Declaration of Resample — polyphase anti-aliased rational resampling for MEG/EEG data.
  *
  * Algorithm:
  *   Given input rate oldSFreq and target rate newSFreq, the rational ratio p/q is computed after

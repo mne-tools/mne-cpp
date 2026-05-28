@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fine_calibration.h
- * @since May 2026
- * @brief Fine calibration data for SSS.
+ * @file     fine_calibration.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Fine calibration data for SSS.
  *
  * Stores per-sensor calibration coefficients (gain and cross-talk imbalance)
  * used to refine the SSS forward model. Equivalent to MNE-Python's

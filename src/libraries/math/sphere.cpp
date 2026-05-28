@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sphere.cpp
- * @since March 2026
- * @brief Closed-form (Jennings) and Nelder–Mead implementations of sphere fitting.
+ * @file     sphere.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Closed-form (Jennings) and Nelder–Mead implementations of sphere fitting.
  *
  * Implements the two static factories declared in @ref sphere.h. The
  * algebraic fit assembles the @c [2x 2y 2z 1] design matrix from the

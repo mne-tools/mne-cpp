@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file epoch_extractor.h
- * @since March 2026
- * @brief Declaration of EpochExtractor — segments continuous MEG/EEG data into trials.
+ * @file     epoch_extractor.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Declaration of EpochExtractor — segments continuous MEG/EEG data into trials.
  *
  * EpochExtractor turns a continuous raw recording into a set of fixed-length trials
  * (epochs) locked to stimulus or response events.  Each epoch can optionally have

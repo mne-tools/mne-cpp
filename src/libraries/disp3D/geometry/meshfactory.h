@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file meshfactory.h
- * @since March 2026
- * @brief Static factory for procedural Qt-RHI meshes (spheres, plates, barbells, cylinders, batched point clouds).
+ * @file     meshfactory.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Static factory for procedural Qt-RHI meshes (spheres, plates, barbells, cylinders, batched point clouds).
  *
  * MeshFactory builds the small primitive geometries used throughout
  * disp3D &mdash; subdivided icosahedron spheres for source-space and

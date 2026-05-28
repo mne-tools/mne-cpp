@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_msh_eyes.h
- * @since March 2026
- * @brief Mesh-viewer camera state (position, focal point, up vector, field of view).
+ * @file     mne_msh_eyes.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Mesh-viewer camera state (position, focal point, up vector, field of view).
  *
  * @ref MNELIB::MNEMshEyes captures the camera parameters that the
  * @c tksurfer / @c mneAnalyze viewers serialised next to a scene; used

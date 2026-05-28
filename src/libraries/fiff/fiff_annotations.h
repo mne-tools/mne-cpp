@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_annotations.h
- * @since April 2026
- * @brief FIFF / MNE annotations: time-tagged textual marks (BAD_*, EDGE, custom) with onset, duration and description.
+ * @file     fiff_annotations.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    FIFF / MNE annotations: time-tagged textual marks (BAD_*, EDGE, custom) with onset, duration and description.
  *
  * Annotations are time-localized comments attached to a continuous
  * recording: rejected segments (``BAD_*''), recording edges (``EDGE''),

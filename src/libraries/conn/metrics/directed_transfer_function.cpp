@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file directed_transfer_function.cpp
- * @since April 2026
- * @brief Implementation of @ref CONNLIB::DirectedTransferFunction - row-normalised |H(f)|^2 directional connectivity (Kaminski & Blinowska 1991), driven by the shared @ref CONNLIB::MvarModel fit.
+ * @file     directed_transfer_function.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of @ref CONNLIB::DirectedTransferFunction - row-normalised |H(f)|^2 directional connectivity (Kaminski & Blinowska 1991), driven by the shared @ref CONNLIB::MvarModel fit.
  */
 
 //=============================================================================================================

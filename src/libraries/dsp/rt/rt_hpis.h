@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rt_hpis.h
- * @since March 2026
- * @brief Real-time continuous Head-Position-Indicator (cHPI) coil-localisation worker.
+ * @file     rt_hpis.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Real-time continuous Head-Position-Indicator (cHPI) coil-localisation worker.
  *
  * RtHpi runs the inverse-library HPI fitter (@ref INVLIB::InvHpiFit) on each
  * incoming data window from a background @c QThread. For every window the

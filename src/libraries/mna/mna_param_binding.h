@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_param_binding.h
- * @since April 2026
- * @brief Formula-driven binding that recomputes one MNA parameter from an expression whenever its triggers fire.
+ * @file     mna_param_binding.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Formula-driven binding that recomputes one MNA parameter from an expression whenever its triggers fire.
  *
  * @ref MnaParamBinding turns the otherwise static @ref MnaParamTree
  * into a reactive system. Each binding links a @c targetPath

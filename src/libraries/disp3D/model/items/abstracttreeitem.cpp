@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file abstracttreeitem.cpp
- * @since March 2026
- * @brief Type-safe accessors backing the shared visibility / transform / colour / alpha roles on every disp3D tree item.
+ * @file     abstracttreeitem.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Type-safe accessors backing the shared visibility / transform / colour / alpha roles on every disp3D tree item.
  */
 
 //=============================================================================================================

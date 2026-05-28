@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_lcmv.h
- * @since March 2026
- * @brief Linearly Constrained Minimum Variance (LCMV) beamformer — time-domain source-power and source-time-course estimation.
+ * @file     inv_lcmv.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Linearly Constrained Minimum Variance (LCMV) beamformer — time-domain source-power and source-time-course estimation.
  *
  * @ref INVLIB::InvLCMV implements the LCMV spatial filter of Van Veen
  * et al., IEEE TBME 44(9), 867-880 (1997): it inverts a regularised

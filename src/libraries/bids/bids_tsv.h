@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_tsv.h
- * @since March 2026
- * @brief Generic tab-separated-value reader/writer for BIDS sidecars (UTF-8, LF, ``n/a`` for missing values, mandatory header row).
+ * @file     bids_tsv.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Generic tab-separated-value reader/writer for BIDS sidecars (UTF-8, LF, ``n/a`` for missing values, mandatory header row).
  *
  * BIDS standardises a strict TSV dialect for every tabular sidecar: a
  * mandatory header row defines the column names, values are separated

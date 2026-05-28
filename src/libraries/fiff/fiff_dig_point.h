@@ -2,18 +2,19 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   doerfelruben@aol.com <rdorfel@mgh.harvard.edu>
- *   Ruben Doerfel <doerfelruben@aol.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_dig_point.h
- * @since October 2012
- * @brief Single digitization point (FIFF_DIG_POINT) with kind (cardinal/HPI/EEG/extra), identifier and 3D coordinates.
+ * @file     fiff_dig_point.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   doerfelruben@aol.com <rdorfel@mgh.harvard.edu>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     October 2012
+ * @brief    Single digitization point (FIFF_DIG_POINT) with kind (cardinal/HPI/EEG/extra), identifier and 3D coordinates.
  *
  * The Polhemus / optical digitizer used for MEG/EEG coregistration writes
  * one @c FIFF_DIG_POINT tag per landmark into the @c FIFFB_ISOTRAK block.

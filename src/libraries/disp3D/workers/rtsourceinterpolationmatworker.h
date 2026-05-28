@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rtsourceinterpolationmatworker.h
- * @since March 2026
- * @brief Background worker that builds the sparse source-to-vertex interpolation matrix for one hemisphere.
+ * @file     rtsourceinterpolationmatworker.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Background worker that builds the sparse source-to-vertex interpolation matrix for one hemisphere.
  *
  * Encapsulates the heavy-weight @ref GeometryInfo::scdc (geodesic
  * distance Dijkstra) and @ref Interpolation::createInterpolationMat

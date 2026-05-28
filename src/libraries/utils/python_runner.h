@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file python_runner.h
- * @since April 2026
- * @brief Embedding-free launcher that runs MNE-Python (or any user) scripts as a child process and streams their output back to the C++ caller.
+ * @file     python_runner.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Embedding-free launcher that runs MNE-Python (or any user) scripts as a child process and streams their output back to the C++ caller.
  *
  * @ref UTILSLIB::PythonRunner wraps @c QProcess with the boilerplate
  * needed to use Python for cross-validation, reference data

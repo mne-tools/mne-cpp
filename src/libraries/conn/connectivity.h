@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2017-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file connectivity.h
- * @since March 2017
- * @brief Front-end dispatcher that runs the requested connectivity metrics over a @ref ConnectivitySettings batch.
+ * @file     connectivity.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     March 2017
+ * @brief    Front-end dispatcher that runs the requested connectivity metrics over a @ref ConnectivitySettings batch.
  *
  * @ref Connectivity is the single entry point used by GUI plugins (rtfwd,
  * connectivity-estimator) and the @c mne_dipole_fit / batch tools to compute

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file warp.cpp
- * @since March 2026
- * @brief Thin-plate-spline fit and evaluation kernels and the landmark-file reader.
+ * @file     warp.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Thin-plate-spline fit and evaluation kernels and the landmark-file reader.
  *
  * Implements the TPS solver declared in @ref warp.h. Fitting assembles
  * the @c (n+4)×(n+4) block-symmetric matrix

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_coord_trans_set.cpp
- * @since February 2026
- * @brief Implementation of @ref FiffCoordTransSet: container management plus lookup of transforms by (from, to) frame pair.
+ * @file     fiff_coord_trans_set.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Implementation of @ref FiffCoordTransSet: container management plus lookup of transforms by (from, to) frame pair.
  *
  * Used by @ref FiffStream::read_meas_info to return every device→head /
  * head→MRI / MRI→RAS transform discovered in a measurement file, and

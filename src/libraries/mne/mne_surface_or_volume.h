@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_surface_or_volume.h
- * @since March 2026
- * @brief Discriminated geometry container that can represent either a triangulated surface or a discrete/volume source space.
+ * @file     mne_surface_or_volume.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Discriminated geometry container that can represent either a triangulated surface or a discrete/volume source space.
  *
  * @ref MNELIB::MNESurfaceOrVolume is the direct port of the
  * @c mneSurfaceOrVolumeRec / @c mneSourceSpaceRec structure of MNE-C and

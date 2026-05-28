@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file report.h
- * @since May 2026
- * @brief HTML report builder — mne-cpp's equivalent of @c mne.Report for summarising analysis pipelines.
+ * @file     report.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    HTML report builder — mne-cpp's equivalent of @c mne.Report for summarising analysis pipelines.
  *
  * @ref UTILSLIB::Report collects titled sections (free text,
  * tables, key-value pairs, preformatted code) and emits a

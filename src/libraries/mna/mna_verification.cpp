@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_verification.cpp
- * @since April 2026
- * @brief JSON and CBOR codecs for @ref MnaVerificationCheck, @ref MnaVerificationResult, @ref MnaProvenance and the top-level @ref MnaVerification aggregator.
+ * @file     mna_verification.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    JSON and CBOR codecs for @ref MnaVerificationCheck, @ref MnaVerificationResult, @ref MnaProvenance and the top-level @ref MnaVerification aggregator.
  *
  * The implementation serialises each struct field-for-field and
  * delegates nested @ref MnaScript bodies and check / result lists

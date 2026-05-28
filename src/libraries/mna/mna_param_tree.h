@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_param_tree.h
- * @since April 2026
- * @brief Hierarchical parameter store with formula-driven dynamic bindings shared across an MNA graph.
+ * @file     mna_param_tree.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Hierarchical parameter store with formula-driven dynamic bindings shared across an MNA graph.
  *
  * @ref MnaParamTree is the second authoritative source of node
  * attribute values — the first being a node's own @c attributes

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file lsl.h
- * @since February 2026
- * @brief Umbrella include header that exposes the full LSLLIB public surface in a single import.
+ * @file     lsl.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Umbrella include header that exposes the full LSLLIB public surface in a single import.
  *
  * LSLLIB is mne-cpp's in-tree, Qt-based reimplementation of the Lab
  * Streaming Layer (LSL) client API. It is designed as an ABI- and

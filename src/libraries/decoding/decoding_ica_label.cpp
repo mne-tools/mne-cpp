@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file decoding_ica_label.cpp
- * @since May 2026
- * @brief Implementation of the static ICA component labeller.
+ * @file     decoding_ica_label.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of the static ICA component labeller.
  *
  * For each row of the ICA-source matrix the implementation scores the
  * component against the EOG reference (maximum absolute Pearson

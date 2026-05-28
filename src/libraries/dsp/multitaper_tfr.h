@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file multitaper_tfr.h
- * @since April 2026
- * @brief Sliding-window multitaper time-frequency representation.
+ * @file     multitaper_tfr.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Sliding-window multitaper time-frequency representation.
  *
  * MultitaperTfr applies the multitaper PSD estimator (@ref MultitaperPsd)
  * to consecutive overlapping windows of a signal, producing a

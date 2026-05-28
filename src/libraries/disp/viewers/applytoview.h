@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file applytoview.h
- * @since August 2020
- * @brief Three-way radio selector widget choosing scope = Selected / Visible / All channels.
+ * @file     applytoview.h
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.6
+ * @date     August 2020
+ * @brief    Three-way radio selector widget choosing scope = Selected / Visible / All channels.
  *
  * ApplyToView is a tiny @ref AbstractView subclass holding a
  * @c QButtonGroup of three radios that lets the user decide whether a

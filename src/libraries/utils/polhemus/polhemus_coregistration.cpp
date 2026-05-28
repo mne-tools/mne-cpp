@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file polhemus_coregistration.cpp
- * @since May 2026
- * @brief Implementation of @ref UTILSLIB::PolhemusCoregistration — fiducial-based head→device rigid alignment.
+ * @file     polhemus_coregistration.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of @ref UTILSLIB::PolhemusCoregistration — fiducial-based head→device rigid alignment.
  *
  * The three cardinal fiducials (LPA, NAS, RPA) define an
  * orthonormal head frame whose construction matches the

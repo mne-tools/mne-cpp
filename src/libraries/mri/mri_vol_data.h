@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mri_vol_data.h
- * @since February 2026
- * @brief Format-agnostic in-memory representation of a 3D MRI volume plus its slice decomposition.
+ * @file     mri_vol_data.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Format-agnostic in-memory representation of a 3D MRI volume plus its slice decomposition.
  *
  * Two cooperating types live in this header:
  *

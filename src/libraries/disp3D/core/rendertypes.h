@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rendertypes.h
- * @since March 2026
- * @brief Lightweight render-related enums (ShaderMode, VisualizationMode) shared across disp3D.
+ * @file     rendertypes.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Lightweight render-related enums (ShaderMode, VisualizationMode) shared across disp3D.
  *
  * Kept QRhi-free and free of heavy Qt includes so it can be pulled in
  * from any disp3D translation unit without forcing a recompile of

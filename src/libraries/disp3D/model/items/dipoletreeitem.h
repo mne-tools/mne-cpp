@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file dipoletreeitem.h
- * @since March 2026
- * @brief Tree item wrapping a fitted @ref INVLIB::InvEcdSet of equivalent current dipoles.
+ * @file     dipoletreeitem.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Tree item wrapping a fitted @ref INVLIB::InvEcdSet of equivalent current dipoles.
  *
  * Each dipole becomes one instance in the @ref DipoleObject arrow
  * mesh: position drives the instance translation, orientation the

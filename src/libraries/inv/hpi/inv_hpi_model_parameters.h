@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_hpi_model_parameters.h
- * @since March 2026
- * @brief Immutable configuration for the HPI signal model — coil drive frequencies, sample rate, line frequency and model variant.
+ * @file     inv_hpi_model_parameters.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Immutable configuration for the HPI signal model — coil drive frequencies, sample rate, line frequency and model variant.
  *
  * @ref INVLIB::InvHpiModelParameters captures the four quantities that
  * fully determine the design of the sinusoidal HPI signal model:

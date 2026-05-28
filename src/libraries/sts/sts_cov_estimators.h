@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_cov_estimators.h
- * @since April 2026
- * @brief Regularised covariance estimators for M/EEG noise covariances, matching MNE-Python's compute_covariance() API.
+ * @file     sts_cov_estimators.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Regularised covariance estimators for M/EEG noise covariances, matching MNE-Python's compute_covariance() API.
  *
  * M/EEG sensor counts routinely exceed the number of clean baseline
  * samples, which makes the unregularised sample covariance rank-deficient

@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_tag.h
- * @since August 2012
- * @brief FIFF tag: the 16-byte tag header (kind, type, size, next) plus its decoded payload.
+ * @file     fiff_tag.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     August 2012
+ * @brief    FIFF tag: the 16-byte tag header (kind, type, size, next) plus its decoded payload.
  *
  * A FIFF tag is the atomic unit of the format: a fixed 16-byte header
  * (@c kind, @c type, @c size, @c next) followed by @c size bytes of

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_cluster.h
- * @since April 2026
- * @brief Maris-Oostenveld cluster-mass permutation tests and Threshold-Free Cluster Enhancement for M/EEG inference.
+ * @file     sts_cluster.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Maris-Oostenveld cluster-mass permutation tests and Threshold-Free Cluster Enhancement for M/EEG inference.
  *
  * Mass-univariate t- or F-tests on dense (channel, time) or (vertex, time)
  * grids generate a severe multiple-comparison problem. This module

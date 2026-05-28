@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file raw_command.cpp
- * @since March 2026
- * @brief Translation unit for @ref COMLIB::RawCommand: storage of the untyped keyword/argument pair before schema binding.
+ * @file     raw_command.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Translation unit for @ref COMLIB::RawCommand: storage of the untyped keyword/argument pair before schema binding.
  *
  * Implements the trivial constructors, copy-assignment and the
  * @c ICommand::execute() override that emits @c executed(QList<QString>)

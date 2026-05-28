@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_ch_selection.h
- * @since March 2026
- * @brief Named subset of channels (e.g. @c "Left-temporal") loaded from an MNE @c .sel file.
+ * @file     mne_ch_selection.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Named subset of channels (e.g. @c "Left-temporal") loaded from an MNE @c .sel file.
  *
  * @ref MNELIB::MNEChSelection represents one entry of the channel
  * selection files shipped with the MNE C tools (per-region groupings of

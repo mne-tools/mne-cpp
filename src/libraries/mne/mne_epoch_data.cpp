@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file mne_epoch_data.cpp
- * @since October 2012
- * @brief Implementation of @ref MNELIB::MNEEpochData.
+ * @file     mne_epoch_data.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     October 2012
+ * @brief    Implementation of @ref MNELIB::MNEEpochData.
  *
  * Provides constructors, deep-copy semantics for the sensor matrix and
  * the application of SSP / baseline correction to one epoch in place.

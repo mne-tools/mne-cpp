@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bad_channels_lof.h
- * @since May 2026
- * @brief Bad-channel detection via the Local Outlier Factor (LOF) algorithm.
+ * @file     bad_channels_lof.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Bad-channel detection via the Local Outlier Factor (LOF) algorithm.
  *
  * LOF (Breunig et al., SIGMOD 2000) scores each channel by the ratio between
  * its own local density (reachability distance to its @c k nearest channels

@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2016-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file network.h
- * @since August 2016
- * @brief Graph container that stores the result of one functional-connectivity metric as nodes (sources/sensors) and weighted edges (channel-pair couplings).
+ * @file     network.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     August 2016
+ * @brief    Graph container that stores the result of one functional-connectivity metric as nodes (sources/sensors) and weighted edges (channel-pair couplings).
  *
  * @ref Network is the common output type returned by every estimator in
  * @c CONNLIB. Each @ref NetworkNode carries a 3D position (sensor coordinate

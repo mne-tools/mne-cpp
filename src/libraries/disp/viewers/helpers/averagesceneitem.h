@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Wayne F. Mead <isk@imsorrykun.com>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file averagesceneitem.h
- * @since July 2018
- * @brief QGraphicsObject painting one channel's averaged evoked trace at its sensor position.
+ * @file     averagesceneitem.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Wayne F. Mead <isk@imsorrykun.com>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2018
+ * @brief    QGraphicsObject painting one channel's averaged evoked trace at its sensor position.
  *
  * AverageSceneItem is a fixed-size mini-plot drawn for every channel
  * by @ref AverageScene. It stores the per-condition data vectors,

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file filter_thread_arg.h
- * @since March 2026
- * @brief Argument record passed to a background raw-data filter worker.
+ * @file     filter_thread_arg.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Argument record passed to a background raw-data filter worker.
  *
  * @ref MNELIB::FilterThreadArg bundles the input buffer, an
  * @ref MNELIB::MNEFilterDef and the completion callback that the

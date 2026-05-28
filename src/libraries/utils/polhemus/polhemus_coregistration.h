@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file polhemus_coregistration.h
- * @since May 2026
- * @brief Head–device coregistration using the Polhemus Fastrak.
+ * @file     polhemus_coregistration.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Head–device coregistration using the Polhemus Fastrak.
  *
  *           Two Polhemus stations work together:
  *

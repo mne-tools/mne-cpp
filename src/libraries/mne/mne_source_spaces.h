@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_source_spaces.h
- * @since March 2026
- * @brief Container pairing the left and right cortical source spaces of a subject.
+ * @file     mne_source_spaces.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Container pairing the left and right cortical source spaces of a subject.
  *
  * @ref MNELIB::MNESourceSpaces wraps the @c QList of
  * @ref MNESourceSpace objects that form a complete cortical source space

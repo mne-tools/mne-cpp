@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file interpolation.h
- * @since March 2026
- * @brief Distance-based sparse interpolation weights and per-frame signal smoothing on triangulated meshes.
+ * @file     interpolation.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Distance-based sparse interpolation weights and per-frame signal smoothing on triangulated meshes.
  *
  * Given the geodesic distance table produced by @ref GeometryInfo,
  * Interpolation builds a sparse <em>n_vertices x n_sources</em>

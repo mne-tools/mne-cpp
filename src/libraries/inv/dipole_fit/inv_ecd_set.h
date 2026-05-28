@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_ecd_set.h
- * @since March 2026
- * @brief Ordered set of @ref INVLIB::InvEcd records — the result of a sequential dipole-fit run.
+ * @file     inv_ecd_set.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Ordered set of @ref INVLIB::InvEcd records — the result of a sequential dipole-fit run.
  *
  * @ref INVLIB::InvEcdSet collects one @ref InvEcd per fitted time bin
  * and exposes append, index access and stream-insertion as well as

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file warp.h
- * @since March 2026
- * @brief Thin-plate-spline 3-D warp from landmark correspondences.
+ * @file     warp.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Thin-plate-spline 3-D warp from landmark correspondences.
  *
  * @ref UTILSLIB::Warp implements Bookstein's thin-plate spline (TPS), the
  * minimum-bending-energy interpolant that maps an @c n×3 set of source

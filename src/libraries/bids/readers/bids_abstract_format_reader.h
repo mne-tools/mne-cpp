@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_abstract_format_reader.h
- * @since March 2026
- * @brief Strategy interface for format-specific raw-data readers (BrainVision, EDF, …) consumed by @ref BIDSLIB::BidsRawData.
+ * @file     bids_abstract_format_reader.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Strategy interface for format-specific raw-data readers (BrainVision, EDF, …) consumed by @ref BIDSLIB::BidsRawData.
  *
  * BIDS allows several wire formats for electrophysiology raw data
  * (BrainVision @c .vhdr triplets and @c .edf are by far the most common

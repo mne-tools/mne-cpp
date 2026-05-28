@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fs_atlas_lookup.h
- * @since April 2026
- * @brief RAS-coordinate lookup against a FreeSurfer volumetric parcellation (e.g. aparc+aseg.mgz / wmparc.mgz).
+ * @file     fs_atlas_lookup.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    RAS-coordinate lookup against a FreeSurfer volumetric parcellation (e.g. aparc+aseg.mgz / wmparc.mgz).
  *
  * FreeSurfer’s @c recon-all writes the joint cortical+subcortical
  * parcellation @c mri/aparc+aseg.mgz and the white-matter counterpart

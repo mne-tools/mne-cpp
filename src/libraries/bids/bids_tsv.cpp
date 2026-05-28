@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_tsv.cpp
- * @since March 2026
- * @brief Implementation of @ref BIDSLIB::BidsTsv — generic UTF-8 / LF / @c n/a TSV reader and writer for BIDS sidecars.
+ * @file     bids_tsv.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of @ref BIDSLIB::BidsTsv — generic UTF-8 / LF / @c n/a TSV reader and writer for BIDS sidecars.
  */
 
 //=============================================================================================================

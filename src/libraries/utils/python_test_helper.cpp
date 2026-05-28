@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file python_test_helper.cpp
- * @since April 2026
- * @brief Implementation of @ref UTILSLIB::PythonTestHelper — availability cache, package probes and scalar @c eval helpers.
+ * @file     python_test_helper.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of @ref UTILSLIB::PythonTestHelper — availability cache, package probes and scalar @c eval helpers.
  *
  * The interpreter availability check and the package probe
  * results are memoised in @c static QHash members so the

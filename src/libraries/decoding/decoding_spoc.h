@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file decoding_spoc.h
- * @since May 2026
- * @brief Source Power Comodulation (SPoC) for regressing continuous targets onto narrowband M/EEG power.
+ * @file     decoding_spoc.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Source Power Comodulation (SPoC) for regressing continuous targets onto narrowband M/EEG power.
  *
  * SPoC is the regression analogue of CSP: instead of two class
  * covariances it solves the generalised eigenproblem

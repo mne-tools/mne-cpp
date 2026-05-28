@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file dataloader.h
- * @since March 2026
- * @brief Static helpers for loading FreeSurfer / MNE source-space and BEM data into the disp3D model tree.
+ * @file     dataloader.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Static helpers for loading FreeSurfer / MNE source-space and BEM data into the disp3D model tree.
  *
  * DataLoader is a thin facade over @ref FSLIB and @ref MNELIB readers
  * that turns raw files (FsSurface, FsAnnotation, MNESourceSpaces,

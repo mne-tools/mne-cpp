@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file networkobject.h
- * @since March 2026
- * @brief Instanced connectivity-graph renderable: node spheres and edge cylinders coloured by weight through a named colormap.
+ * @file     networkobject.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Instanced connectivity-graph renderable: node spheres and edge cylinders coloured by weight through a named colormap.
  *
  * NetworkObject mirrors the @ref DipoleObject instancing pattern
  * but splits the scene into two meshes &mdash; nodes (spheres) and

@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_dig_point.cpp
- * @since October 2012
- * @brief Implementation of @ref FiffDigPoint: streaming of one FIFF_DIG_POINT record (kind, ident, xyz).
+ * @file     fiff_dig_point.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     October 2012
+ * @brief    Implementation of @ref FiffDigPoint: streaming of one FIFF_DIG_POINT record (kind, ident, xyz).
  *
  * Field layout matches @c fiffDigPointRec on disk so the records can be
  * read straight into the @ref FiffDigPoint array of a

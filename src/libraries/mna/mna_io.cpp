@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_io.cpp
- * @since April 2026
- * @brief Implementation of the @ref MnaIO codecs — UTF-8 JSON for @c .mna files and CBOR (prefixed with the @c "MNX1" four-byte magic) for @c .mnx files.
+ * @file     mna_io.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of the @ref MnaIO codecs — UTF-8 JSON for @c .mna files and CBOR (prefixed with the @c "MNX1" four-byte magic) for @c .mnx files.
  *
  * The @ref read / @ref write entry points dispatch on the file
  * extension and delegate to the four private helpers. The CBOR

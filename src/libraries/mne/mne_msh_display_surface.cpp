@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_msh_display_surface.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNEMshDisplaySurface.
+ * @file     mne_msh_display_surface.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNEMshDisplaySurface.
  *
  * Implements per-vertex colour assembly from a scalar overlay, the
  * binding of an overlay range to a colour scale and the toggle of

@@ -2,16 +2,17 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Limin Sun <liminsun@nmr.mgh.harvard.edu>
- *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_constants.h
- * @since August 2012
- * @brief Symbolic FIFF tag, block, value, unit and channel-type constants shared across FIFFLIB.
+ * @file     fiff_constants.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>
+ * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     August 2012
+ * @brief    Symbolic FIFF tag, block, value, unit and channel-type constants shared across FIFFLIB.
  *
  * Mirrors the @c fiff_constants.h header shipped with the original MNE-C
  * toolchain and the matching tables in @c mne.io.constants in MNE-Python,

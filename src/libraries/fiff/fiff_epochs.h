@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_epochs.h
- * @since May 2026
- * @brief Static epoching utilities: cut a FiffRawData stream into fixed-length, event-aligned epochs.
+ * @file     fiff_epochs.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Static epoching utilities: cut a FiffRawData stream into fixed-length, event-aligned epochs.
  *
  * Implements the equivalent of @c mne.Epochs construction from a
  * continuous recording: given a @ref FiffRawData, an event list (or a

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_meas_data.h
- * @since March 2026
- * @brief Legacy MNE-C measurement-data container assembling raw/evoked sets and their projection state.
+ * @file     mne_meas_data.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Legacy MNE-C measurement-data container assembling raw/evoked sets and their projection state.
  *
  * @ref MNELIB::MNEMeasData mirrors @c mneMeasDataRec from the original
  * MNE C tooling. It bundles an @ref FIFFLIB::FiffInfo with a list of

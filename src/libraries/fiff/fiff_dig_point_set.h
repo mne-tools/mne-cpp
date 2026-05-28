@@ -2,16 +2,17 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2016-2026 MNE-CPP Authors
- *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Ruben Doerfel <doerfelruben@aol.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_dig_point_set.h
- * @since July 2016
- * @brief Container for the FIFF_DIG_POINT records of a measurement (a parsed FIFFB_ISOTRAK block).
+ * @file     fiff_dig_point_set.h
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     July 2016
+ * @brief    Container for the FIFF_DIG_POINT records of a measurement (a parsed FIFFB_ISOTRAK block).
  *
  * @ref FiffDigPointSet holds the head-coordinate point cloud associated
  * with one recording: cardinal fiducials, HPI coil positions, EEG

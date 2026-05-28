@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file filter_thread_arg.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::FilterThreadArg.
+ * @file     filter_thread_arg.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::FilterThreadArg.
  *
  * Provides constructors and the deep-copy semantics needed when the
  * argument is queued across a thread boundary.

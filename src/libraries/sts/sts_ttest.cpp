@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_ttest.cpp
- * @since April 2026
- * @brief Implementation of one-sample, paired and independent two-sample t-tests declared in sts_ttest.h.
+ * @file     sts_ttest.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of one-sample, paired and independent two-sample t-tests declared in sts_ttest.h.
  *
  * One-sample and paired variants compute the column-wise sample mean and
  * unbiased standard deviation in two Eigen reductions and form

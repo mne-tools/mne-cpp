@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_ecd_set.cpp
- * @since March 2026
- * @brief Implementation of @ref INVLIB::InvEcdSet including the @c .dip and @c .bdip readers/writers.
+ * @file     inv_ecd_set.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref INVLIB::InvEcdSet including the @c .dip and @c .bdip readers/writers.
  *
  * Implements the dipole list management plus the file-format
  * serialisation that keeps round-trip compatibility with mrilab

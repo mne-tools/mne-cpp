@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2016-2026 MNE-CPP Authors
- *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file mne_project_to_surface.h
- * @since August 2016
- * @brief Geometric projection of a 3D point onto the closest cortex triangle.
+ * @file     mne_project_to_surface.h
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     August 2016
+ * @brief    Geometric projection of a 3D point onto the closest cortex triangle.
  *
  * @ref MNELIB::MNEProjectToSurface provides the point-to-triangle
  * projection used when associating MRI fiducials with the cortical

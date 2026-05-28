@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file multimodalscene.h
- * @since May 2026
- * @brief Host-agnostic controller that owns the ordered scene-layer stack (MRI slice, BEM, cortex, sensors, dipoles, networks, overlays).
+ * @file     multimodalscene.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Host-agnostic controller that owns the ordered scene-layer stack (MRI slice, BEM, cortex, sensors, dipoles, networks, overlays).
  *
  * MultimodalScene composes the disp3D primitives into a single
  * depth-sorted layer stack so the GUI shell does not need to know

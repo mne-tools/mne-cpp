@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file artifact_detect.h
- * @since March 2026
- * @brief Declaration of ArtifactDetect — ECG and EOG physiological artifact event detection.
+ * @file     artifact_detect.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Declaration of ArtifactDetect — ECG and EOG physiological artifact event detection.
  *
  * ECG detection finds cardiac R-peak events via bandpass filtering (5–40 Hz) followed by
  * an adaptive threshold and local maximum search.  If no dedicated ECG channel is present

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file decoding_ica_label.h
- * @since May 2026
- * @brief Automatic ICA component labelling for artefact identification on M/EEG.
+ * @file     decoding_ica_label.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Automatic ICA component labelling for artefact identification on M/EEG.
  *
  * After an independent-component analysis decomposition of an M/EEG
  * recording the analyst is left with one source time course per

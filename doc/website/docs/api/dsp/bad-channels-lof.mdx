@@ -21,7 +21,7 @@ class; the functions live directly in the library namespace.
 
 `#include <dsp/bad_channels_lof.h>`
 
-SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
 LOF (Breunig et al., SIGMOD 2000) scores each channel by the ratio between its own local density (reachability distance to its `k` nearest channels in the chosen feature space) and the average local density of those neighbours. Values close to 1 indicate a sample that belongs to a dense cluster, values noticeably above 1 mark density outliers. For MEG / EEG each channel is summarised by per-segment statistics (RMS, variance, higher-order moments) so that genuinely flat, very noisy or amplifier- saturated sensors stand out in the LOF score and can be flagged at a single threshold (default 2.0).
 

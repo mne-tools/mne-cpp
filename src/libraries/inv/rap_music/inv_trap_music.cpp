@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_trap_music.cpp
- * @since May 2026
- * @brief Implementation of the TRAP-MUSIC scanning algorithm.
+ * @file     inv_trap_music.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of the TRAP-MUSIC scanning algorithm.
  *
  * Implements the SVD-based signal-subspace estimator, the per-grid-
  * point @c scanCorrelations helper that evaluates the maximum

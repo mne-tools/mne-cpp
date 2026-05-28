@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_beamformer.cpp
- * @since March 2026
- * @brief Implementation of the @ref INVLIB::InvBeamformer container.
+ * @file     inv_beamformer.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of the @ref INVLIB::InvBeamformer container.
  *
  * Implements the default constructor and the small bookkeeping methods.
  * All non-inline accessors return shape information derived from the

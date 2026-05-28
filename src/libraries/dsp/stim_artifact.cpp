@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file stim_artifact.cpp
- * @since May 2026
- * @brief Implementation of fixStimArtifact.
+ * @file     stim_artifact.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of fixStimArtifact.
  */
 
 //=============================================================================================================

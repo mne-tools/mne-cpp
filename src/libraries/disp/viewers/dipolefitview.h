@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file dipolefitview.h
- * @since November 2020
- * @brief Input / output panel for the single-equivalent-current-dipole fit tool.
+ * @file     dipolefitview.h
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.8
+ * @date     November 2020
+ * @brief    Input / output panel for the single-equivalent-current-dipole fit tool.
  *
  * DipoleFitView gathers all files and parameters required by
  * @c mne_dipole_fit (measurement, BEM, noise covariance, mri trans,

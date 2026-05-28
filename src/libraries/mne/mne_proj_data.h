@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_proj_data.h
- * @since March 2026
- * @brief Legacy MNE-C aggregator for SSP projections plus the channel list they apply to.
+ * @file     mne_proj_data.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Legacy MNE-C aggregator for SSP projections plus the channel list they apply to.
  *
  * @ref MNELIB::MNEProjData ports @c mneProjDataRec - the cached state
  * kept by the C raw-data path so projection vectors do not have to be

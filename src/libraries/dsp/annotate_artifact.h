@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file annotate_artifact.h
- * @since May 2026
- * @brief Continuous-data annotation of muscle and amplitude artefacts.
+ * @file     annotate_artifact.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Continuous-data annotation of muscle and amplitude artefacts.
  *
  * The detectors in this header scan continuous MEG / EEG data and emit
  * @ref FIFFLIB::FiffAnnotation intervals marking time segments that

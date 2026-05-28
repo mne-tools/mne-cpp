@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file simulate.h
- * @since May 2026
- * @brief Simulation utilities for source estimates and evoked data.
+ * @file     simulate.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Simulation utilities for source estimates and evoked data.
  *
  * Provides functions equivalent to MNE-Python's mne.simulation module:
  *   - simulateStc(): create synthetic source time courses

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rtsensordataworker.h
- * @since March 2026
- * @brief Background worker that turns queued sensor packets into per-vertex ABGR colour buffers via a dense mapping matrix.
+ * @file     rtsensordataworker.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Background worker that turns queued sensor packets into per-vertex ABGR colour buffers via a dense mapping matrix.
  *
  * On every timer tick the worker pops the next packet (or averages
  * the queue), multiplies it by the dense (n_vertices x n_channels)

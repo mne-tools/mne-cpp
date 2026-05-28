@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file lsl_stream_info.cpp
- * @since March 2026
- * @brief Implements stream_info construction, accessors and the wire serialisation used by LSL discovery datagrams.
+ * @file     lsl_stream_info.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implements stream_info construction, accessors and the wire serialisation used by LSL discovery datagrams.
  *
  * The constructors populate the two transport-identity fields that
  * cannot be supplied by the caller: a per-instance @c uid generated

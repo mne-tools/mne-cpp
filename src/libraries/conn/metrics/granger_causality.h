@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file granger_causality.h
- * @since April 2026
- * @brief Spectral Granger Causality (Geweke 1982, Bressler & Seth 2011) between every channel pair, computed from a fitted MVAR model.
+ * @file     granger_causality.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Spectral Granger Causality (Geweke 1982, Bressler & Seth 2011) between every channel pair, computed from a fitted MVAR model.
  *
  * Granger's idea (Granger, Econometrica 1969) is that a process @c X_j
  * "causes" @c X_i if the past of @c X_j helps predict @c X_i beyond what

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_mxne.h
- * @since April 2026
- * @brief Mixed-Norm Estimate (MxNE) sparse inverse solver — block-sparse L21 minimisation for focal source recovery.
+ * @file     inv_mxne.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Mixed-Norm Estimate (MxNE) sparse inverse solver — block-sparse L21 minimisation for focal source recovery.
  *
  * @ref INVLIB::InvMxne implements the MxNE solver of Gramfort et al.,
  * @em Mixed-norm estimates for the M/EEG inverse problem using

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file raypicker.h
- * @since March 2026
- * @brief Mouse-ray vs scene-object intersection for picking dipoles, electrodes and surfaces.
+ * @file     raypicker.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Mouse-ray vs scene-object intersection for picking dipoles, electrodes and surfaces.
  *
  * RayPicker unprojects the current mouse position through the
  * active camera into a world-space ray and tests it against every

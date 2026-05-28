@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_dipole_fit_data.h
- * @since March 2026
- * @brief Dipole-fit workspace bundling sensor geometry, forward-model function pointers, noise covariance and SSP projection.
+ * @file     inv_dipole_fit_data.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Dipole-fit workspace bundling sensor geometry, forward-model function pointers, noise covariance and SSP projection.
  *
  * @ref INVLIB::InvDipoleFitData replaces the @c dipoleFitDataRec record
  * of MNE-C and aggregates everything that the dipole-fit objective

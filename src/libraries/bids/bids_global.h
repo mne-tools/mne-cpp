@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_global.h
- * @since March 2026
- * @brief MNE-CPP BIDS library entry point: Qt symbol-visibility plumbing and the @ref BIDSLIB namespace documentation.
+ * @file     bids_global.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    MNE-CPP BIDS library entry point: Qt symbol-visibility plumbing and the @ref BIDSLIB namespace documentation.
  *
  * Every public symbol in the BIDS library is annotated with
  * @c BIDSSHARED_EXPORT, which expands to @c Q_DECL_EXPORT when the

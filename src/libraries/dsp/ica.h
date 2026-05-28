@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file ica.h
- * @since March 2026
- * @brief FastICA-based independent component analysis for MEG / EEG artifact removal.
+ * @file     ica.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    FastICA-based independent component analysis for MEG / EEG artifact removal.
  *
  * Independent Component Analysis recovers a set of statistically independent
  * latent sources from their linear, instantaneous mixture at the sensors.

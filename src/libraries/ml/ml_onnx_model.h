@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file ml_onnx_model.h
- * @since April 2026
- * @brief ONNX Runtime backed @ref MLLIB::MlModel implementation for loading and evaluating @c .onnx graphs.
+ * @file     ml_onnx_model.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    ONNX Runtime backed @ref MLLIB::MlModel implementation for loading and evaluating @c .onnx graphs.
  *
  * @ref MLLIB::MlOnnxModel is the default inference backend in MLLIB:
  * load any model exported to the ONNX format - from PyTorch,

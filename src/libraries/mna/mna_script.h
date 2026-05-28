@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_script.h
- * @since April 2026
- * @brief Inline source code carried by a Script-mode graph node — language, interpreter command, code body, optional authoring URI and integrity hash.
+ * @file     mna_script.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Inline source code carried by a Script-mode graph node — language, interpreter command, code body, optional authoring URI and integrity hash.
  *
  * @ref MnaScript is the payload that turns a generic @ref MnaNode
  * into a one-off custom step without forcing every user-written

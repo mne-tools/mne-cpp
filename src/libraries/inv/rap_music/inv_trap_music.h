@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_trap_music.h
- * @since May 2026
- * @brief Truncated RAP-MUSIC (TRAP-MUSIC) source-localisation algorithm — sub-space truncation per iteration for robust correlated-source resolution.
+ * @file     inv_trap_music.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Truncated RAP-MUSIC (TRAP-MUSIC) source-localisation algorithm — sub-space truncation per iteration for robust correlated-source resolution.
  *
  * @ref INVLIB::InvTrapMusic implements the TRAP-MUSIC algorithm of
  * Mäkelä et al., NeuroImage 197, 616-626 (2019). It extends classic

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file report.cpp
- * @since May 2026
- * @brief Implementation of @ref UTILSLIB::Report — builds the HTML scaffolding, escapes user content and writes the file to disk.
+ * @file     report.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of @ref UTILSLIB::Report — builds the HTML scaffolding, escapes user content and writes the file to disk.
  *
  * HTML is assembled by streaming @c QString concatenations
  * directly into the section vector; no DOM model is kept in

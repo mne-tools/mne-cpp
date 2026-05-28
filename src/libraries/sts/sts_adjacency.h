@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_adjacency.h
- * @since April 2026
- * @brief Construction of the sensor- and source-space neighbourhood graphs that define the cluster support for permutation testing.
+ * @file     sts_adjacency.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Construction of the sensor- and source-space neighbourhood graphs that define the cluster support for permutation testing.
  *
  * Cluster-based inference (@ref STSLIB::StatsCluster) reduces the
  * multiple-comparison problem by grouping supra-threshold samples into

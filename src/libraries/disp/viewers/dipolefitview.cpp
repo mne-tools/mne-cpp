@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file dipolefitview.cpp
- * @since November 2020
- * @brief Implementation of the DipoleFitView dipole-fit input / result panel.
+ * @file     dipolefitview.cpp
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Andreas Griesshammer <ag@fieldlineinc.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.8
+ * @date     November 2020
+ * @brief    Implementation of the DipoleFitView dipole-fit input / result panel.
  */
 
 //=============================================================================================================

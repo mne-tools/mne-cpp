@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file channellabelpanel.h
- * @since March 2026
- * @brief Vertical column of channel-name labels synced with @ref ChannelDataView's row geometry.
+ * @file     channellabelpanel.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Vertical column of channel-name labels synced with @ref ChannelDataView's row geometry.
  *
  * ChannelLabelPanel listens to the same @ref ChannelDataModel as the
  * central data view and paints each visible channel's label aligned

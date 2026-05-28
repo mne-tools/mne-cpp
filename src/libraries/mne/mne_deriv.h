@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_deriv.h
- * @since March 2026
- * @brief Single channel derivation (linear combination of physical channels exposed as a virtual channel).
+ * @file     mne_deriv.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Single channel derivation (linear combination of physical channels exposed as a virtual channel).
  *
  * @ref MNELIB::MNEDeriv stores one row of a derivation matrix together
  * with the name of the resulting virtual channel and the names of the

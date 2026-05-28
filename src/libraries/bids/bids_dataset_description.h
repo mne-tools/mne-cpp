@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_dataset_description.h
- * @since March 2026
- * @brief Reader/writer for ``dataset_description.json`` — the REQUIRED root sidecar of every BIDS dataset.
+ * @file     bids_dataset_description.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Reader/writer for ``dataset_description.json`` — the REQUIRED root sidecar of every BIDS dataset.
  *
  * Every BIDS validator refuses to walk a tree that does not have a
  * @c dataset_description.json at the root, so this is also the first

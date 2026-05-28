@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_minimum_norm.h
- * @since March 2026
- * @brief Linear minimum-norm inverse solver — MNE, dSPM, sLORETA and eLORETA from a precomputed @c MNEInverseOperator.
+ * @file     inv_minimum_norm.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Linear minimum-norm inverse solver — MNE, dSPM, sLORETA and eLORETA from a precomputed @c MNEInverseOperator.
  *
  * @ref INVLIB::InvMinimumNorm wraps an @c MNELIB::MNEInverseOperator
  * and turns it into a runnable inverse pipeline. The class can compute

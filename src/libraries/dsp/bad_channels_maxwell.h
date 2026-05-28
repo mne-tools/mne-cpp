@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bad_channels_maxwell.h
- * @since May 2026
- * @brief Bad channel detection via SSS reconstruction residuals.
+ * @file     bad_channels_maxwell.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Bad channel detection via SSS reconstruction residuals.
  *
  * Channels whose SSS reconstruction error is anomalously high are flagged
  * as bad. This mirrors MNE-Python's mne.preprocessing.find_bad_channels_maxwell().

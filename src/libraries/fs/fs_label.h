@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fs_label.h
- * @since March 2026
- * @brief Reader and in-memory representation of a FreeSurfer/MNE surface label (.label).
+ * @file     fs_label.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Reader and in-memory representation of a FreeSurfer/MNE surface label (.label).
  *
  * A FreeSurfer @c .label file describes a region of interest on a cortical
  * surface as an explicit list of vertex indices restricted to one

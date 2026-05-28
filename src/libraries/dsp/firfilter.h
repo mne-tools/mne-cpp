@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file firfilter.h
- * @since March 2026
- * @brief Discoverable design / apply façade over the @ref FilterKernel FIR engine.
+ * @file     firfilter.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Discoverable design / apply façade over the @ref FilterKernel FIR engine.
  *
  * FirFilter mirrors the @ref IirFilter API surface (design, apply,
  * applyZeroPhase, applyZeroPhaseMatrix) so callers see one consistent

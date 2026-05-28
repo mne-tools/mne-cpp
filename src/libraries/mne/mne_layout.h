@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_layout.h
- * @since March 2026
- * @brief 2D sensor layout (channel name -> [x,y,w,h]) used by topographic plots.
+ * @file     mne_layout.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    2D sensor layout (channel name -> [x,y,w,h]) used by topographic plots.
  *
  * @ref MNELIB::MNELayout mirrors the @c .lay files distributed with the
  * MNE tools and Neuromag systems. Each entry maps a channel name to a

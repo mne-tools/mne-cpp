@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_file_ref.cpp
- * @since April 2026
- * @brief JSON and CBOR codecs for @ref MnaFileRef, including base64 framing of embedded payloads and preservation of unknown keys in @c extras.
+ * @file     mna_file_ref.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    JSON and CBOR codecs for @ref MnaFileRef, including base64 framing of embedded payloads and preservation of unknown keys in @c extras.
  *
  * The implementation is symmetric: every field declared in the
  * struct round-trips losslessly through both the JSON and CBOR

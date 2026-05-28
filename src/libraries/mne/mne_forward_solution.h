@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_forward_solution.h
- * @since March 2026
- * @brief Forward solution (gain matrix mapping source dipoles to sensor measurements).
+ * @file     mne_forward_solution.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Forward solution (gain matrix mapping source dipoles to sensor measurements).
  *
  * @ref MNELIB::MNEForwardSolution is the in-memory representation of an
  * @c -fwd.fif file: the leadfield matrix, the source spaces it was

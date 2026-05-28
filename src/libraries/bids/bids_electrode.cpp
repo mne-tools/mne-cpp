@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_electrode.cpp
- * @since March 2026
- * @brief Implementation of @ref BIDSLIB::BidsElectrode — TSV I/O and FIFF digitizer-point conversion for ``_electrodes.tsv``.
+ * @file     bids_electrode.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of @ref BIDSLIB::BidsElectrode — TSV I/O and FIFF digitizer-point conversion for ``_electrodes.tsv``.
  */
 
 //=============================================================================================================

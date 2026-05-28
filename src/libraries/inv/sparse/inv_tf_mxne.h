@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_tf_mxne.h
- * @since May 2026
- * @brief Time-Frequency Mixed-Norm Estimate (TF-MxNE) sparse inverse solver — joint L21 + L1 sparsity in a Gabor time-frequency dictionary.
+ * @file     inv_tf_mxne.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Time-Frequency Mixed-Norm Estimate (TF-MxNE) sparse inverse solver — joint L21 + L1 sparsity in a Gabor time-frequency dictionary.
  *
  * @ref INVLIB::InvTfMxne implements the TF-MxNE solver of Gramfort
  * et al., @em Time-Frequency Mixed-Norm Estimates: Sparse M/EEG imaging

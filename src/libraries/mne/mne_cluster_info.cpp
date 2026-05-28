@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2013-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file mne_cluster_info.cpp
- * @since March 2013
- * @brief Implementation of @ref MNELIB::MNEClusterInfo.
+ * @file     mne_cluster_info.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     March 2013
+ * @brief    Implementation of @ref MNELIB::MNEClusterInfo.
  *
  * Implements constructors and the helpers that group source vertices
  * into clusters / undo the grouping when expanding back to the original

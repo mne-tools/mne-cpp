@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mri_nifti_io.h
- * @since May 2026
- * @brief NIfTI-1 single-file (.nii / .nii.gz) volume reader producing the same per-slice layout as the MGH reader.
+ * @file     mri_nifti_io.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    NIfTI-1 single-file (.nii / .nii.gz) volume reader producing the same per-slice layout as the MGH reader.
  *
  * NIfTI-1 is the standard exchange container used by FSL, AFNI, SPM,
  * nibabel and essentially every neuroimaging toolchain outside the

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_source_space.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNESourceSpace.
+ * @file     mne_source_space.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNESourceSpace.
  *
  * Provides FIFF read helpers that walk the @c FIFFB_MNE_SOURCE_SPACE blocks
  * (extracting @c FIFF_MNE_SOURCE_SPACE_POINTS, @c _NORMALS, @c _TRIANGLES,

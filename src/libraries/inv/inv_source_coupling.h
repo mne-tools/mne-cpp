@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_source_coupling.h
- * @since March 2026
- * @brief Container for an N-tuple of correlated grid sources discovered by RAP-/TRAP-MUSIC.
+ * @file     inv_source_coupling.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Container for an N-tuple of correlated grid sources discovered by RAP-/TRAP-MUSIC.
  *
  * Sub-space scanning algorithms (RAP-MUSIC, TRAP-MUSIC, PWL-RAP-MUSIC)
  * return groups of N coupled dipoles together with their mutual

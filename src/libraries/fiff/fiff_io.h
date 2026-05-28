@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2013-2026 MNE-CPP Authors
- *   Florian Schlembach <fschlembach@web.de>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_io.h
- * @since November 2013
- * @brief High-level convenience reader/writer that loads a whole FIFF measurement file into FIFFLIB containers in one call.
+ * @file     fiff_io.h
+ * @author   Florian Schlembach <fschlembach@web.de>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     November 2013
+ * @brief    High-level convenience reader/writer that loads a whole FIFF measurement file into FIFFLIB containers in one call.
  *
  * Most callers want to open a FIFF file and immediately get back a
  * @ref FiffRawData (for ``*-raw.fif''), a @ref FiffEvokedSet (for

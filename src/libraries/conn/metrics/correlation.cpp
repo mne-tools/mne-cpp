@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file correlation.cpp
- * @since January 2018
- * @brief Implementation of @ref CONNLIB::Correlation - trial-averaged zero-lag Pearson correlation between every channel pair, run in parallel via @c QtConcurrent::mappedReduced.
+ * @file     correlation.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     January 2018
+ * @brief    Implementation of @ref CONNLIB::Correlation - trial-averaged zero-lag Pearson correlation between every channel pair, run in parallel via @c QtConcurrent::mappedReduced.
  */
 
 //=============================================================================================================

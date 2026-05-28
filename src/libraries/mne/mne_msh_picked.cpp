@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_msh_picked.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNEMshPicked.
+ * @file     mne_msh_picked.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNEMshPicked.
  *
  * Implements addition / removal of picked items and the conversion to /
  * from a FreeSurfer-style label file.

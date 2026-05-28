@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_time.h
- * @since February 2026
- * @brief Compact seconds + microseconds time record used by FIFF measurement, event and HPI tags.
+ * @file     fiff_time.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Compact seconds + microseconds time record used by FIFF measurement, event and HPI tags.
  *
  * Replaces the legacy @c fiffTimeRec struct from MNE-C with a small C++
  * class whose layout matches the on-disk pair of 32-bit integers stored in

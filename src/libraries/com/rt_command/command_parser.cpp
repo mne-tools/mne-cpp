@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file command_parser.cpp
- * @since March 2026
- * @brief Translation unit for @ref COMLIB::CommandParser: JSON/CLI tokenisation and fan-out to attached managers.
+ * @file     command_parser.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Translation unit for @ref COMLIB::CommandParser: JSON/CLI tokenisation and fan-out to attached managers.
  *
  * Implements the dual-dialect @c parse() entry point. CLI input is
  * split on whitespace into a keyword and string arguments; JSON input

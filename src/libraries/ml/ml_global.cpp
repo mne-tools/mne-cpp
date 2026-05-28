@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file ml_global.cpp
- * @since April 2026
- * @brief Implementation of MLLIB build-stamp accessors that forward to UTILSLIB::buildinfo.
+ * @file     ml_global.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of MLLIB build-stamp accessors that forward to UTILSLIB::buildinfo.
  *
  * Each of @ref MLLIB::buildDateTime, @ref MLLIB::buildHash and
  * @ref MLLIB::buildHashLong is a one-line delegate to the matching

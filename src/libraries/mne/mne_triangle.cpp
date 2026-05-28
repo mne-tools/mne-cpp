@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_triangle.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNETriangle.
+ * @file     mne_triangle.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNETriangle.
  *
  * Implements the constructors and the triangle-property recomputation
  * from three vertex coordinates.

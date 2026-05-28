@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file decoding_global.h
- * @since May 2026
- * @brief Export/import macros and build-info entry points for DECODINGLIB.
+ * @file     decoding_global.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Export/import macros and build-info entry points for DECODINGLIB.
  *
  * DECODINGLIB groups the supervised- and unsupervised-decomposition
  * algorithms that turn raw M/EEG into discriminative or regressable

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file ml_tensor.h
- * @since April 2026
- * @brief N-dimensional, row-major, reference-counted float32 tensor used as the universal MLLIB data carrier.
+ * @file     ml_tensor.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    N-dimensional, row-major, reference-counted float32 tensor used as the universal MLLIB data carrier.
  *
  * @ref MLLIB::MlTensor is the interchange type that crosses every
  * MLLIB boundary: feature matrices going into a classifier, batched

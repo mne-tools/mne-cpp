@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file abstractview.h
- * @since June 2020
- * @brief Common base widget for every dockable Quick-Control settings panel in DISPLIB.
+ * @file     abstractview.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.3
+ * @date     June 2020
+ * @brief    Common base widget for every dockable Quick-Control settings panel in DISPLIB.
  *
  * AbstractView is the shared QWidget super-class used by all the
  * viewers in this directory. It standardises the three runtime modes

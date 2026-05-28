@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_focal_dipole.h
- * @since March 2026
- * @brief Single off-grid focal dipole result with free position, moment and fit-quality metrics.
+ * @file     inv_focal_dipole.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Single off-grid focal dipole result with free position, moment and fit-quality metrics.
  *
  * @ref INVLIB::InvFocalDipole captures one equivalent current dipole that
  * is not constrained to a source-space vertex — typically the output of

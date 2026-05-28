@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_byte_swap.h
- * @since March 2026
- * @brief Endianness swap helpers for the FIFF binary tag I/O layer (FIFF is always written big-endian on disk).
+ * @file     fiff_byte_swap.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Endianness swap helpers for the FIFF binary tag I/O layer (FIFF is always written big-endian on disk).
  *
  * FIFF tags are stored in network (big-endian) byte order on disk while
  * all currently supported host platforms are little-endian. @ref FiffStream

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_sensor_set.h
- * @since March 2026
- * @brief Compact MEG sensor-geometry container (positions, orientations, integration weights) used by the HPI fitter.
+ * @file     inv_sensor_set.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Compact MEG sensor-geometry container (positions, orientations, integration weights) used by the HPI fitter.
  *
  * @ref INVLIB::InvSensorSet replaces the verbose
  * @ref FWDLIB::FwdCoilSet for read-only use by the HPI fit loop: it

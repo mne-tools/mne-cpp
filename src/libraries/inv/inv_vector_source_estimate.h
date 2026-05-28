@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_vector_source_estimate.h
- * @since May 2026
- * @brief Free-orientation surface source estimate carrying a 3-component vector per vertex.
+ * @file     inv_vector_source_estimate.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Free-orientation surface source estimate carrying a 3-component vector per vertex.
  *
  * @ref INVLIB::InvVectorSourceEstimate extends
  * @ref InvSourceEstimate so that the data matrix holds an interleaved

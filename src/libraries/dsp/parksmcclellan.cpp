@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file parksmcclellan.cpp
- * @since March 2026
- * @brief TODO: describe this file in one substantive sentence.
+ * @file     parksmcclellan.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    TODO: describe this file in one substantive sentence.
  */
 
 //=============================================================================================================

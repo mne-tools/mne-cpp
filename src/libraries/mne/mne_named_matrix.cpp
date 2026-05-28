@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_named_matrix.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNENamedMatrix.
+ * @file     mne_named_matrix.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNENamedMatrix.
  *
  * Implements FIFF read/write of the @c FIFF_MNE_ROW_NAMES,
  * @c FIFF_MNE_COL_NAMES and @c FIFF_MNE_NAMED_MATRIX tags, plus the

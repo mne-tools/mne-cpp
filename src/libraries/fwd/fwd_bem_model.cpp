@@ -2,16 +2,17 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2017-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   1DIce <lars.debor@tu-ilmenau.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Ruben Doerfel <doerfelruben@aol.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fwd_bem_model.cpp
- * @since March 2017
- * @brief BEM model implementation — FIFF I/O for layered surfaces and pre-inverted potential-solution matrices, IP-approach setup, and the dipole-field/potential evaluators that drive the BEM forward solver.
+ * @file     fwd_bem_model.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   1DIce <lars.debor@tu-ilmenau.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     March 2017
+ * @brief    BEM model implementation — FIFF I/O for layered surfaces and pre-inverted potential-solution matrices, IP-approach setup, and the dipole-field/potential evaluators that drive the BEM forward solver.
  */
 
 //=============================================================================================================

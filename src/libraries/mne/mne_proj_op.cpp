@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_proj_op.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNEProjOp.
+ * @file     mne_proj_op.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNEProjOp.
  *
  * Implements list management, the orthonormalisation that turns the
  * user-supplied SSP vectors into a projector and the in-place application

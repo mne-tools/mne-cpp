@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fs_surface.h
- * @since March 2026
- * @brief Reader and in-memory representation of a single FreeSurfer triangular surface (e.g. lh.pial, rh.white, lh.inflated).
+ * @file     fs_surface.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Reader and in-memory representation of a single FreeSurfer triangular surface (e.g. lh.pial, rh.white, lh.inflated).
  *
  * A FreeSurfer surface file stores one cortical hemisphere as a closed
  * triangular mesh: a list of vertex positions in Tk-surface RAS millimetres

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file filterio.h
- * @since March 2026
- * @brief Plain-text serialisation of @ref FilterKernel coefficient sets.
+ * @file     filterio.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Plain-text serialisation of @ref FilterKernel coefficient sets.
  *
  * FilterIO reads and writes the simple human-readable text format used by
  * mne-cpp tooling to persist designed FIR / IIR coefficient sets: header

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_raw_data.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNERawData.
+ * @file     mne_raw_data.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNERawData.
  *
  * Implements buffer-list construction by walking the @c FIFFB_RAW_DATA
  * block tree, per-buffer file seek/read with on-the-fly type conversion

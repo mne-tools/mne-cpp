@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file multiviewlayout.h
- * @since March 2026
- * @brief Viewport geometry, splitter logic and per-pane preset assignment for the disp3D multi-view grid.
+ * @file     multiviewlayout.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Viewport geometry, splitter logic and per-pane preset assignment for the disp3D multi-view grid.
  *
  * MultiViewLayout computes the four sub-viewports (Top-left
  * perspective, Top-right orthographic top, Bottom-left

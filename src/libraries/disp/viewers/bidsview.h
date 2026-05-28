@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bidsview.h
- * @since October 2020
- * @brief Tree view of the BIDS dataset hierarchy backed by @ref BidsViewModel.
+ * @file     bidsview.h
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.7
+ * @date     October 2020
+ * @brief    Tree view of the BIDS dataset hierarchy backed by @ref BidsViewModel.
  *
  * BidsView wraps a @c QTreeView around a @ref BidsViewModel so the
  * user can browse a loaded BIDS dataset (subjects → sessions →

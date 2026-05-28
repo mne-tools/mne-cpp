@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2021-2026 MNE-CPP Authors
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file utils_global.cpp
- * @since August 2021
- * @brief Out-of-line definitions for the UTILSLIB build-info accessors declared in @ref utils_global.h.
+ * @file     utils_global.cpp
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     August 2021
+ * @brief    Out-of-line definitions for the UTILSLIB build-info accessors declared in @ref utils_global.h.
  *
  * Kept as a separate translation unit so the @c __DATE__ and
  * @c __TIME__ macros are expanded when this file is compiled

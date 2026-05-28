@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file xdawn.h
- * @since March 2026
- * @brief Declaration of the Xdawn class for event-related response enhancement.
+ * @file     xdawn.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Declaration of the Xdawn class for event-related response enhancement.
  *
  * xDAWN estimates spatial filters that maximise the signal-to-noise ratio of a target
  * event-related response. The implementation here operates on epoched data and follows the

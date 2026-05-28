@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bidsviewmodel.h
- * @since October 2020
- * @brief QStandardItemModel mirroring the BIDS dataset hierarchy (subjects / sessions / runs / derivatives).
+ * @file     bidsviewmodel.h
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.7
+ * @date     October 2020
+ * @brief    QStandardItemModel mirroring the BIDS dataset hierarchy (subjects / sessions / runs / derivatives).
  *
  * BidsViewModel rebuilds itself from a top-level dataset path and
  * exposes the BIDS tree to @ref BidsView. Item roles carry the

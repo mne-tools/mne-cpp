@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_path.h
- * @since March 2026
- * @brief Programmatic construction and matching of BIDS-compliant directories, filenames and sidecar paths.
+ * @file     bids_path.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Programmatic construction and matching of BIDS-compliant directories, filenames and sidecar paths.
  *
  * The BIDS specification fixes both the directory layout
  * (@c root/sub-XX/[ses-YY/]<datatype>/) and the @c <entity>-<value>

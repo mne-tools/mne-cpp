@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fs_annotation.cpp
- * @since March 2026
- * @brief Implementation of @ref FSLIB::FsAnnotation: parses FreeSurfer .annot per-vertex parcellation files and their embedded colortable.
+ * @file     fs_annotation.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref FSLIB::FsAnnotation: parses FreeSurfer .annot per-vertex parcellation files and their embedded colortable.
  */
 
 //=============================================================================================================

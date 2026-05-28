@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_registry_loader.cpp
- * @since April 2026
- * @brief Implementation of the @c mna-registry.json manifest reader, drop-in directory merger and registry-to-manifest serialiser.
+ * @file     mna_registry_loader.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of the @c mna-registry.json manifest reader, drop-in directory merger and registry-to-manifest serialiser.
  *
  * @ref MnaRegistryLoader::loadFile parses one manifest JSON, walks
  * the @c ops array, deserialises each entry into a

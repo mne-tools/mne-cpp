@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file field_map.h
- * @since March 2026
- * @brief Forwarding header &mdash; field-map computation moved to the fwd library.
+ * @file     field_map.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Forwarding header &mdash; field-map computation moved to the fwd library.
  *
  * Kept as a stub so legacy includes continue to compile. New code
  * should pull in @c <fwd/computeFieldMap.h> directly.

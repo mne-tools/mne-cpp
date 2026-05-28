@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sliceobject.h
- * @since April 2026
- * @brief Single MRI volume slice rendered as a textured quad with adjustable axis, position, contrast and colormap.
+ * @file     sliceobject.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Single MRI volume slice rendered as a textured quad with adjustable axis, position, contrast and colormap.
  *
  * SliceObject mounts one orthogonal slice (axial, sagittal or
  * coronal) of an @ref MriVolume on a screen-aligned quad and uploads

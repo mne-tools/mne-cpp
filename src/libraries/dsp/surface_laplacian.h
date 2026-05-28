@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file surface_laplacian.h
- * @since May 2026
- * @brief Spherical-spline surface Laplacian (Current Source Density) for EEG.
+ * @file     surface_laplacian.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Spherical-spline surface Laplacian (Current Source Density) for EEG.
  *
  * The surface Laplacian ∇²V approximates the radial current density at
  * the scalp and acts as a reference-free spatial high-pass filter:

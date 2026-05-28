@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file math_global.h
- * @since March 2026
- * @brief Export/import macros and build-stamp accessors for MATHLIB.
+ * @file     math_global.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Export/import macros and build-stamp accessors for MATHLIB.
  *
  * MATHLIB is the numerical-helpers layer of mne-cpp: linear algebra
  * (@ref UTILSLIB::Linalg), general numerics and baseline rescaling

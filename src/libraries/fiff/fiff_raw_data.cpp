@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Florian Schlembach <fschlembach@web.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Ruben Doerfel <doerfelruben@aol.com>
  *
- * @file fiff_raw_data.cpp
- * @since October 2012
- * @brief Implementation of @ref FiffRawData: continuous-recording representation backed by a directory of FIFF_DATA_BUFFER tags.
+ * @file     fiff_raw_data.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Florian Schlembach <fschlembach@web.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
+ * @since    0.1.0
+ * @date     October 2012
+ * @brief    Implementation of @ref FiffRawData: continuous-recording representation backed by a directory of FIFF_DATA_BUFFER tags.
  *
  * @ref FiffRawData::read_segment uses the @ref FiffRawDir directory to
  * seek straight to the buffers that cover a requested sample window,

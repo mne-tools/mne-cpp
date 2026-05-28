@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_epochs.cpp
- * @since May 2026
- * @brief Implementation of the static epoch-cutting helpers declared in @ref fiff_epochs.h.
+ * @file     fiff_epochs.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of the static epoch-cutting helpers declared in @ref fiff_epochs.h.
  *
  * Slices a @ref FiffRawData into fixed-length, event-aligned epochs
  * respecting both annotation-driven bad segments and peak-to-peak /

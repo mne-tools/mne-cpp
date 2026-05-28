@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_node.h
- * @since April 2026
- * @brief One operation in an MNA graph — opType, typed I/O ports, attributes, execution mode (Batch / Stream / IPC / Script) and provenance.
+ * @file     mna_node.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    One operation in an MNA graph — opType, typed I/O ports, attributes, execution mode (Batch / Stream / IPC / Script) and provenance.
  *
  * @ref MnaNode is the executable counterpart to a @ref MnaFileRef:
  * where the latter records a derived artefact, the node records

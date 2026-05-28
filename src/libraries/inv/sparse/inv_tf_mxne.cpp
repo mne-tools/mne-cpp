@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_tf_mxne.cpp
- * @since May 2026
- * @brief Implementation of the TF-MxNE solver including the Gabor-dictionary builder.
+ * @file     inv_tf_mxne.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of the TF-MxNE solver including the Gabor-dictionary builder.
  *
  * Implements the Gabor tight-frame dictionary @c buildGaborDictionary
  * (complex Morlet atoms tiled across the requested frequency band) and

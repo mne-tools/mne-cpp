@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_hpi_data_updater.cpp
- * @since March 2026
- * @brief Implementation of the HPI pre-processing front-end.
+ * @file     inv_hpi_data_updater.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of the HPI pre-processing front-end.
  *
  * Implements the cached state machine: detect @c FiffInfo changes
  * (channel list, bad-channel list, dig-point list), rebuild the

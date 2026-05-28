@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_description_parser.cpp
- * @since February 2026
- * @brief Implementation of @ref MNELIB::MNEDescriptionParser.
+ * @file     mne_description_parser.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Implementation of @ref MNELIB::MNEDescriptionParser.
  *
  * Implements the tokeniser, the @c { ... } stanza state machine and the
  * per-keyword field assignment used to populate one

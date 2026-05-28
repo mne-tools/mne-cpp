@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_ctf_comp_data.h
- * @since March 2026
- * @brief Single CTF reference-sensor compensation matrix labelled by kind.
+ * @file     mne_ctf_comp_data.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Single CTF reference-sensor compensation matrix labelled by kind.
  *
  * @ref MNELIB::MNECTFCompData stores one entry of the CTF software
  * compensation chain (1st / 2nd / 3rd gradient) as a labelled matrix

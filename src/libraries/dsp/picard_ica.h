@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file picard_ica.h
- * @since May 2026
- * @brief Declaration of the PicardIca class — Preconditioned ICA for Real Data.
+ * @file     picard_ica.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Declaration of the PicardIca class — Preconditioned ICA for Real Data.
  *
  * Algorithm: P. Ablin, J.-F. Cardoso, A. Gramfort (2018). "Faster Independent Component
  *            Analysis by Preconditioning with Hessian Approximations." IEEE TSP 66(15):4040–4049.

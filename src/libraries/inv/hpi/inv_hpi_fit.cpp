@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_hpi_fit.cpp
- * @since March 2026
- * @brief Implementation of the per-fit HPI pipeline (coil localisation, ordering, transform estimation).
+ * @file     inv_hpi_fit.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of the per-fit HPI pipeline (coil localisation, ordering, transform estimation).
  *
  * Implements the per-coil dipole fit using @ref InvHpiFitData, the
  * optional re-ordering that matches the fitted dipoles to the

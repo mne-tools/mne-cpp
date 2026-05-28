@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_signal_model.h
- * @since March 2026
- * @brief Sinusoidal HPI signal model — builds and inverts the regressor matrix that extracts coil amplitudes from MEG data.
+ * @file     inv_signal_model.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Sinusoidal HPI signal model — builds and inverts the regressor matrix that extracts coil amplitudes from MEG data.
  *
  * @ref INVLIB::InvSignalModel builds the model matrix that pairs the
  * HPI coil drive frequencies (and, optionally, the line-frequency

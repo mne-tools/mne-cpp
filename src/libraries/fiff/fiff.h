@@ -2,16 +2,17 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- *   Florian Schlembach <fschlembach@web.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff.h
- * @since August 2012
- * @brief Static MATLAB-style FIFF facade: thin wrapper functions kept for parity with the historical mne-matlab toolbox API.
+ * @file     fiff.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ * @author   Florian Schlembach <fschlembach@web.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     August 2012
+ * @brief    Static MATLAB-style FIFF facade: thin wrapper functions kept for parity with the historical mne-matlab toolbox API.
  *
  * The MNE-Matlab toolbox exposes file I/O as flat functions
  * (@c fiff_open, @c fiff_read_raw_segment, @c fiff_read_evoked, ...).

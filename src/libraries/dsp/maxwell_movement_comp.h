@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file maxwell_movement_comp.h
- * @since May 2026
- * @brief Maxwell movement compensation for MEG.
+ * @file     maxwell_movement_comp.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Maxwell movement compensation for MEG.
  *
  * Implements head movement compensation via SSS. Equivalent to
  * MNE-Python's mne.preprocessing.maxwell_filter with head_pos parameter.

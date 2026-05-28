@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_vector_source_estimate.cpp
- * @since May 2026
- * @brief Implementation of @ref INVLIB::InvVectorSourceEstimate.
+ * @file     inv_vector_source_estimate.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of @ref INVLIB::InvVectorSourceEstimate.
  *
  * Implements the constructors, the L2-norm magnitude collapse, the
  * signed projection onto surface normals and the per-vertex slice

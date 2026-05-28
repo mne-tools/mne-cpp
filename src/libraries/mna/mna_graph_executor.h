@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_graph_executor.h
- * @since April 2026
- * @brief Stateless executor that runs an @ref MnaGraph in topological order, in batch or stream mode, and reports progress.
+ * @file     mna_graph_executor.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Stateless executor that runs an @ref MnaGraph in topological order, in batch or stream mode, and reports progress.
  *
  * @ref MnaGraphExecutor is the bridge between the declarative
  * @ref MnaGraph and the live op functions registered with

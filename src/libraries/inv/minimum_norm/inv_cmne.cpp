@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_cmne.cpp
- * @since April 2026
- * @brief Implementation of the CMNE solver (dSPM kernel, z-score rectification, LSTM inference, optional training driver).
+ * @file     inv_cmne.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of the CMNE solver (dSPM kernel, z-score rectification, LSTM inference, optional training driver).
  *
  * Implements the dSPM kernel assembly, the per-source z-score
  * rectification, the sliding-window LSTM inference via ONNX Runtime

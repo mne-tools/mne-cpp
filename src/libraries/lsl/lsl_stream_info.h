@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file lsl_stream_info.h
- * @since March 2026
- * @brief Declares stream_info, the LSL metadata descriptor that identifies and routes a stream on the network.
+ * @file     lsl_stream_info.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Declares stream_info, the LSL metadata descriptor that identifies and routes a stream on the network.
  *
  * A @ref LSLLIB::stream_info is the handshake object of the Lab
  * Streaming Layer protocol: every outlet announces itself with one,

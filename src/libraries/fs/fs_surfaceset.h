@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fs_surfaceset.h
- * @since March 2026
- * @brief Bi-hemispheric grouping of FreeSurfer surfaces (lh + rh) loaded as a single object.
+ * @file     fs_surfaceset.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Bi-hemispheric grouping of FreeSurfer surfaces (lh + rh) loaded as a single object.
  *
  * Cortical analyses in FreeSurfer/MNE typically operate on a pair of
  * hemisphere surfaces of the same kind (both @c pial, both @c white, both

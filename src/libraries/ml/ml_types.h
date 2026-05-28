@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file ml_types.h
- * @since April 2026
- * @brief Strongly typed enumerations describing the ML backend, tensor element type and inference task.
+ * @file     ml_types.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Strongly typed enumerations describing the ML backend, tensor element type and inference task.
  *
  * The three @c enum @c class definitions in this header are the shared
  * vocabulary used across every MLLIB interface: @ref MLLIB::MlBackend

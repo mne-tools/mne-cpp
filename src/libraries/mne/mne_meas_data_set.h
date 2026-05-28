@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_meas_data_set.h
- * @since March 2026
- * @brief One condition / averaging slice within a legacy @ref MNELIB::MNEMeasData.
+ * @file     mne_meas_data_set.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    One condition / averaging slice within a legacy @ref MNELIB::MNEMeasData.
  *
  * @ref MNELIB::MNEMeasDataSet represents either a single average or a
  * raw chunk together with its baseline, sampling info and event

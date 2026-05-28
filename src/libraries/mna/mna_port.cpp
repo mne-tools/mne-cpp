@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_port.cpp
- * @since April 2026
- * @brief JSON and CBOR codecs for @ref MnaPort including data-kind enum mapping, optional stream binding fields and cached-result references.
+ * @file     mna_port.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    JSON and CBOR codecs for @ref MnaPort including data-kind enum mapping, optional stream binding fields and cached-result references.
  *
  * The implementation converts @ref MnaDataKind and
  * @ref MnaPortDir through the canonical string helpers from

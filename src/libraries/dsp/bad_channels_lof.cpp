@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bad_channels_lof.cpp
- * @since May 2026
- * @brief LOF-based bad channel detection implementation.
+ * @file     bad_channels_lof.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    LOF-based bad channel detection implementation.
  */
 
 //=============================================================================================================

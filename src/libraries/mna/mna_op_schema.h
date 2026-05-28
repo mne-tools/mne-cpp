@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_op_schema.h
- * @since April 2026
- * @brief Declarative contract for an MNA operation — expected input/output ports, attributes, binding kind and validation against a concrete @ref MnaNode.
+ * @file     mna_op_schema.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Declarative contract for an MNA operation — expected input/output ports, attributes, binding kind and validation against a concrete @ref MnaNode.
  *
  * @ref MnaOpSchema is the type information an MNA operation
  * publishes to the rest of the system. It declares the

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_channel.h
- * @since March 2026
- * @brief Reader/writer for the BIDS ``_channels.tsv`` sidecar — one record per recorded channel.
+ * @file     bids_channel.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Reader/writer for the BIDS ``_channels.tsv`` sidecar — one record per recorded channel.
  *
  * BIDS mandates that every electrophysiology recording (MEG, EEG, iEEG)
  * ship a sibling @c _channels.tsv with one row per channel describing

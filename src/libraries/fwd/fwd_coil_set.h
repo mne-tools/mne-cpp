@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2017-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fwd_coil_set.h
- * @since March 2017
- * @brief Container of FwdCoil instances representing either a sensor-type *template database* or a concrete per-channel sensor array.
+ * @file     fwd_coil_set.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     March 2017
+ * @brief    Container of FwdCoil instances representing either a sensor-type *template database* or a concrete per-channel sensor array.
  *
  * FwdCoilSet serves two roles. As a *template database* it is the
  * in-memory image of @c coil_def.dat, the canonical CTF/Elekta file

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rtsensorstreammanager.cpp
- * @since March 2026
- * @brief Wiring between the real-time sensor data controller, the field mapper and the bound surface colour buffer.
+ * @file     rtsensorstreammanager.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Wiring between the real-time sensor data controller, the field mapper and the bound surface colour buffer.
  */
 
 //=============================================================================================================

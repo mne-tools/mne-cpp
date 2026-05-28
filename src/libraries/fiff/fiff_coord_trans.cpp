@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Ruben Doerfel <doerfelruben@aol.com>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_coord_trans.cpp
- * @since October 2012
- * @brief Implementation of @ref FiffCoordTrans: 4x4 FIFF affine I/O, composition, inversion and (from, to) frame lookup.
+ * @file     fiff_coord_trans.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     October 2012
+ * @brief    Implementation of @ref FiffCoordTrans: 4x4 FIFF affine I/O, composition, inversion and (from, to) frame lookup.
  *
  * Backs the @c FIFFV_COORD_DEVICE / @c FIFFV_COORD_HEAD /
  * @c FIFFV_COORD_MRI / @c FIFFV_COORD_HPI transforms threaded through

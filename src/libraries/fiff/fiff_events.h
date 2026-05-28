@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_events.h
- * @since February 2026
- * @brief Stim-channel event list (sample, previous value, new value triples) with FIFF read/write helpers.
+ * @file     fiff_events.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Stim-channel event list (sample, previous value, new value triples) with FIFF read/write helpers.
  *
  * FIFF events are the standard integer representation of trigger / stim
  * information: each event is a @c (sample, previous_value, new_value)

@@ -113,7 +113,7 @@ def class_slug(qualified: str) -> str:
 # ---------------------------------------------------------------------------
 
 _SPDX_AUTHOR_RE = re.compile(
-    r"^\s*[*/#]*\s*([A-ZÄÖÜ][\w\-.' ]+?)\s*<([^>]+@[^>]+)>\s*$"
+    r"^\s*[*/#]*\s*(?:@author\s+)?([A-ZÄÖÜ][\w\-.' ]+?)\s*<([^>]+@[^>]+)>\s*$"
 )
 _SPDX_HEADER_RE = re.compile(r"SPDX-License-Identifier", re.IGNORECASE)
 

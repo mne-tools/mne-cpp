@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file brainrenderer.cpp
- * @since March 2026
- * @brief Shader pipeline creation, dual-render-target setup and per-frame QRhi draw orchestration for the disp3D scene.
+ * @file     brainrenderer.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Shader pipeline creation, dual-render-target setup and per-frame QRhi draw orchestration for the disp3D scene.
  */
 
 //=============================================================================================================

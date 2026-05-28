@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file raypicker.cpp
- * @since March 2026
- * @brief Mouse-ray unprojection plus Moller-Trumbore triangle and sphere / cylinder intersection over all selectable scene primitives.
+ * @file     raypicker.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Mouse-ray unprojection plus Moller-Trumbore triangle and sphere / cylinder intersection over all selectable scene primitives.
  */
 
 //=============================================================================================================

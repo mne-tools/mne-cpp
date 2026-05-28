@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_process_description.h
- * @since February 2026
- * @brief Plain-old-data record describing one MNE-C @c .ave / @c .cov processing entry.
+ * @file     mne_process_description.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Plain-old-data record describing one MNE-C @c .ave / @c .cov processing entry.
  *
  * Mirrors the description entries used by @c mne_process_raw to declare
  * epoching and covariance computations (event id, baseline, time range,

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_token.h
- * @since March 2026
- * @brief Token vocabulary, value-carrier struct and tokenisation options for the foundation-model serialisation of @ref INVLIB::InvSourceEstimate.
+ * @file     inv_token.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Token vocabulary, value-carrier struct and tokenisation options for the foundation-model serialisation of @ref INVLIB::InvSourceEstimate.
  *
  * Defines @ref INVLIB::InvTokenId — the integer vocabulary used by the
  * tokeniser in @c inv_source_estimate_token.h — organised into stable

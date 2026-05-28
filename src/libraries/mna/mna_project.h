@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_project.h
- * @since April 2026
- * @brief Top-level MNA container binding subjects, processing pipeline, schema version and project metadata.
+ * @file     mna_project.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Top-level MNA container binding subjects, processing pipeline, schema version and project metadata.
  *
  * @ref MnaProject is the in-memory representation of one @c .mna
  * (JSON) or @c .mnx (CBOR) file and the entry point for every other

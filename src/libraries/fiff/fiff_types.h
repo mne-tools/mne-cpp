@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_types.h
- * @since August 2012
- * @brief Primitive scalar typedefs and forward-compatible aliases backing the FIFF type system.
+ * @file     fiff_types.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     August 2012
+ * @brief    Primitive scalar typedefs and forward-compatible aliases backing the FIFF type system.
  *
  * Defines the fixed-width FIFFLIB primitives (@c fiff_int_t,
  * @c fiff_float_t, @c fiff_byte_t, @c fiff_double_t, the DAU packed

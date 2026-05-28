@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file spectral.h
- * @since March 2026
- * @brief Multi-taper spectral estimation: tapered FFT, power and cross-spectral density, DPSS weighting.
+ * @file     spectral.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Multi-taper spectral estimation: tapered FFT, power and cross-spectral density, DPSS weighting.
  *
  * @ref UTILSLIB::Spectral implements the multi-taper / Welch family of
  * spectral estimators that the connectivity and time-frequency pipelines

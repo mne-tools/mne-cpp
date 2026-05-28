@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file welch_psd.h
- * @since March 2026
- * @brief Welch's averaged-periodogram power-spectral-density estimator.
+ * @file     welch_psd.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Welch's averaged-periodogram power-spectral-density estimator.
  *
  * Welch's method (1967) splits the signal into overlapping segments,
  * applies a window function (Hann by default) to each segment, takes the

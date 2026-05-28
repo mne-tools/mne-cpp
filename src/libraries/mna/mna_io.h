@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_io.h
- * @since April 2026
- * @brief Reader and writer for MNA project containers — @c .mna (JSON, human-editable) and @c .mnx (CBOR, compact binary with @c "MNX1" magic).
+ * @file     mna_io.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Reader and writer for MNA project containers — @c .mna (JSON, human-editable) and @c .mnx (CBOR, compact binary with @c "MNX1" magic).
  *
  * @ref MnaIO is the single dispatch point between an on-disk
  * project file and an in-memory @ref MnaProject. The public

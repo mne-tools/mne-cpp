@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file lsl_stream_outlet.cpp
- * @since March 2026
- * @brief Implements the TCP-server / UDP-announcer worker that publishes pushed samples to every connected LSL inlet.
+ * @file     lsl_stream_outlet.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implements the TCP-server / UDP-announcer worker that publishes pushed samples to every connected LSL inlet.
  *
  * The PIMPL class @c StreamOutletPrivate spawns a dedicated
  * @c std::thread that owns a @c QTcpServer for accepting inlet

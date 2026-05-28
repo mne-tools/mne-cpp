@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_surface_or_volume.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNESurfaceOrVolume.
+ * @file     mne_surface_or_volume.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNESurfaceOrVolume.
  *
  * Defines the constructors and helpers shared by surface and volume
  * specialisations. Most routines simply allocate the geometry arrays at

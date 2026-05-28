@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_source_metrics.h
- * @since April 2026
- * @brief Peak localisation error and spatial dispersion metrics for evaluating distributed M/EEG inverse solutions.
+ * @file     sts_source_metrics.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Peak localisation error and spatial dispersion metrics for evaluating distributed M/EEG inverse solutions.
  *
  * Distributed source estimators (MNE, dSPM, sLORETA, eLORETA, CMNE)
  * smear point sources across a neighbourhood of the cortex, so judging

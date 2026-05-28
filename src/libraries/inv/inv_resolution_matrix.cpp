@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_resolution_matrix.cpp
- * @since May 2026
- * @brief Implementation of the resolution-matrix analytics declared in @c inv_resolution_matrix.h.
+ * @file     inv_resolution_matrix.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of the resolution-matrix analytics declared in @c inv_resolution_matrix.h.
  *
  * Implements the @c K·L product, per-source PSF / CTF extraction,
  * distance-weighted spatial spread and peak-localisation error against

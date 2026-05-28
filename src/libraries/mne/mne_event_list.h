@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_event_list.h
- * @since March 2026
- * @brief Ordered list of @ref MNELIB::MNEEvent records.
+ * @file     mne_event_list.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Ordered list of @ref MNELIB::MNEEvent records.
  *
  * @ref MNELIB::MNEEventList wraps the per-recording event list with the
  * helpers needed by epoching (search by id, slice by time window) and

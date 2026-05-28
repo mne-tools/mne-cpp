@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rtsourceinterpolationmatworker.cpp
- * @since March 2026
- * @brief Off-thread SCDC + interpolation-matrix build for one hemisphere with interpolation- or annotation-based modes.
+ * @file     rtsourceinterpolationmatworker.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Off-thread SCDC + interpolation-matrix build for one hemisphere with interpolation- or annotation-based modes.
  */
 
 //=============================================================================================================

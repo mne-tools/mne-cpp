@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2016-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Ruben Doerfel <doerfelruben@aol.com>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_explain.h
- * @since December 2016
- * @brief Static lookup table mapping every documented FIFF tag kind to a fixed-width human-readable label, used by the FIFF dumper / show_fiff tool.
+ * @file     fiff_explain.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
+ * @author   Andreas Griesshammer <ag@fieldlineinc.com>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     December 2016
+ * @brief    Static lookup table mapping every documented FIFF tag kind to a fixed-width human-readable label, used by the FIFF dumper / show_fiff tool.
  *
  * Mirrors the @c _fiff_explanations table in MNE-C's @c fiff_explain.c
  * and the @c mne.io.show_fiff helper in MNE-Python: a flat array of

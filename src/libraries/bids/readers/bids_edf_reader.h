@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_edf_reader.h
- * @since March 2026
- * @brief @ref BIDSLIB::AbstractFormatReader implementation for European Data Format (EDF / EDF+) files.
+ * @file     bids_edf_reader.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    @ref BIDSLIB::AbstractFormatReader implementation for European Data Format (EDF / EDF+) files.
  *
  * EDF stores a recording as a fixed-size ASCII header followed by a
  * stream of @c duration_seconds-long ``data records''; inside each

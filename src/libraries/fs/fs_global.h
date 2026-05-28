@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *
- * @file fs_global.h
- * @since December 2012
- * @brief Export/import macros and build-info accessors for the FSLIB FreeSurfer I/O library.
+ * @file     fs_global.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @since    0.1.0
+ * @date     December 2012
+ * @brief    Export/import macros and build-info accessors for the FSLIB FreeSurfer I/O library.
  *
  * Defines the @c FSSHARED_EXPORT visibility macro used by every public
  * class in FSLIB so the library can be built either as a Qt shared

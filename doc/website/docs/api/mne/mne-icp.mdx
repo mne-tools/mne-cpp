@@ -21,7 +21,7 @@ class; the functions live directly in the library namespace.
 
 `#include <mne/mne_icp.h>`
 
-SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
 MNELIB::MNEIcp wraps the classical point-to-surface ICP used by mne-cpp's coregistration tools to refine an initial `head` &lt;-&gt; `MRI` transformation. It projects each digitiser point onto the nearest triangle of an MNEBemSurface (via MNEProjectToSurface), solves a rigid-body least squares with SVD and iterates until convergence.
 

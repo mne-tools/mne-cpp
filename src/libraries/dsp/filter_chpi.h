@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file filter_chpi.h
- * @since May 2026
- * @brief Declaration of filterChpi — cHPI signal removal by notch filtering.
+ * @file     filter_chpi.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Declaration of filterChpi — cHPI signal removal by notch filtering.
  *
  * Removes continuous head-position indicator (cHPI) excitation signals from MEG data by
  * applying zero-phase Butterworth band-stop (notch) filters at each cHPI frequency.

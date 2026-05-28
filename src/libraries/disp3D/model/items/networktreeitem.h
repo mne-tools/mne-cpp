@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file networktreeitem.h
- * @since March 2026
- * @brief Tree item identifying a connectivity network rendered as instanced nodes and edges.
+ * @file     networktreeitem.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Tree item identifying a connectivity network rendered as instanced nodes and edges.
  *
  * Holds only the unique object key that maps the item back to its
  * @ref CONNLIB::Network payload inside @ref NetworkObject. The

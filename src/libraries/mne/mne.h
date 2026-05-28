@@ -2,16 +2,17 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *
- * @file mne.h
- * @since August 2012
- * @brief Static MNE facade providing matlab-toolbox-compatible high-level helpers across MNELIB.
+ * @file     mne.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @since    0.1.0
+ * @date     August 2012
+ * @brief    Static MNE facade providing matlab-toolbox-compatible high-level helpers across MNELIB.
  *
  * @ref MNELIB::MNE is a thin collection of @c static utilities that mirror
  * the function surface of the Python/Matlab MNE toolbox so existing

@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file multiviewwindow.h
- * @since February 2020
- * @brief QDockWidget wrapper used as the building block of @ref MultiView layouts.
+ * @file     multiviewwindow.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     February 2020
+ * @brief    QDockWidget wrapper used as the building block of @ref MultiView layouts.
  *
  * MultiViewWindow exposes the small amount of state @ref MultiView
  * needs to manage its docks (the wrapped widget, a stable name, a

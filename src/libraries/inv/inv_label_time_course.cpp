@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_label_time_course.cpp
- * @since May 2026
- * @brief Implementation of the label-aggregation modes and sign-flip computation declared in @c inv_label_time_course.h.
+ * @file     inv_label_time_course.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of the label-aggregation modes and sign-flip computation declared in @c inv_label_time_course.h.
  *
  * Implements per-label slicing of the vertex index list, the four
  * aggregation kernels (simple mean, sign-flipped mean, PCA-flip via

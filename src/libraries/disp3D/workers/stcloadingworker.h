@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file stcloadingworker.h
- * @since March 2026
- * @brief Background worker that loads source-time-course (.stc) files and prepares per-hemisphere interpolation matrices.
+ * @file     stcloadingworker.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Background worker that loads source-time-course (.stc) files and prepares per-hemisphere interpolation matrices.
  *
  * StcLoadingWorker pulls the LH and RH @c .stc files from disk in a
  * background thread, parses them into an @ref

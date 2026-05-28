@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file overviewbarwidget.cpp
- * @since April 2026
- * @brief Implementation of the OverviewBarWidget recording minimap.
+ * @file     overviewbarwidget.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     April 2026
+ * @brief    Implementation of the OverviewBarWidget recording minimap.
  */
 
 //=============================================================================================================

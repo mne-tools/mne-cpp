@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_recording.cpp
- * @since April 2026
- * @brief JSON and CBOR codecs for @ref MnaRecording — ordered @ref MnaFileRef list plus opaque id and forward-compatible @c extras.
+ * @file     mna_recording.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    JSON and CBOR codecs for @ref MnaRecording — ordered @ref MnaFileRef list plus opaque id and forward-compatible @c extras.
  *
  * The implementation defers to @ref MnaFileRef::toJson and the
  * matching @c fromCbor for each file entry, preserving order so

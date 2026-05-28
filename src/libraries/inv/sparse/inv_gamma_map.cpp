@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_gamma_map.cpp
- * @since April 2026
- * @brief Implementation of the Gamma-MAP / SBL solver.
+ * @file     inv_gamma_map.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of the Gamma-MAP / SBL solver.
  *
  * Implements the EM / fixed-point update loop for the per-source
  * variance hyperparameters @f$\gamma_{i}@f$: at each step build the

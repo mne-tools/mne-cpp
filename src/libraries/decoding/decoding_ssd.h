@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file decoding_ssd.h
- * @since May 2026
- * @brief Spatio-Spectral Decomposition (SSD) for noise-aware narrowband enhancement of continuous M/EEG.
+ * @file     decoding_ssd.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Spatio-Spectral Decomposition (SSD) for noise-aware narrowband enhancement of continuous M/EEG.
  *
  * SSD extracts spatial filters that maximise variance in a narrow
  * signal band of interest while simultaneously minimising variance in

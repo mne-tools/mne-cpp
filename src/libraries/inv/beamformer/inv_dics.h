@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_dics.h
- * @since March 2026
- * @brief Dynamic Imaging of Coherent Sources (DICS) beamformer — frequency-domain source-power and source-time-course estimation.
+ * @file     inv_dics.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Dynamic Imaging of Coherent Sources (DICS) beamformer — frequency-domain source-power and source-time-course estimation.
  *
  * @ref INVLIB::InvDICS implements the DICS beamformer of Gross et al.,
  * PNAS 98(2), 694-699 (2001). Where LCMV operates on a time-domain data

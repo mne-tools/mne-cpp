@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2017-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fwd_eeg_sphere_model.h
- * @since March 2017
- * @brief Multi-shell spherical head model with Berg-Scherg equivalent-source approximation for fast EEG forward computation.
+ * @file     fwd_eeg_sphere_model.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     March 2017
+ * @brief    Multi-shell spherical head model with Berg-Scherg equivalent-source approximation for fast EEG forward computation.
  *
  * For EEG, the exact potential of a current dipole in a layered sphere
  * is a Legendre series whose convergence slows dramatically as the

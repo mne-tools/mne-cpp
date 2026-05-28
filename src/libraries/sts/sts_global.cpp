@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_global.cpp
- * @since April 2026
- * @brief Definitions of the STSLIB build-info accessors declared in sts_global.h.
+ * @file     sts_global.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Definitions of the STSLIB build-info accessors declared in sts_global.h.
  *
  * The three thin wrappers forward to UTILSLIB so the build timestamp and
  * git hash are baked into the STSLIB shared object at link time; this

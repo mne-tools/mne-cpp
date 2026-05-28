@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_pwl_rap_music.cpp
- * @since March 2026
- * @brief Implementation of the Powell-accelerated RAP-MUSIC variant.
+ * @file     inv_pwl_rap_music.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of the Powell-accelerated RAP-MUSIC variant.
  *
  * Implements the Powell direction-set search over the leadfield grid,
  * the @c PowellOffset / @c PowellIdxVec helpers that linearise pair

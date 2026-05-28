@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_global.h
- * @since March 2026
- * @brief INVLIB library export/import macros, build-info accessors, and namespace docstring for the inverse-solver library.
+ * @file     inv_global.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    INVLIB library export/import macros, build-info accessors, and namespace docstring for the inverse-solver library.
  *
  * The INVLIB library bundles every inverse-method, beamformer and HPI-fit
  * class used by mne-cpp: minimum-norm / dSPM / sLORETA / eLORETA, LCMV and

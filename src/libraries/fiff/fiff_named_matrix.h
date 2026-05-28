@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_named_matrix.h
- * @since September 2012
- * @brief Matrix paired with row and column name lists, the on-disk form of FIFFB_PROJ_ITEM / FIFFB_MNE_NAMED_MATRIX payloads.
+ * @file     fiff_named_matrix.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     September 2012
+ * @brief    Matrix paired with row and column name lists, the on-disk form of FIFFB_PROJ_ITEM / FIFFB_MNE_NAMED_MATRIX payloads.
  *
  * Several FIFF blocks store a matrix whose rows and columns refer to
  * channel names (SSP projection vectors, CTF compensation matrices,

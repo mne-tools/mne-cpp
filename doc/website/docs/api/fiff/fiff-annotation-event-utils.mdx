@@ -21,7 +21,7 @@ class; the functions live directly in the library namespace.
 
 `#include <fiff/fiff_annotation_event_utils.h>`
 
-SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
 Two representations coexist in MNE workflows: free-text FiffAnnotation entries (onset / duration / description) and integer (sample, prev, code) event triples extracted from a stim channel or fed to `mne.Epochs`. These free functions translate between the two: mapping annotation descriptions to event codes via a description→code table, exploding annotation durations into start / stop event pairs, and the reverse aggregation. They mirror `mne.events_from_annotations` and `mne.annotations_from_events` in MNE-Python.
 

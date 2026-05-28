@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_correction.h
- * @since April 2026
- * @brief Family-wise error and false-discovery-rate corrections for mass-univariate p-value maps.
+ * @file     sts_correction.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Family-wise error and false-discovery-rate corrections for mass-univariate p-value maps.
  *
  * Provides the three multiple-comparison adjustments most commonly
  * reported in M/EEG papers: classical Bonferroni

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_subject.h
- * @since April 2026
- * @brief One participant in an MNA project — owner of measurement sessions and link to the FreeSurfer anatomy.
+ * @file     mna_subject.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    One participant in an MNA project — owner of measurement sessions and link to the FreeSurfer anatomy.
  *
  * @ref MnaSubject is the root of the per-participant subtree in an
  * MNA project. It binds together all sessions/recordings that

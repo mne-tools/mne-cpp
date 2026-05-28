@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_sensor_set.cpp
- * @since March 2026
- * @brief Implementation of @ref INVLIB::InvSensorSet and the @c FwdCoilSet → @c InvSensorSet builder.
+ * @file     inv_sensor_set.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref INVLIB::InvSensorSet and the @c FwdCoilSet → @c InvSensorSet builder.
  *
  * Implements the @c FwdCoilSet → @c InvSensorSet conversion (sizing
  * the per-integration-point matrices, copying positions / normals /

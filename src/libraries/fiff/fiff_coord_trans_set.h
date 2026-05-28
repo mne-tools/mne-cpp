@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_coord_trans_set.h
- * @since February 2026
- * @brief Ordered set of FIFF coordinate transforms, the on-disk content of a FIFFB_MRI / FIFFB_HPI_MEAS block.
+ * @file     fiff_coord_trans_set.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Ordered set of FIFF coordinate transforms, the on-disk content of a FIFFB_MRI / FIFFB_HPI_MEAS block.
  *
  * Container that owns multiple @ref FiffCoordTrans instances along with the
  * auxiliary tags that travel with them inside the FIFF tree

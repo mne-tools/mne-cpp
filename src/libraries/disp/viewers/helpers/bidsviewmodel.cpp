@@ -2,12 +2,13 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bidsviewmodel.cpp
- * @since October 2020
- * @brief Implementation of the BidsViewModel BIDS-tree model.
+ * @file     bidsviewmodel.cpp
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.7
+ * @date     October 2020
+ * @brief    Implementation of the BidsViewModel BIDS-tree model.
  */
 
 //=============================================================================================================

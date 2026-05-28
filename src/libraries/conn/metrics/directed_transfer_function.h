@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file directed_transfer_function.h
- * @since April 2026
- * @brief Directed Transfer Function (Kaminski & Blinowska 1991) between every channel pair, derived from a fitted MVAR transfer function.
+ * @file     directed_transfer_function.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Directed Transfer Function (Kaminski & Blinowska 1991) between every channel pair, derived from a fitted MVAR transfer function.
  *
  * The DTF normalises each row of the squared MVAR transfer matrix to a
  * unit sum,

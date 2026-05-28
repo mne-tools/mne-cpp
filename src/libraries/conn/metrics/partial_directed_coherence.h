@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file partial_directed_coherence.h
- * @since April 2026
- * @brief Partial Directed Coherence (Baccala & Sameshima 2001) between every channel pair, derived from a fitted MVAR model.
+ * @file     partial_directed_coherence.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Partial Directed Coherence (Baccala & Sameshima 2001) between every channel pair, derived from a fitted MVAR model.
  *
  * PDC works in the @c z-domain on the inverse of the MVAR transfer
  * function, @c A(f) = I - sum_{k=1}^{p} A_k * exp(-2*pi*i*f*k), and

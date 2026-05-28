@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Ruben Doerfel <doerfelruben@aol.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_file.h
- * @since September 2012
- * @brief FIFF tag-kind, block-kind and type-code numerical definitions, authoritative for FIFFLIB.
+ * @file     fiff_file.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     September 2012
+ * @brief    FIFF tag-kind, block-kind and type-code numerical definitions, authoritative for FIFFLIB.
  *
  * Companion to @ref fiff_constants.h that focuses on the value space of
  * tag kinds (the FIFF_* numbers below 1000), of block kinds (FIFFB_*)

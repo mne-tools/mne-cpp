@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rt_averaging.h
- * @since March 2026
- * @brief Real-time stimulus-locked averaging worker producing running evoked responses.
+ * @file     rt_averaging.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Real-time stimulus-locked averaging worker producing running evoked responses.
  *
  * RtAveragingWorker accumulates fixed-length epochs around trigger events
  * detected on a user-specified stim channel and maintains a running

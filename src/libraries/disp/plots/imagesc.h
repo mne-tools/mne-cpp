@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file imagesc.h
- * @since July 2018
- * @brief MATLAB-style false-colour heat-map widget for Eigen matrices.
+ * @file     imagesc.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2018
+ * @brief    MATLAB-style false-colour heat-map widget for Eigen matrices.
  *
  * ImageSc visualises an @c Eigen::MatrixXd / @c MatrixXf / @c MatrixXi as
  * a 2-D image, mapping the data range linearly into a selectable

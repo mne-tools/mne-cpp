@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_label_time_course.h
- * @since May 2026
- * @brief ROI-level aggregation of vertex-wise source estimates — the C++ peer of MNE-Python's @c extract_label_time_course.
+ * @file     inv_label_time_course.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    ROI-level aggregation of vertex-wise source estimates — the C++ peer of MNE-Python's @c extract_label_time_course.
  *
  * @ref INVLIB::InvLabelTimeCourse provides the five standard aggregation
  * modes used by mne-python — @c mean, @c mean_flip, @c pca_flip, @c max

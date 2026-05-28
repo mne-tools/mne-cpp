@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file standard_montage.h
- * @since May 2026
- * @brief Built-in 10-20 / 10-10 / 10-05 EEG electrode position tables in MNI head coordinates.
+ * @file     standard_montage.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Built-in 10-20 / 10-10 / 10-05 EEG electrode position tables in MNI head coordinates.
  *
  * @ref UTILSLIB::StandardMontage provides hard-coded, vendor-
  * neutral electrode placements for the three canonical

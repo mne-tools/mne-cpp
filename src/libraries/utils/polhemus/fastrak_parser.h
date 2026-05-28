@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fastrak_parser.h
- * @since May 2026
- * @brief Polhemus Fastrak / FastSCAN ASCII record parser.
+ * @file     fastrak_parser.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Polhemus Fastrak / FastSCAN ASCII record parser.
  *
  *           Supported ASCII record formats:
  *

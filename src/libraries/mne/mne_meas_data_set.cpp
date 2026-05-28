@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_meas_data_set.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNEMeasDataSet.
+ * @file     mne_meas_data_set.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNEMeasDataSet.
  *
  * Provides constructors, deep-copy of the per-condition sample matrix
  * and the timing helpers used by the legacy C-ported algorithms.

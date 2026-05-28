@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2019-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file tfsettingsview.cpp
- * @since July 2019
- * @brief Implementation of the TfSettingsView TF-analysis configuration panel.
+ * @file     tfsettingsview.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Andreas Griesshammer <ag@fieldlineinc.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2019
+ * @brief    Implementation of the TfSettingsView TF-analysis configuration panel.
  */
 
 //=============================================================================================================

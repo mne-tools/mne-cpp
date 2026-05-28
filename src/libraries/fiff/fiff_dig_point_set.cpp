@@ -2,16 +2,17 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2016-2026 MNE-CPP Authors
- *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Ruben Doerfel <doerfelruben@aol.com>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
  *
- * @file fiff_dig_point_set.cpp
- * @since July 2016
- * @brief Implementation of @ref FiffDigPointSet: parses an entire FIFFB_ISOTRAK block into a list of @ref FiffDigPoint records.
+ * @file     fiff_dig_point_set.cpp
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Andreas Griesshammer <ag@fieldlineinc.com>
+ * @since    0.1.0
+ * @date     July 2016
+ * @brief    Implementation of @ref FiffDigPointSet: parses an entire FIFFB_ISOTRAK block into a list of @ref FiffDigPoint records.
  *
  * Mirrors the @c info['dig'] list in MNE-Python. Used by the
  * registration GUIs and by the head-shape coregistration paths.

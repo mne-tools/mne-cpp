@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2021-2026 MNE-CPP Authors
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file buildinfo.h
- * @since August 2021
- * @brief Compile-time helpers that capture the build date, time and git commit hash into the binary.
+ * @file     buildinfo.h
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     August 2021
+ * @brief    Compile-time helpers that capture the build date, time and git commit hash into the binary.
  *
  * Every accessor is a header-only @c constexpr function so the
  * @c __DATE__ / @c __TIME__ macros and the @c MNE_GIT_HASH_*

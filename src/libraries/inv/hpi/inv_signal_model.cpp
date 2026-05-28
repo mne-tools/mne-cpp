@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_signal_model.cpp
- * @since March 2026
- * @brief Implementation of the basic / advanced HPI signal-model builders and the cached pseudo-inverse.
+ * @file     inv_signal_model.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of the basic / advanced HPI signal-model builders and the cached pseudo-inverse.
  *
  * Implements the basic model (sin/cos pairs for the HPI drive
  * frequencies only), the advanced model (extra sin/cos pairs for the

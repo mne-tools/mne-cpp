@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_global.h
- * @since April 2026
- * @brief Export/import macros, build-info accessors, and MNALIB namespace anchor for the MNE Analysis Container Format.
+ * @file     mna_global.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Export/import macros, build-info accessors, and MNALIB namespace anchor for the MNE Analysis Container Format.
  *
  * MNALIB implements the @c .mna (JSON) and @c .mnx (CBOR) project
  * container — a declarative, reproducible record of MEG/EEG analyses

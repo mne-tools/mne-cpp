@@ -2,16 +2,17 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2015-2026 MNE-CPP Authors
- *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Ruben Doerfel <doerfelruben@aol.com>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
  *
- * @file mne_bem.cpp
- * @since June 2015
- * @brief Implementation of @ref MNELIB::MNEBem.
+ * @file     mne_bem.cpp
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
+ * @author   Andreas Griesshammer <ag@fieldlineinc.com>
+ * @since    0.1.0
+ * @date     June 2015
+ * @brief    Implementation of @ref MNELIB::MNEBem.
  *
  * Implements FIFF read/write of the @c FIFFB_BEM block, dispatching the
  * @c FIFFB_BEM_SURF child blocks to @ref MNEBemSurface::read and

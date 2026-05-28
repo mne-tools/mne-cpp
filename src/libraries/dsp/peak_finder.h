@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file peak_finder.h
- * @since May 2026
- * @brief Local-maxima peak detection in 1-D signals with prominence filtering.
+ * @file     peak_finder.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Local-maxima peak detection in 1-D signals with prominence filtering.
  *
  * A peak is defined as a sample that is strictly larger than its two direct
  * neighbours. The basic detector locates every such sample in linear time;

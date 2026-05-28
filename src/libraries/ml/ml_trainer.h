@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file ml_trainer.h
- * @since April 2026
- * @brief @ref MLLIB::MLTrainer convenience wrapper that drives Python training scripts via @ref UTILSLIB::PythonRunner.
+ * @file     ml_trainer.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    @ref MLLIB::MLTrainer convenience wrapper that drives Python training scripts via @ref UTILSLIB::PythonRunner.
  *
  * Inference in mne-cpp goes through ONNX Runtime, but training itself
  * stays in Python where the ecosystem lives (PyTorch, scikit-learn,

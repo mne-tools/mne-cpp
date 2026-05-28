@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fs_label_utils.h
- * @since May 2026
- * @brief Surface-mesh label manipulation: grow, split into connected components, STC ↔ label conversion.
+ * @file     fs_label_utils.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Surface-mesh label manipulation: grow, split into connected components, STC ↔ label conversion.
  *
  * Algorithmic counterpart to @ref FsLabel I/O. Operates on labels in the
  * frame of an accompanying @ref FsSurface, using the surface’s triangle

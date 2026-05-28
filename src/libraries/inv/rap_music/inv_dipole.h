@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_dipole.h
- * @since March 2026
- * @brief Templated dipole and dipole-pair value types used by the RAP-MUSIC scanning algorithm.
+ * @file     inv_dipole.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Templated dipole and dipole-pair value types used by the RAP-MUSIC scanning algorithm.
  *
  * @ref INVLIB::InvDipole<T> is a templated representation of a single
  * current dipole (position + orientation, optionally length and

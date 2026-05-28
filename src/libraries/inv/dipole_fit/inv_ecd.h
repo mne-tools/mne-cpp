@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_ecd.h
- * @since March 2026
- * @brief Single equivalent current dipole (ECD) with position, moment and per-fit goodness/χ² metrics.
+ * @file     inv_ecd.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Single equivalent current dipole (ECD) with position, moment and per-fit goodness/χ² metrics.
  *
  * @ref INVLIB::InvEcd represents one ECD record produced by the dipole-
  * fit pipeline at one time point: the head-frame position, the dipole

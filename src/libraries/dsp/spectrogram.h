@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file spectrogram.h
- * @since March 2026
- * @brief Gaussian-windowed short-time Fourier transform (STFT) spectrogram.
+ * @file     spectrogram.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Gaussian-windowed short-time Fourier transform (STFT) spectrogram.
  *
  * Spectrogram slides a Gaussian window of user-defined size along a 1-D
  * input signal, applies an FFT to each windowed segment and stacks the

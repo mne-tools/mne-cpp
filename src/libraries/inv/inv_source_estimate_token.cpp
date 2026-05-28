@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_source_estimate_token.cpp
- * @since March 2026
- * @brief Implementation of the @ref INVLIB::tokenize / @ref INVLIB::fromTokens free functions.
+ * @file     inv_source_estimate_token.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of the @ref INVLIB::tokenize / @ref INVLIB::fromTokens free functions.
  *
  * Walks the @ref InvSourceEstimate in canonical order — metadata,
  * positions, dense grid, coupling groups, focal dipoles, connectivity

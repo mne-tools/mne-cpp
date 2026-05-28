@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fastrak_parser.cpp
- * @since May 2026
- * @brief Streaming ASCII record decoder that converts Polhemus Fastrak / FastSCAN bytes into @ref UTILSLIB::FastrakSample values.
+ * @file     fastrak_parser.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Streaming ASCII record decoder that converts Polhemus Fastrak / FastSCAN bytes into @ref UTILSLIB::FastrakSample values.
  *
  * Bytes are accumulated in an internal buffer; complete
  * CR/LF terminated records are tokenised on demand by

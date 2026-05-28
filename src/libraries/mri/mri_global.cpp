@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mri_global.cpp
- * @since February 2026
- * @brief Out-of-line definitions of the MRILIB build-info accessors declared in @ref mri_global.h.
+ * @file     mri_global.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Out-of-line definitions of the MRILIB build-info accessors declared in @ref mri_global.h.
  *
  * Pulls the build timestamp and short git hash from
  * @c utils/buildinfo.h (populated at configure time by

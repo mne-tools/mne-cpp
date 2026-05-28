@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file kmeans.h
- * @since March 2026
- * @brief K-means partitional clustering with multiple distance metrics, initialisations and empty-cluster policies.
+ * @file     kmeans.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    K-means partitional clustering with multiple distance metrics, initialisations and empty-cluster policies.
  *
  * Lloyd-style K-means partitions @c n p-dimensional samples into @c k
  * clusters by alternating an assignment step (each point goes to the

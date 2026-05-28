@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2014-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
  *
- * @file layoutloader.cpp
- * @since September 2014
- * @brief Implementation of the ANT @c .elc / MNE @c .lout parsers declared in @ref layoutloader.h.
+ * @file     layoutloader.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Andreas Griesshammer <ag@fieldlineinc.com>
+ * @since    0.1.0
+ * @date     September 2014
+ * @brief    Implementation of the ANT @c .elc / MNE @c .lout parsers declared in @ref layoutloader.h.
  *
  * The parsers are deliberately tolerant of trailing whitespace
  * and missing comment lines because exported layouts from

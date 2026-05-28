@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_ftest.h
- * @since April 2026
- * @brief One-way ANOVA F-test with exact p-values for comparing two or more independent groups.
+ * @file     sts_ftest.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    One-way ANOVA F-test with exact p-values for comparing two or more independent groups.
  *
  * Provides a one-way ANOVA on a list of @c k matrices, each holding
  * @c n_g observations of the same set of variables. For each variable

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file partial_directed_coherence.cpp
- * @since April 2026
- * @brief Implementation of @ref CONNLIB::PartialDirectedCoherence - column-normalised |A(f)| directional connectivity (Baccala & Sameshima 2001), direct paths only.
+ * @file     partial_directed_coherence.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of @ref CONNLIB::PartialDirectedCoherence - column-normalised |A(f)| directional connectivity (Baccala & Sameshima 2001), direct paths only.
  */
 
 //=============================================================================================================

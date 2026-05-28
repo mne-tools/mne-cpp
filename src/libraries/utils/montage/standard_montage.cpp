@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file standard_montage.cpp
- * @since May 2026
- * @brief Embedded 10-20 / 10-10 electrode tables and the densification routine that yields the 10-05 system.
+ * @file     standard_montage.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Embedded 10-20 / 10-10 electrode tables and the densification routine that yields the 10-05 system.
  *
  * The coordinate tables are anonymous @c constexpr arrays
  * compiled directly into the binary so the standard caps are

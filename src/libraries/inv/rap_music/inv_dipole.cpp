@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_dipole.cpp
- * @since March 2026
- * @brief Template definitions for @ref INVLIB::InvDipole<T> (included from the matching header).
+ * @file     inv_dipole.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Template definitions for @ref INVLIB::InvDipole<T> (included from the matching header).
  *
  * Provides the explicit ctor / dtor and the @c clean reset method for
  * @ref INVLIB::InvDipole<T>. This file is included from

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_logger.cpp
- * @since March 2026
- * @brief Out-of-line definition of the colourised, thread-safe @c qInstallMessageHandler installed by @ref UTILSLIB::MNELogger.
+ * @file     mne_logger.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Out-of-line definition of the colourised, thread-safe @c qInstallMessageHandler installed by @ref UTILSLIB::MNELogger.
  *
  * Holds the @c std::mutex used to serialise the writes to
  * @c stderr so log lines from different worker threads never

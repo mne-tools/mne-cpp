@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bridged_electrodes.h
- * @since May 2026
- * @brief Detection of electrically bridged EEG electrodes via the Electrical Distance metric.
+ * @file     bridged_electrodes.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Detection of electrically bridged EEG electrodes via the Electrical Distance metric.
  *
  * Two EEG electrodes are said to be bridged when conductive paste, sweat or
  * skin abrasion creates a low-impedance shortcut between them; the recorded

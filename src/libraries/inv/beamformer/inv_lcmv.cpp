@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_lcmv.cpp
- * @since March 2026
- * @brief Implementation of the LCMV beamformer pipeline (filter design + multiple application paths).
+ * @file     inv_lcmv.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of the LCMV beamformer pipeline (filter design + multiple application paths).
  *
  * Builds the leadfield ↔ data-covariance pipeline, delegates the
  * numerical core to @ref InvBeamformerCompute, then exposes the

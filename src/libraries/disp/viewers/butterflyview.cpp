@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Wayne F. Mead <isk@imsorrykun.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file butterflyview.cpp
- * @since July 2018
- * @brief Implementation of the ButterflyView QRhi butterfly evoked viewer (shader setup, vertex packing, draw loop).
+ * @file     butterflyview.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Wayne F. Mead <isk@imsorrykun.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2018
+ * @brief    Implementation of the ButterflyView QRhi butterfly evoked viewer (shader setup, vertex packing, draw loop).
  */
 
 //=============================================================================================================

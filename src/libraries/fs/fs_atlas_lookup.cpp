@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fs_atlas_lookup.cpp
- * @since April 2026
- * @brief Implementation of @ref FSLIB::FsAtlasLookup: RAS → region-name resolver over a FreeSurfer volumetric parcellation.
+ * @file     fs_atlas_lookup.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of @ref FSLIB::FsAtlasLookup: RAS → region-name resolver over a FreeSurfer volumetric parcellation.
  */
 
 //=============================================================================================================

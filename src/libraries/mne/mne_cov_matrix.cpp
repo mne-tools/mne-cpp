@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_cov_matrix.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNECovMatrix.
+ * @file     mne_cov_matrix.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNECovMatrix.
  *
  * Provides the constructors, eigen-decomposition cache and FIFF read/write
  * helpers that round-trip the @c FIFFB_MNE_COV block exactly the way the

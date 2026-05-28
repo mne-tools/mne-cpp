@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file lineplot.cpp
- * @since July 2018
- * @brief Implementation of the LinePlot widget (auto-range computation and polyline painting).
+ * @file     lineplot.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Andreas Griesshammer <ag@fieldlineinc.com>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2018
+ * @brief    Implementation of the LinePlot widget (auto-range computation and polyline painting).
  */
 
 //=============================================================================================================

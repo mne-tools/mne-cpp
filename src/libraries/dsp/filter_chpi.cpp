@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file filter_chpi.cpp
- * @since May 2026
- * @brief Implementation of filterChpi — cHPI signal removal by notch filtering.
+ * @file     filter_chpi.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of filterChpi — cHPI signal removal by notch filtering.
  */
 
 //=============================================================================================================

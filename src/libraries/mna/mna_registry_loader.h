@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_registry_loader.h
- * @since April 2026
- * @brief Declarative loader for @ref MnaOpRegistry contents — ingests @c mna-registry.json manifests and overrides them with drop-ins under @c mna-registry.d/.
+ * @file     mna_registry_loader.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Declarative loader for @ref MnaOpRegistry contents — ingests @c mna-registry.json manifests and overrides them with drop-ins under @c mna-registry.d/.
  *
  * @ref MnaRegistryLoader is the bridge between the on-disk
  * representation of MNA op schemas (JSON manifests authored by

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mvar_model.h
- * @since April 2026
- * @brief Multivariate autoregressive (MVAR) model fit and its frequency-domain decomposition; backbone of the directed connectivity metrics.
+ * @file     mvar_model.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Multivariate autoregressive (MVAR) model fit and its frequency-domain decomposition; backbone of the directed connectivity metrics.
  *
  * The MVAR(p) model expresses each channel as a linear combination of the
  * last @c p samples of all channels plus white innovation noise,

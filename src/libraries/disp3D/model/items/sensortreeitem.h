@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sensortreeitem.h
- * @since March 2026
- * @brief Tree item for a single MEG / EEG sensor with position, optional coil orientation and rendered scale.
+ * @file     sensortreeitem.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Tree item for a single MEG / EEG sensor with position, optional coil orientation and rendered scale.
  *
  * A sensor item couples a 3-D position with an optional 3x3
  * coil-orientation matrix (embedded in a 4x4 for GPU upload). The

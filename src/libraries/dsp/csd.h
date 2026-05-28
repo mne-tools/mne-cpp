@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file csd.h
- * @since April 2026
- * @brief Cross-spectral density (CSD) estimation via averaged windowed FFTs.
+ * @file     csd.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Cross-spectral density (CSD) estimation via averaged windowed FFTs.
  *
  * The cross-spectral density matrix is the frequency-domain counterpart of
  * the time-domain covariance and the central quantity behind coherence,

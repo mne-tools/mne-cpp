@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2021-2026 MNE-CPP Authors
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_global.cpp
- * @since August 2021
- * @brief Definitions for the FIFFLIB build-info accessors declared in @ref fiff_global.h.
+ * @file     fiff_global.cpp
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     August 2021
+ * @brief    Definitions for the FIFFLIB build-info accessors declared in @ref fiff_global.h.
  *
  * Each accessor forwards to the matching macro defined by
  * @c utils/buildinfo.h so the FIFF build identity (timestamp, short hash,

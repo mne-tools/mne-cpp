@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file extended_infomax.h
- * @since April 2026
- * @brief Extended Infomax independent component analysis (super- and sub-Gaussian sources).
+ * @file     extended_infomax.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Extended Infomax independent component analysis (super- and sub-Gaussian sources).
  *
  * Extended Infomax (Lee, Girolami & Sejnowski, 1999) is a maximum-likelihood
  * ICA algorithm that maximises the joint entropy of a non-linearly

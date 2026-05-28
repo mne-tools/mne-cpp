@@ -1,4 +1,4 @@
-"""One-shot migration to the v2 unified SPDX+Doxygen header form.
+"""One-shot migration to the v3 unified SPDX+Doxygen header form.
 
 Source form (legacy):
 
@@ -16,28 +16,36 @@ Source form (legacy):
      * @brief    Foo bar baz.
      */
 
-Target form (v2 unified, matches src/libraries/mri/):
+Target form (v3):
 
     //=============================================================================================================
     /**
      * SPDX-License-Identifier: BSD-3-Clause
      * Copyright (c) <years> MNE-CPP Authors
-     *   <Name> <<email>>
-     *   ...
      *
-     * @file foo.h
-     * @since <year>
-     * @date  <Month Year>
-     * @brief Foo bar baz.
+     * @file     foo.h
+     * @author   <Name> <<email>>
+     * @author   <Name> <<email>>
+     * @since    <closest-version-tag>          (e.g. 0.1.0)
+     * @date     <Month YYYY>                   (first commit)
+     * @brief    Foo bar baz.
      *
      * <preserved substantive body, if any>
      */
+
+Differences from v2:
+  * Authors moved from bare ``*   Name <email>`` lines under the
+    Copyright header back into proper Doxygen ``@author`` tags.
+  * ``@since`` is now the closest git version tag at or after the
+    file's first commit (e.g. 0.1.0, 2.0.0) instead of the year.
+  * ``@date`` reintroduced to record the month/year of the file's
+    first appearance in git history.
 
 Authors / year range / @since / @date are derived from **path-only**
 ``git log`` (no ``--follow``) so they reflect the people who actually
 edited *this* file, not rename ancestry of older sibling files.
 
-The migrator is idempotent: re-running on an already-v2 file is a no-op.
+The migrator is idempotent: re-running on an already-v3 file is a no-op.
 It only rewrites the metadata; agents are expected to polish the
 ``@brief`` one-liner and the substantive body afterwards.
 """
@@ -50,7 +58,12 @@ import re
 import subprocess
 import sys
 
-from .core import _git_authors, _year_range_for, _git_creation_month_year
+from .core import (
+    _first_version_for,
+    _git_authors,
+    _git_creation_month_year,
+    _year_range_for,
+)
 
 DIV = "//" + "=" * 109
 
@@ -79,7 +92,13 @@ def git_year_span(fp: pathlib.Path) -> str:
     return _year_range_for(fp)
 
 
-def git_since(fp: pathlib.Path) -> str:
+def git_since_version(fp: pathlib.Path) -> str:
+    """Closest version tag at or after the file's first commit."""
+    return _first_version_for(fp)
+
+
+def git_first_date(fp: pathlib.Path) -> str:
+    """Month + year of the file's first commit (e.g. ``July 2012``)."""
     return _git_creation_month_year(fp) or "May 2026"
 
 
@@ -144,21 +163,23 @@ def _render(
     if not authors:
         authors = [("Christoph Dinh", "christoph.dinh@mne-cpp.org")]
     year_range = git_year_span(fp)
-    since = git_since(fp)
+    since = git_since_version(fp)
+    date = git_first_date(fp)
     lines: list[str] = [
         DIV,
         "/**",
         " * SPDX-License-Identifier: BSD-3-Clause",
         f" * Copyright (c) {year_range} MNE-CPP Authors",
+        " *",
+        f" * @file     {fp.name}",
     ]
     for name, email in authors:
-        lines.append(f" *   {name} <{email}>")
+        lines.append(f" * @author   {name} <{email}>")
     lines.extend(
         [
-            " *",
-            f" * @file {fp.name}",
-            f" * @since {since}",
-            f" * @brief {brief or 'TODO: describe this file in one substantive sentence.'}",
+            f" * @since    {since}",
+            f" * @date     {date}",
+            f" * @brief    {brief or 'TODO: describe this file in one substantive sentence.'}",
         ]
     )
     if body:
@@ -257,12 +278,12 @@ def _parse_v2_existing(
 
 
 def rebuild_file(fp: pathlib.Path) -> bool:
-    """Re-render an already-v2 file's header with fresh git data.
+    """Re-render an already-v2/v3 file's header with fresh git data.
 
     Preserves the ``@brief`` text and substantive body verbatim while
     regenerating the SPDX line, copyright year range, chronological
-    author list, ``@file`` and ``@since`` fields (and *omitting* the
-    legacy ``@date`` line entirely).
+    author list, ``@file``, ``@since`` (closest version tag) and
+    ``@date`` (first-commit month/year) fields.
     """
     if fp.name == "CMakeLists.txt" or fp.suffix == ".cmake":
         return _rebuild_cmake(fp)

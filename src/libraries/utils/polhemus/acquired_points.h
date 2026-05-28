@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file acquired_points.h
- * @since May 2026
- * @brief Shared digitised-point store for Polhemus digitizer sessions.
+ * @file     acquired_points.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Shared digitised-point store for Polhemus digitizer sessions.
  *
  *           Plain Qt model object passed by reference between the wizard,
  *           the 3-D view, and the FIFF exporter. Points are stored in

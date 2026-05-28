@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_cluster.cpp
- * @since April 2026
- * @brief Implementation of the cluster permutation tests and TFCE enhancement declared in sts_cluster.h.
+ * @file     sts_cluster.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of the cluster permutation tests and TFCE enhancement declared in sts_cluster.h.
  *
  * Each permutation entry point first computes the observed statistic map
  * (paired or one-sample t for the t-variants, one-way ANOVA F for the

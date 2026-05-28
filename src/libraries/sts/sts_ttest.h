@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_ttest.h
- * @since April 2026
- * @brief Frequentist Student's t-tests with exact p-values via the regularised incomplete beta function.
+ * @file     sts_ttest.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Frequentist Student's t-tests with exact p-values via the regularised incomplete beta function.
  *
  * Provides the three single-sample / paired / two-sample independent
  * variants of Student's t-test that the rest of STSLIB needs. All three

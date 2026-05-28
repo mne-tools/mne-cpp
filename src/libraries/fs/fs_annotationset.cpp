@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fs_annotationset.cpp
- * @since March 2026
- * @brief Implementation of @ref FSLIB::FsAnnotationSet: pairs lh and rh @ref FSLIB::FsAnnotation for whole-brain parcellations.
+ * @file     fs_annotationset.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref FSLIB::FsAnnotationSet: pairs lh and rh @ref FSLIB::FsAnnotation for whole-brain parcellations.
  */
 
 //=============================================================================================================

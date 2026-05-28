@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2017-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fwd_coil.cpp
- * @since March 2017
- * @brief FwdCoil implementation — construction, copy, coordinate-frame transforms and coil-class predicates for a single MEG sensor coil or EEG electrode.
+ * @file     fwd_coil.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     March 2017
+ * @brief    FwdCoil implementation — construction, copy, coordinate-frame transforms and coil-class predicates for a single MEG sensor coil or EEG electrode.
  */
 
 //=============================================================================================================

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_session.h
- * @since April 2026
- * @brief Container for all recordings collected within a single experimental session for one subject.
+ * @file     mna_session.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Container for all recordings collected within a single experimental session for one subject.
  *
  * @ref MnaSession sits between @ref MnaSubject and @ref MnaRecording
  * in the MNA project tree and mirrors the BIDS @c ses-XX directory

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file compute_fwd.h
- * @since March 2026
- * @brief Top-level driver that assembles the MEG/EEG lead-field matrix G from a source space, sensor array and volume-conductor model.
+ * @file     compute_fwd.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Top-level driver that assembles the MEG/EEG lead-field matrix G from a source space, sensor array and volume-conductor model.
  *
  * ComputeFwd is the C++ analogue of the @c mne_forward_solution
  * command-line tool: given a ComputeFwdSettings (source-space file, BEM

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_volume_source_estimate.h
- * @since May 2026
- * @brief Volume (voxel-grid) source estimate that augments @ref InvSourceEstimate with 3-D grid shape information.
+ * @file     inv_volume_source_estimate.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Volume (voxel-grid) source estimate that augments @ref InvSourceEstimate with 3-D grid shape information.
  *
  * @ref INVLIB::InvVolumeSourceEstimate represents an inverse solution
  * on a regular voxel grid — used by volume MNE, beamformers in volume

@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   johaenns <j.vorw01@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file minimumnormsettingsview.cpp
- * @since September 2018
- * @brief Implementation of the MinimumNormSettingsView inverse-method panel.
+ * @file     minimumnormsettingsview.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   johaenns <j.vorw01@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     September 2018
+ * @brief    Implementation of the MinimumNormSettingsView inverse-method panel.
  */
 
 //=============================================================================================================

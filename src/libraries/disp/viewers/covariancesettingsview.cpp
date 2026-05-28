@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file covariancesettingsview.cpp
- * @since June 2020
- * @brief Implementation of the CovarianceSettingsView covariance-length panel.
+ * @file     covariancesettingsview.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.3
+ * @date     June 2020
+ * @brief    Implementation of the CovarianceSettingsView covariance-length panel.
  */
 
 //=============================================================================================================

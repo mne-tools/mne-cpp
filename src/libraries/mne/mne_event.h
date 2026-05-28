@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_event.h
- * @since March 2026
- * @brief Single recorded event (sample, previous and new trigger code).
+ * @file     mne_event.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Single recorded event (sample, previous and new trigger code).
  *
  * @ref MNELIB::MNEEvent is the per-event record used by the legacy
  * @c mne_process_raw event list: it stores the sample index relative to

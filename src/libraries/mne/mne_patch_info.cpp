@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_patch_info.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNEPatchInfo.
+ * @file     mne_patch_info.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNEPatchInfo.
  *
  * Implements patch construction from the source-space @ref MNENearest
  * mapping and the FIFF read/write of @c FIFF_MNE_SOURCE_SPACE_PATCH_INFO

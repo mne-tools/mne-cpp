@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file ml_model.h
- * @since April 2026
- * @brief Pure-virtual @ref MLLIB::MlModel interface that every MLLIB inference backend implements.
+ * @file     ml_model.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Pure-virtual @ref MLLIB::MlModel interface that every MLLIB inference backend implements.
  *
  * @ref MLLIB::MlModel is the polymorphic seam between mne-cpp
  * application code and the underlying runtime that actually executes a

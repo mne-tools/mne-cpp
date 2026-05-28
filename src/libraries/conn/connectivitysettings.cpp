@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2017-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file connectivitysettings.cpp
- * @since March 2017
- * @brief Implementation of @ref CONNLIB::ConnectivitySettings - the input/parameter container shared by every functional-connectivity metric in @c CONNLIB.
+ * @file     connectivitysettings.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     March 2017
+ * @brief    Implementation of @ref CONNLIB::ConnectivitySettings - the input/parameter container shared by every functional-connectivity metric in @c CONNLIB.
  *
  * Defines the trial append/clear/remove bookkeeping, the lazy invalidation
  * of the cached per-trial DPSS spectra and cross-spectral sums when the

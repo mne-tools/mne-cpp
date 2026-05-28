@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_file_ref.h
- * @since April 2026
- * @brief Reference to a file inside an MNA project — relative path, semantic role, SHA-256 hash, and optional embedded payload.
+ * @file     mna_file_ref.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Reference to a file inside an MNA project — relative path, semantic role, SHA-256 hash, and optional embedded payload.
  *
  * @ref MnaFileRef is the leaf node of an MNA project tree. Every raw
  * recording, forward/inverse operator, covariance matrix, BEM model

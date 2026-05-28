@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2017-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Daniel Strohmeier <daniel.strohmeier@gmail.com>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file connectivitysettings.h
- * @since March 2017
- * @brief Input-data and parameter container shared by every functional-connectivity metric in @c CONNLIB.
+ * @file     connectivitysettings.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Daniel Strohmeier <daniel.strohmeier@gmail.com>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     March 2017
+ * @brief    Input-data and parameter container shared by every functional-connectivity metric in @c CONNLIB.
  *
  * @ref ConnectivitySettings carries the per-trial time-domain matrices, the
  * derived per-trial cross-spectral data (DPSS tapered FFTs, CSDs and the

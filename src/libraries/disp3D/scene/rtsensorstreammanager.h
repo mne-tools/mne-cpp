@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rtsensorstreammanager.h
- * @since March 2026
- * @brief Manager that wires real-time sensor data into the scene: owns the data controller, the field mapper and the target surface.
+ * @file     rtsensorstreammanager.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Manager that wires real-time sensor data into the scene: owns the data controller, the field mapper and the target surface.
  *
  * RtSensorStreamManager bridges the streaming side (sensor packets
  * arriving on a worker thread) and the rendering side (per-vertex

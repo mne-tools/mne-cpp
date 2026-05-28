@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_raw_dir.h
- * @since September 2012
- * @brief One entry of the per-buffer raw-data directory: kind, first sample, number of samples and on-disk position.
+ * @file     fiff_raw_dir.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     September 2012
+ * @brief    One entry of the per-buffer raw-data directory: kind, first sample, number of samples and on-disk position.
  *
  * For every @c FIFF_DATA_BUFFER tag in a continuous recording
  * @ref FiffStream builds one @ref FiffRawDir entry: the kind of buffer

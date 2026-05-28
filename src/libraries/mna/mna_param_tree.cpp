@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_param_tree.cpp
- * @since April 2026
- * @brief Implementation of the hierarchical parameter store: path-keyed value access, binding management, formula evaluation and JSON round-trip.
+ * @file     mna_param_tree.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of the hierarchical parameter store: path-keyed value access, binding management, formula evaluation and JSON round-trip.
  *
  * The implementation keeps two parallel @c QMap members — one
  * mapping path strings to literal @c QVariant values, the other

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file electrodeobject.h
- * @since April 2026
- * @brief ECoG / sEEG electrode model: shaft cylinders, contact spheres and grid layouts mapped to a colour-bar overlay.
+ * @file     electrodeobject.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    ECoG / sEEG electrode model: shaft cylinders, contact spheres and grid layouts mapped to a colour-bar overlay.
  *
  * ElectrodeObject describes one or more electrode arrays in three
  * topologies (@ref ElectrodeLayout::Depth stereotactic shaft,

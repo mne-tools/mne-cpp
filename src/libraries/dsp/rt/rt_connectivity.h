@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rt_connectivity.h
- * @since March 2026
- * @brief Real-time worker that re-estimates a connectivity network from incoming data epochs.
+ * @file     rt_connectivity.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Real-time worker that re-estimates a connectivity network from incoming data epochs.
  *
  * RtConnectivity drives the CONNLIB connectivity estimators (coherence,
  * imaginary coherence, phase-locking value, weighted phase-lag index,

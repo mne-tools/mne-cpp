@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_mxne.cpp
- * @since April 2026
- * @brief Implementation of the MxNE (mixed-norm) sparse solver via IRLS.
+ * @file     inv_mxne.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of the MxNE (mixed-norm) sparse solver via IRLS.
  *
  * Implements the iteratively-reweighted least-squares loop: solve a
  * weighted least-squares problem against the leadfield, update the

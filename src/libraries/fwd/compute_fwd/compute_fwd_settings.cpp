@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file compute_fwd_settings.cpp
- * @since March 2026
- * @brief ComputeFwdSettings implementation — default initialisation and @c checkIntegrity validation of the @c mne_forward_solution parameter set consumed by ComputeFwd.
+ * @file     compute_fwd_settings.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    ComputeFwdSettings implementation — default initialisation and @c checkIntegrity validation of the @c mne_forward_solution parameter set consumed by ComputeFwd.
  */
 
 //=============================================================================================================

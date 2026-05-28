@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2015-2026 MNE-CPP Authors
- *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   sheinke <simon.j.w.heinke@gmail.com>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file mne_bem_surface.cpp
- * @since June 2015
- * @brief Implementation of @ref MNELIB::MNEBemSurface.
+ * @file     mne_bem_surface.cpp
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   sheinke <simon.j.w.heinke@gmail.com>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     June 2015
+ * @brief    Implementation of @ref MNELIB::MNEBemSurface.
  *
  * Reads a single @c FIFFB_BEM_SURF block, recomputing missing per-vertex
  * normals from the triangulation and applying the coordinate-frame

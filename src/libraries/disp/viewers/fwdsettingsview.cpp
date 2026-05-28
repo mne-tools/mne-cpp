@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Ruben Doerfel <doerfelruben@aol.com>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   johaenns <j.vorw01@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fwdsettingsview.cpp
- * @since May 2020
- * @brief Implementation of the FwdSettingsView forward-solution control panel.
+ * @file     fwdsettingsview.cpp
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   johaenns <j.vorw01@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.2
+ * @date     May 2020
+ * @brief    Implementation of the FwdSettingsView forward-solution control panel.
  */
 
 //=============================================================================================================

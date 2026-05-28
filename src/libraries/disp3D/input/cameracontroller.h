@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file cameracontroller.h
- * @since March 2026
- * @brief Camera state and projection / view / model matrix computation for single- and multi-view layouts.
+ * @file     cameracontroller.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Camera state and projection / view / model matrix computation for single- and multi-view layouts.
  *
  * CameraController is widget-agnostic: it takes the visible scene
  * centroid + extent and a per-pane @ref SubView and produces the

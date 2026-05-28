@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_brain_vision_reader.h
- * @since March 2026
- * @brief @ref BIDSLIB::AbstractFormatReader implementation for the BrainVision ``.vhdr / .vmrk / .eeg`` triplet.
+ * @file     bids_brain_vision_reader.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    @ref BIDSLIB::AbstractFormatReader implementation for the BrainVision ``.vhdr / .vmrk / .eeg`` triplet.
  *
  * BrainVision is the de-facto wire format for sEEG / ECoG / scalp-EEG
  * recordings shared as BIDS datasets: an ASCII @c .vhdr describing

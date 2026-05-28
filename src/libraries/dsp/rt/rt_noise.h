@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rt_noise.h
- * @since March 2026
- * @brief Real-time noise power-spectral-density estimation from streaming data blocks.
+ * @file     rt_noise.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Real-time noise power-spectral-density estimation from streaming data blocks.
  *
  * RtNoiseWorker accumulates a configurable number of contiguous data blocks,
  * applies an FFT of user-defined length and averages the squared magnitude

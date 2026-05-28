@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_msh_display_surface.h
- * @since March 2026
- * @brief One renderable surface (cortex / pial / inflated / BEM) inside an MSH display set.
+ * @file     mne_msh_display_surface.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    One renderable surface (cortex / pial / inflated / BEM) inside an MSH display set.
  *
  * @ref MNELIB::MNEMshDisplaySurface attaches an @ref MNESurface to a
  * shading state - per-vertex colours, scalar overlays, current

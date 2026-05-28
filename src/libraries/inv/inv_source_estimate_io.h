@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_source_estimate_io.h
- * @since May 2026
- * @brief Text-based and FIFF-based export/import for @ref INVLIB::InvSourceEstimate that complement the binary STC / W format.
+ * @file     inv_source_estimate_io.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Text-based and FIFF-based export/import for @ref INVLIB::InvSourceEstimate that complement the binary STC / W format.
  *
  * @ref INVLIB::InvSourceEstimateIO adds CSV and tab-separated matrix
  * export (and matching CSV import) on top of the built-in STC / W binary

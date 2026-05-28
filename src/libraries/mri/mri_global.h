@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mri_global.h
- * @since February 2026
- * @brief Export/import macros and build-info accessors for MRILIB.
+ * @file     mri_global.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Export/import macros and build-info accessors for MRILIB.
  *
  * Provides the @c MRISHARED_EXPORT decorator used by every public
  * symbol in the MRI library so that the same headers can be

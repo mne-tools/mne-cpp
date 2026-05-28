@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_recording.h
- * @since April 2026
- * @brief Grouping of every file that belongs to one continuous measurement run inside an MNA project.
+ * @file     mna_recording.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Grouping of every file that belongs to one continuous measurement run inside an MNA project.
  *
  * An @ref MnaRecording is the second tier of the
  * subject → session → recording → file hierarchy used by MNA, and

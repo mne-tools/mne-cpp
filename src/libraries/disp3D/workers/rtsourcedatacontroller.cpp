@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rtsourcedatacontroller.cpp
- * @since March 2026
- * @brief Thread / timer plumbing tying the source data worker and per-hemisphere interpolation workers together.
+ * @file     rtsourcedatacontroller.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Thread / timer plumbing tying the source data worker and per-hemisphere interpolation workers together.
  */
 
 //=============================================================================================================

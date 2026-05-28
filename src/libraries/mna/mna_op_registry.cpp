@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_op_registry.cpp
- * @since April 2026
- * @brief Implementation of the @ref MnaOpRegistry singleton, including the upward search for @c resources/mna/ and the drop-in registry merge logic.
+ * @file     mna_op_registry.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of the @ref MnaOpRegistry singleton, including the upward search for @c resources/mna/ and the drop-in registry merge logic.
  *
  * The registry stores schemas and op functions in two
  * @c QMap members keyed by op type. @ref registerOp and

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sourcespacetreeitem.h
- * @since March 2026
- * @brief Tree item holding one hemisphere of source-space dipole positions rendered as batched spheres.
+ * @file     sourcespacetreeitem.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Tree item holding one hemisphere of source-space dipole positions rendered as batched spheres.
  *
  * Source-space points come from @ref MNELIB::MNESourceSpaces (the
  * decimated cortical grid used by the forward model). Each

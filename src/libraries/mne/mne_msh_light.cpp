@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_msh_light.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNEMshLight.
+ * @file     mne_msh_light.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNEMshLight.
  *
  * Implements constructors and the small helpers used by
  * @ref MNEMshLightSet to apply the light to a renderer.

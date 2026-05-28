@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file meshfactory.cpp
- * @since March 2026
- * @brief Procedural construction of icosahedron spheres, oriented plates, barbells, cylinders and batched point clouds used by disp3D.
+ * @file     meshfactory.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Procedural construction of icosahedron spheres, oriented plates, barbells, cylinders and batched point clouds used by disp3D.
  */
 
 //=============================================================================================================

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_graph.h
- * @since April 2026
- * @brief In-memory directed acyclic graph of @ref MnaNode operations — connectivity, validation, topological sort and serialization.
+ * @file     mna_graph.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    In-memory directed acyclic graph of @ref MnaNode operations — connectivity, validation, topological sort and serialization.
  *
  * @ref MnaGraph is the executable spine of an MNA project: a
  * collection of @ref MnaNode operations wired together through

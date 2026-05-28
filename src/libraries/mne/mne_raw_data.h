@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_raw_data.h
- * @since March 2026
- * @brief Legacy MNE-C raw-recording container with per-file buffer descriptors.
+ * @file     mne_raw_data.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Legacy MNE-C raw-recording container with per-file buffer descriptors.
  *
  * @ref MNELIB::MNERawData mirrors @c mneRawDataRec: it pairs an
  * @ref FIFFLIB::FiffInfo with the list of @ref MNERawBufDef entries that

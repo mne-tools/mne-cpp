@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_msh_display_surface_set.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNEMshDisplaySurfaceSet.
+ * @file     mne_msh_display_surface_set.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNEMshDisplaySurfaceSet.
  *
  * Implements addition / lookup of named surfaces, the per-set apply of
  * a new colour scale and the broadcast of camera / light updates to all

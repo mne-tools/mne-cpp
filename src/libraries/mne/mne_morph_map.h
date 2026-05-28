@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_morph_map.h
- * @since March 2026
- * @brief Sparse linear operator that morphs a source estimate between two subjects.
+ * @file     mne_morph_map.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Sparse linear operator that morphs a source estimate between two subjects.
  *
  * @ref MNELIB::MNEMorphMap composes a left and a right @ref MNECorticalMap
  * into the rectangular sparse matrix used by @ref INVERSELIB::MneMorph

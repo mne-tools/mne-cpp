@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_rap_music.cpp
- * @since March 2026
- * @brief Implementation of the RAP-MUSIC scanning algorithm.
+ * @file     inv_rap_music.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of the RAP-MUSIC scanning algorithm.
  *
  * Implements the signal-subspace estimator @c calcPhi_s, the dual
  * @c subcorr variants (with and without returning the dipole pair

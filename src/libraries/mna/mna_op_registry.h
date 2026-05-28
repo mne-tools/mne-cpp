@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_op_registry.h
- * @since April 2026
- * @brief Process-wide singleton catalog mapping @c opType strings to their @ref MnaOpSchema and (for built-in ops) executable implementation.
+ * @file     mna_op_registry.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Process-wide singleton catalog mapping @c opType strings to their @ref MnaOpSchema and (for built-in ops) executable implementation.
  *
  * @ref MnaOpRegistry is the lookup table that the rest of the
  * library hits whenever an @c opType string needs to be resolved

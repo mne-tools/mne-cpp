@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_vol_geom.h
- * @since March 2026
- * @brief FreeSurfer volume geometry header carried by surface and tag streams.
+ * @file     mne_vol_geom.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    FreeSurfer volume geometry header carried by surface and tag streams.
  *
  * @ref MNELIB::MNEVolGeom records the original volume's dimensions,
  * voxel size, direction cosines and centre RAS - the information needed

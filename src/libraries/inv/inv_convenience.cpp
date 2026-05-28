@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_convenience.cpp
- * @since May 2026
- * @brief Implementation of the apply-inverse / compute-PSD convenience helpers declared in @c inv_convenience.h.
+ * @file     inv_convenience.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of the apply-inverse / compute-PSD convenience helpers declared in @c inv_convenience.h.
  *
  * Implements the streaming epoch / raw loops by constructing a single
  * @ref InvMinimumNorm kernel and re-applying it across data chunks, the

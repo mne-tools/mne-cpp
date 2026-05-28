@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_data_ref.h
- * @since February 2026
- * @brief External-data reference record describing type, endianness, size and offset of an out-of-file FIFF payload.
+ * @file     fiff_data_ref.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    External-data reference record describing type, endianness, size and offset of an out-of-file FIFF payload.
  *
  * A @c FIFF_REF_ROLE / @c FIFF_DATA_REF tag carries a small fixed-size
  * record (the original @c fiffDataRefRec, 24 bytes: two 32-bit ints

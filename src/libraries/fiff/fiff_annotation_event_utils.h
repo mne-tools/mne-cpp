@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_annotation_event_utils.h
- * @since May 2026
- * @brief Conversion helpers between FIFF annotations and the integer stim-channel event list used by epoching / averaging.
+ * @file     fiff_annotation_event_utils.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Conversion helpers between FIFF annotations and the integer stim-channel event list used by epoching / averaging.
  *
  * Two representations coexist in MNE workflows: free-text @ref
  * FiffAnnotation entries (onset / duration / description) and integer

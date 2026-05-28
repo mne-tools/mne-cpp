@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file viewstate.cpp
- * @since March 2026
- * @brief Implementation of per-viewport SubView / ViewVisibilityProfile state and QSettings round-trip.
+ * @file     viewstate.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of per-viewport SubView / ViewVisibilityProfile state and QSettings round-trip.
  */
 
 //=============================================================================================================

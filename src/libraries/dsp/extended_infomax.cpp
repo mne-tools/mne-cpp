@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file extended_infomax.cpp
- * @since April 2026
- * @brief ExtendedInfomax class definition.
+ * @file     extended_infomax.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    ExtendedInfomax class definition.
  */
 
 //=============================================================================================================

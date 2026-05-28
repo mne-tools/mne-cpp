@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_coordinate_system.cpp
- * @since March 2026
- * @brief Implementation of @ref BIDSLIB::BidsCoordinateSystem — JSON I/O and @c FiffCoordTrans bridge for ``_coordsystem.json``.
+ * @file     bids_coordinate_system.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of @ref BIDSLIB::BidsCoordinateSystem — JSON I/O and @c FiffCoordTrans bridge for ``_coordsystem.json``.
  */
 
 //=============================================================================================================

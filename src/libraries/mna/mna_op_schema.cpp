@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_op_schema.cpp
- * @since April 2026
- * @brief Implementation of @ref MnaOpSchema::validate — checks a concrete @ref MnaNode against its declared port and attribute contract.
+ * @file     mna_op_schema.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of @ref MnaOpSchema::validate — checks a concrete @ref MnaNode against its declared port and attribute contract.
  *
  * The validator walks the schema's input and output port lists
  * looking for matching named ports on the node, recording an

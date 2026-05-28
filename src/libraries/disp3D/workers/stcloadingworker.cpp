@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file stcloadingworker.cpp
- * @since March 2026
- * @brief Background STC file parse plus per-hemisphere sparse interpolation matrix construction.
+ * @file     stcloadingworker.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Background STC file parse plus per-hemisphere sparse interpolation matrix construction.
  */
 
 //=============================================================================================================

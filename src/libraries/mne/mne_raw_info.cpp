@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_raw_info.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNERawInfo.
+ * @file     mne_raw_info.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNERawInfo.
  *
  * Reads the measurement header (@c FIFFB_MEAS_INFO) and the
  * @c FIFFB_RAW_DATA index from a FIFF file, populating the channel and

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file command.h
- * @since March 2026
- * @brief Typed, parameter-bearing command object that round-trips between mne-cpp clients and @c mne_rt_server.
+ * @file     command.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Typed, parameter-bearing command object that round-trips between mne-cpp clients and @c mne_rt_server.
  *
  * @ref COMLIB::Command is the unit of conversation on the
  * @c mne_rt_server control channel after parsing has assigned types

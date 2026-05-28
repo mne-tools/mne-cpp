@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2013-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Florian Schlembach <fschlembach@web.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *
- * @file fiff_evoked.h
- * @since March 2013
- * @brief Single averaged evoked response: time axis, samples, baseline, channel info and processing history.
+ * @file     fiff_evoked.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Florian Schlembach <fschlembach@web.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @since    0.1.0
+ * @date     March 2013
+ * @brief    Single averaged evoked response: time axis, samples, baseline, channel info and processing history.
  *
  * @ref FiffEvoked is one averaged response as written under a
  * @c FIFFB_EVOKED block: the time axis (@c times, @c first, @c last),

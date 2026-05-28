@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rt_cmd_client.cpp
- * @since March 2026
- * @brief Translation unit for @ref COMLIB::RtCmdClient: command-port (4217) I/O and reply accumulation.
+ * @file     rt_cmd_client.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Translation unit for @ref COMLIB::RtCmdClient: command-port (4217) I/O and reply accumulation.
  *
  * Owns the wire-level encoding of outbound requests (CLI string vs.
  * @c QJsonDocument), drains incoming reply bytes into

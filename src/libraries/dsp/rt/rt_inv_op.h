@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rt_inv_op.h
- * @since March 2026
- * @brief Real-time recomputation of the linear inverse operator from updated noise covariance.
+ * @file     rt_inv_op.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Real-time recomputation of the linear inverse operator from updated noise covariance.
  *
  * RtInvOp recomputes a regularised @ref MNELIB::MNEInverseOperator whenever
  * a new noise-covariance estimate is published by @ref RtCov, so a live

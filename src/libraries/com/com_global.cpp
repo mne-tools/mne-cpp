@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file com_global.cpp
- * @since March 2026
- * @brief Translation unit for the @c COMLIB build-info entry points declared in @ref com_global.h.
+ * @file     com_global.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Translation unit for the @c COMLIB build-info entry points declared in @ref com_global.h.
  *
  * Provides the three out-of-line definitions of @ref COMLIB::buildDateTime,
  * @ref COMLIB::buildHash and @ref COMLIB::buildHashLong. Each delegates

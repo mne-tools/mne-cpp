@@ -2,12 +2,13 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file applytoview.cpp
- * @since August 2020
- * @brief Implementation of the ApplyToView selector widget.
+ * @file     applytoview.cpp
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.6
+ * @date     August 2020
+ * @brief    Implementation of the ApplyToView selector widget.
  */
 
 //=============================================================================================================

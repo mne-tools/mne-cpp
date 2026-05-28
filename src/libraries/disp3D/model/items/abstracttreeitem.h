@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file abstracttreeitem.h
- * @since March 2026
- * @brief Base @ref QStandardItem with check-state, visibility, transform, colour and alpha roles shared by every disp3D scene item.
+ * @file     abstracttreeitem.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Base @ref QStandardItem with check-state, visibility, transform, colour and alpha roles shared by every disp3D scene item.
  *
  * AbstractTreeItem centralises the data roles every scene object
  * needs (@c VisibleRole, @c TransformRole, @c ColorRole,

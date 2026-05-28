@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file polhemus_connection.cpp
- * @since May 2026
- * @brief Backend implementation for @ref UTILSLIB::PolhemusConnection — mock sweep generator and live @c QSerialPort driver.
+ * @file     polhemus_connection.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Backend implementation for @ref UTILSLIB::PolhemusConnection — mock sweep generator and live @c QSerialPort driver.
  *
  * The hardware backend opens the serial port with the
  * documented Fastrak defaults (115 200 8N1, no flow control),

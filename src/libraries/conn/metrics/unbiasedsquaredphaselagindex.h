@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Daniel Strohmeier <daniel.strohmeier@gmail.com>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file unbiasedsquaredphaselagindex.h
- * @since April 2018
- * @brief Unbiased estimator of squared Phase Lag Index between every channel pair.
+ * @file     unbiasedsquaredphaselagindex.h
+ * @author   Daniel Strohmeier <daniel.strohmeier@gmail.com>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     April 2018
+ * @brief    Unbiased estimator of squared Phase Lag Index between every channel pair.
  *
  * The plain Phase Lag Index (Stam et al. 2007) and its square are biased
  * upward when the number of trials @c N is small: even uncorrelated signals

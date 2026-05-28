@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file timerulerwidget.h
- * @since March 2026
- * @brief Horizontal time-axis ruler displayed beneath @ref ChannelDataView with sample / second ticks.
+ * @file     timerulerwidget.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Horizontal time-axis ruler displayed beneath @ref ChannelDataView with sample / second ticks.
  *
  * TimeRulerWidget paints the time axis aligned with the central raw
  * table, supports left-click drag for window scrolling and

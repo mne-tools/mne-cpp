@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_electrode.h
- * @since March 2026
- * @brief Reader/writer for the BIDS ``_electrodes.tsv`` sidecar plus a bridge into FIFF digitizer-point space.
+ * @file     bids_electrode.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Reader/writer for the BIDS ``_electrodes.tsv`` sidecar plus a bridge into FIFF digitizer-point space.
  *
  * @c _electrodes.tsv lists one row per implanted/positioned electrode
  * with REQUIRED @c name and @c x / @c y / @c z coordinates plus

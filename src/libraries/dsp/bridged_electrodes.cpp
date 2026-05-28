@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bridged_electrodes.cpp
- * @since May 2026
- * @brief Bridged electrode detection implementation.
+ * @file     bridged_electrodes.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Bridged electrode detection implementation.
  */
 
 //=============================================================================================================

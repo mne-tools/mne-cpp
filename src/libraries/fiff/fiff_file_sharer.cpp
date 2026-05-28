@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_file_sharer.cpp
- * @since March 2026
- * @brief Implementation of @ref FiffFileSharer: refcounted memory-mapped view of a FIFF file shared across consumers.
+ * @file     fiff_file_sharer.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref FiffFileSharer: refcounted memory-mapped view of a FIFF file shared across consumers.
  *
  * Backs zero-copy access for the realtime pipeline, the GUI viewer and
  * the recording dumper without duplicating I/O.

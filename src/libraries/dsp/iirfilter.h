@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file iirfilter.h
- * @since March 2026
- * @brief Butterworth IIR filter design and application via numerically stable second-order sections.
+ * @file     iirfilter.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Butterworth IIR filter design and application via numerically stable second-order sections.
  *
  * Direct-form realisations of high-order IIR filters are numerically
  * unstable on finite-precision hardware because tiny coefficient

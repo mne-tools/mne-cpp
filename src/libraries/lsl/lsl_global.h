@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file lsl_global.h
- * @since February 2026
- * @brief LSLLIB shared-library export macro and build-stamp accessors used by every public LSL symbol.
+ * @file     lsl_global.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    LSLLIB shared-library export macro and build-stamp accessors used by every public LSL symbol.
  *
  * This header defines the @c LSLSHARED_EXPORT decoration that every
  * exported class and free function in LSLLIB must carry so that the

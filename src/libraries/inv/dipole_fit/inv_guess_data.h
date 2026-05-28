@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_guess_data.h
- * @since March 2026
- * @brief Initial-guess grid for the dipole-fit optimiser, with per-guess forward fields pre-computed.
+ * @file     inv_guess_data.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Initial-guess grid for the dipole-fit optimiser, with per-guess forward fields pre-computed.
  *
  * @ref INVLIB::InvGuessData generates and stores the regular grid of
  * candidate dipole positions that seeds the Nelder-Mead optimiser used

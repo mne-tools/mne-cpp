@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file frequencyspectrumdelegate.h
- * @since July 2018
- * @brief QAbstractItemDelegate painting one row of the @ref SpectrumView as a horizontal frequency band.
+ * @file     frequencyspectrumdelegate.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2018
+ * @brief    QAbstractItemDelegate painting one row of the @ref SpectrumView as a horizontal frequency band.
  *
  * FrequencySpectrumDelegate reads the per-row FFT amplitudes from
  * @ref FrequencySpectrumModel, maps them through a Hot / Jet colour

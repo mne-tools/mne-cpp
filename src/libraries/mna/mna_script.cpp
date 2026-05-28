@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_script.cpp
- * @since April 2026
- * @brief JSON and CBOR codecs for @ref MnaScript including code body, interpreter selection, integrity hash and optional source URI.
+ * @file     mna_script.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    JSON and CBOR codecs for @ref MnaScript including code body, interpreter selection, integrity hash and optional source URI.
  *
  * The implementation writes the script @c code verbatim (after
  * resolving an optional @c sourceUri to the on-disk file at save

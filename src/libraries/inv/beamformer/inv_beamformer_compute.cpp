@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_beamformer_compute.cpp
- * @since March 2026
- * @brief Implementation of the shared LCMV / DICS math kernels declared in @c inv_beamformer_compute.h.
+ * @file     inv_beamformer_compute.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of the shared LCMV / DICS math kernels declared in @c inv_beamformer_compute.h.
  *
  * Implements eigen-decomposition based regularised pseudo-inverse of
  * the data covariance, the per-source filter derivation loop, the

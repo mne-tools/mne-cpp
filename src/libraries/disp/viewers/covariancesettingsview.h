@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file covariancesettingsview.h
- * @since June 2020
- * @brief Tiny settings panel exposing the noise-covariance estimation window length.
+ * @file     covariancesettingsview.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.3
+ * @date     June 2020
+ * @brief    Tiny settings panel exposing the noise-covariance estimation window length.
  *
  * CovarianceSettingsView holds a single @c QSpinBox whose value (in
  * samples) is forwarded as @c changeMinNumberSamples to the

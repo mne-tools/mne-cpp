@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_msh_light.h
- * @since March 2026
- * @brief Single directional / positional light source for the mesh viewer.
+ * @file     mne_msh_light.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Single directional / positional light source for the mesh viewer.
  *
  * @ref MNELIB::MNEMshLight stores direction or position, RGB colour,
  * intensity and on/off state - one record per scene light - matching

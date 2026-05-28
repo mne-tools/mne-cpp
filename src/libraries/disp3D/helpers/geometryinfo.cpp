@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file geometryinfo.cpp
- * @since March 2026
- * @brief Multi-source Dijkstra (SCDC), sensor-to-mesh projection and sparse-matrix fusion implementations.
+ * @file     geometryinfo.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Multi-source Dijkstra (SCDC), sensor-to-mesh projection and sparse-matrix fusion implementations.
  */
 
 //=============================================================================================================

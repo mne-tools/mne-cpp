@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_meas_data.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNEMeasData.
+ * @file     mne_meas_data.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNEMeasData.
  *
  * Implements construction, ownership of the contained measurement data
  * sets and the projection bookkeeping that the MNE C tools expected.

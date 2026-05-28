@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_session.cpp
- * @since April 2026
- * @brief JSON and CBOR codecs for @ref MnaSession — ordered @ref MnaRecording list plus opaque id and forward-compatible @c extras.
+ * @file     mna_session.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    JSON and CBOR codecs for @ref MnaSession — ordered @ref MnaRecording list plus opaque id and forward-compatible @c extras.
  *
  * Implementation mirrors the rest of the project tree: each
  * recording is serialised through @ref MnaRecording::toJson /

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_proj_op.h
- * @since March 2026
- * @brief Composite SSP projection operator P = I - U U^T assembled from a list of @ref MNELIB::MNEProjItem.
+ * @file     mne_proj_op.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Composite SSP projection operator P = I - U U^T assembled from a list of @ref MNELIB::MNEProjItem.
  *
  * @ref MNELIB::MNEProjOp is the operator form of the SSP machinery: it
  * stacks the active projection vectors into an orthonormal basis and

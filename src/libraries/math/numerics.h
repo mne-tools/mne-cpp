@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file numerics.h
- * @since March 2026
- * @brief General numerical helpers: GCD, log2, histogram binning, baseline rescaling, sparsity tests.
+ * @file     numerics.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    General numerical helpers: GCD, log2, histogram binning, baseline rescaling, sparsity tests.
  *
  * @ref UTILSLIB::Numerics groups the scalar / per-vector numerical
  * primitives that almost every other library needs but that have no

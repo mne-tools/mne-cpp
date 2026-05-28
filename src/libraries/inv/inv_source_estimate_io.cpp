@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_source_estimate_io.cpp
- * @since May 2026
- * @brief Implementation of the CSV / matrix exporters and importer in @ref INVLIB::InvSourceEstimateIO.
+ * @file     inv_source_estimate_io.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of the CSV / matrix exporters and importer in @ref INVLIB::InvSourceEstimateIO.
  *
  * Implements buffered streaming readers and writers that walk the
  * source-estimate row-by-row so very large estimates can be persisted

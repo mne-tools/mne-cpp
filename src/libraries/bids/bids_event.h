@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_event.h
- * @since March 2026
- * @brief Reader/writer for the BIDS ``_events.tsv`` sidecar — discrete annotations on the time axis of a recording.
+ * @file     bids_event.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Reader/writer for the BIDS ``_events.tsv`` sidecar — discrete annotations on the time axis of a recording.
  *
  * BIDS events live in a @c _events.tsv sibling of every electrophysiology
  * or functional acquisition with REQUIRED columns @c onset and

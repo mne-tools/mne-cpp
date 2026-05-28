@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file channel_derivation.h
- * @since April 2026
- * @brief Linear channel derivations — bipolar montages and arbitrary weighted recombinations.
+ * @file     channel_derivation.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Linear channel derivations — bipolar montages and arbitrary weighted recombinations.
  *
  * ChannelDerivation builds an explicit derivation matrix @c D so that
  * @c derived = D · raw, where each output row is a weighted linear

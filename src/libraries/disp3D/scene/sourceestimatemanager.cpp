@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sourceestimatemanager.cpp
- * @since March 2026
- * @brief Ownership glue between StcLoadingWorker, SourceEstimateOverlay and RtSourceDataController for static and streaming STC.
+ * @file     sourceestimatemanager.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Ownership glue between StcLoadingWorker, SourceEstimateOverlay and RtSourceDataController for static and streaming STC.
  */
 
 //=============================================================================================================

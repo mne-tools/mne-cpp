@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rt_client.h
- * @since March 2026
- * @brief Self-contained worker thread that owns the command and data sockets to a running @c mne_rt_server.
+ * @file     rt_client.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Self-contained worker thread that owns the command and data sockets to a running @c mne_rt_server.
  *
  * @ref COMLIB::RtClient is the high-level convenience wrapper around the
  * two lower-level sockets in this directory: it constructs a private

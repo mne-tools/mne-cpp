@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_surface_patch.cpp
- * @since March 2026
- * @brief Implementation of @ref MNELIB::MNESurfacePatch.
+ * @file     mne_surface_patch.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref MNELIB::MNESurfacePatch.
  *
  * Implements patch growth from a seed using triangle adjacency, geodesic
  * distance accumulation and the export back to a plain

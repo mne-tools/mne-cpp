@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file digitizersettreeitem.h
- * @since March 2026
- * @brief Container item that groups raw FIFF digitizer points by category (Cardinal, HPI, EEG, Extra).
+ * @file     digitizersettreeitem.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Container item that groups raw FIFF digitizer points by category (Cardinal, HPI, EEG, Extra).
  *
  * Takes a flat @c QList<FiffDigPoint> from the FIFF info block
  * and fans it into one @ref DigitizerTreeItem child per category

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fs_label_utils.cpp
- * @since May 2026
- * @brief Implementation of @ref FSLIB::FsLabelUtils: grow / split labels on the surface mesh and convert between source-estimate matrices and labels.
+ * @file     fs_label_utils.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of @ref FSLIB::FsLabelUtils: grow / split labels on the surface mesh and convert between source-estimate matrices and labels.
  */
 
 //=============================================================================================================

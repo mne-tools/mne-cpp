@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rt_cov.h
- * @since March 2026
- * @brief Real-time noise covariance estimation from streaming MEG / EEG data blocks.
+ * @file     rt_cov.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Real-time noise covariance estimation from streaming MEG / EEG data blocks.
  *
  * RtCov maintains a running unbiased estimate of the channel–channel
  * covariance matrix used by linear inverse operators (MNE, dSPM, sLORETA,

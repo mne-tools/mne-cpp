@@ -311,6 +311,8 @@ def detect_spdx_block(text: str) -> tuple[int, str, list[tuple[str, str]]] | Non
                 year_range = cm.group(1)
                 authors: list[tuple[str, str]] = []
                 idx = 2
+                # v2 bare-line form: ``*   Name <email>`` lines sit
+                # between Copyright and the blank separator.
                 while idx < len(inner):
                     stripped = _strip(inner[idx])
                     am = re.match(r"^\s{2,}(?P<name>[^<]+?)\s+<(?P<email>[^>]+)>\s*$", stripped)
@@ -318,7 +320,28 @@ def detect_spdx_block(text: str) -> tuple[int, str, list[tuple[str, str]]] | Non
                         break
                     authors.append((am.group("name").strip(), am.group("email").strip()))
                     idx += 1
-                # Only accept the v2 block if we found at least one author;
+                # v3 Doxygen-tag form: authors live in ``@author Name <email>``
+                # lines after the blank line, alongside @file/@since/@date.
+                # Walk the rest of the block and collect them.
+                tag_authors: list[tuple[str, str]] = []
+                for ln in inner[idx:]:
+                    if ln.strip() == "*/":
+                        break
+                    body = _strip(ln)
+                    am2 = re.match(
+                        r"^@author\s+(?P<name>[^<]+?)\s+<(?P<email>[^>]+)>\s*$",
+                        body,
+                    )
+                    if am2:
+                        tag_authors.append(
+                            (am2.group("name").strip(),
+                             am2.group("email").strip())
+                        )
+                if not authors and tag_authors:
+                    authors = tag_authors
+                elif tag_authors and not authors:
+                    pass
+                # Only accept the v2/v3 block if we found at least one author;
                 # otherwise treat as a regular Doxygen file header.
                 if authors:
                     # Advance past the rest of the Doxygen block (up to and
@@ -648,6 +671,85 @@ def _year_range_for(path: Path) -> str:
     if floored >= CURRENT_YEAR:
         return f"{CURRENT_YEAR}"
     return f"{floored}-{CURRENT_YEAR}"
+
+
+# ---------------------------------------------------------------------------
+# Git version-tag lookup (for @since derivation)
+# ---------------------------------------------------------------------------
+
+
+_VERSION_TAG_RE = re.compile(r"^v?(\d+\.\d+\.\d+)$")
+_VERSION_TAGS: list[tuple[str, str]] | None = None  # sorted [(YYYY-MM-DD, X.Y.Z)]
+
+
+def _load_version_tags() -> list[tuple[str, str]]:
+    """Return cached list of ``(YYYY-MM-DD, version)`` for every
+    ``vX.Y.Z`` / ``X.Y.Z`` git tag, sorted by tag creation date."""
+    global _VERSION_TAGS
+    if _VERSION_TAGS is not None:
+        return _VERSION_TAGS
+    out = ""
+    try:
+        out = subprocess.check_output(
+            ["git", "tag", "--sort=creatordate",
+             "--format=%(creatordate:short) %(refname:short)"],
+            stderr=subprocess.DEVNULL, text=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        _VERSION_TAGS = []
+        return _VERSION_TAGS
+    parsed: list[tuple[str, str]] = []
+    for line in out.splitlines():
+        try:
+            date_str, tag = line.split(None, 1)
+        except ValueError:
+            continue
+        m = _VERSION_TAG_RE.match(tag.strip())
+        if not m:
+            continue
+        parsed.append((date_str, m.group(1)))
+    _VERSION_TAGS = parsed
+    return _VERSION_TAGS
+
+
+def _git_creation_iso(path: Path) -> str | None:
+    """Return ``YYYY-MM-DD`` of the earliest commit touching *path* or
+    any of its historical paths."""
+    earliest: str | None = None
+    for hist in _historical_paths(path):
+        try:
+            out = subprocess.check_output(
+                ["git", "log", "--format=%ad",
+                 "--date=format:%Y-%m-%d", "--", str(hist)],
+                stderr=subprocess.DEVNULL, text=True,
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            continue
+        for entry in out.splitlines():
+            s = entry.strip()
+            if len(s) == 10 and s[4] == "-" and s[7] == "-":
+                if earliest is None or s < earliest:
+                    earliest = s
+    return earliest
+
+
+def _first_version_for(path: Path, fallback: str = "0.1.0") -> str:
+    """Return the closest version tag whose creation date is at or
+    after *path*'s first commit. Files older than every tagged release
+    pick the earliest tag (e.g. ``0.1.0``); files newer than every tag
+    pick the most recent tag. Returns *fallback* when the repository
+    has no version tags at all."""
+    tags = _load_version_tags()
+    if not tags:
+        return fallback
+    iso = _git_creation_iso(path)
+    if iso is None:
+        return tags[-1][1]
+    for tag_date, version in tags:
+        if tag_date >= iso:
+            return version
+    # File post-dates every release tag -- attribute to the latest tag.
+    return tags[-1][1]
 
 
 def authors_for(

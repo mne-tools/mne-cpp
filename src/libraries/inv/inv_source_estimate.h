@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_source_estimate.h
- * @since March 2026
- * @brief InvSourceEstimate value type — central source-space data container produced by every INVLIB inverse solver.
+ * @file     inv_source_estimate.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    InvSourceEstimate value type — central source-space data container produced by every INVLIB inverse solver.
  *
  * @ref INVLIB::InvSourceEstimate replaces the legacy MNE-C
  * @c mneStcDataRec record and carries the full output of an inverse

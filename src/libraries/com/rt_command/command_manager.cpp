@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file command_manager.cpp
- * @since March 2026
- * @brief Translation unit for @ref COMLIB::CommandManager: schema storage, observer-side dispatch and JSON bulk-load.
+ * @file     command_manager.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Translation unit for @ref COMLIB::CommandManager: schema storage, observer-side dispatch and JSON bulk-load.
  *
  * Implements the @c init() helper that wires the inbound
  * @c triggered/@c response signals to the manager’s own slots, the

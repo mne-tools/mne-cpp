@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fwd_field_map.h
- * @since February 2026
- * @brief Sphere-model field interpolator that maps measured MEG/EEG values onto a dense scalp or cortical surface.
+ * @file     fwd_field_map.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Sphere-model field interpolator that maps measured MEG/EEG values onto a dense scalp or cortical surface.
  *
  * Field mapping is the dual of source estimation: instead of recovering
  * cortical currents, it produces a smooth continuous field on a target

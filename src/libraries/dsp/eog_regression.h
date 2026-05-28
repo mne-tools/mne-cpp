@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file eog_regression.h
- * @since May 2026
- * @brief Declaration of EogRegression — EOG artifact removal via linear regression.
+ * @file     eog_regression.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Declaration of EogRegression — EOG artifact removal via linear regression.
  *
  * Fits a least-squares model from EOG channels to all other channels and subtracts the
  * predicted EOG contribution. This mirrors MNE-Python's mne.preprocessing.EOGRegression.

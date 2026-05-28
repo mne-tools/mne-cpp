@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file multitaper_psd.h
- * @since April 2026
- * @brief Thomson multitaper power-spectral-density estimator.
+ * @file     multitaper_psd.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Thomson multitaper power-spectral-density estimator.
  *
  * The multitaper estimator (Thomson, 1982) computes @c K independent
  * eigenspectra by tapering the input with the first @c K Discrete Prolate

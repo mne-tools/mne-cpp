@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_resolution_matrix.h
- * @since May 2026
- * @brief Resolution-matrix analysis for linear inverse operators — point-spread and cross-talk functions.
+ * @file     inv_resolution_matrix.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Resolution-matrix analysis for linear inverse operators — point-spread and cross-talk functions.
  *
  * @ref INVLIB::InvResolutionMatrix computes
  * @f$ \mathbf{R} = \mathbf{K}\,\mathbf{L} @f$ from an inverse kernel

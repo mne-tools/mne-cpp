@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_volume_source_estimate.cpp
- * @since May 2026
- * @brief Implementation of @ref INVLIB::InvVolumeSourceEstimate.
+ * @file     inv_volume_source_estimate.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of @ref INVLIB::InvVolumeSourceEstimate.
  *
  * Implements the shape setter, the inactive-voxel-zero-fill volume
  * reconstruction at a given time index, and the activity-weighted

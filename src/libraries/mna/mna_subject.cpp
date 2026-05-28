@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_subject.cpp
- * @since April 2026
- * @brief JSON and CBOR codecs for @ref MnaSubject — subject id, FreeSurfer @c $SUBJECTS_DIR link, ordered session list and forward-compatible @c extras.
+ * @file     mna_subject.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    JSON and CBOR codecs for @ref MnaSubject — subject id, FreeSurfer @c $SUBJECTS_DIR link, ordered session list and forward-compatible @c extras.
  *
  * The implementation walks the @ref MnaSession list with the
  * matching session codec and emits @c freeSurferDir as a relative

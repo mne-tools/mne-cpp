@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mvar_model.cpp
- * @since April 2026
- * @brief Implementation of @ref CONNLIB::MvarModel - Yule-Walker / Levinson-Durbin MVAR fit and frequency-domain decomposition into H(f) and S(f); backbone of the directed-connectivity metrics.
+ * @file     mvar_model.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of @ref CONNLIB::MvarModel - Yule-Walker / Levinson-Durbin MVAR fit and frequency-domain decomposition into H(f) and S(f); backbone of the directed-connectivity metrics.
  */
 
 //=============================================================================================================

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file com_global.h
- * @since March 2026
- * @brief Export macros, build-info entry points and namespace anchor for the @c COMLIB communication library.
+ * @file     com_global.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Export macros, build-info entry points and namespace anchor for the @c COMLIB communication library.
  *
  * @c COMLIB is the transport layer that connects mne-cpp acquisition and
  * analysis code to a running @c mne_rt_server instance — the long-running

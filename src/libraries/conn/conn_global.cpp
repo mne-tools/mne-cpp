@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2021-2026 MNE-CPP Authors
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file conn_global.cpp
- * @since August 2021
- * @brief Translation unit anchoring the @c CONNLIB shared-library symbols.
+ * @file     conn_global.cpp
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     August 2021
+ * @brief    Translation unit anchoring the @c CONNLIB shared-library symbols.
  *
  * The file intentionally contains no executable code: it exists so that
  * the build system has at least one @c .cpp unit to compile when building

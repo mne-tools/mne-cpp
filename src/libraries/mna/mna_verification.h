@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_verification.h
- * @since April 2026
- * @brief Verification, declarative checks, evaluation results and provenance snapshot attached to every @ref MnaNode for reproducible execution.
+ * @file     mna_verification.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Verification, declarative checks, evaluation results and provenance snapshot attached to every @ref MnaNode for reproducible execution.
  *
  * This header carries the four structs that turn an MNA graph from
  * a black-box runner into a self-auditing pipeline. @ref MnaVerificationCheck

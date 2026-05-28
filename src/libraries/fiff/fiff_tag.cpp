@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Florian Schlembach <fschlembach@web.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_tag.cpp
- * @since October 2012
- * @brief Implementation of @ref FiffTag: the 16-byte FIFF tag header plus payload, with typed decoders for every FIFFT_* type.
+ * @file     fiff_tag.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Florian Schlembach <fschlembach@web.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     October 2012
+ * @brief    Implementation of @ref FiffTag: the 16-byte FIFF tag header plus payload, with typed decoders for every FIFFT_* type.
  *
  * Decoders convert the payload to the appropriate C++ representation
  * (scalars, dense and sparse matrices, structured FIFF records). Used by

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sourceestimateoverlay.h
- * @since March 2026
- * @brief Colour-mapped source-time-course overlay that interpolates STC activation onto a cortical mesh and uploads per-vertex RGBA.
+ * @file     sourceestimateoverlay.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Colour-mapped source-time-course overlay that interpolates STC activation onto a cortical mesh and uploads per-vertex RGBA.
  *
  * SourceEstimateOverlay loads a pair of @c .stc files (one per
  * hemisphere), holds the source-time-course matrix and the sparse

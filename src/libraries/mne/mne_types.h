@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_types.h
- * @since March 2026
- * @brief Legacy MNE-C constants and shared typedefs used across MNELIB structures.
+ * @file     mne_types.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Legacy MNE-C constants and shared typedefs used across MNELIB structures.
  *
  * Mirrors a curated subset of the @c mne_types.h shipped with the
  * original MNE C tooling so ported code can continue to refer to the

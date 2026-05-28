@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_msh_light_set.h
- * @since March 2026
- * @brief Collection of @ref MNELIB::MNEMshLight sources making up the viewer lighting rig.
+ * @file     mne_msh_light_set.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Collection of @ref MNELIB::MNEMshLight sources making up the viewer lighting rig.
  *
  * @ref MNELIB::MNEMshLightSet aggregates the lights (typically a key /
  * fill / rim trio) and is consumed by @ref MNEMshDisplaySurfaceSet when

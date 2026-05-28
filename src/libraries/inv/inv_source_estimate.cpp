@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_source_estimate.cpp
- * @since March 2026
- * @brief Implementation of @ref INVLIB::InvSourceEstimate including STC / W binary I/O and label-based subset access.
+ * @file     inv_source_estimate.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref INVLIB::InvSourceEstimate including STC / W binary I/O and label-based subset access.
  *
  * Provides the constructors, assignment operators, deep-copy helpers and
  * the @c read / @c write methods for the STC and W binary formats. STC

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_port.h
- * @since April 2026
- * @brief Typed input or output slot on a graph node — carries an @ref MnaDataKind, an upstream link, an optional real-time stream binding and a cached-result reference.
+ * @file     mna_port.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Typed input or output slot on a graph node — carries an @ref MnaDataKind, an upstream link, an optional real-time stream binding and a cached-result reference.
  *
  * @ref MnaPort is the unit of connectivity in an MNA graph: every
  * data hand-off from one @ref MnaNode to another goes through a

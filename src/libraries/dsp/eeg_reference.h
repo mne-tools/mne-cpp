@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file eeg_reference.h
- * @since May 2026
- * @brief EEG re-referencing operators — common-average, single-electrode and REST.
+ * @file     eeg_reference.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    EEG re-referencing operators — common-average, single-electrode and REST.
  *
  * Every EEG measurement is implicitly a potential difference between an
  * active electrode and a reference; changing that reference is therefore

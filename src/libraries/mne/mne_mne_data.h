@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_mne_data.h
- * @since March 2026
- * @brief Container for the working tensors of an MNE inverse computation (whitened residuals, source-time matrices).
+ * @file     mne_mne_data.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Container for the working tensors of an MNE inverse computation (whitened residuals, source-time matrices).
  *
  * @ref MNELIB::MNEMneData ports the @c mneMneDataRec struct and is the
  * scratchpad shared between @c prepare_inverse_operator and the

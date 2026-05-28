@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_raw_data.h
- * @since March 2026
- * @brief Central container for a BIDS raw recording — the BIDS-side analogue of @c FIFFLIB::FiffRawData, bundling raw signal I/O with every electrophysiology sidecar.
+ * @file     bids_raw_data.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Central container for a BIDS raw recording — the BIDS-side analogue of @c FIFFLIB::FiffRawData, bundling raw signal I/O with every electrophysiology sidecar.
  *
  * @ref BidsRawData is the top-level object exposed by BIDSLIB: a single
  * @ref BidsRawData::read call walks a @ref BIDSPath, picks the right

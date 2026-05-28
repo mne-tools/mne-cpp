@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file lsl_stream_discovery.h
- * @since March 2026
- * @brief Declares the resolve_streams / resolve_stream free functions used to enumerate LSL outlets currently visible on the LAN.
+ * @file     lsl_stream_discovery.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Declares the resolve_streams / resolve_stream free functions used to enumerate LSL outlets currently visible on the LAN.
  *
  * Stream discovery is the entry point of every LSLLIB consumer: an
  * acquisition plug-in or analysis tool first calls

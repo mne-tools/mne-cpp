@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_global.cpp
- * @since March 2026
- * @brief Implementation of the INVLIB build-info accessors.
+ * @file     inv_global.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of the INVLIB build-info accessors.
  *
  * Defines @ref INVLIB::buildDateTime and @ref INVLIB::buildHash using
  * the compile-time strings produced by @c utils/buildinfo.h. The two

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_mgh_tag_group.h
- * @since March 2026
- * @brief Ordered group of @ref MNELIB::MNEMghTag entries appended to an MGH/MGZ file.
+ * @file     mne_mgh_tag_group.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Ordered group of @ref MNELIB::MNEMghTag entries appended to an MGH/MGZ file.
  *
  * @ref MNELIB::MNEMghTagGroup gathers every tag present at the tail of
  * an MGH volume and offers typed accessors for the commonly used kinds

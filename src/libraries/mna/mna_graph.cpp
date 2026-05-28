@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_graph.cpp
- * @since April 2026
- * @brief Implementation of @ref MnaGraph: node management, port connectivity, schema-aware validation, Kahn topological sort and JSON/CBOR round-trip.
+ * @file     mna_graph.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of @ref MnaGraph: node management, port connectivity, schema-aware validation, Kahn topological sort and JSON/CBOR round-trip.
  *
  * The implementation backs the graph with a single @c QList of
  * @ref MnaNode and resolves node ids through linear search, which

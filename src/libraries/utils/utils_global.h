@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2013-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file utils_global.h
- * @since March 2013
- * @brief Public umbrella header for UTILSLIB exposing the @c UTILSSHARED_EXPORT macro and build-info accessors.
+ * @file     utils_global.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     March 2013
+ * @brief    Public umbrella header for UTILSLIB exposing the @c UTILSSHARED_EXPORT macro and build-info accessors.
  *
  * UTILSLIB is the cross-cutting helper library that every other
  * mne-cpp module links against: I/O helpers, layout / selection

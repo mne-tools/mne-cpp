@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_path.cpp
- * @since March 2026
- * @brief Implementation of @ref BIDSLIB::BIDSPath — entity-based construction and matching of BIDS-compliant paths and sidecar siblings.
+ * @file     bids_path.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of @ref BIDSLIB::BIDSPath — entity-based construction and matching of BIDS-compliant paths and sidecar siblings.
  */
 
 //=============================================================================================================

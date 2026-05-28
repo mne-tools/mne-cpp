@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_global.h
- * @since April 2026
- * @brief STSLIB shared-library export macro and build-info accessors for the statistical-tests library.
+ * @file     sts_global.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    STSLIB shared-library export macro and build-info accessors for the statistical-tests library.
  *
  * STSLIB is the mne-cpp library that performs frequentist inference on
  * sensor- and source-level M/EEG data. It bundles classic parametric

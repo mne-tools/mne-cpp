@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_source_estimate_token.h
- * @since March 2026
- * @brief Tokeniser and de-tokeniser that turn an @ref INVLIB::InvSourceEstimate into a flat sequence consumable by foundation-model architectures.
+ * @file     inv_source_estimate_token.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Tokeniser and de-tokeniser that turn an @ref INVLIB::InvSourceEstimate into a flat sequence consumable by foundation-model architectures.
  *
  * Declares the free functions @ref INVLIB::tokenize and
  * @ref INVLIB::fromTokens that round-trip an @ref InvSourceEstimate

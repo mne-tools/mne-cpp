@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file morlet_tfr.h
- * @since March 2026
- * @brief Complex Morlet wavelet time-frequency representation (TFR).
+ * @file     morlet_tfr.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Complex Morlet wavelet time-frequency representation (TFR).
  *
  * The complex Morlet wavelet ψ(t) = π^{-1/4} · e^{i2πf₀t} · e^{-t²/2σ²}
  * is a Gaussian-modulated complex exponential and is by far the most

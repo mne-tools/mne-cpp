@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_cov_estimators.cpp
- * @since April 2026
- * @brief Implementation of the regularised covariance estimators declared in sts_cov_estimators.h.
+ * @file     sts_cov_estimators.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of the regularised covariance estimators declared in sts_cov_estimators.h.
  *
  * Ledoit-Wolf and OAS forward to @c Skigen::LedoitWolf and @c Skigen::OAS
  * after transposing the input so the @c (n_channels, n_samples) STSLIB

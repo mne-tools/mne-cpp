@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file connectivity_aec.h
- * @since May 2026
- * @brief ConnectivityAec — Amplitude Envelope Correlation connectivity metric.
+ * @file     connectivity_aec.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    ConnectivityAec — Amplitude Envelope Correlation connectivity metric.
  *
  * Implements both standard AEC and orthogonalized AEC (AEC-c / corrected) as described in:
  *   Brookes et al. (2012) NeuroImage 62(3):2271-2280.

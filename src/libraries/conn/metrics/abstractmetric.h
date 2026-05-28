@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file abstractmetric.h
- * @since January 2018
- * @brief Common static knobs shared by every functional-connectivity estimator in @c CONNLIB.
+ * @file     abstractmetric.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     January 2018
+ * @brief    Common static knobs shared by every functional-connectivity estimator in @c CONNLIB.
  *
  * Every metric in @c CONNLIB (Coherence, Imaginary Coherence, PLI, wPLI,
  * dwPLI, USPLI, PLV, cross-correlation, Granger Causality, DTF, PDC) reads

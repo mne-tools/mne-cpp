@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_sparse_named_matrix.h
- * @since March 2026
- * @brief Sparse variant of @ref MNELIB::MNENamedMatrix backed by an Eigen @c SparseMatrix.
+ * @file     mne_sparse_named_matrix.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Sparse variant of @ref MNELIB::MNENamedMatrix backed by an Eigen @c SparseMatrix.
  *
  * Used by inverse operators and clustering machinery where the gain or
  * projection matrix is dominated by zero columns (clustered leadfield,

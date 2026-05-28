@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file python_test_helper.h
- * @since April 2026
- * @brief QtTest convenience layer on top of @ref UTILSLIB::PythonRunner for cross-validating MNE-CPP results against MNE-Python.
+ * @file     python_test_helper.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    QtTest convenience layer on top of @ref UTILSLIB::PythonRunner for cross-validating MNE-CPP results against MNE-Python.
  *
  * Built on @ref UTILSLIB::PythonRunner, this helper adds the
  * thin layer test code needs: a one-shot @c isAvailable() probe

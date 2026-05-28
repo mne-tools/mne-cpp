@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_brain_vision_reader.cpp
- * @since March 2026
- * @brief Implementation of @ref BIDSLIB::BrainVisionReader — parses the BrainVision @c .vhdr / @c .vmrk / @c .eeg triplet behind @ref BIDSLIB::AbstractFormatReader.
+ * @file     bids_brain_vision_reader.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of @ref BIDSLIB::BrainVisionReader — parses the BrainVision @c .vhdr / @c .vmrk / @c .eeg triplet behind @ref BIDSLIB::AbstractFormatReader.
  */
 
 //=============================================================================================================

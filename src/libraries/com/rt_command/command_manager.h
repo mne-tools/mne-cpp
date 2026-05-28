@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file command_manager.h
- * @since March 2026
- * @brief Per-component registry of @ref COMLIB::Command schemas; receives @ref COMLIB::RawCommand from the parser and dispatches matching @c Command instances.
+ * @file     command_manager.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Per-component registry of @ref COMLIB::Command schemas; receives @ref COMLIB::RawCommand from the parser and dispatches matching @c Command instances.
  *
  * @ref COMLIB::CommandManager is the receiver half of the observer
  * pattern anchored at @ref COMLIB::CommandParser. Each subsystem that

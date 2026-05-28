@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mneoperator.h
- * @since July 2018
- * @brief Light-weight wrapper describing one MNE pre-processing operator (FIR, SSP, compensation) inside a model.
+ * @file     mneoperator.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2018
+ * @brief    Light-weight wrapper describing one MNE pre-processing operator (FIR, SSP, compensation) inside a model.
  *
  * MNEOperator stores the operator type, display name, active flag and
  * the underlying matrix / kernel reference. @ref ChannelInfoModel

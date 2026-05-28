@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_beamformer_settings.h
- * @since March 2026
- * @brief Strongly-typed enumerations shared by the LCMV and DICS beamformer pipelines.
+ * @file     inv_beamformer_settings.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Strongly-typed enumerations shared by the LCMV and DICS beamformer pipelines.
  *
  * Defines @ref INVLIB::BeamformerWeightNorm (none / unit-noise-gain /
  * NAI / rotation-invariant unit-noise-gain), @ref BeamformerPickOri

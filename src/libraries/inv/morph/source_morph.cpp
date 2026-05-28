@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file source_morph.cpp
- * @since May 2026
- * @brief Implementation of @ref INVLIB::SourceMorph (matrix caching and apply step).
+ * @file     source_morph.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of @ref INVLIB::SourceMorph (matrix caching and apply step).
  *
  * Implements @c compute (caches the from/to vertex lists and the
  * sparse @c (nTo × nFrom) interpolation matrix) and @c apply, which is

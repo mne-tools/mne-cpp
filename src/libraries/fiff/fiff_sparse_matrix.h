@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_sparse_matrix.h
- * @since February 2026
- * @brief FIFF sparse matrix: column / row-compressed sparse storage backed by Eigen::SparseMatrix.
+ * @file     fiff_sparse_matrix.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    FIFF sparse matrix: column / row-compressed sparse storage backed by Eigen::SparseMatrix.
  *
  * The FIFF matrix tag format supports three storage modes encoded in the
  * type word (see @ref fiff_tag.h): dense, column-compressed sparse

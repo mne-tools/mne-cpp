@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_cmne_settings.h
- * @since April 2026
- * @brief Settings record for the @ref INVLIB::InvCMNE solver (model path, sliding-window length, regularisation, base method).
+ * @file     inv_cmne_settings.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Settings record for the @ref INVLIB::InvCMNE solver (model path, sliding-window length, regularisation, base method).
  *
  * @ref INVLIB::InvCMNESettings collects every knob that
  * @ref InvCMNE::compute and @ref InvCMNE::trainLstm need: the path to

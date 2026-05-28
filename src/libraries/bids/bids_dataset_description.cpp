@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_dataset_description.cpp
- * @since March 2026
- * @brief Implementation of @ref BIDSLIB::BidsDatasetDescription — JSON I/O for the root ``dataset_description.json`` sidecar.
+ * @file     bids_dataset_description.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of @ref BIDSLIB::BidsDatasetDescription — JSON I/O for the root ``dataset_description.json`` sidecar.
  */
 
 //=============================================================================================================

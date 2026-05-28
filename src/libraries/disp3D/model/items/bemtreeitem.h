@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bemtreeitem.h
- * @since March 2026
- * @brief Tree item wrapping a single @ref MNELIB::MNEBemSurface (brain / inner-skull / outer-skull / scalp shell).
+ * @file     bemtreeitem.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Tree item wrapping a single @ref MNELIB::MNEBemSurface (brain / inner-skull / outer-skull / scalp shell).
  *
  * BEM surfaces are triangulated boundary meshes produced by
  * @c mne_watershed_bem or the FreeSurfer @c mri_make_bem_surfaces

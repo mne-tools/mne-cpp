@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file videooverlay.h
- * @since April 2026
- * @brief Generic live-RGB video texture overlay rendered as a screen-aligned quad with chroma keying.
+ * @file     videooverlay.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     April 2026
+ * @brief    Generic live-RGB video texture overlay rendered as a screen-aligned quad with chroma keying.
  *
  * VideoOverlay accepts a stream of QImage frames (e.g. from a
  * tracking webcam or a recorded video) and uploads each frame to a

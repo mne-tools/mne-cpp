@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_nearest.h
- * @since March 2026
- * @brief Per-source-space-vertex nearest-cortex-vertex mapping.
+ * @file     mne_nearest.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Per-source-space-vertex nearest-cortex-vertex mapping.
  *
  * @ref MNELIB::MNENearest records, for each vertex of an
  * @ref MNESourceSpace, the index of and distance to the closest vertex

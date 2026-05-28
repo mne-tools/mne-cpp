@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file raw_command.h
- * @since March 2026
- * @brief Untyped intermediate produced by @ref COMLIB::CommandParser before type information is bound to parameters.
+ * @file     raw_command.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Untyped intermediate produced by @ref COMLIB::CommandParser before type information is bound to parameters.
  *
  * @ref COMLIB::RawCommand is the first object the parser builds when a
  * command arrives on @ref RtCmdClient. At that point the wire payload

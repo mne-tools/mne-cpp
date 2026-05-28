@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file lsl_stream_inlet.cpp
- * @since March 2026
- * @brief Implements the QTcpSocket-backed receive path that turns a remote LSL outlet into a stream of multichannel float chunks.
+ * @file     lsl_stream_inlet.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implements the QTcpSocket-backed receive path that turns a remote LSL outlet into a stream of multichannel float chunks.
  *
  * The PIMPL class @c StreamInletPrivate owns the @c QTcpSocket and
  * is responsible for opening the connection to the host/port pair

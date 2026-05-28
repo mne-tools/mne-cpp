@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rt_detect_trigger.h
- * @since March 2026
- * @brief Threshold and edge-based trigger detection on streaming stim channels.
+ * @file     rt_detect_trigger.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Threshold and edge-based trigger detection on streaming stim channels.
  *
  * The functions in this header scan the rows of an incoming data matrix —
  * typically the stimulus / digital-trigger channels of a MEG or EEG file —

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file channelrhiview.cpp
- * @since March 2026
- * @brief Implementation of the ChannelRhiView QRhi raw-trace renderer (pipeline, buffer streaming, shader bindings).
+ * @file     channelrhiview.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of the ChannelRhiView QRhi raw-trace renderer (pipeline, buffer streaming, shader bindings).
  */
 
 //=============================================================================================================

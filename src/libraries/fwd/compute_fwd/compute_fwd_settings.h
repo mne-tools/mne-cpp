@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file compute_fwd_settings.h
- * @since March 2026
- * @brief Parameter object holding the CLI/script-level configuration consumed by ComputeFwd.
+ * @file     compute_fwd_settings.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Parameter object holding the CLI/script-level configuration consumed by ComputeFwd.
  *
  * ComputeFwdSettings is the in-memory image of the command-line
  * arguments accepted by @c mne_forward_solution — paths to the

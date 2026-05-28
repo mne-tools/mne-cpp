@@ -2,16 +2,17 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2015-2026 MNE-CPP Authors
- *   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Ruben Doerfel <doerfelruben@aol.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *
- * @file mne_bem.h
- * @since June 2015
- * @brief Boundary element model bundle (inner skull, outer skull, outer skin) loaded from -bem.fif.
+ * @file     mne_bem.h
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @since    0.1.0
+ * @date     June 2015
+ * @brief    Boundary element model bundle (inner skull, outer skull, outer skin) loaded from -bem.fif.
  *
  * @ref MNELIB::MNEBem aggregates the @ref MNEBemSurface objects that
  * make up a head conductor model produced by @c mne_setup_forward_model.

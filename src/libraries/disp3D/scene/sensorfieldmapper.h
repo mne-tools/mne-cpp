@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sensorfieldmapper.h
- * @since March 2026
- * @brief Builds the dense sensor-to-surface mapping matrix and the iso-contour overlay for MEG / EEG evoked data.
+ * @file     sensorfieldmapper.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Builds the dense sensor-to-surface mapping matrix and the iso-contour overlay for MEG / EEG evoked data.
  *
  * SensorFieldMapper holds the loaded @ref FIFFLIB::FiffEvoked, the
  * channel picks, the SSP projectors and the per-modality (MEG on

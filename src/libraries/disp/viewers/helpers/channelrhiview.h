@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file channelrhiview.h
- * @since March 2026
- * @brief QRhi-based GPU-accelerated channel time-series renderer used by the modern raw browser.
+ * @file     channelrhiview.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    QRhi-based GPU-accelerated channel time-series renderer used by the modern raw browser.
  *
  * ChannelRhiView replaces the legacy @c QPainter raw-trace painter
  * with a @c QRhiWidget that uploads channel data as vertex buffers

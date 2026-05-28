@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_beamformer.h
- * @since March 2026
- * @brief InvBeamformer value type — container for pre-computed LCMV / DICS spatial filters and associated metadata.
+ * @file     inv_beamformer.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    InvBeamformer value type — container for pre-computed LCMV / DICS spatial filters and associated metadata.
  *
  * @ref INVLIB::InvBeamformer stores the spatial filter weights produced
  * by @ref InvLCMV::makeLCMV or @ref InvDICS::makeDICS together with the

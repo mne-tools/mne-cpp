@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mri_types.h
- * @since February 2026
- * @brief Numeric type codes, layout constants, and sentinel values shared by every MRI reader.
+ * @file     mri_types.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Numeric type codes, layout constants, and sentinel values shared by every MRI reader.
  *
  * Centralises the four magic-number families that show up in every
  * MGH/MGZ, COR and (indirectly) NIfTI reader so that the I/O classes

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_gamma_map.h
- * @since April 2026
- * @brief Gamma-MAP sparse Bayesian inverse solver — automatic-relevance-determination prior on per-source variance hyperparameters.
+ * @file     inv_gamma_map.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Gamma-MAP sparse Bayesian inverse solver — automatic-relevance-determination prior on per-source variance hyperparameters.
  *
  * @ref INVLIB::InvGammaMap implements the Gamma-MAP / sparse Bayesian
  * learning (SBL) solver of Wipf &amp; Rao, NeuroImage 44(3), 947-966

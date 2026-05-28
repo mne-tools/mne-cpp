@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_global.cpp
- * @since April 2026
- * @brief Definitions for the MNALIB build-info accessors declared in @ref mna_global.h.
+ * @file     mna_global.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Definitions for the MNALIB build-info accessors declared in @ref mna_global.h.
  *
  * The two functions implemented here simply forward to the
  * @c utils/buildinfo.h helpers, which embed the build date/time

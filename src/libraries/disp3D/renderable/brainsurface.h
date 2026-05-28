@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file brainsurface.h
- * @since March 2026
- * @brief Renderable cortical / BEM mesh with interleaved vertex attributes and Qt-RHI buffer management.
+ * @file     brainsurface.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Renderable cortical / BEM mesh with interleaved vertex attributes and Qt-RHI buffer management.
  *
  * BrainSurface is the core 3-D primitive of disp3D. It owns the
  * interleaved @ref VertexData stream (position, normal, packed-ABGR

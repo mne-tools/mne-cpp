@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file source_morph.h
- * @since May 2026
- * @brief Sparse morph operator that re-samples an @ref INVLIB::InvSourceEstimate from one subject's source space onto another.
+ * @file     source_morph.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Sparse morph operator that re-samples an @ref INVLIB::InvSourceEstimate from one subject's source space onto another.
  *
  * @ref INVLIB::SourceMorph is the C++ peer of mne-python's
  * @c mne.compute_source_morph + @c SourceMorph.apply. It consumes the

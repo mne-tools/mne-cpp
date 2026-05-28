@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_hpi_fit_data.cpp
- * @since March 2026
- * @brief Implementation of the HPI per-coil magnetic-dipole fitter.
+ * @file     inv_hpi_fit_data.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of the HPI per-coil magnetic-dipole fitter.
  *
  * Implements the analytic infinite-medium magnetic-dipole leadfield,
  * the per-iteration residual / error functional, the Nelder-Mead

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_dipole_fit.h
- * @since March 2026
- * @brief High-level driver for sequential equivalent-current-dipole (ECD) fitting at every time point of an evoked or raw recording.
+ * @file     inv_dipole_fit.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    High-level driver for sequential equivalent-current-dipole (ECD) fitting at every time point of an evoked or raw recording.
  *
  * @ref INVLIB::InvDipoleFit orchestrates the full mne-c
  * @c mne_dipole_fit pipeline: it consumes a populated

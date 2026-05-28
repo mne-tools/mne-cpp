@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_pwl_rap_music.h
- * @since March 2026
- * @brief Powell-accelerated RAP-MUSIC variant — replaces the exhaustive pair scan with a Powell line-search refinement.
+ * @file     inv_pwl_rap_music.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Powell-accelerated RAP-MUSIC variant — replaces the exhaustive pair scan with a Powell line-search refinement.
  *
  * @ref INVLIB::InvPwlRapMusic derives from @ref InvRapMusic and
  * overrides the pair-scanning step with a Powell direction-set

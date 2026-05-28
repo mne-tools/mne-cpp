@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rtsensorinterpolationmatworker.h
- * @since March 2026
- * @brief Background worker that recomputes the dense MEG / EEG sensor-to-surface mapping matrix off the GUI thread.
+ * @file     rtsensorinterpolationmatworker.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Background worker that recomputes the dense MEG / EEG sensor-to-surface mapping matrix off the GUI thread.
  *
  * Owns the inputs to the field-map kernel &mdash; evoked info, head
  * and helmet surface geometry, MRI / head coordinate transforms,

@@ -21,7 +21,7 @@ class; the functions live directly in the library namespace.
 
 `#include <dsp/bridged_electrodes.h>`
 
-SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors Christoph Dinh [christoph.dinh@mne-cpp.org](mailto:christoph.dinh@mne-cpp.org).
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
 Two EEG electrodes are said to be bridged when conductive paste, sweat or skin abrasion creates a low-impedance shortcut between them; the recorded signals then become near-identical and any subsequent source localisation is biased. Following Tenke & Kayser (2001, Clin. Neurophysiol. 112) the detector computes the Electrical Distance — the time-domain variance of the difference signal — for every channel pair, and flags pairs whose normalised distance falls below a user-defined threshold (default 0.3).
 

@@ -2,12 +2,13 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file channeldataview.cpp
- * @since July 2018
- * @brief Implementation of the ChannelDataView composite raw-data scroller.
+ * @file     channeldataview.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2018
+ * @brief    Implementation of the ChannelDataView composite raw-data scroller.
  */
 
 //=============================================================================================================

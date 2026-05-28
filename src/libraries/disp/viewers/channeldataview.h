@@ -2,12 +2,13 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file channeldataview.h
- * @since July 2018
- * @brief Composite real-time multi-channel time-series scroller (label panel, table view, time ruler, scrollbars).
+ * @file     channeldataview.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2018
+ * @brief    Composite real-time multi-channel time-series scroller (label panel, table view, time ruler, scrollbars).
  *
  * ChannelDataView assembles the four widgets that make up the rolling
  * raw-data browser: a @ref ChannelLabelPanel column on the left, a

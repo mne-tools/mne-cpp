@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_beamformer_compute.h
- * @since March 2026
- * @brief Shared math kernels (filter derivation, source power, regularised pseudo-inverse) used by both the LCMV and DICS beamformers.
+ * @file     inv_beamformer_compute.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Shared math kernels (filter derivation, source power, regularised pseudo-inverse) used by both the LCMV and DICS beamformers.
  *
  * @ref INVLIB::InvBeamformerCompute is a stateless helper that holds
  * the numerical core of every beamformer in INVLIB. It implements the

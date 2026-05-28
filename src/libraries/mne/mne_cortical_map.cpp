@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_cortical_map.cpp
- * @since April 2026
- * @brief Implementation of @ref MNELIB::MNECorticalMap.
+ * @file     mne_cortical_map.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of @ref MNELIB::MNECorticalMap.
  *
  * Implements binary read of the FreeSurfer @c .map file and the
  * construction of the per-vertex weight table.

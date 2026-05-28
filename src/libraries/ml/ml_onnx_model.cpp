@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file ml_onnx_model.cpp
- * @since April 2026
- * @brief Implementation of @ref MLLIB::MlOnnxModel including session creation, IO-binding cache and zero-copy predict.
+ * @file     ml_onnx_model.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of @ref MLLIB::MlOnnxModel including session creation, IO-binding cache and zero-copy predict.
  *
  * The translation unit isolates every direct dependency on the ONNX
  * Runtime C++ API behind @c \#ifdef @c MNE_USE_ONNXRUNTIME, so the

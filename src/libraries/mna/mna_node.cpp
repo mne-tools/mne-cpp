@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_node.cpp
- * @since April 2026
- * @brief JSON and CBOR codecs for @ref MnaNode covering ports, attributes, IPC/Script configuration, verification, provenance and execution metadata.
+ * @file     mna_node.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    JSON and CBOR codecs for @ref MnaNode covering ports, attributes, IPC/Script configuration, verification, provenance and execution metadata.
  *
  * The implementation serialises every field declared in
  * @ref mna_node.h and routes nested structs through their own

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_ecd.cpp
- * @since March 2026
- * @brief Implementation of @ref INVLIB::InvEcd (default/copy ctors, destructor, debug print).
+ * @file     inv_ecd.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of @ref INVLIB::InvEcd (default/copy ctors, destructor, debug print).
  *
  * Provides the field initialisers and the human-readable debug print
  * helper used by the @c mne_dipole_fit driver to dump per-time-point

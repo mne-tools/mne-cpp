@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rtsourcedataworker.cpp
- * @since March 2026
- * @brief Per-tick sparse source-to-vertex mat-vec, colormap mapping and ABGR colour packing per hemisphere.
+ * @file     rtsourcedataworker.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Per-tick sparse source-to-vertex mat-vec, colormap mapping and ABGR colour packing per hemisphere.
  */
 
 //=============================================================================================================

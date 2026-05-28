@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file brainview.h
- * @since March 2026
- * @brief Top-level QRhiWidget that hosts the 3-D scene, drives camera interaction and exposes the multi-view + live-marker API.
+ * @file     brainview.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Top-level QRhiWidget that hosts the 3-D scene, drives camera interaction and exposes the multi-view + live-marker API.
  *
  * BrainView is the public face of disp3D &mdash; the QWidget that
  * any host application embeds to get an interactive cortical /

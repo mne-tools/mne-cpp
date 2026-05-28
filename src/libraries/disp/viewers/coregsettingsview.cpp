@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2020-2026 MNE-CPP Authors
- *   Ruben Doerfel <doerfelruben@aol.com>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file coregsettingsview.cpp
- * @since August 2020
- * @brief Implementation of the CoregSettingsView co-registration parameter panel.
+ * @file     coregsettingsview.cpp
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.7
+ * @date     August 2020
+ * @brief    Implementation of the CoregSettingsView co-registration parameter panel.
  */
 
 # define M_PI           3.14159265358979323846  /* pi */

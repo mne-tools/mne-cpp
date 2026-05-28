@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sensortreeitem.cpp
- * @since March 2026
- * @brief Per-sensor position, coil orientation and render-scale storage for the sensor layer.
+ * @file     sensortreeitem.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Per-sensor position, coil orientation and render-scale storage for the sensor layer.
  */
 
 //=============================================================================================================

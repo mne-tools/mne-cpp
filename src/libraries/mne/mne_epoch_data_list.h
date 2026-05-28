@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
  *
- * @file mne_epoch_data_list.h
- * @since October 2012
- * @brief Ordered list of @ref MNELIB::MNEEpochData objects sharing a common @ref FIFFLIB::FiffInfo.
+ * @file     mne_epoch_data_list.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @since    0.1.0
+ * @date     October 2012
+ * @brief    Ordered list of @ref MNELIB::MNEEpochData objects sharing a common @ref FIFFLIB::FiffInfo.
  *
  * @ref MNELIB::MNEEpochDataList is the C++ counterpart of MNE-Python's
  * @c mne.Epochs: a vector of trials cut from a continuous raw recording

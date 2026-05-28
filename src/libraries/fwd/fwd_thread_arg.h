@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2017-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fwd_thread_arg.h
- * @since March 2017
- * @brief Per-thread work packet (dipole range, coil set, output column) consumed by the parallel forward-solution dipole loop.
+ * @file     fwd_thread_arg.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     March 2017
+ * @brief    Per-thread work packet (dipole range, coil set, output column) consumed by the parallel forward-solution dipole loop.
  *
  * Building the lead-field matrix G is embarrassingly parallel along the
  * source dimension: each dipole's column of G is independent of every

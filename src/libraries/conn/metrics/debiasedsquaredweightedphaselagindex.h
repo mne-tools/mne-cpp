@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Daniel Strohmeier <daniel.strohmeier@gmail.com>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file debiasedsquaredweightedphaselagindex.h
- * @since April 2018
- * @brief Debiased squared Weighted Phase Lag Index (Vinck et al., 2011) between every channel pair.
+ * @file     debiasedsquaredweightedphaselagindex.h
+ * @author   Daniel Strohmeier <daniel.strohmeier@gmail.com>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     April 2018
+ * @brief    Debiased squared Weighted Phase Lag Index (Vinck et al., 2011) between every channel pair.
  *
  * The plain @ref WeightedPhaseLagIndex is still positively biased for
  * small numbers of trials @c N because the squared expectation in the

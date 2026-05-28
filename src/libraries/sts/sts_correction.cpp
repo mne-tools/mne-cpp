@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_correction.cpp
- * @since April 2026
- * @brief Implementation of Bonferroni, Holm-Bonferroni and Benjamini-Hochberg FDR corrections declared in sts_correction.h.
+ * @file     sts_correction.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of Bonferroni, Holm-Bonferroni and Benjamini-Hochberg FDR corrections declared in sts_correction.h.
  *
  * Bonferroni is a constant rescale by @c n followed by a @c cwiseMin(1).
  * Holm-Bonferroni flattens the p-value matrix, sorts ascending and walks

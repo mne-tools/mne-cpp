@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_msh_display_surface_set.h
- * @since March 2026
- * @brief Set of @ref MNELIB::MNEMshDisplaySurface objects sharing a camera, lights and selection.
+ * @file     mne_msh_display_surface_set.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Set of @ref MNELIB::MNEMshDisplaySurface objects sharing a camera, lights and selection.
  *
  * @ref MNELIB::MNEMshDisplaySurfaceSet aggregates one or more renderable
  * surfaces with the @ref MNEMshEyes camera, the

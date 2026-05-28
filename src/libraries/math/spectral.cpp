@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file spectral.cpp
- * @since March 2026
- * @brief FFT, multi-taper combination and PSD/CSD assembly kernels.
+ * @file     spectral.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    FFT, multi-taper combination and PSD/CSD assembly kernels.
  *
  * Implements the static estimators declared in @ref spectral.h. Each
  * tapered FFT runs through @c Eigen::FFT (Kiss-FFT backend) at

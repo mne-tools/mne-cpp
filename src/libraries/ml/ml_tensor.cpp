@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file ml_tensor.cpp
- * @since April 2026
- * @brief Implementation of @ref MLLIB::MlTensor including row-major/Eigen interop and shared-buffer reshape.
+ * @file     ml_tensor.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of @ref MLLIB::MlTensor including row-major/Eigen interop and shared-buffer reshape.
  *
  * The translation unit keeps the storage rule in one place: every
  * owning constructor allocates a @c std::shared_ptr<std::vector<float>>

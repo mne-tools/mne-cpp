@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Florian Schlembach <fschlembach@web.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_cov.cpp
- * @since October 2012
- * @brief Implementation of @ref FiffCov: read / write of ``*-cov.fif`` files, projector application, regularization and whitening eigendecomposition.
+ * @file     fiff_cov.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Florian Schlembach <fschlembach@web.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     October 2012
+ * @brief    Implementation of @ref FiffCov: read / write of ``*-cov.fif`` files, projector application, regularization and whitening eigendecomposition.
  *
  * Round-trips with @c mne.Covariance in MNE-Python. Carries the matrix,
  * the channel names, the kind, the active SSP projectors and the

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_dics.cpp
- * @since March 2026
- * @brief Implementation of the DICS beamformer pipeline (per-frequency filter design + application paths).
+ * @file     inv_dics.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of the DICS beamformer pipeline (per-frequency filter design + application paths).
  *
  * For each frequency bin in the CSD stack the implementation extracts
  * the (optionally real-cast) cross-spectral density, calls into

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sourceestimateoverlay.cpp
- * @since March 2026
- * @brief STC file loading, per-vertex activation interpolation and colormap packing onto the target cortical mesh.
+ * @file     sourceestimateoverlay.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    STC file loading, per-vertex activation interpolation and colormap packing onto the target cortical mesh.
  */
 
 //=============================================================================================================

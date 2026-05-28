@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sts_ftest.cpp
- * @since April 2026
- * @brief Implementation of the one-way ANOVA F-test declared in sts_ftest.h.
+ * @file     sts_ftest.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of the one-way ANOVA F-test declared in sts_ftest.h.
  *
  * Computes the grand mean across all groups, then per group adds
  * @c n_g*(mean_g - grand_mean)^2 to the between-group sum-of-squares and

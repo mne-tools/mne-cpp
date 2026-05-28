@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file decoding_global.cpp
- * @since May 2026
- * @brief Build-stamp accessors for the DECODINGLIB shared library.
+ * @file     decoding_global.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Build-stamp accessors for the DECODINGLIB shared library.
  *
  * Exposes the embedded build date, abbreviated git hash and full git
  * hash so that the @c About dialogs and version probes of the

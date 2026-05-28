@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file lsl_stream_outlet.h
- * @since March 2026
- * @brief Declares stream_outlet, the server side of an LSL stream that publishes samples over TCP and advertises itself via UDP multicast.
+ * @file     lsl_stream_outlet.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Declares stream_outlet, the server side of an LSL stream that publishes samples over TCP and advertises itself via UDP multicast.
  *
  * A @ref LSLLIB::stream_outlet is the producer counterpart of
  * @ref LSLLIB::stream_inlet: instantiating it immediately binds a

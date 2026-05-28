@@ -2,14 +2,15 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2018-2026 MNE-CPP Authors
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
- *   Andreas Griesshammer <ag@fieldlineinc.com>
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file averagelayoutview.cpp
- * @since July 2018
- * @brief Implementation of the AverageLayoutView sensor-layout evoked viewer.
+ * @file     averagelayoutview.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @author   Andreas Griesshammer <ag@fieldlineinc.com>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2018
+ * @brief    Implementation of the AverageLayoutView sensor-layout evoked viewer.
  */
 
 //=============================================================================================================

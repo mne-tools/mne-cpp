@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mri_mgh_io.h
- * @since February 2026
- * @brief FreeSurfer MGH / MGZ volume reader: byte-level decoder for the 284-byte fixed header, voxel buffer, and optional tag footer.
+ * @file     mri_mgh_io.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    FreeSurfer MGH / MGZ volume reader: byte-level decoder for the 284-byte fixed header, voxel buffer, and optional tag footer.
  *
  * MGH is FreeSurfer's native volume container --- a fixed 284-byte
  * big-endian header followed by a column-major voxel buffer and an

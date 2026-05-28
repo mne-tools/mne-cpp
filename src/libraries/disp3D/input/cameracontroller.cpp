@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file cameracontroller.cpp
- * @since March 2026
- * @brief Quaternion-based rotation, exponential zoom and screen-to-world pan math producing the per-viewport CameraResult.
+ * @file     cameracontroller.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Quaternion-based rotation, exponential zoom and screen-to-world pan math producing the per-viewport CameraResult.
  */
 
 //=============================================================================================================

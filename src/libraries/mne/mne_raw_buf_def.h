@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_raw_buf_def.h
- * @since March 2026
- * @brief Descriptor of a single @c FIFF_DATA_BUFFER block (file offset, sample range, type).
+ * @file     mne_raw_buf_def.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Descriptor of a single @c FIFF_DATA_BUFFER block (file offset, sample range, type).
  *
  * @ref MNELIB::MNERawBufDef is the C++ port of @c mneRawBufDefRec. It
  * lets the raw reader perform random-access seek to any sample without

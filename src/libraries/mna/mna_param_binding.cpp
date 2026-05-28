@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_param_binding.cpp
- * @since April 2026
- * @brief JSON and CBOR codecs for @ref MnaParamBinding — target path, expression, trigger, period and dependency list.
+ * @file     mna_param_binding.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    JSON and CBOR codecs for @ref MnaParamBinding — target path, expression, trigger, period and dependency list.
  *
  * The implementation is a straightforward field-for-field codec
  * pair that keeps the expression body unchanged so future

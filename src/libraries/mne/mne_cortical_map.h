@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_cortical_map.h
- * @since April 2026
- * @brief Vertex-to-vertex map between two cortical surfaces (e.g. subject -> fsaverage).
+ * @file     mne_cortical_map.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Vertex-to-vertex map between two cortical surfaces (e.g. subject -> fsaverage).
  *
  * @ref MNELIB::MNECorticalMap stores the resampling weights used by
  * FreeSurfer's surface-based morphing: for each target-surface vertex,

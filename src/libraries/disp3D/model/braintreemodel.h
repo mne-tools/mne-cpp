@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file braintreemodel.h
- * @since March 2026
- * @brief QStandardItemModel hierarchy that organises every 3-D scene object (surfaces, sensors, sources, networks) for a QTreeView.
+ * @file     braintreemodel.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    QStandardItemModel hierarchy that organises every 3-D scene object (surfaces, sensors, sources, networks) for a QTreeView.
  *
  * BrainTreeModel is the single source of truth for what is in the
  * scene: each renderable owns a @ref AbstractTreeItem-derived row

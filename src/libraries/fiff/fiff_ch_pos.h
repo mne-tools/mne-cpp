@@ -2,15 +2,16 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2012-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Juan GPC <jgarciaprieto@mgh.harvard.edu>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fiff_ch_pos.h
- * @since October 2012
- * @brief Coil-frame position record embedded inside FIFF_CH_INFO: coil location and 3x3 EX/EY/EZ orientation triad.
+ * @file     fiff_ch_pos.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     October 2012
+ * @brief    Coil-frame position record embedded inside FIFF_CH_INFO: coil location and 3x3 EX/EY/EZ orientation triad.
  *
  * A FIFF channel info record carries a sub-record describing where the
  * sensing element sits in the device coordinate frame (@c FIFFV_COORD_DEVICE)

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file geometryinfo.h
- * @since March 2026
- * @brief Surface-constrained geodesic distance and sensor-to-mesh projection helpers.
+ * @file     geometryinfo.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Surface-constrained geodesic distance and sensor-to-mesh projection helpers.
  *
  * GeometryInfo provides the geometric kernels that drive every
  * smooth source / sensor overlay in disp3D. @ref scdc runs a

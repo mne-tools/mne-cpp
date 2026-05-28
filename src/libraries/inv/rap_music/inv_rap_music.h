@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_rap_music.h
- * @since March 2026
- * @brief Recursively Applied and Projected MUSIC (RAP-MUSIC) source-localisation algorithm.
+ * @file     inv_rap_music.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Recursively Applied and Projected MUSIC (RAP-MUSIC) source-localisation algorithm.
  *
  * @ref INVLIB::InvRapMusic implements the RAP-MUSIC scanning algorithm
  * of Mosher &amp; Leahy, IEEE Trans. Signal Process. 47(2), 332-340

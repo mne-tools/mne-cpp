@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file math_global.cpp
- * @since March 2026
- * @brief Thin forwarders that surface UTILSLIB build-info into MATHLIB.
+ * @file     math_global.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Thin forwarders that surface UTILSLIB build-info into MATHLIB.
  *
  * The three accessors declared in @ref math_global.h simply delegate to
  * the equivalent helpers in @ref UTILSLIB::buildinfo so that every

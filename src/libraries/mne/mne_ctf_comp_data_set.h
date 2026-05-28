@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_ctf_comp_data_set.h
- * @since March 2026
- * @brief Set of CTF compensation matrices plus the currently active grade.
+ * @file     mne_ctf_comp_data_set.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Set of CTF compensation matrices plus the currently active grade.
  *
  * @ref MNELIB::MNECTFCompDataSet aggregates the @ref MNECTFCompData
  * entries shipped with a CTF dataset and produces, given a target

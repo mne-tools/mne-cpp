@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_hpi_data_updater.h
- * @since March 2026
- * @brief Pre-processing front-end for HPI fitting — re-shapes raw MEG data, projectors and digitised coils into per-fit inputs.
+ * @file     inv_hpi_data_updater.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Pre-processing front-end for HPI fitting — re-shapes raw MEG data, projectors and digitised coils into per-fit inputs.
  *
  * @ref INVLIB::InvHpiDataUpdater isolates everything that has to
  * happen before @ref InvHpiFit can run on a new measurement block:

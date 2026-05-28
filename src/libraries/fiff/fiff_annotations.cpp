@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_annotations.cpp
- * @since April 2026
- * @brief Implementation of @ref FiffAnnotation / @ref FiffAnnotations, including the FIFF, JSON and CSV serializers.
+ * @file     fiff_annotations.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Implementation of @ref FiffAnnotation / @ref FiffAnnotations, including the FIFF, JSON and CSV serializers.
  *
  * FIFF I/O reads and writes under @c FIFFB_MNE_ANNOTATIONS. The JSON and
  * CSV paths exist so the same annotations can be exchanged with BIDS

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file pickresult.h
- * @since May 2026
- * @brief Uniform pick payload (object identity, sub-index, world hit point, distance) for multimodal 3-D scenes.
+ * @file     pickresult.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Uniform pick payload (object identity, sub-index, world hit point, distance) for multimodal 3-D scenes.
  *
  * Every renderable that supports picking (BrainSurface triangles,
  * DipoleObject arrow instances, ElectrodeObject contacts,

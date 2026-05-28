@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file surfacekeys.h
- * @since March 2026
- * @brief String key constants for surfaces in the @ref DISP3DLIB scene map.
+ * @file     surfacekeys.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    String key constants for surfaces in the @ref DISP3DLIB scene map.
  *
  * BrainView and the scene controllers store all renderable surfaces
  * in a single @c QMap<QString, std::shared_ptr<BrainSurface>>. The

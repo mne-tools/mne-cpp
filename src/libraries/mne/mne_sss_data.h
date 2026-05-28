@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_sss_data.h
- * @since March 2026
- * @brief Signal Space Separation (Maxwell filter) basis metadata stored alongside MEG raw data.
+ * @file     mne_sss_data.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Signal Space Separation (Maxwell filter) basis metadata stored alongside MEG raw data.
  *
  * @ref MNELIB::MNESssData captures the inside/outside basis orders
  * (@c LIn, @c LOut), the device-to-head transformation in effect at

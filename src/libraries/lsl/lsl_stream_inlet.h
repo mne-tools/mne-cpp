@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file lsl_stream_inlet.h
- * @since March 2026
- * @brief Declares stream_inlet, the client side of an LSL connection that pulls multichannel sample chunks from a remote outlet.
+ * @file     lsl_stream_inlet.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Declares stream_inlet, the client side of an LSL connection that pulls multichannel sample chunks from a remote outlet.
  *
  * A @ref LSLLIB::stream_inlet is constructed from a resolved
  * @ref LSLLIB::stream_info (typically obtained via

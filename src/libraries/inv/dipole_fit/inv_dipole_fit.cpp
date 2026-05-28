@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_dipole_fit.cpp
- * @since March 2026
- * @brief Implementation of the sequential ECD-fit driver.
+ * @file     inv_dipole_fit.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementation of the sequential ECD-fit driver.
  *
  * Implements the time-bin loop that calls into the Nelder-Mead /
  * guess-grid optimiser, reads averaged or raw data through @c MNELIB

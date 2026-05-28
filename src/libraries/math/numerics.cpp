@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file numerics.cpp
- * @since March 2026
- * @brief Implementations of GCD, sparsity test, histogram binning and baseline rescaling.
+ * @file     numerics.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Implementations of GCD, sparsity test, histogram binning and baseline rescaling.
  *
  * Implements the static helpers declared in @ref numerics.h. The GCD
  * uses the standard Euclidean recursion and runs in

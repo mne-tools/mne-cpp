@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mna_types.h
- * @since April 2026
- * @brief Enums and string-conversion helpers for the MNA container vocabulary (file roles, data kinds, port directions, exec modes).
+ * @file     mna_types.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Enums and string-conversion helpers for the MNA container vocabulary (file roles, data kinds, port directions, exec modes).
  *
  * Every MNA file, port and node is tagged with a small set of
  * controlled vocabularies that downstream tooling — schema validators,

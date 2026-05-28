@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rt_filter.h
- * @since March 2026
- * @brief Real-time FIR / IIR filtering of streaming MEG / EEG data blocks.
+ * @file     rt_filter.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Real-time FIR / IIR filtering of streaming MEG / EEG data blocks.
  *
  * The functions in this header wrap @ref UTILSLIB::FilterKernel and the
  * design back-ends so an incoming raw data file or live data block can be

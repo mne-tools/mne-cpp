@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rtsensordataworker.cpp
- * @since March 2026
- * @brief Per-tick dense sensor-to-vertex mat-vec, symmetric normalisation and ABGR colour packing.
+ * @file     rtsensordataworker.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Per-tick dense sensor-to-vertex mat-vec, symmetric normalisation and ABGR colour packing.
  */
 
 //=============================================================================================================

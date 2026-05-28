@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file brainrenderer.h
- * @since March 2026
- * @brief Qt-RHI scene renderer: shader pipelines, lighting, dual render targets and per-frame draw orchestration for disp3D.
+ * @file     brainrenderer.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Qt-RHI scene renderer: shader pipelines, lighting, dual render targets and per-frame draw orchestration for disp3D.
  *
  * BrainRenderer is the only object in disp3D that talks directly to
  * QRhi. It creates the shader pipelines for every @ref ShaderMode

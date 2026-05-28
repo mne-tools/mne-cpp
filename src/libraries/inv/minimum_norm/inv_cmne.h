@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file inv_cmne.h
- * @since April 2026
- * @brief Contextual Minimum-Norm Estimate (CMNE) inverse solver — deep-learning-corrected dSPM (Dinh et al. 2021).
+ * @file     inv_cmne.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.0
+ * @date     April 2026
+ * @brief    Contextual Minimum-Norm Estimate (CMNE) inverse solver — deep-learning-corrected dSPM (Dinh et al. 2021).
  *
  * @ref INVLIB::InvCMNE implements the CMNE algorithm of Dinh et al.,
  * @em Contextual Minimum-Norm Estimates: A Deep Learning Method for

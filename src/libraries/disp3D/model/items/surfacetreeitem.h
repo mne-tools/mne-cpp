@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file surfacetreeitem.h
- * @since March 2026
- * @brief Tree item wrapping a FreeSurfer @ref FSLIB::FsSurface plus optional @ref FSLIB::FsAnnotation parcellation.
+ * @file     surfacetreeitem.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Tree item wrapping a FreeSurfer @ref FSLIB::FsSurface plus optional @ref FSLIB::FsAnnotation parcellation.
  *
  * Carries the per-surface shader mode (Standard / Holographic /
  * Anatomical) and the optional annotation that drives the

@@ -2,13 +2,14 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2017-2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
- *   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- *   Gabriel Motta <gabrielbenmotta@gmail.com>
  *
- * @file fwd_bem_solution.h
- * @since March 2017
- * @brief Per-sensor projection matrix that turns BEM node potentials into MEG coil readings or EEG electrode voltages.
+ * @file     fwd_bem_solution.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     March 2017
+ * @brief    Per-sensor projection matrix that turns BEM node potentials into MEG coil readings or EEG electrode voltages.
  *
  * Solving a BEM model produces a node-potential vector @c v of length
  * @c np (one entry per surface vertex). For a fixed sensor array that

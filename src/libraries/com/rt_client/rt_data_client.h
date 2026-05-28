@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rt_data_client.h
- * @since March 2026
- * @brief TCP client for the @c mne_rt_server raw-data port (4218): pulls @c FiffInfo, digitizer points and streamed sample buffers.
+ * @file     rt_data_client.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    TCP client for the @c mne_rt_server raw-data port (4218): pulls @c FiffInfo, digitizer points and streamed sample buffers.
  *
  * @ref COMLIB::RtDataClient is a thin @c QTcpSocket subclass that speaks
  * the binary FIFF dialect @c mne_rt_server uses on its data port. The

@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_annotation_event_utils.cpp
- * @since May 2026
- * @brief Implementation of the annotation ↔ event conversion helpers declared in @ref fiff_annotation_event_utils.h.
+ * @file     fiff_annotation_event_utils.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Implementation of the annotation ↔ event conversion helpers declared in @ref fiff_annotation_event_utils.h.
  *
  * Mirrors @c mne.events_from_annotations / @c mne.annotations_from_events
  * in MNE-Python.

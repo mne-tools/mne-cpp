@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file bids_coordinate_system.h
- * @since March 2026
- * @brief Reader/writer for the BIDS ``_coordsystem.json`` sidecar describing the spatial reference frame of an ``_electrodes.tsv`` record.
+ * @file     bids_coordinate_system.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Reader/writer for the BIDS ``_coordsystem.json`` sidecar describing the spatial reference frame of an ``_electrodes.tsv`` record.
  *
  * @c _coordsystem.json is REQUIRED for every iEEG (and recommended for
  * EEG) electrode-position file and pins down three things: the name of

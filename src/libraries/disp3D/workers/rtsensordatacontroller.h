@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file rtsensordatacontroller.h
- * @since March 2026
- * @brief Real-time MEG / EEG sensor streaming controller that orchestrates the data and field-mapping workers.
+ * @file     rtsensordatacontroller.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Real-time MEG / EEG sensor streaming controller that orchestrates the data and field-mapping workers.
  *
  * RtSensorDataController spins up a background @ref
  * RtSensorDataWorker (queue, averaging, dense mat-vec mapping,

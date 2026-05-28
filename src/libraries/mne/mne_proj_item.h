@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_proj_item.h
- * @since March 2026
- * @brief Single SSP projection vector with kind/active flag and channel labels.
+ * @file     mne_proj_item.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Single SSP projection vector with kind/active flag and channel labels.
  *
  * @ref MNELIB::MNEProjItem corresponds to one @c FIFFB_PROJ_ITEM block:
  * the labelled vector that gets removed from the data when the

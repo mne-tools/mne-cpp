@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file simplex_algorithm.h
- * @since March 2026
- * @brief Header-only Nelder–Mead simplex minimiser with pluggable cost and report callables.
+ * @file     simplex_algorithm.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Header-only Nelder–Mead simplex minimiser with pluggable cost and report callables.
  *
  * Nelder–Mead is a derivative-free direct-search minimiser that
  * deforms a simplex of @c n+1 vertices in @c R^n using reflection,

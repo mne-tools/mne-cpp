@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fwd_field_map.cpp
- * @since February 2026
- * @brief Sphere-model field mapping.
+ * @file     fwd_field_map.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Sphere-model field mapping.
  *
  * The computations in this file are a C++ port of the MNE-Python field
  * mapping code, which is BSD-3-Clause licensed:

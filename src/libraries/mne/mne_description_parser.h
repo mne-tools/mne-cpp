@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file mne_description_parser.h
- * @since February 2026
- * @brief Parser for the legacy MNE-C @c .ave / @c .cov plain-text description files.
+ * @file     mne_description_parser.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    Parser for the legacy MNE-C @c .ave / @c .cov plain-text description files.
  *
  * @ref MNELIB::MNEDescriptionParser tokenises the @c "average { ... }"
  * / @c "cov { ... }" stanzas used by @c mne_process_raw and turns them

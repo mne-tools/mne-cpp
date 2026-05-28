@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file viewstate.h
- * @since March 2026
- * @brief Per-viewport state (camera preset, zoom, pan, visibility filter) and serialisation helpers.
+ * @file     viewstate.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Per-viewport state (camera preset, zoom, pan, visibility filter) and serialisation helpers.
  *
  * A disp3D scene can be displayed either in a single interactive
  * viewport or in a 2x2 multi-view grid. @ref SubView holds the

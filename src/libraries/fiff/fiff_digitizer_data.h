@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file fiff_digitizer_data.h
- * @since February 2026
- * @brief High-level digitization data: dig points plus the device→head transform and fitting metadata that together define a coregistration source.
+ * @file     fiff_digitizer_data.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     February 2026
+ * @brief    High-level digitization data: dig points plus the device→head transform and fitting metadata that together define a coregistration source.
  *
  * Where @ref FiffDigPointSet is a flat point list, @ref FiffDigitizerData
  * is the registration-ready view: the dig points themselves, the

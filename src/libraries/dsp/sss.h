@@ -2,11 +2,12 @@
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
- *   Christoph Dinh <christoph.dinh@mne-cpp.org>
  *
- * @file sss.h
- * @since March 2026
- * @brief Signal-Space Separation (SSS) and temporal SSS (tSSS) for MEG data.
+ * @file     sss.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Signal-Space Separation (SSS) and temporal SSS (tSSS) for MEG data.
  *
  * SSS represents the magnetic field measured by an array of MEG sensors as
  * a series expansion in vector spherical harmonics centred on the head.
