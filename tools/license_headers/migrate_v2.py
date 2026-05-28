@@ -50,7 +50,7 @@ import re
 import subprocess
 import sys
 
-from .core import _unique_authors
+from .core import _unique_authors, _year_range_for
 
 MONTHS = [
     "January", "February", "March", "April", "May", "June",
@@ -60,9 +60,11 @@ DIV = "//" + "=" * 109
 
 
 def _git(args: list[str], fp: pathlib.Path) -> list[str]:
+    abs_fp = fp.resolve()
     try:
         out = subprocess.run(
-            ["git", "log", *args, "--", str(fp)],
+            ["git", "log", *args, "--", str(abs_fp)],
+            cwd=abs_fp.parent,
             capture_output=True, text=True, check=False,
         ).stdout
     except FileNotFoundError:
@@ -77,10 +79,10 @@ def git_authors(fp: pathlib.Path) -> list[tuple[str, str]]:
 
 
 def git_year_span(fp: pathlib.Path) -> str:
-    years = sorted({int(ln[:4]) for ln in _git(["--format=%aI"], fp)})
-    if not years:
-        return "2026"
-    return f"{years[0]}" if years[0] == years[-1] else f"{years[0]}-{years[-1]}"
+    # Match the validator's `_year_range_for` semantics: earliest path-only
+    # commit year .. CURRENT_YEAR (always extending to the current year so
+    # the SPDX range covers the active copyright window).
+    return _year_range_for(fp)
 
 
 def git_since(fp: pathlib.Path) -> str:

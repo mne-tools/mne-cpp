@@ -413,10 +413,11 @@ def parse_legacy_header(text: str) -> LegacyHeader | None:
 def _git_authors(path: Path) -> list[tuple[str, str]]:
     # Path-only history (no --follow): we want the people who actually edited
     # *this* file, not the rename-ancestry authors of older sibling files.
+    abs_path = path.resolve()
     try:
         out = subprocess.check_output(
-            ["git", "log", "--format=%an <%ae>", "--", str(path)],
-            cwd=path.parent if path.parent.exists() else None,
+            ["git", "log", "--format=%an <%ae>", "--", str(abs_path)],
+            cwd=abs_path.parent if abs_path.parent.exists() else None,
             stderr=subprocess.DEVNULL,
             text=True,
         )
@@ -433,6 +434,7 @@ def _git_authors(path: Path) -> list[tuple[str, str]]:
 def _git_earliest_year(path: Path) -> int | None:
     # Path-only history (no --follow): the year range tracks edits to this
     # path, not the content lineage of files it inherited from.
+    abs_path = path.resolve()
     try:
         out = subprocess.check_output(
             [
@@ -441,9 +443,9 @@ def _git_earliest_year(path: Path) -> int | None:
                 "--format=%ad",
                 "--date=format:%Y",
                 "--",
-                str(path),
+                str(abs_path),
             ],
-            cwd=path.parent if path.parent.exists() else None,
+            cwd=abs_path.parent if abs_path.parent.exists() else None,
             stderr=subprocess.DEVNULL,
             text=True,
         )
