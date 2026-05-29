@@ -604,7 +604,7 @@ void MNERawData::setup_filter_bufs()
         filt_bufs[k].comp_status = MNE_CTFV_NOGRAD;
     }
     nring_buf       = approx_ring_buf_size/((2*filter->taper_size+filter->size)*
-                                            this->info->nchan*sizeof(float));
+                                            static_cast<std::size_t>(this->info->nchan)*sizeof(float));
     this->filt_ring = std::make_unique<RingBuffer>(nring_buf);
     add_filter_response(&highpass_effective);
 
@@ -1455,7 +1455,7 @@ MNERawData *MNERawData::open_file_comp(const QString& name,
     /*
        * Initialize the raw data buffers
        */
-    nbuf = approx_ring_buf_size/(data->info->buf_size*data->info->nchan*sizeof(float));
+    nbuf = approx_ring_buf_size/(data->info->buf_size*static_cast<std::size_t>(data->info->nchan)*sizeof(float));
     data->ring = std::make_unique<RingBuffer>(nbuf);
     /*
        * Initialize the filter buffers

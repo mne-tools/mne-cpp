@@ -223,7 +223,7 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd &G,
         nOrientOut = nOrient;
     }
 
-    W.resize(nSources * nOrientOut, nChannels);
+    W.resize(static_cast<Eigen::Index>(nSources) * nOrientOut, nChannels);
     W.setZero();
 
     if(pickOri == BeamformerPickOri::MaxPower) {
@@ -235,7 +235,7 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd &G,
 
     for(int s = 0; s < nSources; ++s) {
         // Extract per-source leadfield block: Gk (n_channels, n_orient)
-        MatrixXd Gk = G.middleCols(s * nOrient, nOrient);
+        MatrixXd Gk = G.middleCols(static_cast<Eigen::Index>(s) * nOrient, nOrient);
 
         // Step 3: Optional rank reduction
         if(reduceRank && nOrient > 1) {
@@ -358,7 +358,7 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd &G,
         }
 
         // Store result
-        W.middleRows(s * nOrientOut, nOrientOut) = Wug;
+        W.middleRows(static_cast<Eigen::Index>(s) * nOrientOut, nOrientOut) = Wug;
     }
 
     return true;
@@ -376,7 +376,7 @@ VectorXd InvBeamformerCompute::computePower(const MatrixXd &Cm,
     VectorXd power(nSources);
     for(int s = 0; s < nSources; ++s) {
         // W_k: (n_orient, n_channels)
-        MatrixXd Wk = W.middleRows(s * nOrient, nOrient);
+        MatrixXd Wk = W.middleRows(static_cast<Eigen::Index>(s) * nOrient, nOrient);
         // power = trace(W_k Cm W_k^T)
         MatrixXd WCW = Wk * Cm * Wk.transpose();
         power(s) = WCW.trace();

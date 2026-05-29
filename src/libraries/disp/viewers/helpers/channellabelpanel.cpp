@@ -332,7 +332,7 @@ void ChannelLabelPanel::paintEvent(QPaintEvent *)
                 barColor = QColor(210, 50, 40);
             if (info.bad)
                 barColor = barColor.darker(115);
-            p.fillRect(QRectF(barX0, barY, barW * level, barH), barColor);
+            p.fillRect(QRectF(barX0, barY, static_cast<qreal>(barW) * level, barH), barColor);
         }
 
         yTop = yBot;

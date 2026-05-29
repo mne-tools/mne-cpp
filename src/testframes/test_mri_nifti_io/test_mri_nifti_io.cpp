@@ -129,11 +129,39 @@ QByteArray makeSyntheticNifti(int nx, int ny, int nz, float dx, float dy, float 
 
 bool writeGz(const QString& path, const QByteArray& raw)
 {
-    gzFile gz = gzopen(path.toLocal8Bit().constData(), "wb6");
-    if (!gz) return false;
-    int n = gzwrite(gz, raw.constData(), static_cast<unsigned>(raw.size()));
-    gzclose(gz);
-    return n == raw.size();
+    // Compress in memory with a gzip wrapper (MAX_WBITS + 16), mirroring the
+    // library's inflateInit2(&strm, MAX_WBITS + 16) decoder. We deliberately
+    // avoid the gz* file helpers (gzopen/gzwrite/gzclose): Qt's bundled zlib
+    // (ZlibPrivate, used when no system zlib is present, e.g. on Windows CI)
+    // omits those file-I/O symbols, while deflate* is always available.
+    z_stream strm;
+    std::memset(&strm, 0, sizeof(strm));
+    if (deflateInit2(&strm, 6, Z_DEFLATED, MAX_WBITS + 16, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
+        return false;
+    }
+
+    QByteArray out;
+    out.resize(static_cast<int>(deflateBound(&strm, static_cast<uLong>(raw.size()))));
+    strm.next_in = reinterpret_cast<Bytef*>(const_cast<char*>(raw.constData()));
+    strm.avail_in = static_cast<uInt>(raw.size());
+    strm.next_out = reinterpret_cast<Bytef*>(out.data());
+    strm.avail_out = static_cast<uInt>(out.size());
+
+    const int ret = deflate(&strm, Z_FINISH);
+    const uLong produced = strm.total_out;
+    deflateEnd(&strm);
+    if (ret != Z_STREAM_END) {
+        return false;
+    }
+    out.resize(static_cast<int>(produced));
+
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly)) {
+        return false;
+    }
+    const qint64 written = file.write(out);
+    file.close();
+    return written == out.size();
 }
 
 } // namespace

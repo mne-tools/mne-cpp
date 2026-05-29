@@ -354,7 +354,7 @@ bool InvDipoleFit::fit_dipoles_raw(const QString& dataname, MNERawData* raw, mne
     Eigen::VectorXf one(nchan);
 
     // Row-major storage compatible with float** interface
-    std::vector<float> storage(nchan * length);
+    std::vector<float> storage(static_cast<std::size_t>(nchan) * length);
     std::vector<float*> rows(nchan);
     for (int i = 0; i < nchan; ++i)
         rows[i] = storage.data() + i * length;

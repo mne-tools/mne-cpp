@@ -246,7 +246,7 @@ void MNERTServer::comHelp(Command p_command)
             qint32 lines = (int)ceil((double)t_sCommandList[2].size() / (double)t_maxSizeDescriptions);
             for(i = 0; i < lines; ++i)
             {
-                t_sCommand.append(QString("%1").arg(t_sCommandList[2].mid(i * t_maxSizeDescriptions, t_maxSizeDescriptions)));
+                t_sCommand.append(QString("%1").arg(t_sCommandList[2].mid(static_cast<qsizetype>(i) * t_maxSizeDescriptions, t_maxSizeDescriptions)));
                 t_sCommand.append(QString("\n\r"));
                 //Spaces
                 if(i < lines-1)

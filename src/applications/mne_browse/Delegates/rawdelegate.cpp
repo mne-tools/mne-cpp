@@ -265,7 +265,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
     path.moveTo(path.currentPosition().x(), -(y_base + ((*(listPairs[0].first) - channelMean)*dScaleY)));
 
     //plot all rows from list of pairs
-    for(qint8 i=0; i < listPairs.size(); ++i) {
+    for(qsizetype i=0; i < listPairs.size(); ++i) {
         //create lines from one to the next sample
         for(qint32 j=0; j < listPairs[i].second; ++j)
         {

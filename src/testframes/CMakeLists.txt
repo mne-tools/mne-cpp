@@ -19,6 +19,16 @@ endif()
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
+# ── Code-coverage instrumentation ───────────────────────────────────────
+# Some tests link coverage-instrumented application/plugin static libraries
+# (e.g. the mne_inspect electrodes/mri_slices plugins). The final test
+# executables must therefore link with --coverage so that the gcov runtime
+# (__gcov_init/__gcov_exit/__gcov_merge_add) is pulled in; otherwise the
+# link fails with undefined references to those symbols.
+if(WITH_CODE_COV)
+  add_link_options("--coverage")
+endif()
+
 add_subdirectory(test_coregistration)
 
 add_subdirectory(test_lsl)

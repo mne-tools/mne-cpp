@@ -293,7 +293,7 @@ std::unique_ptr<MNECovMatrix> InvDipoleFitData::ad_hoc_noise(FwdCoilSet *meg, Fw
     if (meg) {
         for (k = 0; k < meg->ncoil(); k++, n++) {
             if (meg->coils[k]->is_axial_coil()) {
-                stds[n] = mag_std*mag_std;
+                stds[n] = static_cast<double>(mag_std)*mag_std;
 #ifdef TEST_REF
                 if (meg->coils[k]->type == FIFFV_COIL_CTF_REF_MAG ||
                         meg->coils[k]->type == FIFFV_COIL_CTF_REF_GRAD ||
@@ -302,13 +302,13 @@ std::unique_ptr<MNECovMatrix> InvDipoleFitData::ad_hoc_noise(FwdCoilSet *meg, Fw
 #endif
             }
             else
-                stds[n] = grad_std*grad_std;
+                stds[n] = static_cast<double>(grad_std)*grad_std;
             ch_names.append(meg->coils[k]->chname);
         }
     }
     if (eeg) {
         for (k = 0; k < eeg->ncoil(); k++, n++) {
-            stds[n]     = eeg_std*eeg_std;
+            stds[n]     = static_cast<double>(eeg_std)*eeg_std;
             ch_names.append(eeg->coils[k]->chname);
         }
     }
@@ -479,12 +479,12 @@ int InvDipoleFitData::select_dipole_fit_noise_cov(InvDipoleFitData *f,
             if (f->noise->cov.size() > 0) {
                 for (j = 0; j < f->noise->ncov; j++)
                     for (k = 0; k <= j; k++) {
-                        f->noise->cov[MNECovMatrix::lt_packed_index(j, k)] *= w[j] * w[k];
+                        f->noise->cov[MNECovMatrix::lt_packed_index(j, k)] *= static_cast<double>(w[j]) * w[k];
                     }
             }
             else {
                 for (j = 0; j < f->noise->ncov; j++) {
-                    f->noise->cov_diag[j] *= w[j] * w[j];
+                    f->noise->cov_diag[j] *= static_cast<double>(w[j]) * w[j];
                 }
             }
         }

@@ -141,7 +141,7 @@ bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet,
     //Make the compensator and apply it to all data sets
     p_FiffEvokedSet.info.make_compensator(now,to,ctf_comp);
 
-    for(qint16 i=0; i < p_FiffEvokedSet.evoked.size(); ++i)
+    for(qsizetype i=0; i < p_FiffEvokedSet.evoked.size(); ++i)
     {
         p_FiffEvokedSet.evoked[i].data = ctf_comp.data->data*p_FiffEvokedSet.evoked[i].data;
     }

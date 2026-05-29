@@ -200,7 +200,7 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
                 //pack all adjacent (after reload) RowVectorPairs into a QList
                 QList<RowVectorPair> listRowVectorPair;
 
-                for(qint16 i=0; i < m_data.size(); ++i) {
+                for(qsizetype i=0; i < m_data.size(); ++i) {
                     //if channel is not filtered or background Processing pending...
                     if(!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore && i==0) || (m_bProcessing && !m_bReloadBefore && i==m_data.size()-1)) {
                         rowVectorPair.first = m_data[i]->dataRaw().data() + index.row()*m_data[i]->dataRaw().cols();

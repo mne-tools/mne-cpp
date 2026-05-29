@@ -898,7 +898,7 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
                     return compdata;
                 }
 
-                row_cals(row, 0) = p_Chs[p].range*p_Chs[p].cal;
+                row_cals(row, 0) = static_cast<double>(p_Chs[p].range)*p_Chs[p].cal;
             }
             mat->data           = row_cals.asDiagonal()* mat->data *col_cals.asDiagonal();
             one.rowcals         = row_cals;
@@ -2001,7 +2001,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice,
     RowVectorXd cals(data.info.nchan);
     cals.setZero();
     for (qint32 k = 0; k < data.info.nchan; ++k)
-        cals[k] = data.info.chs[k].range*data.info.chs[k].cal;
+        cals[k] = static_cast<double>(data.info.chs[k].range)*data.info.chs[k].cal;
     //
     data.cals       = cals;
     data.rawdir     = rawdir;

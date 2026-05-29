@@ -64,7 +64,7 @@ void RtNoiseWorker::doWork(const MatrixXd& matData)
         m_iNumOfBlocks = m_iDataLength;
         m_iBlockSize = static_cast<int>(matData.cols());
         m_iSensors = static_cast<int>(matData.rows());
-        m_matCircBuf.resize(m_iSensors, m_iNumOfBlocks * m_iBlockSize);
+        m_matCircBuf.resize(m_iSensors, static_cast<Eigen::Index>(m_iNumOfBlocks) * m_iBlockSize);
         m_iBlockIndex = 0;
         m_bFirstBlock = false;
     }

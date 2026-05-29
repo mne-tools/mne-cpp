@@ -202,7 +202,7 @@ void ScaleControl::sliderChanged(int dScale)
 
 inline float ScaleControl::weightedSensitivity(float s)
 {
-    return s * s * s * 100 / m_pUi->spinBox->maximum();
+    return static_cast<double>(s) * s * s * 100 / m_pUi->spinBox->maximum();
 }
 
 //=============================================================================================================

@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    fprintf(stdout, "Found %d SSP projector(s):\n\n", projs.size());
+    fprintf(stdout, "Found %d SSP projector(s):\n\n", static_cast<int>(projs.size()));
 
     // Print header
     fprintf(stdout, "%-6s %-20s %-8s %-8s %s\n",

@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    fprintf(stderr, "Found %d EEG channels.\n", eegChannels.size());
+    fprintf(stderr, "Found %d EEG channels.\n", static_cast<int>(eegChannels.size()));
 
     int nProblems = 0;
 
@@ -182,10 +182,10 @@ int main(int argc, char *argv[])
 
     // Summary
     if (nProblems == 0) {
-        fprintf(stdout, "All %d EEG channels have valid locations.\n", eegChannels.size());
+        fprintf(stdout, "All %d EEG channels have valid locations.\n", static_cast<int>(eegChannels.size()));
         return 0;
     } else {
-        fprintf(stdout, "\n%d problem(s) found in %d EEG channels.\n", nProblems, eegChannels.size());
+        fprintf(stdout, "\n%d problem(s) found in %d EEG channels.\n", nProblems, static_cast<int>(eegChannels.size()));
         return 1;
     }
 }

@@ -153,7 +153,7 @@ void MvarModel::fitLevinsonDurbin(const MatrixXd& data, int p)
     MatrixXd matZ(nCh * p, nObs);
 
     for(int k = 0; k < p; ++k) {
-        matZ.middleRows(k * nCh, nCh) = dataCentered.middleCols(p - 1 - k, nObs);
+        matZ.middleRows(static_cast<Eigen::Index>(k) * nCh, nCh) = dataCentered.middleCols(p - 1 - k, nObs);
     }
 
     // Solve Y = A * Z via least squares: A = Y * Z^T * (Z * Z^T)^{-1}
@@ -206,7 +206,7 @@ int MvarModel::selectOrderBIC(const MatrixXd& data, int maxOrder) const
         MatrixXd matZ(nCh * p, nObs);
 
         for(int k = 0; k < p; ++k) {
-            matZ.middleRows(k * nCh, nCh) = dataCentered.middleCols(p - 1 - k, nObs);
+            matZ.middleRows(static_cast<Eigen::Index>(k) * nCh, nCh) = dataCentered.middleCols(p - 1 - k, nObs);
         }
 
         // Solve via OLS

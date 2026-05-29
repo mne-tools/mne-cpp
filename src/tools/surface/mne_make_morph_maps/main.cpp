@@ -93,7 +93,7 @@ static SparseMatrix<double> computeMorphMap(const MatrixX3f& srcSphere,
 
     typedef Triplet<double> T;
     std::vector<T> triplets;
-    triplets.reserve(nDst * nNearest);
+    triplets.reserve(static_cast<std::size_t>(nDst) * nNearest);
 
     for (int d = 0; d < nDst; ++d) {
         // Find nNearest closest source vertices

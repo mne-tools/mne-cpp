@@ -172,7 +172,7 @@ std::unique_ptr<MriVolData> demoMriSlab(int dim)
         slice.dimx         = vol->xsize * 1e-3f;   // metres per pixel
         slice.dimy         = vol->ysize * 1e-3f;
         slice.scale        = 1.0f;
-        slice.pixelsFloat.resize(dim * dim);
+        slice.pixelsFloat.resize(static_cast<qsizetype>(dim) * dim);
 
         for (int j = 0; j < dim; ++j) {
             for (int i = 0; i < dim; ++i) {

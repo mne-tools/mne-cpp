@@ -214,7 +214,7 @@ void WriteToFile::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
         // Check if data is present
         if(pRTMSA->getMultiSampleArray().size() > 0) {
-            for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
+            for(qsizetype i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                 // Please note that we do not need a copy here since this function will block until
                 // the buffer accepts new data again. Hence, the data is not deleted in the actual
                 // Measurement function after it emitted the notify signal.

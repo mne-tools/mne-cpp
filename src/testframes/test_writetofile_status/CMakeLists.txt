@@ -54,6 +54,29 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
 
+# scan_writetofile is a runtime-loaded shared plugin that is built into
+# bin/mne_scan_plugins, not next to the test binary nor in the usual lib
+# directory. The CI test runner launches the test executable directly
+# (not through CTest), so the CTest ENVIRONMENT property below is not
+# honoured in that path. Copy the plugin next to the test binary and add
+# the binary's own directory to the runtime search path so the loader can
+# resolve scan_writetofile regardless of how the test is launched. The
+# plugin's own dependencies (scShared, mne_* …) keep resolving through the
+# test executable's @executable_path/../lib ($ORIGIN/../lib) entry.
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:scan_writetofile>
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+)
+
+if(APPLE)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        INSTALL_RPATH "@executable_path/../lib;@executable_path")
+elseif(UNIX)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        INSTALL_RPATH "\$ORIGIN/../lib:\$ORIGIN")
+endif()
+
 enable_testing()
 add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
 

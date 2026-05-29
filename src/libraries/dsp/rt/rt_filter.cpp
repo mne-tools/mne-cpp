@@ -118,7 +118,7 @@ bool RTPROCESSINGLIB::filterFile(QIODevice &pIODevice,
     }
 
     float quantum_sec = iSize/pFiffRawData->info.sfreq;
-    fiff_int_t quantum = ceil(quantum_sec*pFiffRawData->info.sfreq);
+    fiff_int_t quantum = ceil(static_cast<double>(quantum_sec)*pFiffRawData->info.sfreq);
 
     // Read, filter and write the data
     bool first_buffer = true;

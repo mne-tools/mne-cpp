@@ -102,7 +102,7 @@ QVector<float> MriVolData::voxelDataAsFloat() const
         return {};
 
     const int nPixels = width * height;
-    QVector<float> result(width * height * depth, 0.0f);
+    QVector<float> result(static_cast<qsizetype>(width) * height * depth, 0.0f);
 
     for (int k = 0; k < depth && k < slices.size(); ++k) {
         const MriSlice& slice = slices[k];

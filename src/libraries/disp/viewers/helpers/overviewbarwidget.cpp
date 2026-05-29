@@ -227,7 +227,7 @@ void OverviewBarWidget::rebuildEnvelope()
         f.setPointSizeF(7.0);
         p.setFont(f);
         p.setPen(QColor(200, 200, 200, 180));
-        p.drawText(QRectF(2, ti * laneH, 60, laneH * 0.5f),
+        p.drawText(QRectF(2, static_cast<qreal>(ti) * laneH, 60, laneH * 0.5f),
                    Qt::AlignLeft | Qt::AlignTop, te.typeLabel);
     }
 

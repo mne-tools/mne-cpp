@@ -202,7 +202,7 @@ MatrixXd DecodingCsp::transform(const std::vector<MatrixXd>& epochs) const
 
         MatrixXd result(nEpochs * nComp, nTimes);
         for (int e = 0; e < nEpochs; ++e) {
-            result.middleRows(e * nComp, nComp) = m_filters * epochs[static_cast<size_t>(e)];
+            result.middleRows(static_cast<Eigen::Index>(e) * nComp, nComp) = m_filters * epochs[static_cast<size_t>(e)];
         }
         return result;
     }

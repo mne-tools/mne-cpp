@@ -349,7 +349,7 @@ void InvMinimumNorm::computeELoreta()
     std::vector<Matrix3d> R_mat;  // For matrix mode: nSrc x (3x3)
 
     if(useScalar) {
-        R_vec = VectorXd::Ones(nSrc * nOrient);
+        R_vec = VectorXd::Ones(static_cast<Eigen::Index>(nSrc) * nOrient);
         // Apply prior: R *= sourceStd^2
         for(int i = 0; i < R_vec.size(); ++i) {
             R_vec(i) *= sourceStd(i) * sourceStd(i);

@@ -790,8 +790,8 @@ bool FiffRawData::read_raw_segment_times(MatrixXd& data,
     //
     //   Convert to samples
     //
-    from = floor(from*this->info.sfreq);
-    to   = ceil(to*this->info.sfreq);
+    from = floor(static_cast<double>(from)*this->info.sfreq);
+    to   = ceil(static_cast<double>(to)*this->info.sfreq);
     //
     //   Read it
     //

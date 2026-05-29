@@ -191,13 +191,13 @@ int main(int argc, char *argv[])
     printf("[done]\n");
 
     //Compose the selection name list
-    for(qint16 i=0; i < npair; ++i) {
+    for(qint32 i=0; i < npair; ++i) {
         ch_sel_names.append(p_FiffEvokedSet.info.ch_names.at(i));
     }
 
     //Omit MEG channels but include others
     qint16 k = npair;
-    for(qint16 p=0; p < p_FiffEvokedSet.info.nchan; ++p) {
+    for(qint32 p=0; p < p_FiffEvokedSet.info.nchan; ++p) {
         if((p_FiffEvokedSet.info.channel_type(p) == "grad") || (p_FiffEvokedSet.info.channel_type(p) == "mag")) {
             ++k;
             ch_sel_names.append(p_FiffEvokedSet.info.ch_names.at(p));

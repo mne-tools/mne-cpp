@@ -458,7 +458,7 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot(const Eigen::Vector3f& rd_in, con
             Qr = Q.dot(rd)/rd_len;
             Qt = sqrt(Q2 - Qr*Qr);
         }
-        Vval[k] = pi4_inv*(Qr*Vr + Qt*cos_beta*Vt)/pos2;
+        Vval[k] = static_cast<double>(pi4_inv)*(Qr*Vr + Qt*cos_beta*Vt)/pos2;
     }
     /*
        * Scale by the conductivity if we have the layers

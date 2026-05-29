@@ -152,7 +152,7 @@ void createPaths(const QModelIndex &index,
 
     //create lines from one to the next sample for last path
     qint32 sample_offset = t_pModel->numVLines() + 1;
-    qSamplePosition.setX(qSamplePosition.x() + dDx*sample_offset);
+    qSamplePosition.setX(qSamplePosition.x() + dDx*static_cast<double>(sample_offset));
 
     //start painting from first sample value
     float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
@@ -485,7 +485,7 @@ void RtFiffRawViewDelegate::createGridPath(const QModelIndex &index, const QStyl
 
         float yEnd = option.rect.bottomRight().y();
 
-        for(qint8 i = 0; i < t_pModel->numVLines(); ++i) {
+        for(qint32 i = 0; i < t_pModel->numVLines(); ++i) {
             float x = distance*(i+1);
             path.moveTo(x,yStart);
             path.lineTo(x,yEnd);
@@ -511,8 +511,8 @@ void RtFiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index, cons
 
         float yEnd = option.rect.bottomRight().y();
 
-        for(qint8 t = 0; t < t_pModel->numVLines()+1; ++t) {
-            for(qint8 i = 0; i < t_pModel->getNumberOfTimeSpacers(); ++i) {
+        for(qint32 t = 0; t < t_pModel->numVLines()+1; ++t) {
+            for(qint32 i = 0; i < t_pModel->getNumberOfTimeSpacers(); ++i) {
                 float x = (distanceSec*t)+(distanceSpacers*(i+1));
                 path.moveTo(x,yStart);
                 path.lineTo(x,yEnd);
@@ -556,8 +556,8 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter *painter,
         }
 
         if(triggerPos <= currentSampleIndex + t_pModel->getCurrentOverlapAddDelay()) {
-            path.moveTo(triggerPos*dDx,yStart);
-            path.lineTo(triggerPos*dDx,yEnd);
+            path.moveTo(static_cast<qreal>(triggerPos)*dDx,yStart);
+            path.lineTo(static_cast<qreal>(triggerPos)*dDx,yEnd);
         }
 
         painter->drawPath(path);
@@ -577,8 +577,8 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter *painter,
                 painter->setPen(QPen(mapTriggerTypeColors[detectedTriggersOld[u].second], 1.5, Qt::SolidLine));
             }
 
-            path.moveTo(triggerPos*dDx,yStart);
-            path.lineTo(triggerPos*dDx,yEnd);
+            path.moveTo(static_cast<qreal>(triggerPos)*dDx,yStart);
+            path.lineTo(static_cast<qreal>(triggerPos)*dDx,yEnd);
 
             painter->drawPath(path);
             painter->restore();
