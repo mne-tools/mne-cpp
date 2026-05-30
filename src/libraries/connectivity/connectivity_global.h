@@ -1,0 +1,77 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2016-2026 MNE-CPP Authors
+ *
+ * @file     connectivity_global.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     July 2016
+ * @brief    Export/import macros for the @c CONNECTIVITYLIB functional-connectivity library.
+ *
+ * @c CONNECTIVITYLIB implements the spectral and time-domain functional-connectivity
+ * estimators used by mne-cpp's source-space and sensor-space analysis
+ * pipelines: magnitude-squared coherence and complex coherency, the
+ * imaginary part of coherency (Nolte et al., 2004), the phase-locking value
+ * (Lachaux et al., 1999), the phase lag index (Stam et al., 2007), the
+ * weighted and debiased squared weighted PLI (Vinck et al., 2011), the
+ * unbiased squared PLI, Pearson and time-lagged cross-correlation, and the
+ * MVAR-based directed metrics Granger causality, DTF and PDC (Baccala &
+ * Sameshima, 2001). This header provides the @c CONNECTIVITYSHARED_EXPORT macro that
+ * resolves to @c Q_DECL_EXPORT when @c CONNECTIVITY_LIBRARY is defined during the
+ * library build and to @c Q_DECL_IMPORT for downstream consumers, keeping
+ * Windows DLL symbol visibility correct without per-class boilerplate.
+ */
+
+#ifndef CONNECTIVITY_GLOBAL_H
+#define CONNECTIVITY_GLOBAL_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <QtCore/qglobal.h>
+#include <utils/buildinfo.h>
+
+//=============================================================================================================
+// DEFINES
+//=============================================================================================================
+
+#if defined(STATICBUILD)
+#  define CONNECTIVITYSHARED_EXPORT
+#elif defined(MNE_CONNECTIVITY_LIBRARY)
+#  define CONNECTIVITYSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define CONNECTIVITYSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
+
+//=============================================================================================================
+/**
+ * @namespace CONNECTIVITYLIB
+ * @brief     Functional connectivity metrics (coherence, PLV, cross-correlation, etc.).
+ */
+namespace CONNECTIVITYLIB{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+CONNECTIVITYSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+CONNECTIVITYSHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+CONNECTIVITYSHARED_EXPORT const char* buildHashLong();
+}
+
+#endif // CONNECTIVITY_GLOBAL_H

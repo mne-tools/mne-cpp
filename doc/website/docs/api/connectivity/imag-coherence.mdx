@@ -1,0 +1,57 @@
+---
+id: imag-coherence
+title: "CONNECTIVITYLIB::ImagCoherence"
+sidebar_label: ImagCoherence
+sidebar_position: 14
+---
+
+# ImagCoherence
+
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+
+`#include <connectivity/imagcoherence.h>`
+
+```cpp
+class CONNECTIVITYLIB::ImagCoherence
+```
+
+Computes the imaginary part of complex coherency for every channel pair.
+
+The estimator inherits the volume-conduction rejection property derived by Nolte et al. (NeuroImage, 2004): zero-lag mixing of independent sources contributes only to the real axis and is removed, so the returned edge weights reflect interactions with non-zero conduction delay only. The cross-spectral accumulation is delegated to `Coherency::calculateImag`; this class is the public entry point used by the dispatcher in `Connectivity`.
+
+Imaginary-coherence estimator (Nolte et al. 2004); rejects zero-lag volume-conduction mixing.
+
+---
+
+## Public Methods
+
+### ImagCoherence()
+
+Constructs a `ImagCoherence` object.
+
+---
+
+## Static Methods
+
+### calculate(connectivitySettings)
+
+Calculates the imaginary coherence between the rows of the data matrix.
+
+**Parameters:**
+
+- **connectivitySettings** : *ConnectivitySettings &*
+  The input data and parameters.
+
+**Returns:**
+
+- *Network* — The connectivity information in form of a network structure.
+
+---
+
+## Authors of this file
+
+- Daniel Strohmeier &lt;daniel.strohmeier@gmail.com&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

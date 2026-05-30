@@ -64,7 +64,7 @@ class BrainSurface;
 class DipoleObject;
 class NetworkObject;
 namespace DISP3DLIB { class VideoOverlay; }
-namespace CONNLIB { class Network; }
+namespace CONNECTIVITYLIB { class Network; }
 
 //=============================================================================================================
 /**
@@ -252,7 +252,7 @@ public slots:
      * @param[in] name       Display name for the network.
      * @return True if successful.
      */
-    bool loadNetwork(const CONNLIB::Network &network, const QString &name = "Network");
+    bool loadNetwork(const CONNECTIVITYLIB::Network &network, const QString &name = "Network");
 
     //=========================================================================================================
     /**

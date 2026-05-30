@@ -1,0 +1,282 @@
+---
+id: network-node
+title: "CONNECTIVITYLIB::NetworkNode"
+sidebar_label: NetworkNode
+sidebar_position: 18
+---
+
+# NetworkNode
+
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+
+`#include <connectivity/networknode.h>`
+
+```cpp
+class CONNECTIVITYLIB::NetworkNode
+```
+
+Node of a `Network`.
+
+Stores a unique ID, a 3D anatomical position (sensor coordinate or source vertex) and the lists of incident edges partitioned by direction (in / out) and by threshold state (full / thresholded), so that graph-theoretic measures can be read off without rescanning the global edge list.
+
+Graph node carrying a 3D position and its incident in/out, full/thresholded edge lists.
+
+---
+
+## Public Methods
+
+### NetworkNode(iId, vecVert)
+
+Constructs a `NetworkNode` object.
+
+**Parameters:**
+
+- **iId** : *qint16*
+  The node's ID.
+
+- **vecVert** : *const Eigen::RowVectorXf &*
+  The node's 3D position.
+
+---
+
+### getFullEdges()
+
+Returns the ingoing edges corresponding to the full network.
+
+**Returns:**
+
+- *const QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt; &* — Returns the list with all ingoing edges.
+
+---
+
+### getThresholdedEdges()
+
+Returns all edges corresponding to the thresholded network.
+
+**Returns:**
+
+- *QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt;* — Returns the list with all ingoing edges.
+
+---
+
+### getFullEdgesIn()
+
+Returns the ingoing edges corresponding to the full network.
+
+**Returns:**
+
+- *QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt;* — Returns the list with all ingoing edges.
+
+---
+
+### getThresholdedEdgesIn()
+
+Returns the ingoing edges corresponding to the thresholded network.
+
+**Returns:**
+
+- *QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt;* — Returns the list with all ingoing edges.
+
+---
+
+### getFullEdgesOut()
+
+Returns the outgoing edges corresponding to the full network.
+
+**Returns:**
+
+- *QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt;* — Returns the list with all outgoing edges.
+
+---
+
+### getThresholdedEdgesOut()
+
+Returns the outgoing edges corresponding to the thresholded network.
+
+**Returns:**
+
+- *QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt;* — Returns the list with all outgoing edges.
+
+---
+
+### getVert()
+
+Returns the vertex (position) of the node.
+
+**Returns:**
+
+- *const Eigen::RowVectorXf &* — Returns the 3D position of the node.
+
+---
+
+### getId()
+
+Returns the node id.
+
+**Returns:**
+
+- *qint16* — Returns the node id.
+
+---
+
+### getFullDegree()
+
+Returns node degree corresponding to the full network.
+
+**Returns:**
+
+- *qint16* — The node degree calculated as the number of edges connected to a node (undirected gaph).
+
+---
+
+### getThresholdedDegree()
+
+Returns node degree corresponding to the thresholded network.
+
+**Returns:**
+
+- *qint16* — The node degree calculated as the number of edges connected to a node (undirected gaph).
+
+---
+
+### getFullIndegree()
+
+Returns node indegree corresponding to the full network.
+
+**Returns:**
+
+- *qint16* — The node degree calculated as the number of incoming edges (only in directed graphs).
+
+---
+
+### getThresholdedIndegree()
+
+Returns node indegree corresponding to the thresholded network.
+
+**Returns:**
+
+- *qint16* — The node degree calculated as the number of incoming edges (only in directed graphs).
+
+---
+
+### getFullOutdegree()
+
+Returns node outdegree corresponding to the full network.
+
+**Returns:**
+
+- *qint16* — The node degree calculated as the number of outgoing edges (only in directed graphs).
+
+---
+
+### getThresholdedOutdegree()
+
+Returns node outdegree corresponding to the thresholded network.
+
+**Returns:**
+
+- *qint16* — The node degree calculated as the number of outgoing edges (only in directed graphs).
+
+---
+
+### getFullStrength()
+
+Returns node strength corresponding to the full network.
+
+**Returns:**
+
+- *double* — The node strength calculated as the sum of all weights of all edges of a node.
+
+---
+
+### getThresholdedStrength()
+
+Returns node strength corresponding to the thresholded network.
+
+**Returns:**
+
+- *double* — The node strength calculated as the sum of all weights of all edges of a node.
+
+---
+
+### getFullInstrength()
+
+Returns node strength of all ingoing edges corresponding to the full network.
+
+**Returns:**
+
+- *double* — The node strength calculated as the sum of all weights of all ingoing edges of a node.
+
+---
+
+### getThresholdedInstrength()
+
+Returns node strength of all ingoing edges corresponding to the thresholded network.
+
+**Returns:**
+
+- *double* — The node strength calculated as the sum of all weights of all ingoing edges of a node.
+
+---
+
+### getFullOutstrength()
+
+Returns node strength of all outgoing edges corresponding to the full network.
+
+**Returns:**
+
+- *double* — The node strength calculated as the sum of all weights of all outgoing edges of a node.
+
+---
+
+### getThresholdedOutstrength()
+
+Returns node strength of all outgoing edges corresponding to the thresholded network.
+
+**Returns:**
+
+- *double* — The node strength calculated as the sum of all weights of all outgoing edges of a node.
+
+---
+
+### setHubStatus(bIsHub)
+
+Sets the hub status of this node.
+
+**Parameters:**
+
+- **bIsHub** : *bool*
+  New hub status for this node.
+
+---
+
+### getHubStatus()
+
+Returns flag describing whether this node is a hub or not.
+
+**Returns:**
+
+- *bool* — Whether this node is a hub or not.
+
+---
+
+### append(newEdge)
+
+Appends a network edge to this network node.
+
+Automatically decides whether to add to the in or out edges.
+
+**Parameters:**
+
+- **newEdge** : *QSharedPointer&lt;NetworkEdge&gt;*
+  The new edge item.
+
+---
+
+## Authors of this file
+
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Daniel Strohmeier &lt;daniel.strohmeier@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

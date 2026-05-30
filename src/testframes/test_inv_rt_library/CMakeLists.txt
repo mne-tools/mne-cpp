@@ -21,7 +21,7 @@ target_link_libraries(test_inv_rt_library PRIVATE
     mne_disp3D
     mne_disp
     mne_dsp
-    mne_conn
+    mne_connectivity
     mne_inv
     mne_fwd
     mne_mne

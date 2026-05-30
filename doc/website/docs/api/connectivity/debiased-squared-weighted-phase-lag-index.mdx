@@ -1,0 +1,59 @@
+---
+id: debiased-squared-weighted-phase-lag-index
+title: "CONNECTIVITYLIB::DebiasedSquaredWeightedPhaseLagIndex"
+sidebar_label: DebiasedSquaredWeightedPhaseLagIndex
+sidebar_position: 13
+---
+
+# DebiasedSquaredWeightedPhaseLagIndex
+
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+
+`#include <connectivity/debiasedsquaredweightedphaselagindex.h>`
+
+```cpp
+class CONNECTIVITYLIB::DebiasedSquaredWeightedPhaseLagIndex
+```
+
+Computes the debiased squared Weighted Phase Lag Index of Vinck et al.
+
+(NeuroImage 2011) for every channel pair.
+
+The estimator subtracts the analytically known diagonal variance from both numerator and denominator of `WeightedPhaseLagIndex`, producing an estimator whose expectation equals `wPLI^2` even for very small trial counts. It is the preferred PLI-family metric when the number of trials is low and is the volume-conduction-robust counterpart of magnitude-squared coherence.
+
+Debiased squared Weighted Phase Lag Index (Vinck et al. 2011); low-bias volume-conduction-robust estimator.
+
+---
+
+## Public Methods
+
+### DebiasedSquaredWeightedPhaseLagIndex()
+
+Constructs a `DebiasedSquaredWeightedPhaseLagIndex` object.
+
+---
+
+## Static Methods
+
+### calculate(connectivitySettings)
+
+Calculates the debiased squared weighted phase lag index between the rows of the data matrix.
+
+**Parameters:**
+
+- **connectivitySettings** : *ConnectivitySettings &*
+  The input data and parameters.
+
+**Returns:**
+
+- *Network* — The connectivity information in form of a network structure.
+
+---
+
+## Authors of this file
+
+- Daniel Strohmeier &lt;daniel.strohmeier@gmail.com&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

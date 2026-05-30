@@ -37,7 +37,7 @@
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_source_spaces.h>
 #include <fiff/fiff_dig_point.h>
-#include <conn/network/network.h>
+#include <connectivity/network/network.h>
 
 namespace INVLIB {
 class InvEcdSet;
@@ -80,7 +80,7 @@ public:
     void addSourceSpace(const MNELIB::MNESourceSpaces &srcSpace);
 
     // Add connectivity network
-    NetworkTreeItem* addNetwork(const CONNLIB::Network &network, const QString &name = "Network");
+    NetworkTreeItem* addNetwork(const CONNECTIVITYLIB::Network &network, const QString &name = "Network");
 
 private:
    // Helpers to find specific items

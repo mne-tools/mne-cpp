@@ -65,7 +65,7 @@ add_subdirectory(mne)
 add_subdirectory(fwd)
 add_subdirectory(inv)
 add_subdirectory(com)
-add_subdirectory(conn)
+add_subdirectory(connectivity)
 add_subdirectory(dsp)
 
 add_subdirectory(mna)

@@ -1,0 +1,114 @@
+---
+id: mvar-model
+title: "CONNECTIVITYLIB::MvarModel"
+sidebar_label: MvarModel
+sidebar_position: 15
+---
+
+# MvarModel
+
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+
+`#include <connectivity/mvar_model.h>`
+
+```cpp
+class CONNECTIVITYLIB::MvarModel
+```
+
+Multivariate autoregressive (MVAR) model fit and its frequency-domain decomposition into transfer function `H(f)` and spectral matrix `S(f)`.
+
+The model order `p` is either supplied by the caller or selected automatically by Bayesian Information Criterion over ``[1, 20]; the coefficient matrices are estimated by Levinson-Durbin recursion on the Yule-Walker equations. The resulting `H` and `S` are consumed by the three directed-connectivity metrics in this library (Granger Causality, DTF, PDC) and are exposed via `transferFunction` and `spectralMatrix` at arbitrary normalised frequencies.
+
+MVAR model fit; provides H(f) and S(f) for Granger Causality, DTF and PDC.
+
+---
+
+## Public Methods
+
+### MvarModel()
+
+Constructs a default `MvarModel` object.
+
+---
+
+### fit(data, p)
+
+Fits an MVAR model of order p to multi-channel data.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  The input data matrix (nChannels x nSamples).
+
+- **p** : *int*
+  The model order. If 0, the order is auto-selected via BIC.
+
+---
+
+### coefficients()
+
+Returns the fitted coefficient matrices A_1 .
+
+. A_p (each nChannels x nChannels).
+
+**Returns:**
+
+- *QVector&lt; Eigen::MatrixXd &gt;* — The MVAR coefficient matrices.
+
+---
+
+### noiseCov()
+
+Returns the noise covariance matrix (nChannels x nChannels).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The noise covariance matrix.
+
+---
+
+### order()
+
+Returns the fitted model order.
+
+**Returns:**
+
+- *int* — The model order p.
+
+---
+
+### transferFunction(freqs)
+
+Computes the transfer function H(f) at the given normalized frequencies.
+
+H(f) = (I - sum_\{k=1\}^\{p\} A_k * exp(-2*pi*i*f*k))^\{-1\}
+
+**Parameters:**
+
+- **freqs** : *const Eigen::VectorXd &*
+  Vector of normalized frequencies in [0, 0.5].
+
+**Returns:**
+
+- *QVector&lt; Eigen::MatrixXcd &gt;* — Vector of nChannels x nChannels complex matrices, one per frequency.
+
+---
+
+### spectralMatrix(freqs)
+
+Computes the spectral matrix S(f) = H(f) * Sigma * H(f)^H.
+
+**Parameters:**
+
+- **freqs** : *const Eigen::VectorXd &*
+  Vector of normalized frequencies in [0, 0.5].
+
+**Returns:**
+
+- *QVector&lt; Eigen::MatrixXcd &gt;* — Vector of nChannels x nChannels complex matrices, one per frequency.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -26,7 +26,7 @@ set(MNE_LIBS_REQUIRED
     mne_inv
     mne_utils
     mne_math
-    mne_conn
+    mne_connectivity
 )
 
 # Standalone static-library plugins (see app/plugins/README.md).

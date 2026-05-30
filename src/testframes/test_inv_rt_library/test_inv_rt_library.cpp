@@ -42,14 +42,14 @@
 #include <dsp/rt/rt_filter.h>
 #include <dsp/filterkernel.h>
 
-#include <conn/connectivitysettings.h>
+#include <connectivity/connectivitysettings.h>
 
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace INVLIB;
 using namespace RTPROCESSINGLIB;
 using namespace UTILSLIB;
-using namespace CONNLIB;
+using namespace CONNECTIVITYLIB;
 using namespace Eigen;
 
 //=============================================================================================================

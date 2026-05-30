@@ -150,7 +150,7 @@ set(MNE_LIBS_REQUIRED
     mne_math
     mne_fiff
     mne_mne
-    mne_conn
+    mne_connectivity
     mne_fwd
     mne_inv
 )

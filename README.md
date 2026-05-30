@@ -51,7 +51,7 @@ Libraries
 | **Fwd** | Forward modelling — BEM and MEG/EEG lead-field computation |
 | **Inv** | Inverse estimation — MNE, dSPM, sLORETA, eLORETA, LCMV/DICS beamformers, RAP MUSIC, dipole fit, HPI |
 | **Dsp** | Signal processing — FIR/IIR filtering, ICA, xDAWN, SSS/tSSS, Welch PSD, Morlet TFR, resampling, SPHARA |
-| **Conn** | Connectivity — coherence, PLV, PLI, WPLI, cross-correlation, network analysis |
+| **Connectivity** | Connectivity — coherence, PLV, PLI, WPLI, cross-correlation, network analysis |
 | **Disp3D** | 3D brain visualization (Metal / Vulkan / D3D / OpenGL via Qt RHI) |
 
 All libraries depend on [Qt](https://www.qt.io/), [Eigen](http://eigen.tuxfamily.org/), and [skigen](https://github.com/skigen-project/skigen) (header-only scikit-learn-equivalent algorithms backing ML/decoding). See the [API documentation](https://mne-cpp.github.io/docs/development/api).

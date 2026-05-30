@@ -37,10 +37,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <conn/connectivity.h>
-#include <conn/connectivitysettings.h>
-#include <conn/network/network.h>
-#include <conn/metrics/abstractmetric.h>
+#include <connectivity/connectivity.h>
+#include <connectivity/connectivitysettings.h>
+#include <connectivity/network/network.h>
+#include <connectivity/metrics/abstractmetric.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -70,7 +70,7 @@
 
 using namespace Eigen;
 using namespace FIFFLIB;
-using namespace CONNLIB;
+using namespace CONNECTIVITYLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
 using namespace MNELIB;

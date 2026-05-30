@@ -21,7 +21,7 @@ set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED
-  mne_conn mne_utils mne_math mne_fiff
+  mne_connectivity mne_utils mne_math mne_fiff
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

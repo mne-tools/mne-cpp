@@ -35,9 +35,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <conn/network/network.h>
-#include <conn/network/networknode.h>
-#include <conn/network/networkedge.h>
+#include <connectivity/network/network.h>
+#include <connectivity/network/networknode.h>
+#include <connectivity/network/networkedge.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -55,7 +55,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNLIB;
+using namespace CONNECTIVITYLIB;
 using namespace Eigen;
 
 //=============================================================================================================

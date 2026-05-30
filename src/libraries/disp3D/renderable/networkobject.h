@@ -19,7 +19,7 @@
  * @ref setColormap selects the palette (Viridis, Hot, Jet, ...) used
  * to map edge weight to RGBA; @ref setThreshold prunes edges and
  * nodes below a normalised cut-off and regenerates the instance
- * stream without touching the underlying @ref CONNLIB::Network.
+ * stream without touching the underlying @ref CONNECTIVITYLIB::Network.
  */
 
 #ifndef NETWORKOBJECT_H
@@ -37,7 +37,7 @@
 #include <vector>
 #include <memory>
 
-#include <conn/network/network.h>
+#include <connectivity/network/network.h>
 
 // Forward-declare QRhi types so that this header stays QRhi-free
 class QRhi;
@@ -73,7 +73,7 @@ public:
      * @param[in] network       The connectivity network to visualize.
      * @param[in] sColormap     Colormap name for weight-based coloring (e.g. "Viridis", "Hot").
      */
-    void load(const CONNLIB::Network &network, const QString &sColormap = "Viridis");
+    void load(const CONNECTIVITYLIB::Network &network, const QString &sColormap = "Viridis");
 
     //=========================================================================================================
     /**
@@ -155,7 +155,7 @@ private:
     void buildEdgeInstances();
 
     // ── Network data ────────────────────────────────────────────────────
-    CONNLIB::Network m_network;
+    CONNECTIVITYLIB::Network m_network;
     QString m_colormap = "Viridis";
 
     // ── Node GPU resources ──────────────────────────────────────────────

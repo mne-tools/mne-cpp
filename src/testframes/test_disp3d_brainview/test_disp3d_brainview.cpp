@@ -68,7 +68,7 @@
 #include <fiff/fiff_constants.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
 #include <inv/dipole_fit/inv_ecd.h>
-#include <conn/network/network.h>
+#include <connectivity/network/network.h>
 #include <fs/fs_label.h>
 
 #include <Eigen/Core>
@@ -909,12 +909,12 @@ void TestDisp3dBrainView::brainTreeModel_extended()
 
     // addNetwork
     {
-        CONNLIB::Network net("Coherence");
+        CONNECTIVITYLIB::Network net("Coherence");
         NetworkTreeItem *netItem = model.addNetwork(net, "TestNet");
         QVERIFY(netItem != nullptr);
         QCOMPARE(netItem->text(), QString("TestNet"));
 
-        CONNLIB::Network net2("PLV");
+        CONNECTIVITYLIB::Network net2("PLV");
         NetworkTreeItem *netItem2 = model.addNetwork(net2, "");
         QVERIFY(netItem2 != nullptr);
     }

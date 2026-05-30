@@ -452,9 +452,10 @@ def parse_legacy_header(text: str) -> LegacyHeader | None:
 # look similar to the headers of unrelated 2012 files. We therefore do
 # *not* use ``--follow``; instead we maintain a small hand-curated map
 # of the project's real historical paths so that a current file like
-# ``src/libraries/conn/conn_global.h`` also sees the history of
-# ``src/libraries/connectivity/connectivity_global.h`` and (further
-# back) ``libraries/connectivity/connectivity_global.h``.
+# ``src/libraries/connectivity/connectivity_global.h`` also sees the
+# history of ``src/libraries/conn/conn_global.h`` (the Mar-Jun 2026
+# interlude) and (further back)
+# ``libraries/connectivity/connectivity_global.h``.
 #
 # Format: a list of ``(prefix_old, prefix_new, basename_substitutions)``
 # entries describing each path rewrite that ever happened in the repo,
@@ -478,10 +479,25 @@ _PROJECT_RENAMES: tuple[tuple[str, str, tuple[tuple[str, str], ...]], ...] = (
     # MNE/fiff/include/<file> and similarly for mne.
     ("MNE/fiff/", "MNE/fiff/include/", ()),
     ("MNE/mne/", "MNE/mne/include/", ()),
+    # Jun 2026: conn/ -> connectivity/ plus the ``conn_global.{h,cpp}`` ->
+    # ``connectivity_global.{h,cpp}`` basename rename, restoring the
+    # original name to match mne-python's ``mne_connectivity``. Applies to
+    # the current src/libraries/connectivity/ layout (and cascades to the
+    # pre-Oct-2022 libraries/ layout and the Mar 2026 conn/ interlude).
+    (
+        "src/libraries/connectivity/",
+        "src/libraries/conn/",
+        (("conn_global.", "connectivity_global."),),
+    ),
+    (
+        "libraries/connectivity/",
+        "libraries/conn/",
+        (("conn_global.", "connectivity_global."),),
+    ),
     # Mar 2026, commit b3dfbd1a5f: connectivity/ -> conn/ plus the
     # ``connectivity_global.{h,cpp}`` -> ``conn_global.{h,cpp}`` basename
-    # rename. Applies both to the current src/libraries/conn/ layout and
-    # (via cascade with the rule above) to the pre-Oct-2022 layout.
+    # rename. Applies to the (now historical) src/libraries/conn/ layout
+    # and (via cascade) to the pre-Oct-2022 layout.
     (
         "src/libraries/conn/",
         "src/libraries/connectivity/",

@@ -55,7 +55,7 @@
 #include <mne/mne_source_spaces.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_constants.h>
-#include <conn/network/network.h>
+#include <connectivity/network/network.h>
 
 using namespace FIFFLIB;
 
@@ -2550,7 +2550,7 @@ bool BrainView::loadDipoles(const QString &dipPath)
 
 //=============================================================================================================
 
-bool BrainView::loadNetwork(const CONNLIB::Network &network, const QString &name)
+bool BrainView::loadNetwork(const CONNECTIVITYLIB::Network &network, const QString &name)
 {
     if (network.getNodes().isEmpty()) return false;
 

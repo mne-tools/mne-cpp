@@ -184,7 +184,7 @@ Pillar F = NeuralSet interop)
 
 ---
 
-## 5. Connectivity (CONNLIB)
+## 5. Connectivity (CONNECTIVITYLIB)
 
 ### What mne-cpp already has
 

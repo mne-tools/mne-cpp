@@ -1,0 +1,425 @@
+---
+id: network
+title: "CONNECTIVITYLIB::Network"
+sidebar_label: Network
+sidebar_position: 16
+---
+
+# Network
+
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+
+`#include <connectivity/network.h>`
+
+```cpp
+class CONNECTIVITYLIB::Network
+```
+
+Graph container for one functional-connectivity result.
+
+Holds the `NetworkNode` list (channel / source positions) and the `NetworkEdge` list (per-frequency weight matrices + scalar band- averaged weights). Provides full and thresholded views of both edges and the corresponding adjacency matrix, the metric name ("COH", "PLI", "GC", ...) and threshold currently in effect, and the `VisualizationInfo` block read by the disp3D rendering layer.
+
+Graph container for one connectivity metric; nodes + weighted edges + threshold/visualisation state.
+
+---
+
+## Public Methods
+
+### Network(sConnectivityMethod, dThreshold)
+
+Constructs a `Network` object.
+
+**Parameters:**
+
+- **sConnectivityMethod** : *const QString &*
+  The connectivity measure method used to create the data of this network structure.
+
+- **dThreshold** : *double*
+  The threshold of the network. Default is 0.0.
+
+---
+
+### getFullConnectivityMatrix(bGetMirroredVersion)
+
+Returns the full connectivity matrix for this network structure.
+
+**Parameters:**
+
+- **bGetMirroredVersion** : *bool*
+  Flag whether to return the mirrored version of the connectivity matrix, if the network. is a non-directional one. Otherwise returns zeros for the lower part of the matrix. Default is set to true.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The full connectivity matrix generated from the current network information.
+
+---
+
+### getThresholdedConnectivityMatrix(bGetMirroredVersion)
+
+Returns the thresholded connectivity matrix for this network structure.
+
+**Parameters:**
+
+- **bGetMirroredVersion** : *bool*
+  Flag whether to return the mirrored version of the connectivity matrix, if the network. is a non-directional one. Otherwise returns zeros for the lower part of the matrix. Default is set to true.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The thresholded connectivity matrix generated from the current network information.
+
+---
+
+### getFullEdges()
+
+Returns the full and non thresholded edges.
+
+**Returns:**
+
+- *const QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt; &* — Returns the network edges.
+
+---
+
+### getThresholdedEdges()
+
+Returns the thresholded edges.
+
+**Returns:**
+
+- *const QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt; &* — Returns the network edges.
+
+---
+
+### getNodes()
+
+Returns the nodes.
+
+**Returns:**
+
+- *const QList&lt; QSharedPointer&lt;NetworkNode&gt; &gt; &* — Returns the network nodes.
+
+---
+
+### getEdgeAt(i)
+
+Returns the edge at a specific position.
+
+**Parameters:**
+
+- **i** : *int*
+  The index to look up the edge. i must be a valid index position in the network list (i.e., 0 &lt;= i &lt; size()).
+
+**Returns:**
+
+- *QSharedPointer&lt;NetworkEdge&gt;* — Returns the network edge.
+
+---
+
+### getNodeAt(i)
+
+Returns the node at a specific position.
+
+**Parameters:**
+
+- **i** : *int*
+  The index to look up the node. i must be a valid index position in the network list (i.e., 0 &lt;= i &lt; size()).
+
+**Returns:**
+
+- *QSharedPointer&lt;NetworkNode&gt;* — Returns the network node.
+
+---
+
+### getFullDistribution()
+
+Returns network distribution, also known as network degree, corresponding to the full network.
+
+**Returns:**
+
+- *qint16* — The network distribution calculated as degrees of all nodes together.
+
+---
+
+### getThresholdedDistribution()
+
+Returns network distribution, also known as network degree, corresponding to the thresholded network.
+
+**Returns:**
+
+- *qint16* — The network distribution calculated as degrees of all nodes together.
+
+---
+
+### setConnectivityMethod(sConnectivityMethod)
+
+Sets the connectivity measure method used to create the data of this network structure.
+
+**Parameters:**
+
+- **sConnectivityMethod** : *const QString &*
+  The connectivity measure method used to create the data of this network structure.
+
+---
+
+### getConnectivityMethod()
+
+Returns the connectivity measure method used to create the data of this network structure.
+
+**Returns:**
+
+- *QString* — The connectivity measure method used to create the data of this network structure.
+
+---
+
+### getMinMaxFullWeights()
+
+Returns the minimum and maximum weight strength of the entire network.
+
+**Returns:**
+
+- *QPair&lt; double, double &gt;* — The minimum and maximum weight strength of the entire network.
+
+---
+
+### getMinMaxThresholdedWeights()
+
+Returns the minimum and maximum weight strength of the thresholded network.
+
+**Returns:**
+
+- *QPair&lt; double, double &gt;* — The minimum and maximum weight strength of the entire network.
+
+---
+
+### getMinMaxFullDegrees()
+
+Returns the minimum and maximum degree (in and out) corresponding to the full network.
+
+**Returns:**
+
+- *QPair&lt; int, int &gt;* — The minimum and maximum degree of the entire network.
+
+---
+
+### getMinMaxThresholdedDegrees()
+
+Returns the minimum and maximum degree (in and out) corresponding to the thresholded network.
+
+**Returns:**
+
+- *QPair&lt; int, int &gt;* — The minimum and maximum degree of the entire network.
+
+---
+
+### getMinMaxFullIndegrees()
+
+Returns the minimum and maximum indegree corresponding to the full network.
+
+**Returns:**
+
+- *QPair&lt; int, int &gt;* — The minimum and maximum indegree of the entire network.
+
+---
+
+### getMinMaxThresholdedIndegrees()
+
+Returns the minimum and maximum indegree corresponding to the thresholded network.
+
+**Returns:**
+
+- *QPair&lt; int, int &gt;* — The minimum and maximum indegree of the entire network.
+
+---
+
+### getMinMaxFullOutdegrees()
+
+Returns the minimum and maximum outdegree corresponding to the full network.
+
+**Returns:**
+
+- *QPair&lt; int, int &gt;* — The minimum and maximum outdegree of the entire network.
+
+---
+
+### getMinMaxThresholdedOutdegrees()
+
+Returns the minimum and maximum outdegree corresponding to the thresholded network.
+
+**Returns:**
+
+- *QPair&lt; int, int &gt;* — The minimum and maximum outdegree of the entire network.
+
+---
+
+### setThreshold(dThreshold)
+
+Sets the threshold of the network and updates the resulting active edges.
+
+**Parameters:**
+
+- **dThreshold** : *double*
+  The new threshold.
+
+---
+
+### getThreshold()
+
+Returns the current threshold of the network.
+
+**Returns:**
+
+- *double* — The current threshold.
+
+---
+
+### setFrequencyRange(fLowerFreq, fUpperFreq)
+
+Sets the frequency range to average from/to.
+
+**Parameters:**
+
+- **fLowerFreq** : *float*
+  The new lower frequency edge to average from.
+
+- **fUpperFreq** : *float*
+  The new upper frequency edge to average to.
+
+---
+
+### getFrequencyRange()
+
+Returns the current frequency edge to average from/to.
+
+**Returns:**
+
+- *const QPair&lt; float, float &gt; &* — The current upper/lower frequency edge to average from/to.
+
+---
+
+### append(newEdge)
+
+Appends a network edge to this network node.
+
+**Parameters:**
+
+- **newEdge** : *QSharedPointer&lt;NetworkEdge&gt;*
+  The new edge item.
+
+---
+
+### append(newNode)
+
+Appends a network edge to this network node.
+
+**Parameters:**
+
+- **newNode** : *QSharedPointer&lt;NetworkNode&gt;*
+  The new node item as a reference.
+
+---
+
+### isEmpty()
+
+Returns whether the `Network` is empty by checking the number of nodes and edges.
+
+**Returns:**
+
+- *bool* — The flag identifying whether the `Network` is empty.
+
+---
+
+### normalize()
+
+Normalize the network.
+
+---
+
+### getVisualizationInfo()
+
+Get the current visualization info.
+
+**Returns:**
+
+- *VisualizationInfo* — The current visualization info.
+
+---
+
+### setVisualizationInfo(visualizationInfo)
+
+Set the current visualization info.
+
+**Parameters:**
+
+- **visualizationInfo** : *const VisualizationInfo &*
+  The new visualization info.
+
+---
+
+### getSamplingFrequency()
+
+Get the currently set sampling frequency.
+
+**Returns:**
+
+- *float* — The currently set sampling frequency.
+
+---
+
+### setSamplingFrequency(fSFreq)
+
+Set the new sampling frequency.
+
+**Parameters:**
+
+- **sFreq**
+  The new sampling frequency.
+
+---
+
+### getUsedFreqBins()
+
+Get the currently set number of frequency bins.
+
+**Returns:**
+
+- *int* — The currently set number of samples.
+
+---
+
+### setUsedFreqBins(iNumberFreqBins)
+
+Set the new number of used frequency bins.
+
+**Parameters:**
+
+- **iNumberFreqBins** : *int*
+  The new number of used frequency bins.
+
+---
+
+### setFFTSize(iFFTSize)
+
+Set the new FFT size.
+
+**Parameters:**
+
+- **iFFTSize** : *int*
+  The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).
+
+---
+
+### getFFTSize()
+
+Returns the current FFT size.
+
+**Returns:**
+
+- *int* — The used FFT size (number of total frequency bins for a half spectrum - only positive frequencies).
+
+---
+
+## Authors of this file
+
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

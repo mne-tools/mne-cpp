@@ -53,9 +53,9 @@
 //=============================================================================================================
 
 #if defined(SCAN_NEURONALCONNECTIVITY_PLUGIN)
-#  define NEURONALCONNSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#  define NEURONALCONNECTIVITYSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define NEURONALCONNSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define NEURONALCONNECTIVITYSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
 namespace NEURONALCONNECTIVITYPLUGIN{
@@ -64,19 +64,19 @@ namespace NEURONALCONNECTIVITYPLUGIN{
 /**
  * Returns build date and time.
  */
-NEURONALCONNSHARED_EXPORT const char* buildDateTime();
+NEURONALCONNECTIVITYSHARED_EXPORT const char* buildDateTime();
 
 //=============================================================================================================
 /**
  * Returns abbreviated build git hash.
  */
-NEURONALCONNSHARED_EXPORT const char* buildHash();
+NEURONALCONNECTIVITYSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
  * Returns full build git hash.
  */
-NEURONALCONNSHARED_EXPORT const char* buildHashLong();
+NEURONALCONNECTIVITYSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // CONNECTIVITY_GLOBAL_H

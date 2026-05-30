@@ -9,16 +9,16 @@
  * @date     March 2026
  * @brief    Real-time worker that re-estimates a connectivity network from incoming data epochs.
  *
- * RtConnectivity drives the CONNLIB connectivity estimators (coherence,
+ * RtConnectivity drives the CONNECTIVITYLIB connectivity estimators (coherence,
  * imaginary coherence, phase-locking value, weighted phase-lag index,
  * amplitude envelope correlation, …) from a background @c QThread. Each
  * arriving data block is forwarded to the worker, which updates the
- * windowed connectivity estimate and emits a @ref CONNLIB::Network result
+ * windowed connectivity estimate and emits a @ref CONNECTIVITYLIB::Network result
  * carrying the current edge weights and node positions ready for
  * visualisation.
  *
  * The actual estimator and its parameters — frequency band, window length,
- * connectivity measure — are configured through a @ref CONNLIB::ConnectivitySettings
+ * connectivity measure — are configured through a @ref CONNECTIVITYLIB::ConnectivitySettings
  * instance, so this header only adds the threading, lifecycle and signal
  * plumbing on top of the existing batch implementation.
  */
@@ -31,7 +31,7 @@
 //=============================================================================================================
 
 #include "../dsp_global.h"
-#include <conn/network/network.h>
+#include <connectivity/network/network.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -52,7 +52,7 @@ namespace FIFFLIB {
     class FiffInfo;
 }
 
-namespace CONNLIB {
+namespace CONNECTIVITYLIB {
     class ConnectivitySettings;
 }
 
@@ -64,7 +64,7 @@ namespace RTPROCESSINGLIB
 {
 
 //=============================================================================================================
-// CONNLIB FORWARD DECLARATIONS
+// CONNECTIVITYLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -84,10 +84,10 @@ public:
      *
      * @param[in] connectivitySettings           The connectivity settings to be used during connectivity estimation.
      */
-    void doWork(const CONNLIB::ConnectivitySettings& connectivitySettings);
+    void doWork(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
 signals:
-    void resultReady(const  QList<CONNLIB::Network>& connectivityResults, const CONNLIB::ConnectivitySettings& connectivitySettings);
+    void resultReady(const  QList<CONNECTIVITYLIB::Network>& connectivityResults, const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 };
 
 //=============================================================================================================
@@ -124,7 +124,7 @@ public:
      *
      * @param[in] data  Data to estimate the connectivity from.
      */
-    void append(const CONNLIB::ConnectivitySettings& connectivitySettings);
+    void append(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -142,9 +142,9 @@ protected:
     QThread             m_workerThread;         /**< The worker thread. */
 
 signals:
-    void newConnectivityResultAvailable(const QList<CONNLIB::Network>& connectivityResults, const CONNLIB::ConnectivitySettings& connectivitySettings);
+    void newConnectivityResultAvailable(const QList<CONNECTIVITYLIB::Network>& connectivityResults, const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 
-    void operate(const CONNLIB::ConnectivitySettings& connectivitySettings);
+    void operate(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 };
 
 //=============================================================================================================

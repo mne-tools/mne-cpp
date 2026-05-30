@@ -16,8 +16,8 @@
 
 #include "rt_connectivity.h"
 
-#include <conn/connectivitysettings.h>
-#include <conn/connectivity.h>
+#include <connectivity/connectivitysettings.h>
+#include <connectivity/connectivity.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -35,7 +35,7 @@
 //=============================================================================================================
 
 using namespace RTPROCESSINGLIB;
-using namespace CONNLIB;
+using namespace CONNECTIVITYLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS RtConnectivityWorker

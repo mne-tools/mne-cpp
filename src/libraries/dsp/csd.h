@@ -21,7 +21,7 @@
  * Both Welch-style segmenting (overlapping Hann-windowed segments) and
  * multitaper averaging (Slepian / DPSS tapers via @ref Dpss) are supported
  * to trade between spectral leakage, bias and variance. The output is
- * compatible with the connectivity routines in CONNLIB.
+ * compatible with the connectivity routines in CONNECTIVITYLIB.
  */
 
 #ifndef CSD_H

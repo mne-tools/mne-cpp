@@ -18,15 +18,15 @@
 
 #include <rhi/qrhi.h>
 
-#include <conn/network/networknode.h>
-#include <conn/network/networkedge.h>
+#include <connectivity/network/networknode.h>
+#include <connectivity/network/networkedge.h>
 #include <disp/plots/helpers/colormap.h>
 
 #include <QQuaternion>
 #include <QDebug>
 #include <cmath>
 
-using namespace CONNLIB;
+using namespace CONNECTIVITYLIB;
 using namespace DISPLIB;
 using namespace Eigen;
 

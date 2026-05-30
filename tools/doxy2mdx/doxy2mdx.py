@@ -1038,7 +1038,7 @@ _LIBRARY_OVERVIEW_DEV_FILES: Dict[str, str] = {
     "fwd": "fwd.mdx",
     "inv": "inverse.mdx",
     "dsp": "dsp.mdx",
-    "conn": "connectivity.mdx",
+    "connectivity": "connectivity.mdx",
     "ml": "ml.mdx",
     "sts": "sts.mdx",
     "mna": "mna.mdx",

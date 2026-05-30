@@ -1,0 +1,57 @@
+---
+id: unbiased-squared-phase-lag-index
+title: "CONNECTIVITYLIB::UnbiasedSquaredPhaseLagIndex"
+sidebar_label: UnbiasedSquaredPhaseLagIndex
+sidebar_position: 19
+---
+
+# UnbiasedSquaredPhaseLagIndex
+
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+
+`#include <connectivity/unbiasedsquaredphaselagindex.h>`
+
+```cpp
+class CONNECTIVITYLIB::UnbiasedSquaredPhaseLagIndex
+```
+
+Computes the unbiased estimator of squared PLI for every channel pair.
+
+The estimator subtracts the analytically known diagonal contribution from the squared sum of cross-spectral sign samples, yielding an estimate whose expectation equals `PLI^2` for any trial count `N` &gt;= 2 and is therefore free of the upward small-sample bias that affects the plain `PhaseLagIndex`. The construction preserves the zero-lag rejection property of the PLI family.
+
+Unbiased squared Phase Lag Index estimator; removes the small-sample bias of `PhaseLagIndex`.
+
+---
+
+## Public Methods
+
+### UnbiasedSquaredPhaseLagIndex()
+
+Constructs a `UnbiasedSquaredPhaseLagIndex` object.
+
+---
+
+## Static Methods
+
+### calculate(connectivitySettings)
+
+Calculates the USPLI between the rows of the data matrix.
+
+**Parameters:**
+
+- **connectivitySettings** : *ConnectivitySettings &*
+  The input data and parameters.
+
+**Returns:**
+
+- *Network* — The connectivity information in form of a network structure.
+
+---
+
+## Authors of this file
+
+- Daniel Strohmeier &lt;daniel.strohmeier@gmail.com&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

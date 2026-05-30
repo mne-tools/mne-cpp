@@ -1,0 +1,59 @@
+---
+id: weighted-phase-lag-index
+title: "CONNECTIVITYLIB::WeightedPhaseLagIndex"
+sidebar_label: WeightedPhaseLagIndex
+sidebar_position: 20
+---
+
+# WeightedPhaseLagIndex
+
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+
+`#include <connectivity/weightedphaselagindex.h>`
+
+```cpp
+class CONNECTIVITYLIB::WeightedPhaseLagIndex
+```
+
+Computes the Weighted Phase Lag Index of Vinck et al.
+
+(NeuroImage 2011).
+
+Each channel pair is reduced to `|sum` Im(S_\{xy\})| / sum |Im(S_\{xy\})|, weighting every cross-spectrum sample by the magnitude of its imaginary part. This down-weights near-zero-lag samples that dominate the bias of the plain `PhaseLagIndex` and yields higher detection power for true delayed interactions while preserving the volume-conduction rejection property. Per-trial sums are accumulated in `ConnectivitySettings::IntermediateSumData` and shared with `DebiasedSquaredWeightedPhaseLagIndex` when both metrics are requested in one batch.
+
+Weighted Phase Lag Index estimator (Vinck et al. 2011); volume-conduction-robust with lower bias than PLI.
+
+---
+
+## Public Methods
+
+### WeightedPhaseLagIndex()
+
+Constructs a `WeightedPhaseLagIndex` object.
+
+---
+
+## Static Methods
+
+### calculate(connectivitySettings)
+
+Calculates the WPLI between the rows of the data matrix.
+
+**Parameters:**
+
+- **connectivitySettings** : *ConnectivitySettings &*
+  The input data and parameters.
+
+**Returns:**
+
+- *Network* — The connectivity information in form of a network structure.
+
+---
+
+## Authors of this file
+
+- Daniel Strohmeier &lt;daniel.strohmeier@gmail.com&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
