@@ -1373,7 +1373,7 @@
     {
       "name": "Connectivity",
       "module": "connectivity",
-      "header": "conn/connectivity.h",
+      "header": "connectivity/connectivity.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": "mne_connectivity.spectral_connectivity_epochs",
@@ -1391,7 +1391,7 @@
     {
       "name": "Coherence",
       "module": "connectivity",
-      "header": "conn/metrics/coherence.h",
+      "header": "connectivity/metrics/coherence.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": "mne_connectivity.spectral_connectivity_epochs (method='coh')",
@@ -1409,7 +1409,7 @@
     {
       "name": "PhaseLockingValue",
       "module": "connectivity",
-      "header": "conn/metrics/phaselockingvalue.h",
+      "header": "connectivity/metrics/phaselockingvalue.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": "mne_connectivity.spectral_connectivity_epochs (method='plv')",
@@ -1427,7 +1427,7 @@
     {
       "name": "PhaseLagIndex",
       "module": "connectivity",
-      "header": "conn/metrics/phaselagindex.h",
+      "header": "connectivity/metrics/phaselagindex.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": "mne_connectivity.spectral_connectivity_epochs (method='pli')",
@@ -1445,7 +1445,7 @@
     {
       "name": "GrangerCausality",
       "module": "connectivity",
-      "header": "conn/metrics/granger_causality.h",
+      "header": "connectivity/metrics/granger_causality.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": "mne_connectivity.spectral_connectivity_epochs (method='gc')",
@@ -1463,7 +1463,7 @@
     {
       "name": "PartialDirectedCoherence",
       "module": "connectivity",
-      "header": "conn/metrics/partial_directed_coherence.h",
+      "header": "connectivity/metrics/partial_directed_coherence.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": "mne_connectivity.spectral_connectivity_epochs (method='pdc')",
@@ -1481,7 +1481,7 @@
     {
       "name": "DirectedTransferFunction",
       "module": "connectivity",
-      "header": "conn/metrics/directed_transfer_function.h",
+      "header": "connectivity/metrics/directed_transfer_function.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": "mne_connectivity.spectral_connectivity_epochs (method='dtf')",
@@ -2016,7 +2016,7 @@
     {
       "name": "AbstractMetric",
       "module": "connectivity",
-      "header": "conn/metrics/abstractmetric.h",
+      "header": "connectivity/metrics/abstractmetric.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
@@ -2034,7 +2034,7 @@
     {
       "name": "Coherency",
       "module": "connectivity",
-      "header": "conn/metrics/coherency.h",
+      "header": "connectivity/metrics/coherency.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
@@ -2052,7 +2052,7 @@
     {
       "name": "ConnectivitySettings",
       "module": "connectivity",
-      "header": "conn/connectivitysettings.h",
+      "header": "connectivity/connectivitysettings.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
@@ -2070,7 +2070,7 @@
     {
       "name": "Correlation",
       "module": "connectivity",
-      "header": "conn/metrics/correlation.h",
+      "header": "connectivity/metrics/correlation.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
@@ -2088,7 +2088,7 @@
     {
       "name": "CrossCorrelation",
       "module": "connectivity",
-      "header": "conn/metrics/crosscorrelation.h",
+      "header": "connectivity/metrics/crosscorrelation.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
@@ -2106,7 +2106,7 @@
     {
       "name": "DebiasedSquaredWeightedPhaseLagIndex",
       "module": "connectivity",
-      "header": "conn/metrics/debiasedsquaredweightedphaselagindex.h",
+      "header": "connectivity/metrics/debiasedsquaredweightedphaselagindex.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
@@ -2124,7 +2124,7 @@
     {
       "name": "ImagCoherence",
       "module": "connectivity",
-      "header": "conn/metrics/imagcoherence.h",
+      "header": "connectivity/metrics/imagcoherence.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
@@ -2142,7 +2142,7 @@
     {
       "name": "MvarModel",
       "module": "connectivity",
-      "header": "conn/metrics/mvar_model.h",
+      "header": "connectivity/metrics/mvar_model.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
@@ -2160,7 +2160,7 @@
     {
       "name": "Network",
       "module": "connectivity",
-      "header": "conn/network/network.h",
+      "header": "connectivity/network/network.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
@@ -2178,7 +2178,7 @@
     {
       "name": "NetworkEdge",
       "module": "connectivity",
-      "header": "conn/network/networkedge.h",
+      "header": "connectivity/network/networkedge.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
@@ -2196,7 +2196,7 @@
     {
       "name": "NetworkNode",
       "module": "connectivity",
-      "header": "conn/network/networknode.h",
+      "header": "connectivity/network/networknode.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
@@ -2214,7 +2214,7 @@
     {
       "name": "UnbiasedSquaredPhaseLagIndex",
       "module": "connectivity",
-      "header": "conn/metrics/unbiasedsquaredphaselagindex.h",
+      "header": "connectivity/metrics/unbiasedsquaredphaselagindex.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
@@ -2232,7 +2232,7 @@
     {
       "name": "WeightedPhaseLagIndex",
       "module": "connectivity",
-      "header": "conn/metrics/weightedphaselagindex.h",
+      "header": "connectivity/metrics/weightedphaselagindex.h",
       "origin": "mne-python",
       "mne_c_tool": null,
       "mne_python": null,
