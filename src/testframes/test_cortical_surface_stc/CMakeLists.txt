@@ -58,6 +58,18 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
 
+# analyze_cortical_surface is an mne_analyze plugin that is built into
+# out/<config>/bin/mne_analyze_plugins, not next to the test binary. The CI
+# test runner launches the test executable directly (not through CTest), so the
+# CTest ENVIRONMENT property below is not honoured in that path; on Windows the
+# loader then fails with STATUS_DLL_NOT_FOUND. Copy the plugin next to the test
+# binary so the loader resolves it regardless of how the test is launched.
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:analyze_cortical_surface>
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+)
+
 enable_testing()
 add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
 
