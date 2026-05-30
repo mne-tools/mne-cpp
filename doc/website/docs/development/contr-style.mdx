@@ -45,6 +45,46 @@ FileLoader(int iOpenMode,
            const QString& sCommentIdentifier = "");
 ```
 
+## Documentation Scope: Public API vs. Application Code
+
+MNE-CPP draws a deliberate line between the **reusable library contract** and
+the **application/plugin code** that consumes it:
+
+- **Libraries (`src/libraries/`)** are the public API. They are documented with
+  full Doxygen comments and published to the website [API reference](/docs/api/).
+  The public [`doc/Doxyfile`](https://github.com/mne-tools/mne-cpp/blob/main/doc/Doxyfile)
+  extracts XML from these headers only.
+- **Applications & plugins (`src/applications/`)** are *not* part of the public
+  API and are intentionally excluded from the published reference. They still
+  deserve maintainer-level documentation: add a brief `@brief` file/class header
+  describing the component's responsibility, plus inline comments for non-obvious
+  logic. You do not need the full parameter-by-parameter `@param`/`@return`
+  treatment expected of library API.
+
+If a piece of documentation lives in a header that *is* scanned for the public
+API but is only relevant to maintainers, wrap it in an `@internal` /
+`@endinternal` block so it is stripped from the published reference:
+
+```cpp
+/**
+ * @internal
+ * Implementation note: the spectral cache is rebuilt lazily on the first
+ * metric request to avoid paying for an FFT that may never be needed.
+ * @endinternal
+ */
+```
+
+To browse the application/plugin internals locally, generate the separate
+maintainer doc set (HTML, never published):
+
+```bash
+./doc/build-internal-docs.sh   # output: doc/internal_out/html/index.html
+```
+
+This uses [`doc/Doxyfile.internal`](https://github.com/mne-tools/mne-cpp/blob/main/doc/Doxyfile.internal),
+which adds `src/applications` to the input and enables `INTERNAL_DOCS`, keeping
+the published API surface limited to the libraries.
+
 ## MNE-CPP Class Templates
 
 MNE-CPP provides class templates under `resources/wizards/mnecpp/` that follow the project's coding conventions. These templates can help you quickly scaffold new classes that are consistent with the existing codebase.

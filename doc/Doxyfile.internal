@@ -1,0 +1,106 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+#
+# Doxyfile.internal — Doxygen configuration for the INTERNAL / maintainer
+# documentation of MNE-CPP.
+#
+# This config is deliberately separate from the public-API ``Doxyfile``:
+#
+#   * The public ``Doxyfile`` documents ONLY the reusable library contract
+#     (INPUT = ../src/libraries), emits XML, and is consumed by
+#     tools/doxy2mdx/doxy2mdx.py to publish the website API reference.
+#
+#   * This file additionally covers the application & plugin code under
+#     ../src/applications, turns on INTERNAL_DOCS so ``@internal`` sections
+#     are kept, and emits browsable HTML into a separate directory. Its
+#     output is NEVER fed to doxy2mdx and therefore NEVER reaches the
+#     published API index — it exists purely so maintainers can navigate
+#     the application/plugin internals locally.
+#
+# Run from the doc/ directory:
+#     cd doc && doxygen Doxyfile.internal
+# Output lands in doc/internal_out/html/ (git-ignored).
+
+# ---------------------------------------------------------------------------
+# Project
+# ---------------------------------------------------------------------------
+PROJECT_NAME           = "MNE-CPP — Internal / Maintainer Docs"
+PROJECT_NUMBER         = "2.3.0-dev"
+PROJECT_BRIEF          = "Application & plugin internals (not the public API)"
+
+# ---------------------------------------------------------------------------
+# Input — libraries AND applications/plugins (the maintainer surface)
+# ---------------------------------------------------------------------------
+INPUT                  = ../src/libraries ../src/applications
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h *.hpp *.cpp
+EXCLUDE_PATTERNS       = */moc_* */ui_* */qrc_* */*_autogen/*
+STRIP_FROM_PATH        = ../src/
+EXAMPLE_PATH           = ../src/applications ../doc/website/docs/snippets
+EXAMPLE_RECURSIVE      = YES
+
+# ---------------------------------------------------------------------------
+# Extraction settings — maintainer view: show everything, including the
+# ``@internal`` sections and application code that lacks full Doxygen docs.
+# ---------------------------------------------------------------------------
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+INTERNAL_DOCS          = YES
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+WARN_IF_UNDOCUMENTED   = NO
+WARN_FORMAT            = "$file:$line: $text"
+WARN_AS_ERROR          = NO
+QUIET                  = YES
+
+# ---------------------------------------------------------------------------
+# Output — browsable HTML only, in its own directory. No XML, so the
+# website MDX pipeline (which reads doc/xml_out/xml) never sees this.
+# ---------------------------------------------------------------------------
+OUTPUT_DIRECTORY       = internal_out
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_TREEVIEW      = YES
+# Render LaTeX formulas client-side so the build needs no local LaTeX install.
+USE_MATHJAX            = YES
+GENERATE_XML           = NO
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+
+# ---------------------------------------------------------------------------
+# C++ / template handling
+# ---------------------------------------------------------------------------
+BUILTIN_STL_SUPPORT    = YES
+DISTRIBUTE_GROUP_DOC   = YES
+JAVADOC_AUTOBRIEF      = YES
+QT_AUTOBRIEF           = YES
+MARKDOWN_SUPPORT       = YES
+
+# ---------------------------------------------------------------------------
+# Preprocessor — strip Qt and per-library/per-plugin DLL export macros so
+# they do not pollute the generated documentation.
+# ---------------------------------------------------------------------------
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = "Q_OBJECT=" \
+                         "Q_DISABLE_COPY(x)=" \
+                         "Q_DECLARE_METATYPE(x)=" \
+                         "Q_SIGNALS=public" \
+                         "Q_SLOTS=" \
+                         "QT_BEGIN_NAMESPACE=" \
+                         "QT_END_NAMESPACE=" \
+                         "FIFFSHARED_EXPORT=" \
+                         "MNESHARED_EXPORT=" \
+                         "FSSHARED_EXPORT=" \
+                         "FWDSHARED_EXPORT=" \
+                         "INVSHARED_EXPORT=" \
+                         "MRISHARED_EXPORT=" \
+                         "DISP3DSHARED_EXPORT=" \
+                         "ANSHAREDSHARED_EXPORT=" \
+                         "CONNECTIVITYSHARED_EXPORT=" \
+                         "EIGEN_MAKE_ALIGNED_OPERATOR_NEW="
