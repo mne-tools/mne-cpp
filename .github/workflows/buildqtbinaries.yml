@@ -13,7 +13,7 @@ env:
   QT_BINARY_RELEASE_TITLE: Qt Toolchain Artifacts
   QT_BINARY_RELEASE_NOTES: Reusable Qt runtime, static, WASM and Installer Framework assets for CI.
   QT_MIN_VERSION: '6.10.0'
-  QT_MAX_VERSION: '6.11.0'
+  QT_MAX_VERSION: '6.11.1'
   QIF_VERSION: '4.11.0'
   QIF_VERSION_TOKEN: '4110'
   QIF_QT_VERSION: '6.9.1'
@@ -28,8 +28,8 @@ jobs:
         include:
           - qt_version: '6.10.0'
             version_token: '6100'
-          - qt_version: '6.11.0'
-            version_token: '6110'
+          - qt_version: '6.11.1'
+            version_token: '6111'
 
     steps:
     - name: Clone repository
@@ -82,8 +82,8 @@ jobs:
         include:
           - qt_version: '6.10.0'
             version_token: '6100'
-          - qt_version: '6.11.0'
-            version_token: '6110'
+          - qt_version: '6.11.1'
+            version_token: '6111'
 
     steps:
     - name: Clone repository
@@ -133,8 +133,8 @@ jobs:
         include:
           - qt_version: '6.10.0'
             version_token: '6100'
-          - qt_version: '6.11.0'
-            version_token: '6110'
+          - qt_version: '6.11.1'
+            version_token: '6111'
 
     steps:
     - name: Clone repository
@@ -150,26 +150,15 @@ jobs:
     - name: Compile dynamic Qt version from source
       run: |
         cd ..
-        $workRoot = (Get-Location).Path
         git clone https://code.qt.io/qt/qt5.git -b v${{ matrix.qt_version }}
-        $applyQt611QtToolsPatch = '${{ matrix.qt_version }}' -eq '6.11.0'
-        if ($applyQt611QtToolsPatch) {
-          # Temporary Qt 6.11 Windows workaround:
-          # qhelpenginecore.cpp uses QtConcurrent, but the Help target omits Qt::Concurrent.
-          # Remove this block once the next Qt release no longer needs the patch.
-          # qttools/assistant also needs its nested qlitehtml submodule on 6.11.
+        $useRecursiveSubmoduleInit = '${{ matrix.qt_version }}' -like '6.11.*'
+        if ($useRecursiveSubmoduleInit) {
+          # Qt 6.11 Windows: qttools/assistant pulls in a nested qlitehtml
+          # submodule that configure's -init-submodules does not fetch, so
+          # initialise the required modules recursively up front. (The
+          # Qt::Concurrent Help-target link fix that 6.11.0 needed is upstream
+          # as of 6.11.1, so the previous CMakeLists patch is no longer applied.)
           git -C qt5 submodule update --init --recursive --depth 1 qtrepotools qtbase qtmultimedia qtsvg qtshadertools qtserialport qtimageformats qtlanguageserver qtdeclarative qtactiveqt qttools
-          $helpCmake = Join-Path $workRoot 'qt5\qttools\src\assistant\help\CMakeLists.txt'
-          $helpCmakeLines = [System.Collections.Generic.List[string]]::new()
-          $helpCmakeLines.AddRange([string[]](Get-Content $helpCmake))
-          if (-not ($helpCmakeLines -contains '        Qt::Concurrent')) {
-            $coreLineIndex = $helpCmakeLines.IndexOf('        Qt::Core')
-            if ($coreLineIndex -lt 0) {
-              throw 'Could not locate Qt::Core entry in qttools/src/assistant/help/CMakeLists.txt.'
-            }
-            $helpCmakeLines.Insert($coreLineIndex + 1, '        Qt::Concurrent')
-            Set-Content -Path $helpCmake -Value $helpCmakeLines
-          }
         }
         mkdir qt6_shadow
         cd qt6_shadow
@@ -195,7 +184,7 @@ jobs:
           '-opensource',
           '-confirm-license'
         )
-        if (-not $applyQt611QtToolsPatch) {
+        if (-not $useRecursiveSubmoduleInit) {
           $configureArgs = @('-init-submodules') + $configureArgs
         }
         & ..\qt5\configure.bat @configureArgs
@@ -548,7 +537,7 @@ jobs:
       run: |
         # Clone Qt6 repo
         cd ..
-        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v6.11.0
+        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v6.11.1
         cd qt5
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 ./init-repository -f --module-subset=qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport
         # Create shadow build folder
@@ -561,18 +550,18 @@ jobs:
         cmake --install .
     - name: Package binaries
       run: |
-        tar cfvz qt6_6110_static_binaries_linux.tar.gz -C ../Qt6_binaries .
+        tar cfvz qt6_6111_static_binaries_linux.tar.gz -C ../Qt6_binaries .
     - uses: actions/upload-artifact@v7
       with:
-        name: qt6_6110_static_binaries_linux.tar.gz
-        path: qt6_6110_static_binaries_linux.tar.gz
+        name: qt6_6111_static_binaries_linux.tar.gz
+        path: qt6_6111_static_binaries_linux.tar.gz
     - name: Create qt_binaries release and upload
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
-        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6110_static_binaries_linux.tar.gz --clobber
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6111_static_binaries_linux.tar.gz --clobber
 
   GenerateMacOSStaticBinaries:
     runs-on: macos-26
@@ -587,7 +576,7 @@ jobs:
       run: |
         # Clone Qt6 repo
         cd ..
-        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v6.11.0
+        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v6.11.1
         cd qt5
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 ./init-repository -f --module-subset=qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport
         # Create shadow build folder
@@ -600,18 +589,18 @@ jobs:
         cmake --install .
     - name: Package binaries
       run: |
-        tar cfvz qt6_6110_static_binaries_macos.tar.gz -C ../Qt6_binaries .
+        tar cfvz qt6_6111_static_binaries_macos.tar.gz -C ../Qt6_binaries .
     - uses: actions/upload-artifact@v7
       with:
-        name: qt6_6110_static_binaries_macos.tar.gz
-        path: qt6_6110_static_binaries_macos.tar.gz
+        name: qt6_6111_static_binaries_macos.tar.gz
+        path: qt6_6111_static_binaries_macos.tar.gz
     - name: Upload to qt_binaries release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
-        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6110_static_binaries_macos.tar.gz --clobber
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6111_static_binaries_macos.tar.gz --clobber
 
   GenerateWinStaticBinaries:
     runs-on: windows-2025
@@ -631,7 +620,7 @@ jobs:
       run: |
         # Clone Qt6 repo
         cd ..
-        git clone https://code.qt.io/qt/qt5.git -b v6.11.0
+        git clone https://code.qt.io/qt/qt5.git -b v6.11.1
         # Create shadow build folder
         mkdir qt6_shadow
         cd qt6_shadow
@@ -645,18 +634,18 @@ jobs:
     - name: Package binaries
       run: |
         cd ..\Qt6_binaries
-        7z a ..\mne-cpp\qt6_6110_static_binaries_win.zip .
+        7z a ..\mne-cpp\qt6_6111_static_binaries_win.zip .
     - uses: actions/upload-artifact@v7
       with:
-        name: qt6_6110_static_binaries_win.zip
-        path: qt6_6110_static_binaries_win.zip
+        name: qt6_6111_static_binaries_win.zip
+        path: qt6_6111_static_binaries_win.zip
     - name: Upload to qt_binaries release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
-        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6110_static_binaries_win.zip --clobber
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6111_static_binaries_win.zip --clobber
 
   GenerateWasmBinaries:
     runs-on: ubuntu-24.04
@@ -681,7 +670,7 @@ jobs:
       run: |
         cd ..
         # Clone Qt6 repo
-        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v6.11.0
+        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v6.11.1
         cd qt5
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 ./init-repository -f --module-subset=qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport
         # Build minimal host Qt
@@ -704,15 +693,15 @@ jobs:
         cmake --install .
     - name: Package binaries
       run: |
-        tar cfvz qt6_6110_static_binaries_wasm.tar.gz -C ../Qt6_binaries .
+        tar cfvz qt6_6111_static_binaries_wasm.tar.gz -C ../Qt6_binaries .
     - uses: actions/upload-artifact@v7
       with:
-        name: qt6_6110_static_binaries_wasm.tar.gz
-        path: qt6_6110_static_binaries_wasm.tar.gz
+        name: qt6_6111_static_binaries_wasm.tar.gz
+        path: qt6_6111_static_binaries_wasm.tar.gz
     - name: Upload to qt_binaries release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
-        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6110_static_binaries_wasm.tar.gz --clobber
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6111_static_binaries_wasm.tar.gz --clobber
