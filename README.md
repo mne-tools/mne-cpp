@@ -5,11 +5,10 @@
 <p align="center">
   <a href="https://github.com/mne-tools/mne-cpp/releases/latest"><img src="https://img.shields.io/badge/version-2.2.1-blue.svg" alt="Version 2.2.1"></a>&nbsp;
   <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml"><img src="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml/badge.svg?branch=main" alt="Release"></a>&nbsp;
-  <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml"><img src="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml/badge.svg?branch=staging" alt="Staging"></a>&nbsp;
-  <a href="https://codecov.io/gh/mne-tools/mne-cpp/tree/staging"><img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/staging/graph/badge.svg" alt="CodeCov"></a>
+  <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml"><img src="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml/badge.svg?branch=staging" alt="Staging"></a>
   <br>
   <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/codeql.yml"><img src="https://github.com/mne-tools/mne-cpp/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>&nbsp;
-  <a href="https://scan.coverity.com/projects/mne-tools-mne-cpp"><img src="https://scan.coverity.com/projects/8955/badge.svg" alt="Coverity"></a>&nbsp;
+  <a href="https://codecov.io/gh/mne-tools/mne-cpp/tree/staging"><img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/staging/graph/badge.svg" alt="CodeCov"></a>&nbsp;
   <a href="https://gitter.im/mne-tools/mne-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://badges.gitter.im/mne-tools/mne-cpp.svg" alt="Gitter"></a>
 </p>
 

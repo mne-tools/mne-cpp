@@ -71,7 +71,7 @@ jobs:
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind qt \
-          --version "6.11.0" \
+          --version "6.11.1" \
           --linkage dynamic \
           --output-dir "$RUNNER_TEMP/qt"
 
@@ -105,7 +105,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind qt --version "6.11.0" --linkage dynamic --output-dir "%RUNNER_TEMP%\qt"
+        call scripts\ci\download_toolchain.bat --kind qt --version "6.11.1" --linkage dynamic --output-dir "%RUNNER_TEMP%\qt"
 
     - name: Download Eigen package (Windows)
       if: matrix.os == 'windows-2025'
@@ -137,7 +137,7 @@ jobs:
       uses: actions/cache@v5
       with:
         path: ~/mne_data/MNE-sample-data
-        key: mne-sample-data-v1
+        key: mne-sample-data-v2
 
     - name: Download MNE sample data
       if: steps.cache-mne-data.outputs.cache-hit != 'true'
