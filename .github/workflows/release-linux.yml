@@ -52,7 +52,7 @@ jobs:
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind qt \
-          --version "6.11.0" \
+          --version "6.11.1" \
           --linkage dynamic \
           --output-dir "$RUNNER_TEMP/qt"
     - name: Download Eigen package
@@ -159,7 +159,7 @@ jobs:
       uses: actions/cache@v5
       with:
         path: Qt6_static
-        key: qt-6.11.0-static-linux-x86_64-v2
+        key: qt-6.11.1-static-linux-x86_64-v2
     - name: Download pre-built static Qt
       id: download-qt-static
       if: steps.cache-qt-static.outputs.cache-hit != 'true'
@@ -167,14 +167,14 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release download qt_binaries -p "qt6_6110_static_binaries_linux.tar.gz" -D /tmp
+        gh release download qt_binaries -p "qt6_6111_static_binaries_linux.tar.gz" -D /tmp
         mkdir -p Qt6_static
-        tar xfz /tmp/qt6_6110_static_binaries_linux.tar.gz -C Qt6_static
+        tar xfz /tmp/qt6_6111_static_binaries_linux.tar.gz -C Qt6_static
     - name: Build static Qt from source
       if: steps.cache-qt-static.outputs.cache-hit != 'true' && steps.download-qt-static.outcome != 'success'
       run: |
         cd ..
-        git clone https://code.qt.io/qt/qt5.git -b v6.11.0
+        git clone https://code.qt.io/qt/qt5.git -b v6.11.1
         cd qt5
         ./init-repository -f --module-subset=qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport
         cd ..

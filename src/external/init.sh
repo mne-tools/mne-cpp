@@ -9,7 +9,7 @@ Usage: ./src/external/init.sh [options]
 Downloads the MNE-CPP-maintained Qt and Eigen dependency bundles into src/external.
 
 Options:
-  --qt-version <version>        Qt version to download (default: 6.11.0)
+  --qt-version <version>        Qt version to download (default: 6.11.1)
   --eigen-version <version>     Eigen version to download (default: 5.0.1)
   --linkage <dynamic|static>    Qt linkage to prepare (default: dynamic)
   --qt-dir <path>               Target directory for the Qt bundle
@@ -29,7 +29,7 @@ EOF
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-QT_VERSION="6.11.0"
+QT_VERSION="6.11.1"
 EIGEN_VERSION="5.0.1"
 LINKAGE="dynamic"
 QT_DIR=""

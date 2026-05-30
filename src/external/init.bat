@@ -5,7 +5,7 @@ set "SCRIPT_DIR=%~dp0"
 if "%SCRIPT_DIR:~-1%"=="\" set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
 for %%I in ("%SCRIPT_DIR%\..\..") do set "REPO_ROOT=%%~fI"
 
-set "QT_VERSION=6.11.0"
+set "QT_VERSION=6.11.1"
 set "EIGEN_VERSION=5.0.1"
 set "LINKAGE=dynamic"
 set "QT_DIR="
@@ -217,7 +217,7 @@ echo.
 echo Downloads the MNE-CPP-maintained Qt and Eigen dependency bundles into src\external.
 echo.
 echo Options:
-echo   --qt-version ^<version^>        Qt version to download ^(default: 6.11.0^)
+echo   --qt-version ^<version^>        Qt version to download ^(default: 6.11.1^)
 echo   --eigen-version ^<version^>     Eigen version to download ^(default: 5.0.1^)
 echo   --linkage ^<dynamic^|static^>   Qt linkage to prepare ^(default: dynamic^)
 echo   --qt-dir ^<path^>               Target directory for the Qt bundle

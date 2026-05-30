@@ -10,7 +10,7 @@ Bootstraps a developer build by downloading the MNE-CPP-maintained Qt and Eigen
 artifacts into src/external and configuring a build directory from the repo root.
 
 Options:
-  --qt-version <version>        Qt version to use (default: 6.11.0)
+  --qt-version <version>        Qt version to use (default: 6.11.1)
   --eigen-version <version>     Eigen version to use (default: 5.0.1)
   --linkage <dynamic|static>    Qt linkage / MNE-CPP linkage (default: dynamic)
   --build-type <type>           CMake build type (default: Release)
@@ -33,7 +33,7 @@ EOF
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-QT_VERSION="6.11.0"
+QT_VERSION="6.11.1"
 EIGEN_VERSION="5.0.1"
 LINKAGE="dynamic"
 BUILD_TYPE="Release"

@@ -50,7 +50,7 @@ jobs:
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind qt \
-          --version "6.11.0" \
+          --version "6.11.1" \
           --linkage dynamic \
           --output-dir "$RUNNER_TEMP/qt"
 
