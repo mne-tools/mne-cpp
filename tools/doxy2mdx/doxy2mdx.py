@@ -108,6 +108,22 @@ def class_slug(qualified: str) -> str:
     return slug.lower()
 
 
+def page_slug(qualified: str, dir_slug: str) -> str:
+    """Return the on-disk/URL slug for a class or module page.
+
+    Identical to :func:`class_slug` except that a facade class whose slug
+    would equal the library folder name (e.g. ``FIFFLIB::Fiff`` under the
+    ``fiff`` library) is disambiguated with a ``-class`` suffix.  Without
+    this, Docusaurus treats the file as the folder's index page and it
+    collides with the generated ``index.mdx`` overview, producing a
+    duplicate route and dropping the sidebar on that library's pages.
+    """
+    slug = class_slug(qualified)
+    if slug == dir_slug:
+        slug = f"{slug}-class"
+    return slug
+
+
 # ---------------------------------------------------------------------------
 # SPDX author scraping (TASK 17 source files)
 # ---------------------------------------------------------------------------
@@ -644,7 +660,7 @@ def generate_class_mdx(compounddef,
     out_path = out_dir / dir_slug
     out_path.mkdir(parents=True, exist_ok=True)
 
-    slug = class_slug(compound_name)
+    slug = page_slug(compound_name, dir_slug)
     out_file = out_path / f"{slug}.mdx"
 
     sidebar_position = reg_entry.get("sidebar_position")
@@ -920,7 +936,7 @@ def generate_module_mdx(xml_dir: Path,
     dir_slug = mod.get("dir_slug", module_key)
     out_path = out_dir / dir_slug
     out_path.mkdir(parents=True, exist_ok=True)
-    slug = class_slug(short_name)
+    slug = page_slug(short_name, dir_slug)
     out_file = out_path / f"{slug}.mdx"
 
     sidebar_position = reg_entry.get("sidebar_position")
@@ -1135,13 +1151,11 @@ def generate_sidebar_fragment(sidebar_out: Path,
         # added as the first item / category link.
         overview_path = generate_library_overview(mod_name, mod, out_dir, repo_root)
         for entry in groups[mod_name]:
-            slug = class_slug(entry["name"])
-            # Skip the facade class whose slug matches the library
-            # itself (e.g. ``FIFFLIB::Fiff`` under the ``fiff`` library).
-            # Its content lives on the library overview page and a
-            # standalone sidebar entry of the same name is just noise.
-            if slug == dir_slug:
-                continue
+            # Facade classes whose bare slug matches the library folder
+            # (e.g. ``FIFFLIB::Fiff`` under ``fiff``) are disambiguated
+            # with a ``-class`` suffix so they get their own route and
+            # do not collide with the library ``index.mdx`` overview.
+            slug = page_slug(entry["name"], dir_slug)
             mdx_path = out_dir / dir_slug / f"{slug}.mdx"
             if not mdx_path.exists():
                 missing_mdx.append(f"{entry['name']} (expected {mdx_path})")

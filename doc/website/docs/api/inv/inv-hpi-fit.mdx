@@ -265,8 +265,8 @@ int main(int argc, char *argv[])
     fiff_int_t last = raw.last_samp;
 
     // create time vector that specifies when to fit
-    int iQuantum = floor(fWindow*pFiffInfo->sfreq);     // window size
-    int iQuantumT = floor(fStep*pFiffInfo->sfreq);      // samples between fits
+    int iQuantum = floor(static_cast<double>(fWindow)*pFiffInfo->sfreq);     // window size
+    int iQuantumT = floor(static_cast<double>(fStep)*pFiffInfo->sfreq);      // samples between fits
     int iN = floor((last-first)/iQuantumT)-floor(iQuantum/iQuantumT);
     RowVectorXf vecTime = RowVectorXf::LinSpaced(iN, 0, iN-1);
 
