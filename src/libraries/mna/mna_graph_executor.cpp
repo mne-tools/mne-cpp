@@ -404,9 +404,7 @@ void MnaGraphExecutor::stopStream(StreamContext& ctx)
     for (int i = ctx.executionOrder.size() - 1; i >= 0; --i) {
         const QString& nodeId = ctx.executionOrder[i];
         QObject* plugin = ctx.livePlugins.value(nodeId);
-        if (plugin) {
-            delete plugin;
-        }
+        delete plugin;
     }
 
     ctx.livePlugins.clear();

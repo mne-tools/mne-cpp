@@ -116,9 +116,7 @@ void FtBuffProducer::doWork()
 void FtBuffProducer::connectToBuffer(QString addr,
                                      int port)
 {
-    if (m_pFtConnector != Q_NULLPTR) {
-        delete m_pFtConnector;
-    }
+    delete m_pFtConnector;
 
     //new parameters, new connector object
     m_pFtConnector = new FtConnector();

@@ -574,8 +574,7 @@ int InvRapMusic::calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT* &p_pMatPh
 
     int t_iCols = t_r;//t_r < m_iN ? m_iN : t_r;
 
-    if (p_pMatPhi_s != nullptr)
-        delete p_pMatPhi_s;
+    delete p_pMatPhi_s;
 
     //m_iNumChannels has to be equal to t_svdF.matrixU().rows()
     p_pMatPhi_s = new MatrixXT(m_iNumChannels, t_iCols);

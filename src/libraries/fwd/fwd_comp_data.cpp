@@ -54,10 +54,8 @@ FwdCompData::FwdCompData()
 
 FwdCompData::~FwdCompData()
 {
-    if(this->comp_coils)
-        delete this->comp_coils;
-    if(this->set)
-        delete this->set;
+    delete this->comp_coils;
+    delete this->set;
 }
 
 //=============================================================================================================

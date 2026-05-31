@@ -321,8 +321,7 @@ void FiffSimulator::init()
         t_qFile.close();
     }
 
-    if(m_pRawMatrixBuffer)
-        delete m_pRawMatrixBuffer;
+    delete m_pRawMatrixBuffer;
     m_pRawMatrixBuffer = nullptr;
 
     if(!m_RawInfo.isEmpty())
@@ -470,8 +469,7 @@ bool FiffSimulator::readRawInfo()
         //
         // Create circular buffer to transfer data form producer to simulator
         //
-        if(m_pRawMatrixBuffer)
-            delete m_pRawMatrixBuffer;
+        delete m_pRawMatrixBuffer;
         m_pRawMatrixBuffer = new CircularBuffer_Matrix_float(10);
 
         mutex.unlock();

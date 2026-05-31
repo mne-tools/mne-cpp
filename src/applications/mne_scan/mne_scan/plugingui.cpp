@@ -137,26 +137,18 @@ PluginGui::~PluginGui()
 
     m_pCurrentPlugin.reset();
 
-    //Plugin Toolbar
-    if(m_pSensorToolButton)
-        delete m_pSensorToolButton;
-    if(m_pAlgorithmToolButton)
-        delete m_pAlgorithmToolButton;
-    if(m_pToolBarPlugins)
-        delete m_pToolBarPlugins;
+    //Plugin Toolbar (delete is a no-op on nullptr, so no guards needed)
+    delete m_pSensorToolButton;
+    delete m_pAlgorithmToolButton;
+    delete m_pToolBarPlugins;
     //Pointers Toolbar
-    if(m_pPointerButton)
-        delete m_pPointerButton;
-    if(m_pLinePointerButton)
-        delete m_pLinePointerButton;
-    if(m_pToolBarPointer)
-        delete m_pToolBarPointer;
+    delete m_pPointerButton;
+    delete m_pLinePointerButton;
+    delete m_pToolBarPointer;
     //Item
-    if(m_pToolBarItem)
-        delete m_pToolBarItem;
+    delete m_pToolBarItem;
 
-    if(m_pGraphicsView)
-        delete m_pGraphicsView;
+    delete m_pGraphicsView;
 }
 
 //=============================================================================================================

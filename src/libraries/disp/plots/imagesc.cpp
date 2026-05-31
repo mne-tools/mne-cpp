@@ -81,10 +81,8 @@ ImageSc::ImageSc(MatrixXi &p_iMat, QWidget *parent)
 
 ImageSc::~ImageSc()
 {
-    if(m_pPixmapData)
-        delete m_pPixmapData;
-    if(m_pPixmapColorbar)
-        delete m_pPixmapColorbar;
+    delete m_pPixmapData;
+    delete m_pPixmapColorbar;
 }
 
 //=============================================================================================================
