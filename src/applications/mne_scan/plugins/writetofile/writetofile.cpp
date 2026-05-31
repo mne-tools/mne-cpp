@@ -378,6 +378,8 @@ void WriteToFile::toggleRecordingFile()
         m_pRecordTimer->stop();
         m_pBlinkingRecordButtonTimer->stop();
         m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
+        m_pActionRecordFile->setText(tr("Start Recording"));
+        m_pActionRecordFile->setStatusTip(tr("Start Recording"));
         m_pUpdateTimeInfoTimer->stop();
         if(m_pStatusEmitTimer) {
             m_pStatusEmitTimer->stop();
@@ -427,6 +429,8 @@ void WriteToFile::toggleRecordingFile()
         m_mutex.unlock();
 
         m_bWriteToFile = true;
+        m_pActionRecordFile->setText(tr("Stop Recording"));
+        m_pActionRecordFile->setStatusTip(tr("Stop Recording"));
 
         //Start timers for record button blinking, recording timer and updating the elapsed time in the proj widget
         m_pBlinkingRecordButtonTimer->start(500);
