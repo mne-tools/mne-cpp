@@ -102,6 +102,14 @@ jobs:
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v${{ matrix.qt_version }}
         cd qt5
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 ./init-repository -f --module-subset=qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport,qttools
+        # Temporary fix for Qt <= 6.10.x on the macos-26 image: the newer Xcode
+        # clang treats __yield() as an implicit library function declaration,
+        # which -Werror rejects. Prefer the real __builtin_arm_yield() builtin,
+        # exactly as Qt 6.11+ already does upstream. Idempotent on 6.11.x.
+        sed -i '' \
+          -e 's/__has_builtin(__yield)/__has_builtin(__builtin_arm_yield)/' \
+          -e 's/__yield();/__builtin_arm_yield();/' \
+          qtbase/src/corelib/thread/qyieldcpu.h
         cd ..
         mkdir qt6_shadow
         cd qt6_shadow
@@ -326,6 +334,15 @@ jobs:
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone --depth 1 https://code.qt.io/qt/qt5.git -b v${{ env.QIF_QT_VERSION }}
         cd qt5
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 ./init-repository -f --module-subset=qt5compat,qtbase,qtdeclarative,qttools,qttranslations
+
+        # Temporary fix for Qt <= 6.10.x on the macos-26 image: the newer Xcode
+        # clang treats __yield() as an implicit library function declaration,
+        # which -Werror rejects. Prefer the real __builtin_arm_yield() builtin,
+        # exactly as Qt 6.11+ already does upstream. Idempotent on 6.11.x.
+        sed -i '' \
+          -e 's/__has_builtin(__yield)/__has_builtin(__builtin_arm_yield)/' \
+          -e 's/__yield();/__builtin_arm_yield();/' \
+          qtbase/src/corelib/thread/qyieldcpu.h
 
         cd "${WORK_ROOT}"
         mkdir qtifw_qt_build
