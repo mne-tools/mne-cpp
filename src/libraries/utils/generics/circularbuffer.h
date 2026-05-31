@@ -13,7 +13,7 @@
  * @brief    Bounded single-producer / single-consumer ring buffer used to decouple acquisition threads from processing threads.
  *
  * The template @ref UTILSLIB::CircularBuffer wraps a fixed-size
- * @c _Tp array with two @c QSemaphore counters — one tracking
+ * @c T array with two @c QSemaphore counters — one tracking
  * free slots, one tracking filled slots — so @c push and @c pop
  * block (with a configurable timeout) instead of busy-waiting
  * when the buffer is full or empty. This is the building block
@@ -64,7 +64,7 @@ namespace UTILSLIB
  *
  * @brief Thread-safe lock-free circular (ring) buffer for producer-consumer data exchange between threads.
  */
-template<typename _Tp>
+template<typename T>
 class CircularBuffer
 {
 public:
@@ -92,7 +92,7 @@ public:
      * @param[in] pArray pointer to an Array which should be apend to the end.
      * @param[in] size number of elements containing the array.
      */
-    inline bool push(const _Tp* pArray, unsigned int size);
+    inline bool push(const T* pArray, unsigned int size);
 
     //=========================================================================================================
     /**
@@ -100,7 +100,7 @@ public:
      *
      * @param[in] newElement pointer to an Array which should be apend to the end.
      */
-    inline bool push(const _Tp& newElement);
+    inline bool push(const T& newElement);
 
     //=========================================================================================================
     /**
@@ -108,7 +108,7 @@ public:
      *
      * @return the first element.
      */
-    inline bool pop(_Tp& element);
+    inline bool pop(T& element);
 
     //=========================================================================================================
     /**
@@ -144,7 +144,7 @@ private:
      */
     inline unsigned int mapIndex(int& index);
     unsigned int    m_uiMaxNumElements;     /**< Holds the maximal number of buffer elements.*/
-    _Tp*            m_pBuffer;              /**< Holds the circular buffer.*/
+    T*            m_pBuffer;              /**< Holds the circular buffer.*/
     int             m_iCurrentReadIndex;    /**< Holds the current read index.*/
     int             m_iCurrentWriteIndex;   /**< Holds the current write index.*/
     QSemaphore*     m_pFreeElements;        /**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
@@ -158,10 +158,10 @@ private:
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-template<typename _Tp>
-CircularBuffer<_Tp>::CircularBuffer(unsigned int uiMaxNumElements)
+template<typename T>
+CircularBuffer<T>::CircularBuffer(unsigned int uiMaxNumElements)
 : m_uiMaxNumElements(uiMaxNumElements)
-, m_pBuffer(new _Tp[m_uiMaxNumElements])
+, m_pBuffer(new T[m_uiMaxNumElements])
 , m_iCurrentReadIndex(-1)
 , m_iCurrentWriteIndex(-1)
 , m_pFreeElements(new QSemaphore(m_uiMaxNumElements))
@@ -173,8 +173,8 @@ CircularBuffer<_Tp>::CircularBuffer(unsigned int uiMaxNumElements)
 
 //=============================================================================================================
 
-template<typename _Tp>
-CircularBuffer<_Tp>::~CircularBuffer()
+template<typename T>
+CircularBuffer<T>::~CircularBuffer()
 {
     delete m_pFreeElements;
     delete m_pUsedElements;
@@ -183,8 +183,8 @@ CircularBuffer<_Tp>::~CircularBuffer()
 
 //=============================================================================================================
 
-template<typename _Tp>
-inline bool CircularBuffer<_Tp>::push(const _Tp* pArray, unsigned int size)
+template<typename T>
+inline bool CircularBuffer<T>::push(const T* pArray, unsigned int size)
 {
     if(m_bPause) {
         return false;
@@ -204,8 +204,8 @@ inline bool CircularBuffer<_Tp>::push(const _Tp* pArray, unsigned int size)
 
 //=============================================================================================================
 
-template<typename _Tp>
-inline bool CircularBuffer<_Tp>::push(const _Tp& newElement)
+template<typename T>
+inline bool CircularBuffer<T>::push(const T& newElement)
 {
     if(m_bPause) {
         return false;
@@ -223,8 +223,8 @@ inline bool CircularBuffer<_Tp>::push(const _Tp& newElement)
 
 //=============================================================================================================
 
-template<typename _Tp>
-inline bool CircularBuffer<_Tp>::pop(_Tp& element)
+template<typename T>
+inline bool CircularBuffer<T>::pop(T& element)
 {
     if(m_bPause) {
         return false;
@@ -242,8 +242,8 @@ inline bool CircularBuffer<_Tp>::pop(_Tp& element)
 
 //=============================================================================================================
 
-template<typename _Tp>
-inline unsigned int CircularBuffer<_Tp>::mapIndex(int& index)
+template<typename T>
+inline unsigned int CircularBuffer<T>::mapIndex(int& index)
 {
     int aux = index;
     return index = ++aux % m_uiMaxNumElements;
@@ -251,8 +251,8 @@ inline unsigned int CircularBuffer<_Tp>::mapIndex(int& index)
 
 //=============================================================================================================
 
-template<typename _Tp>
-inline void CircularBuffer<_Tp>::clear()
+template<typename T>
+inline void CircularBuffer<T>::clear()
 {
     delete m_pFreeElements;
     m_pFreeElements = new QSemaphore(m_uiMaxNumElements);
@@ -265,24 +265,24 @@ inline void CircularBuffer<_Tp>::clear()
 
 //=============================================================================================================
 
-template<typename _Tp>
-inline void CircularBuffer<_Tp>::pause(bool bPause)
+template<typename T>
+inline void CircularBuffer<T>::pause(bool bPause)
 {
     m_bPause = bPause;
 }
 
 //=============================================================================================================
 
-template<typename _Tp>
-inline int CircularBuffer<_Tp>::getFreeElementsRead()
+template<typename T>
+inline int CircularBuffer<T>::getFreeElementsRead()
 {
     return m_pUsedElements->available();
 }
 
 //=============================================================================================================
 
-template<typename _Tp>
-inline int CircularBuffer<_Tp>::getFreeElementsWrite()
+template<typename T>
+inline int CircularBuffer<T>::getFreeElementsWrite()
 {
     return m_pFreeElements->available();
 }

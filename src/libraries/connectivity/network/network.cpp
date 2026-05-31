@@ -345,7 +345,7 @@ double Network::getThreshold()
 
 void Network::setFrequencyRange(float fLowerFreq, float fUpperFreq)
 {
-    if(fLowerFreq > fUpperFreq || fUpperFreq < fLowerFreq) {
+    if(fLowerFreq > fUpperFreq) {
         qDebug() << "Network::setFrequencyRange - Upper and lower frequency are out of range from each other. Weights will not be recalculated. Returning.";
         return;
     }

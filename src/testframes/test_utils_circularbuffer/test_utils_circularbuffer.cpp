@@ -108,7 +108,7 @@ void TestCircularBuffer::testBufferPushingPopping()
 
     QVERIFY(resultVal == testVal);
     for (int i = 0; i < 3; ++i){
-        QVERIFY(resultArray[i] == resultArray[i]);
+        QVERIFY(resultArray[i] == testArray[i]);
     }
 }
 
