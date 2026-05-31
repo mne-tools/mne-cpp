@@ -220,6 +220,63 @@ public:
     void issueSurfaceDraw(QRhiCommandBuffer *cb, BrainSurface *surface, ShaderMode mode, int uniformOffset);
 
     //=========================================================================================================
+    // ── WORKAROUND(QRhi-GLES2) ──────────────────────────────────────────
+    // The Qt QRhi GLES2/WebGL backend has a bug where only the first
+    // drawIndexed() per render pass produces visible output.  On WASM we
+    // work around this by merging all brain surfaces into a single VBO/IBO
+    // and issuing one drawIndexed().  When the upstream bug is fixed these
+    // two methods (and the merged buffers in Impl) can be removed.
+    //
+    /**
+     * Prepare merged brain surface geometry for single-drawIndexed rendering.
+     * Call BEFORE beginFrame() with a pre-upload resource batch.
+     *
+     * Uses dirty-flag caching: geometry is only rebuilt when the surface
+     * list changes (add/remove/visibility toggle).  Per-vertex color
+     * updates (STC animation) only re-upload the color channel.
+     *
+     * @param[in] rhi        QRhi pointer.
+     * @param[in] u          Resource update batch (pre-render uploads).
+     * @param[in] surfaces   Brain surfaces to merge.
+     * @param[in] groupName  Category name (e.g. "brain", "bem", "srcsp").
+     */
+    void prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch *u,
+                               const QVector<BrainSurface*> &surfaces,
+                               const QString &groupName = QStringLiteral("default"));
+
+    /**
+     * Mark a merged group as dirty so it is rebuilt on the next
+     * prepareMergedSurfaces call.  Call when surfaces are added/removed
+     * or visibility changes.
+     *
+     * @param[in] groupName  Category name to invalidate.
+     */
+    void invalidateMergedGroup(const QString &groupName = QStringLiteral("default"));
+
+    /**
+     * Check if a merged group has drawable geometry (indexCount > 0).
+     * Use before beginPreservingPass() to avoid empty render passes
+     * which can clear the framebuffer on some WebGL implementations.
+     *
+     * @param[in] groupName  Category name to check.
+     * @return true if the group exists and has indices to draw.
+     */
+    bool hasMergedContent(const QString &groupName) const;
+
+    /**
+     * Draw previously prepared merged surfaces in a single drawIndexed.
+     * Call between beginFrame()/beginPreservingPass() and endPass().
+     *
+     * @param[in] cb         Command buffer.
+     * @param[in] rhi        QRhi pointer.
+     * @param[in] data       Scene uniforms.
+     * @param[in] mode       Shader mode.
+     */
+    void drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
+                            const SceneData &data, ShaderMode mode,
+                            const QString &groupName = QStringLiteral("default"));
+
+    //=========================================================================================================
     /**
      * Render dipoles using instanced rendering.
      *
