@@ -377,9 +377,14 @@ cmake_args=(
     -B "${BUILD_DIR}"
     -S "${REPO_ROOT}"
     -DCMAKE_BUILD_TYPE="${BUILD_TYPE}"
-    -DNO_OPENGL="${NO_OPENGL_VALUE}"
     "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_VALUE}"
 )
+
+# Pin Qt6 to the resolved prefix so a stray Qt6_DIR/CMAKE_PREFIX_PATH in the
+# caller's environment cannot silently redirect the configure to a different Qt.
+if [[ -f "${QT_DIR}/lib/cmake/Qt6/Qt6Config.cmake" ]]; then
+    cmake_args+=("-DQt6_DIR=${QT_DIR}/lib/cmake/Qt6")
+fi
 
 if [[ "${LINKAGE}" == "static" ]]; then
     cmake_args+=(-DBUILD_SHARED_LIBS=OFF)

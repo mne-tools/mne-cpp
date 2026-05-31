@@ -42,6 +42,7 @@ EIGEN_RELEASE_TAG=""
 ONNXRUNTIME_RELEASE_TAG=""
 FORCE=0
 SKIP_QT=0
+QT_DIR_EXPLICIT=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -59,6 +60,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         --qt-dir)
             QT_DIR="$2"
+            QT_DIR_EXPLICIT=1
             shift 2
             ;;
         --eigen-dir)
@@ -115,47 +117,58 @@ if [[ "${LINKAGE}" != "dynamic" && "${LINKAGE}" != "static" ]]; then
 fi
 
 
-# Candidate Qt roots: --qt-dir, env vars, common locations
-QT_CANDIDATES=()
-if [[ -n "${QT_DIR}" ]]; then
-    QT_CANDIDATES+=("${QT_DIR}")
-fi
-if [[ -n "${QT_ROOT_DIR:-}" ]]; then
-    QT_CANDIDATES+=("${QT_ROOT_DIR}")
-fi
-if [[ -n "${Qt6_DIR:-}" ]]; then
-    QT_CANDIDATES+=("${Qt6_DIR}")
-fi
-if [[ -n "${CMAKE_PREFIX_PATH:-}" ]]; then
-    IFS=":" read -ra CPATHS <<< "${CMAKE_PREFIX_PATH}"
-    for p in "${CPATHS[@]}"; do
-        QT_CANDIDATES+=("$p")
-    done
-fi
-# Add common install locations
-QT_CANDIDATES+=("/usr/local/opt/qt6" "/usr/local/Qt-6" "/opt/Qt6" "/usr/local/Qt6" "/usr/lib/qt6" "/usr/local/Cellar/qt@6" "/usr/local/qt6")
-
-# Probe for compatible Qt using a minimal CMake project
+# Resolve the Qt prefix.
+#
+# When an explicit --qt-dir is provided (e.g. the artifact target chosen by the
+# top-level init.sh) we use it verbatim and never auto-probe a system Qt. This
+# is critical: the artifact download below does a `rm -rf` of the target dir, so
+# resolving the target to a user's system Qt install would wipe and overwrite it.
+# Auto-probing only happens when this script is invoked standalone with no target
+# and Qt is not being skipped.
 QT_PROBE_SUCCESS=0
-QT_PROBE_DIR="$(mktemp -d)"
-trap 'rm -rf "${QT_PROBE_DIR}"' EXIT
-cp "${SCRIPT_DIR}/qt_probe.cmake" "${QT_PROBE_DIR}/CMakeLists.txt"
-
-for candidate in "${QT_CANDIDATES[@]}"; do
-    if [[ -d "$candidate/lib/cmake/Qt6" ]]; then
-        if cmake -S "${QT_PROBE_DIR}" -B "${QT_PROBE_DIR}/_build" \
-                 -DCMAKE_PREFIX_PATH="$candidate" \
-                 -DQt6_DIR="$candidate/lib/cmake/Qt6" >/dev/null 2>&1; then
-            QT_PROBE_SUCCESS=1
-            QT_DIR="$candidate"
-            break
-        fi
-        rm -rf "${QT_PROBE_DIR}/_build"
+if [[ ${QT_DIR_EXPLICIT} -eq 0 && ${SKIP_QT} -eq 0 ]]; then
+    # Candidate Qt roots: env vars, common locations
+    QT_CANDIDATES=()
+    if [[ -n "${QT_ROOT_DIR:-}" ]]; then
+        QT_CANDIDATES+=("${QT_ROOT_DIR}")
     fi
-done
-rm -rf "${QT_PROBE_DIR}"
+    if [[ -n "${Qt6_DIR:-}" ]]; then
+        QT_CANDIDATES+=("${Qt6_DIR}")
+    fi
+    if [[ -n "${CMAKE_PREFIX_PATH:-}" ]]; then
+        IFS=":" read -ra CPATHS <<< "${CMAKE_PREFIX_PATH}"
+        for p in "${CPATHS[@]}"; do
+            QT_CANDIDATES+=("$p")
+        done
+    fi
+    # Add common install locations
+    QT_CANDIDATES+=("/usr/local/opt/qt6" "/usr/local/Qt-6" "/opt/Qt6" "/usr/local/Qt6" "/usr/lib/qt6" "/usr/local/Cellar/qt@6" "/usr/local/qt6")
 
-if [[ $QT_PROBE_SUCCESS -eq 0 ]]; then
+    # Probe for compatible Qt using a minimal CMake project
+    QT_PROBE_DIR="$(mktemp -d)"
+    trap 'rm -rf "${QT_PROBE_DIR}"' EXIT
+    cp "${SCRIPT_DIR}/qt_probe.cmake" "${QT_PROBE_DIR}/CMakeLists.txt"
+
+    for candidate in "${QT_CANDIDATES[@]}"; do
+        # A Qt6_DIR-style candidate may point straight at lib/cmake/Qt6; normalise.
+        case "$candidate" in
+            */lib/cmake/Qt6) candidate="${candidate%/lib/cmake/Qt6}" ;;
+        esac
+        if [[ -d "$candidate/lib/cmake/Qt6" ]]; then
+            if cmake -S "${QT_PROBE_DIR}" -B "${QT_PROBE_DIR}/_build" \
+                     -DCMAKE_PREFIX_PATH="$candidate" \
+                     -DQt6_DIR="$candidate/lib/cmake/Qt6" >/dev/null 2>&1; then
+                QT_PROBE_SUCCESS=1
+                QT_DIR="$candidate"
+                break
+            fi
+            rm -rf "${QT_PROBE_DIR}/_build"
+        fi
+    done
+    rm -rf "${QT_PROBE_DIR}"
+fi
+
+if [[ -z "${QT_DIR}" ]]; then
     QT_DIR="${SCRIPT_DIR}/qt/${LINKAGE}"
 fi
 
@@ -175,8 +188,9 @@ download_qt=1
 if [[ ${SKIP_QT} -eq 1 ]]; then
     download_qt=0
 elif [[ ${FORCE} -eq 0 && -f "${QT_DIR}/lib/cmake/Qt6/Qt6Config.cmake" ]]; then
-    # If we just probed a system Qt, don't download
-    if [[ $QT_PROBE_SUCCESS -eq 1 ]]; then
+    # Skip the download when we either probed a compatible system Qt or the
+    # explicit artifact target is already populated.
+    if [[ $QT_PROBE_SUCCESS -eq 1 || ${QT_DIR_EXPLICIT} -eq 1 ]]; then
         download_qt=0
     fi
 fi

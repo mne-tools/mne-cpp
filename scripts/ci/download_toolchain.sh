@@ -206,6 +206,17 @@ trap 'rm -rf "${DOWNLOAD_DIR}"' EXIT
 echo "Downloading ${ASSET_NAME} from release ${RELEASE_TAG} (${REPOSITORY})..."
 download_release_asset "${ASSET_NAME}" "${DOWNLOAD_DIR}"
 
+# Safety: the extraction below wipes OUTPUT_DIR with `rm -rf`. Refuse to do that
+# on a user-managed Qt install (online installer / MaintenanceTool layout), so a
+# mis-resolved target can never destroy someone's system Qt.
+for guard_root in "${OUTPUT_DIR}" "${OUTPUT_DIR}/.." "${OUTPUT_DIR}/../.."; do
+    if compgen -G "${guard_root}/MaintenanceTool*" > /dev/null 2>&1; then
+        echo "Refusing to overwrite '${OUTPUT_DIR}': it lives inside a user-managed Qt install (MaintenanceTool found near '${guard_root}')." >&2
+        echo "Pass an --output-dir under the repository (e.g. src/external/qt/<linkage>)." >&2
+        exit 1
+    fi
+done
+
 rm -rf "${OUTPUT_DIR}"
 mkdir -p "${OUTPUT_DIR}"
 tar xzf "${DOWNLOAD_DIR}/${ASSET_NAME}" -C "${OUTPUT_DIR}"

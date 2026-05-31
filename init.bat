@@ -173,7 +173,12 @@ if "%DEPS_ONLY%"=="1" (
 set "STATIC_ARG="
 if /I "%LINKAGE%"=="static" set "STATIC_ARG=-DBUILD_SHARED_LIBS=OFF"
 
-cmake -B "%BUILD_DIR%" -S "%REPO_ROOT%" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DNO_OPENGL=%NO_OPENGL_VALUE% "-DCMAKE_PREFIX_PATH=%CMAKE_PREFIX_VALUE%" %STATIC_ARG% %EXTRA_CMAKE_ARGS%
+rem Pin Qt6 to the resolved prefix so a stray Qt6_DIR/CMAKE_PREFIX_PATH in the
+rem caller's environment cannot silently redirect the configure to a different Qt.
+set "QT6_DIR_ARG="
+if exist "%QT_DIR%\lib\cmake\Qt6\Qt6Config.cmake" set "QT6_DIR_ARG=-DQt6_DIR=%QT_DIR%\lib\cmake\Qt6"
+
+cmake -B "%BUILD_DIR%" -S "%REPO_ROOT%" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% "-DCMAKE_PREFIX_PATH=%CMAKE_PREFIX_VALUE%" %QT6_DIR_ARG% %STATIC_ARG% %EXTRA_CMAKE_ARGS%
 if errorlevel 1 exit /b 1
 
 echo.
