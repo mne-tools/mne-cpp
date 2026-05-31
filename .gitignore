@@ -91,6 +91,7 @@ doc/papers/
 /out*
 /CMakeCache.txt
 /CMakeFiles/
+/Testing/
 /resources/data*
 /resources/resources
 .cache/*
