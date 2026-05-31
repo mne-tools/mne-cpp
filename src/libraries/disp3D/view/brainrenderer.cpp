@@ -69,26 +69,6 @@ struct BrainRenderer::Impl
     QSize rtSize;
     QRhiTexture *rtColorTex = nullptr;  // Track texture pointer for rebuild
 
-    // ── WORKAROUND(QRhi-GLES2): merged single-drawIndexed buffers ────
-    // Used on WASM to avoid the multi-drawIndexed bug in QRhi's GLES2
-    // backend.  Each surface category (brain, BEM, sensors, etc.) gets
-    // its own merged buffer set, drawn in separate render passes.
-    // Remove when upstream Qt fixes the issue.
-    struct MergedGroup {
-        QVector<BrainSurface*> surfaces;
-        std::unique_ptr<QRhiBuffer> vertexBuffer;
-        std::unique_ptr<QRhiBuffer> indexBuffer;
-        int indexCount = 0;
-        int totalVertexCount = 0; // cached vertex count from last full rebuild
-        bool dirty = true;  // Geometry needs rebuild (surface list changed)
-        bool gpuVertexDirty = true; // Vertex data changed, needs GPU re-upload
-        bool gpuIndexDirty  = true; // Index data changed, needs GPU re-upload
-        QByteArray vertexRaw;
-        QByteArray indexRaw;
-        QVector<quint64> surfaceGenerations; // per-surface vertex generation snapshot
-    };
-    std::map<QString, MergedGroup> mergedGroups;  // keyed by category name
-
     // ── Generic video overlay ───────────────────────────────────────
     // Camera-facing textured quad rendered last (depth test off) at the
     // current focus point. Resources are created lazily on first use.
@@ -159,7 +139,6 @@ namespace {
     constexpr int kOffsetTissueType   = 92;     // float
     constexpr int kOffsetLighting     = 96;     // float
     constexpr int kOffsetOverlayMode  = 100;    // float
-    constexpr int kOffsetSelectedSurfaceId = 104; // float — WORKAROUND(QRhi-GLES2)
 }
 
 //=============================================================================================================
@@ -285,12 +264,11 @@ void BrainRenderer::Impl::createResources(QRhi *rhi, QRhiRenderPassDescriptor *r
                     { 1, 7, QRhiVertexInputAttribute::Float, 20 * sizeof(float) }
                 });
             } else {
-                il.setBindings({{ 36 }});  // sizeof(VertexData) = 36 with surfaceId
+                il.setBindings({{ 32 }});  // sizeof(VertexData) = 32
                 il.setAttributes({{ 0, 0, QRhiVertexInputAttribute::Float3, 0 }, 
                                   { 0, 1, QRhiVertexInputAttribute::Float3, 12 }, 
                                   { 0, 2, QRhiVertexInputAttribute::UNormByte4, 24 },
-                                  { 0, 3, QRhiVertexInputAttribute::UNormByte4, 28 },
-                                  { 0, 4, QRhiVertexInputAttribute::Float, 32 }});   // surfaceId
+                                  { 0, 3, QRhiVertexInputAttribute::UNormByte4, 28 }});
             }
             
             p->setVertexInputLayout(il);
@@ -813,7 +791,6 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
         float tissueType;       // 92..95
         float lightingEnabled;  // 96..99
         float overlayMode;      // 100..103
-        float selectedSurfaceId;// 104..107
     } ub;
     memcpy(ub.mvp, data.mvp.constData(), 64);
     memcpy(ub.cameraPos, &data.cameraPos, 12);
@@ -822,7 +799,6 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     ub.tissueType = static_cast<float>(surface->tissueType());
     ub.lightingEnabled = data.lightingEnabled ? 1.0f : 0.0f;
     ub.overlayMode = data.overlayMode;
-    ub.selectedSurfaceId = -1.0f;  // Per-surface path: surfaceId selection disabled
 
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(ub), &ub);
 
@@ -880,7 +856,6 @@ int BrainRenderer::prepareSurfaceDraw(QRhiResourceUpdateBatch *u,
         float tissueType;
         float lightingEnabled;
         float overlayMode;
-        float selectedSurfaceId;
     } ub;
     memcpy(ub.mvp, data.mvp.constData(), 64);
     memcpy(ub.cameraPos, &data.cameraPos, 12);
@@ -889,7 +864,6 @@ int BrainRenderer::prepareSurfaceDraw(QRhiResourceUpdateBatch *u,
     ub.tissueType = static_cast<float>(surface->tissueType());
     ub.lightingEnabled = data.lightingEnabled ? 1.0f : 0.0f;
     ub.overlayMode = data.overlayMode;
-    ub.selectedSurfaceId = -1.0f;
 
     u->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(ub), &ub);
     return offset;
@@ -1065,287 +1039,3 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     }
 }
 
-//=============================================================================================================
-// WORKAROUND(QRhi-GLES2): Merged single-drawIndexed rendering.
-// The Qt QRhi GLES2/WebGL backend has a bug where only the first
-// drawIndexed() per render pass produces visible output.  These two
-// methods merge all surfaces (brain, BEM, sensors, digitizers,
-// source-space) into a single VBO/IBO so that all geometry is drawn
-// in one call.
-//
-// Remove when upstream Qt fixes the issue.
-//=============================================================================================================
-
-void BrainRenderer::prepareMergedSurfaces(QRhi *rhi, QRhiResourceUpdateBatch * /*u*/,
-                                           const QVector<BrainSurface*> &surfaces,
-                                           const QString &groupName)
-{
-    auto &group = d->mergedGroups[groupName];
-
-    // Check if surface list changed (different count or different pointers)
-    if (!group.dirty) {
-        if (group.surfaces.size() != surfaces.size()) {
-            group.dirty = true;
-        } else {
-            for (int i = 0; i < surfaces.size(); ++i) {
-                if (group.surfaces[i] != surfaces[i]) {
-                    group.dirty = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    // If geometry hasn't changed, check if any surface vertex data actually changed
-    // (STC animation changes vertex colors but not topology)
-    if (!group.dirty && group.indexCount > 0) {
-        // Compare per-surface vertex generation counters
-        bool anyChanged = false;
-        if (group.surfaceGenerations.size() != surfaces.size()) {
-            anyChanged = true;
-        } else {
-            for (int i = 0; i < surfaces.size(); ++i) {
-                if (surfaces[i] && surfaces[i]->vertexGeneration() != group.surfaceGenerations[i]) {
-                    anyChanged = true;
-                    break;
-                }
-            }
-        }
-
-        if (!anyChanged) {
-            // Nothing changed — skip vertex rebuild entirely
-            return;
-        }
-
-        // Re-merge vertex data directly into vertexRaw (no temp allocation)
-        // Safety: verify vertex count hasn't changed since the full rebuild.
-        // If it has, fall through to the full rebuild path to update indices.
-        int totalVerts = 0;
-        for (int si = 0; si < surfaces.size(); ++si)
-            if (surfaces[si]) totalVerts += surfaces[si]->vertexDataRef().size();
-        if (totalVerts != group.totalVertexCount) {
-            group.dirty = true;
-            // Fall through to full rebuild below
-        } else {
-            float brainId = 0.0f;
-            float nonBrainId = 100.0f; // offset so shaders can distinguish
-            group.surfaceGenerations.resize(surfaces.size());
-            VertexData *dst = reinterpret_cast<VertexData*>(group.vertexRaw.data());
-            for (int si = 0; si < surfaces.size(); ++si) {
-                BrainSurface *surf = surfaces[si];
-                if (!surf) { brainId += 1.0f; nonBrainId += 1.0f; continue; }
-                const bool isBrain = (surf->tissueType() == BrainSurface::TissueBrain);
-                const float id = isBrain ? brainId : nonBrainId;
-                const auto &srcVerts = surf->vertexDataRef();
-                const int n = srcVerts.size();
-                memcpy(dst, srcVerts.constData(), n * sizeof(VertexData));
-                for (int j = 0; j < n; ++j)
-                    dst[j].surfaceId = id;
-                dst += n;
-                group.surfaceGenerations[si] = surf->vertexGeneration();
-                brainId += 1.0f;
-                nonBrainId += 1.0f;
-            }
-            group.gpuVertexDirty = true;
-            return;
-        }
-    }
-
-    // Full rebuild: topology or surface list changed
-    group.surfaces = surfaces;
-    group.indexCount = 0;
-    group.totalVertexCount = 0;
-    group.dirty = false;
-
-    // Build merged vertex + index arrays
-    // Pre-calculate total sizes for single allocation
-    int totalVerts = 0;
-    int totalIndices = 0;
-    for (int si = 0; si < surfaces.size(); ++si) {
-        if (!surfaces[si]) continue;
-        totalVerts += surfaces[si]->vertexDataRef().size();
-        totalIndices += surfaces[si]->indexDataRef().size();
-    }
-
-    group.indexCount = totalIndices;
-    if (group.indexCount == 0) return;
-
-    const quint32 vbufSize = totalVerts   * sizeof(VertexData);
-    const quint32 ibufSize = totalIndices * sizeof(uint32_t);
-
-    // (Re-)create Dynamic buffers when they don't exist or are too small
-    if (!group.vertexBuffer || group.vertexBuffer->size() < vbufSize) {
-        group.vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
-                                                    QRhiBuffer::VertexBuffer, vbufSize));
-        group.vertexBuffer->create();
-    }
-    if (!group.indexBuffer || group.indexBuffer->size() < ibufSize) {
-        group.indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
-                                                   QRhiBuffer::IndexBuffer, ibufSize));
-        group.indexBuffer->create();
-    }
-
-    // Write directly into QByteArrays — no temp QVector intermediaries
-    group.vertexRaw.resize(vbufSize);
-    group.indexRaw.resize(ibufSize);
-    group.surfaceGenerations.resize(surfaces.size());
-
-    VertexData *vDst = reinterpret_cast<VertexData*>(group.vertexRaw.data());
-    uint32_t *iDst = reinterpret_cast<uint32_t*>(group.indexRaw.data());
-    float brainId = 0.0f;
-    float nonBrainId = 100.0f; // offset so shaders can distinguish
-    uint32_t vertexOffset = 0;
-    for (int si = 0; si < surfaces.size(); ++si) {
-        BrainSurface *surf = surfaces[si];
-        if (!surf) { brainId += 1.0f; nonBrainId += 1.0f; continue; }
-
-        const bool isBrain = (surf->tissueType() == BrainSurface::TissueBrain);
-        const float id = isBrain ? brainId : nonBrainId;
-        const auto &srcVerts = surf->vertexDataRef();
-        const auto &srcIdx   = surf->indexDataRef();
-        const int nv = srcVerts.size();
-        const int ni = srcIdx.size();
-
-        // Bulk copy vertices + stamp surfaceId
-        memcpy(vDst, srcVerts.constData(), nv * sizeof(VertexData));
-        for (int j = 0; j < nv; ++j)
-            vDst[j].surfaceId = id;
-        vDst += nv;
-
-        // Copy indices with global vertex offset
-        const uint32_t *srcI = srcIdx.constData();
-        for (int j = 0; j < ni; ++j)
-            iDst[j] = srcI[j] + vertexOffset;
-        iDst += ni;
-
-        vertexOffset += nv;
-        group.surfaceGenerations[si] = surf->vertexGeneration();
-        brainId += 1.0f;
-        nonBrainId += 1.0f;
-    }
-    group.totalVertexCount = totalVerts;
-    group.gpuVertexDirty = true;
-    group.gpuIndexDirty  = true;
-}
-
-//=============================================================================================================
-
-void BrainRenderer::invalidateMergedGroup(const QString &groupName)
-{
-    auto it = d->mergedGroups.find(groupName);
-    if (it != d->mergedGroups.end()) {
-        it->second.dirty = true;
-    }
-}
-
-//=============================================================================================================
-
-bool BrainRenderer::hasMergedContent(const QString &groupName) const
-{
-    auto it = d->mergedGroups.find(groupName);
-    return it != d->mergedGroups.end() && it->second.indexCount > 0;
-}
-
-//=============================================================================================================
-
-void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
-                                        const SceneData &data, ShaderMode mode,
-                                        const QString &groupName)
-{
-    auto it = d->mergedGroups.find(groupName);
-    if (it == d->mergedGroups.end()) return;
-    auto &group = it->second;
-
-    if (group.indexCount == 0) return;
-
-    auto *pipeline = d->pipelines[mode].get();
-    if (!pipeline) return;
-
-    // Determine which merged surface (if any) is selected.
-    // surfaceId encoding: brain surfaces get ids 0,1,2...; non-brain get 100,101,102...
-    float selectedSurfaceId = -1.0f;
-    for (int i = 0; i < group.surfaces.size(); ++i) {
-        if (group.surfaces[i] && group.surfaces[i]->isSelected()) {
-            if (group.surfaces[i]->selectedRegionId() == -1
-                && group.surfaces[i]->selectedVertexStart() < 0) {
-                const bool isBrain = (group.surfaces[i]->tissueType() == BrainSurface::TissueBrain);
-                selectedSurfaceId = static_cast<float>(isBrain ? i : 100 + i);
-            }
-            break;
-        }
-    }
-
-    QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
-
-    // Re-upload merged geometry only when data actually changed.
-    // Split VBO / IBO uploads: the fast-update path (STC color changes)
-    // only modifies vertices; re-uploading the IBO via glBufferSubData on
-    // WebGL can corrupt the VAO's element-buffer binding.
-    if (group.gpuVertexDirty) {
-        u->updateDynamicBuffer(group.vertexBuffer.get(), 0, group.vertexRaw.size(), group.vertexRaw.constData());
-        group.gpuVertexDirty = false;
-    }
-    if (group.gpuIndexDirty) {
-        u->updateDynamicBuffer(group.indexBuffer.get(),  0, group.indexRaw.size(),  group.indexRaw.constData());
-        group.gpuIndexDirty = false;
-    }
-
-    int offset = d->currentUniformOffset;
-    d->currentUniformOffset += d->uniformBufferOffsetAlignment;
-    if (d->currentUniformOffset >= d->uniformBuffer->size()) {
-        qWarning("BrainRenderer: uniform buffer overflow in drawMergedSurfaces");
-        return;
-    }
-
-    // Pack all uniforms into a contiguous block for a single upload
-    // Layout must match the shader's UniformBlock (std140).
-    struct {
-        float mvp[16];          // 0..63
-        float cameraPos[3];     // 64..75
-        float isSelected;       // 76..79
-        float lightDir[3];      // 80..91
-        float tissueType;       // 92..95
-        float lightingEnabled;  // 96..99
-        float overlayMode;      // 100..103
-        float selectedSurfaceId;// 104..107
-    } ub;
-    memcpy(ub.mvp, data.mvp.constData(), 64);
-    memcpy(ub.cameraPos, &data.cameraPos, 12);
-    ub.isSelected = 0.0f;
-    memcpy(ub.lightDir, &data.lightDir, 12);
-    ub.tissueType = (!group.surfaces.isEmpty() && group.surfaces.first())
-                  ? static_cast<float>(group.surfaces.first()->tissueType()) : 0.0f;
-    ub.lightingEnabled = data.lightingEnabled ? 1.0f : 0.0f;
-    ub.overlayMode = data.overlayMode;
-    ub.selectedSurfaceId = selectedSurfaceId;
-
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(ub), &ub);
-
-    cb->resourceUpdate(u);
-
-    cb->setViewport(toViewport(data));
-    cb->setScissor(toScissor(data));
-
-    auto draw = [&](QRhiGraphicsPipeline *p) {
-        cb->setGraphicsPipeline(p);
-        const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(offset) };
-        cb->setShaderResources(d->srb.get(), 1, &srbOffset);
-        const QRhiCommandBuffer::VertexInput vbuf(group.vertexBuffer.get(), 0);
-        cb->setVertexInput(0, 1, &vbuf, group.indexBuffer.get(), 0, QRhiCommandBuffer::IndexUInt32);
-        cb->drawIndexed(group.indexCount);
-    };
-
-    // WORKAROUND(QRhi-GLES2): On WebGL, only one drawIndexed() per pass.
-    // For Holographic mode, the back-face pass must happen in a separate
-    // render pass.  The caller is responsible for wrapping each call in
-    // its own beginPreservingPass/endPass on WASM.
-#ifdef __EMSCRIPTEN__
-    draw(pipeline);
-#else
-    if (mode == Holographic && d->pipelinesBackColor[Holographic]) {
-        draw(d->pipelinesBackColor[Holographic].get());
-    }
-
-    draw(pipeline);
-#endif
-}

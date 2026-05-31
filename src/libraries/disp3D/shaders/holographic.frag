@@ -6,7 +6,6 @@ layout(location = 2) in vec3 v_color;
 layout(location = 3) in vec3 v_viewDir;
 layout(location = 4) in float v_curvature;
 layout(location = 5) in vec3 v_annotColor;
-layout(location = 6) in float v_surfaceId;
 
 layout(location = 0) out vec4 fragColor;
 
@@ -18,8 +17,6 @@ layout(std140, binding = 0) uniform UniformBlock {
     float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
     float overlayMode; // 0=Surface, 1=Annotation, 2=Scientific, 3=SourceEstimate
-    float selectedSurfaceId; // WORKAROUND(QRhi-GLES2): merged-draw surface selection
-    float _pad2;
 };
 
 void main() {
@@ -27,13 +24,8 @@ void main() {
     vec3 V = normalize(v_viewDir);
     
     // Select effective vertex colour from overlayMode.
-    // WORKAROUND(QRhi-GLES2): In the merged-draw path, non-brain surfaces
-    // (BEM, sensors, field maps) get surfaceId >= 100.  Always use their
-    // vertex colour so field-map colours are visible.
     vec3 effectiveColor;
-    if (v_surfaceId >= 99.5) {
-        effectiveColor = v_color;
-    } else if (overlayMode < 0.5) {
+    if (overlayMode < 0.5) {
         effectiveColor = vec3(v_curvature); // Surface: neutral curvature grey
     } else if (overlayMode < 1.5) {
         // Annotation: fall back to white when no annotation loaded (black)
@@ -80,10 +72,7 @@ void main() {
     float final_alpha = mix(alpha_shell, alpha_data, is_data);
     
     // --- Selection Highlight (Silver Rim) ---
-    // WORKAROUND(QRhi-GLES2): On WASM merged-draw path, isSelected is 0;
-    // instead selectedSurfaceId >= 0 and v_surfaceId identifies the surface.
-    bool highlighted = (isSelected > 0.5)
-                    || (selectedSurfaceId >= 0.0 && abs(v_surfaceId - selectedSurfaceId) < 0.5);
+    bool highlighted = (isSelected > 0.5);
     if (highlighted) {
         float selectionRim = pow(1.0 - N_dot_V, 3.0);
         vec3 whiteColor = vec3(1.0, 1.1, 1.2); // Cool White

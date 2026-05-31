@@ -4,13 +4,11 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec4 color;
 layout(location = 3) in vec4 annotColor;
-layout(location = 4) in float surfaceId;
 
 layout(location = 0) out vec3 v_normal;
 layout(location = 1) out vec3 v_color;
 layout(location = 2) out vec3 v_worldPos;
 layout(location = 3) out vec3 v_annotColor;
-layout(location = 4) out float v_surfaceId;
 layout(location = 5) out float v_curvatureGray;
 
 layout(std140, binding = 0) uniform UniformBlock {
@@ -21,8 +19,6 @@ layout(std140, binding = 0) uniform UniformBlock {
     float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
     float overlayMode; // 0=Surface, 1=Annotation, 2=Scientific, 3=SourceEstimate
-    float selectedSurfaceId; // WORKAROUND(QRhi-GLES2): merged-draw surface selection
-    float _pad2;
 };
 
 void main() {
@@ -30,7 +26,6 @@ void main() {
     v_normal = normalize(normal);
     v_color = color.rgb;
     v_annotColor = annotColor.rgb;
-    v_surfaceId = surfaceId;
     v_curvatureGray = color.a;
     gl_Position = mvp * vec4(position, 1.0);
 }

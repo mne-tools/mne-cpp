@@ -1471,16 +1471,8 @@ void BrainView::render(QRhiCommandBuffer *cb)
     {
         QRhiResourceUpdateBatch *preUpload = rhi()->nextResourceUpdateBatch();
         for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-#ifdef __EMSCRIPTEN__
-            // WORKAROUND(QRhi-GLES2): Per-surface GPU buffers are unused on
-            // WASM — all geometry is drawn via merged per-category buffers.
-            // Skip individual uploads to avoid polluting GLES2
-            // element-buffer bindings.
-            continue;
-#endif
             it.value()->updateBuffers(rhi(), preUpload);
         }
-#ifndef __EMSCRIPTEN__
         if (m_debugPointerSurface) {
             m_debugPointerSurface->updateBuffers(rhi(), preUpload);
         }
@@ -1490,59 +1482,9 @@ void BrainView::render(QRhiCommandBuffer *cb)
         if (m_dipoles) {
             m_dipoles->updateBuffers(rhi(), preUpload);
         }
-#endif
         if (m_videoOverlay && m_videoOverlay->isEnabled()) {
             m_renderer->prepareVideoOverlay(rhi(), preUpload, m_videoOverlay.get());
         }
-
-#ifdef __EMSCRIPTEN__
-        // WORKAROUND(QRhi-GLES2): Single merged buffer for ALL surfaces.
-        // The Qt QRhi GLES2/WebGL backend only renders the first
-        // drawIndexed() per render pass.  Multi-pass compositing via
-        // PreserveColorContents is unreliable across WebGL implementations.
-        // Merge everything into one VBO/IBO and issue one drawIndexed().
-        {
-            const SubView &sv = (m_viewMode == MultiView) ? m_subViews[0] : m_singleView;
-
-            QVector<BrainSurface*> allSurfaces;
-
-            // Brain surfaces (opaque, drawn first for depth)
-            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-                if (!SubView::isBrainSurfaceKey(it.key())) continue;
-                if (!sv.matchesSurfaceType(it.key())) continue;
-                if (!sv.shouldRenderSurface(it.key())) continue;
-                allSurfaces.append(it.value().get());
-            }
-
-            // Source space points
-            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-                if (!it.key().startsWith("srcsp_")) continue;
-                if (!sv.shouldRenderSurface(it.key())) continue;
-                if (!it.value()->isVisible()) continue;
-                allSurfaces.append(it.value().get());
-            }
-
-            // Digitizer points
-            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-                if (!it.key().startsWith("dig_")) continue;
-                if (!sv.shouldRenderSurface(it.key())) continue;
-                if (!it.value()->isVisible()) continue;
-                allSurfaces.append(it.value().get());
-            }
-
-            // BEM + sensors (transparent — appended last for correct blending order)
-            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-                bool isSensor = it.key().startsWith("sens_");
-                bool isBem = it.key().startsWith("bem_");
-                if (!isSensor && !isBem) continue;
-                if (!sv.shouldRenderSurface(it.key())) continue;
-                if (!it.value()->isVisible()) continue;
-                allSurfaces.append(it.value().get());
-            }
-
-            m_renderer->prepareMergedSurfaces(rhi(), preUpload, allSurfaces, QStringLiteral("default"));
-        }
-#endif
 
         // Network buffers are updated inside renderNetwork() via updateNodeBuffers/updateEdgeBuffers
         cb->resourceUpdate(preUpload);
@@ -1651,11 +1593,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
     const QString overlayName = visualizationModeName(sv.overlayMode);
 
     // Collect matched brain surface keys for this pane's info panel
-#ifndef __EMSCRIPTEN__
     QStringList drawnKeys;
-#else
-    const QString drawnInfo = QStringLiteral("merged");
-#endif
 
     if (m_viewMode == MultiView && m_viewportInfoLabels[vp]) {
         m_viewportInfoLabels[vp]->setText(
@@ -1671,18 +1609,10 @@ void BrainView::render(QRhiCommandBuffer *cb)
         if (!sv.matchesSurfaceType(it.key())) continue;
         if (!sv.shouldRenderSurface(it.key())) continue;
 
-#ifdef __EMSCRIPTEN__
-        // WORKAROUND(QRhi-GLES2): Brain surfaces drawn via merged
-        // per-category buffer (one drawIndexed per render pass).
-        continue;
-#endif
-#ifndef __EMSCRIPTEN__
         drawnKeys << it.key();
-#endif
         m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
     }
 
-#ifndef __EMSCRIPTEN__
     // Update info panel with drawn brain surface keys after rendering
     {
         const QString drawnInfo = drawnKeys.isEmpty() ? QStringLiteral("none") : drawnKeys.join(QStringLiteral(", "));
@@ -1694,22 +1624,6 @@ void BrainView::render(QRhiCommandBuffer *cb)
                 + QStringLiteral("\nDrawn: ") + drawnInfo);
         }
     }
-#endif
-
-#ifdef __EMSCRIPTEN__
-    // ══════════════════════════════════════════════════════════════════════
-    // WORKAROUND(QRhi-GLES2): Single-pass merged rendering.
-    // The Qt QRhi GLES2/WebGL backend only renders the first drawIndexed()
-    // per render pass, AND multi-pass compositing via PreserveColorContents
-    // is unreliable.  All visible surfaces (brain, BEM, sensors, source
-    // space, digitizers) are merged into one VBO/IBO and drawn in a single
-    // drawIndexed() call in the clearing pass.
-    //
-    // Remove when upstream Qt fixes the QRhi GLES2 drawIndexed bug.
-    // ══════════════════════════════════════════════════════════════════════
-    m_renderer->drawMergedSurfaces(cb, rhi(), sceneData, currentShader, QStringLiteral("default"));
-
-#else
 
     // ── Batched desktop rendering ───────────────────────────────────────
     // Single pass over m_surfaces categorises non-brain items into opaque
@@ -1876,14 +1790,9 @@ void BrainView::render(QRhiCommandBuffer *cb)
         m_renderer->renderSurface(cb, rhi(), debugSceneData, m_debugPointerSurface.get(), BrainRenderer::Holographic);
     }
 
-#endif // !__EMSCRIPTEN__ — end of per-surface draw path
-
     } // End of viewport loop
 
     m_renderer->endPass(cb);
-
-    // On WASM, all surfaces are drawn in the single clearing pass above
-    // via the merged "default" group.  No additional preserving passes needed.
 }
 
 //=============================================================================================================

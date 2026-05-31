@@ -68,9 +68,6 @@ struct VertexData {
     QVector3D norm;
     uint32_t color;           // curvature / base / STC color  (ABGR packed)
     uint32_t colorAnnotation; // annotation region color       (ABGR packed)
-    float surfaceId = 0.0f;  // WORKAROUND(QRhi-GLES2): surface ID for merged
-                             // single-drawIndexed on WASM.  Always 0 for
-                             // individual surfaces; set by merged path.
 };
 
 //=============================================================================================================
