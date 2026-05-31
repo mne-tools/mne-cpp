@@ -9,6 +9,7 @@ endif()
 add_subdirectory(ex_averaging)
 add_subdirectory(ex_cancel_noise)
 add_subdirectory(ex_compute_forward)
+add_subdirectory(ex_warp)
 
 ## Examples that link mne_disp3D but don't use 3D visualization directly
 if(NOT WASM)
