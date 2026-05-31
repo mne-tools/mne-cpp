@@ -106,6 +106,9 @@ int main(int argc, char *argv[])
         // Q_INIT_RESOURCE(analyze_rawdataviewer);
     #endif
 
+    // Enable crisp fractional scaling on high-DPI monitors. Must be set before
+    // the QApplication is constructed. (Qt6 enables high-DPI pixmaps by default.)
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QApplication app(argc, argv);
 
     //set application settings
