@@ -61,6 +61,7 @@ Makefile
 .project
 .settings
 .vscode
+.vs/
 .session
 mne-cpp.pro.user*
 compile_commands.json
