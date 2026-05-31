@@ -1100,6 +1100,7 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     FiffCoordTrans cand;// = nullptr;
     FiffCoordTrans dev_head_t;// = nullptr;
     FiffCoordTrans ctf_head_t;// = nullptr;
+    QList<FiffCoordTrans> all_coord_trans;
 
     fiff_int_t meas_date[2];
     meas_date[0] = -1;
@@ -1147,6 +1148,7 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
                 //ToDo: This has to be debugged!!
                 this->read_tag(t_pTag, pos);
                 cand = t_pTag->toCoordTrans();
+                all_coord_trans.append(cand);
                 if(cand.from == FIFFV_COORD_DEVICE && cand.to == FIFFV_COORD_HEAD)
                     dev_head_t = cand;
                 else if (cand.from == FIFFV_MNE_COORD_CTF_HEAD && cand.to == FIFFV_COORD_HEAD)
@@ -1387,6 +1389,7 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     //
     info.dev_head_t = dev_head_t;
     info.ctf_head_t = ctf_head_t;
+    info.all_coord_trans = all_coord_trans;
     if ((!info.dev_head_t.isEmpty()) && (!info.ctf_head_t.isEmpty())) //~isempty(info.dev_head_t) && ~isempty(info.ctf_head_t)
     {
         info.dev_ctf_t     = info.dev_head_t;

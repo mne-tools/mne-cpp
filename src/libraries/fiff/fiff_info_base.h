@@ -251,6 +251,7 @@ public:
     QStringList ch_names;       /**< List of all channel names. */
     FiffCoordTrans dev_head_t;  /**< Device to head coordinate transformation. */
     FiffCoordTrans ctf_head_t;  /**< CTF to head coordinate transformation. */
+    QList<FiffCoordTrans> all_coord_trans;  /**< All coordinate transformations stored in the file, in file order. */
 };
 
 //=============================================================================================================

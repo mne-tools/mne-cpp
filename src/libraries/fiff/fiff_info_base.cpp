@@ -57,6 +57,7 @@ FiffInfoBase::FiffInfoBase(const FiffInfoBase& p_FiffInfoBase)
 , ch_names(p_FiffInfoBase.ch_names)
 , dev_head_t(p_FiffInfoBase.dev_head_t)
 , ctf_head_t(p_FiffInfoBase.ctf_head_t)
+, all_coord_trans(p_FiffInfoBase.all_coord_trans)
 {
 }
 
@@ -110,6 +111,7 @@ void FiffInfoBase::clear()
     ch_names.clear();
     dev_head_t.clear();
     ctf_head_t.clear();
+    all_coord_trans.clear();
     bads.clear();
 }
 
