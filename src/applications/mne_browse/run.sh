@@ -57,9 +57,33 @@ fi
 BIN_DIR="$BuildRoot/bin"
 LIB_DIR="$BuildRoot/lib"
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    QT_BASE="${QT_BASE:-$HOME/Qt/6.10.2/macos}"
+REPO_ROOT="$( cd "$SCRIPT_DIR/../../.." &> /dev/null && pwd )"
 
+# Resolve the Qt prefix the app was linked against. Prefer an explicit QT_BASE,
+# then the in-repo artifact Qt (what init.sh builds against), then the newest
+# ~/Qt/6.x install. Keeps the convenience script working across Qt upgrades.
+resolve_qt_base() {
+    if [ -n "${QT_BASE:-}" ] && [ -d "$QT_BASE" ]; then
+        return 0
+    fi
+    local artifact="$REPO_ROOT/src/external/qt/dynamic"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        if [ -d "$artifact/lib/QtCore.framework" ]; then
+            QT_BASE="$artifact"; return 0
+        fi
+        QT_BASE="$(ls -d "$HOME"/Qt/6.*/macos 2>/dev/null | sort -V | tail -1)"
+    else
+        if ls "$artifact"/lib/libQt6Core.so* >/dev/null 2>&1; then
+            QT_BASE="$artifact"; return 0
+        fi
+        QT_BASE="$(ls -d "$HOME"/Qt/6.*/gcc_64 2>/dev/null | sort -V | tail -1)"
+    fi
+    [ -n "$QT_BASE" ] && [ -d "$QT_BASE" ]
+}
+
+resolve_qt_base || true
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
     unset QT_PLUGIN_PATH
     unset QT_QPA_PLATFORM_PLUGIN_PATH
 
@@ -75,7 +99,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         export DYLD_LIBRARY_PATH="$LIB_DIR${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
     fi
 else
-    QT_BASE="${QT_BASE:-$HOME/Qt/6.10.2/gcc_64}"
     if [ -d "$QT_BASE/plugins" ]; then
         export QT_PLUGIN_PATH="$QT_BASE/plugins"
     fi
