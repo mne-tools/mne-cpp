@@ -94,7 +94,7 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(const QString &text,
                                            hpiPos,
                                            hpiNames,
                                            QColor(128, 0, 0),   // DarkRed
-                                           0.001f);             // 1mm
+                                           0.003f);             // 3mm - enlarged for better visibility
         appendRow(item);
         qDebug() << "DigitizerSetTreeItem: HPI points:" << hpiPos.size();
     }
