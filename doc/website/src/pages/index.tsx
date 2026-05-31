@@ -52,9 +52,9 @@ const funders = [
 // Commit counts mirror the GitHub contributors graph
 // (https://github.com/mne-tools/mne-cpp/graphs/contributors), sorted by
 // commits descending. Bot/AI accounts (dependabot[bot], claude) are
-// intentionally excluded. Last refreshed: 2026-04-28.
+// intentionally excluded. Last refreshed: 2026-05-31.
 const contributors = [
-    { login: 'chdinh', contributions: 3910 },
+    { login: 'chdinh', contributions: 4040 },
     { login: 'LorenzE', contributions: 3907 },
     { login: 'gabrielbmotta', contributions: 1518 },
     { login: 'juangpc', contributions: 1345 },
@@ -77,13 +77,14 @@ const contributors = [
     { login: 'femigr', contributions: 17 },
     { login: 'jobehrens', contributions: 12 },
     { login: 'cdoshi', contributions: 12 },
+    { login: 'ag-fieldline', contributions: 12 },
     { login: 'cpieloth', contributions: 11 },
     { login: 'alexrockhill', contributions: 10 },
-    { login: 'ag-fieldline', contributions: 10 },
     { login: 'buildqa', contributions: 9 },
     { login: 'SachdevaS', contributions: 7 },
     { login: 'mfarisyahya', contributions: 6 },
     { login: 'er06645810', contributions: 6 },
+    { login: 'larsoner', contributions: 4 },
     { login: 'fjpolo', contributions: 4 },
     { login: 'betaha', contributions: 4 },
     { login: 'MKlamke', contributions: 4 },
@@ -91,7 +92,6 @@ const contributors = [
     { login: 'jasmainak', contributions: 3 },
     { login: 'benkay86', contributions: 3 },
     { login: 'PetrosSimidyan', contributions: 3 },
-    { login: 'larsoner', contributions: 2 },
 ];
 
 function WaveBackground() {
