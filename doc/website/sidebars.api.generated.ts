@@ -394,7 +394,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
     },
     {
       type: 'category',
-      label: "MNA Library (Modular Architecture)",
+      label: "MNA Library",
       collapsible: true,
       collapsed: true,
       link: {type: 'doc', id: 'api/mna/index'},
