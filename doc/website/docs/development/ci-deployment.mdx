@@ -12,13 +12,13 @@ This page explains how MNE-CPP handles deployment on Windows, Linux, and macOS. 
 All MNE-CPP libraries are built to the `mne-cpp/lib` folder. All applications, test, and examples are built to the `mne-cpp/out/Release` folder.
 
 ## Dependency Solving
-MNE-CPP depends on [Qt](https://www.qt.io/) and [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). Eigen, as a lightweight template library, [is included in the MNE-CPP repository by default](https://github.com/mne-tools/mne-cpp/tree/main/include/3rdParty/eigen3) and does not need further dependency solving. For Qt dependencies we use Qt specific deployment tools (`windeployqt`, `linuxdeployqt`, `macdeployqt`).
+MNE-CPP depends on [Qt](https://www.qt.io/), [Eigen](https://eigen.tuxfamily.org/), and optionally [ONNX Runtime](https://onnxruntime.ai/) and [Skigen](https://github.com/mne-tools/mne-cpp/tree/staging/src/external/skigen). Qt and Eigen are downloaded automatically by the repository init scripts (`./init.sh` / `.\init.bat`) into `src/external/`; neither is bundled in the repository. For Qt runtime deployment we use Qt-specific deployment tools (`windeployqt`, `linuxdeployqt`, `macdeployqt`).
 
 ### Windows
 
 The `WinDynamic` workflow in [release-windows.yml](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/release-windows.yml) excludes examples and tests. MNE-CPP libraries are copied to both `mne-cpp/lib` and `mne-cpp/out/Release`.
 
-Dependency resolution uses `windeployqt` (maintained by Qt), called from [deploy.bat](https://github.com/mne-tools/mne-cpp/blob/main/tools/deploy.bat) with `dynamic` as the first argument. It runs against:
+Dependency resolution uses `windeployqt` (maintained by Qt), called from [deploy.bat](https://github.com/mne-tools/mne-cpp/blob/staging/scripts/deploy/deploy.bat) with `dynamic` as the first argument. It runs against:
 - The MNE Scan `.exe` (covers all application-level Qt modules)
 - The Disp3D `.dll` (the highest-level library, linking all needed Qt modules)
 
@@ -28,7 +28,7 @@ Afterward, Qt and system libraries reside in `mne-cpp/out/Release`. The test dat
 
 The `LinuxDynamic` workflow in [release-linux.yml](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/release-linux.yml) excludes examples and tests. CMake configures the `RPATH` to link against libraries in `mne-cpp/lib`.
 
-Dependency resolution uses [linuxdeployqt](https://github.com/probonopd/linuxdeployqt), called from the deployment script under `tools/deployment`.
+Dependency resolution uses [linuxdeployqt](https://github.com/probonopd/linuxdeployqt), called from the deployment script under `scripts/deploy/`.
 
 The test data folder is deleted, and the folders `out/Release/apps`, `out/Release/lib`, `out/Release/plugins`, and `out/Release/translations` are compressed to a `.tar.gz` file and uploaded as a release asset.
 
@@ -42,11 +42,11 @@ Before packaging, standalone plugin folders (`mne_scan_plugins`, `mne_analyze_pl
 
 ## Static Builds
 
-The information above corresponds to deploying the dynamically built version of MNE-CPP. In case of static deployment the process differs slightly. See the deployment scripts in `tools/deployment`.
+The information above corresponds to deploying the dynamically built version of MNE-CPP. In case of static deployment the process differs slightly. See the deployment scripts in `scripts/deploy/`.
 
 ## Deployment Scripts
 
-The deployment scripts live in `tools/deployment`. Platform-specific scripts (`deploy.bat` for Windows, `deploy.sh` for Linux/macOS) handle dependency resolution and packaging.
+The deployment scripts live in `scripts/deploy/`. The cross-platform `deploy.bat` script handles dependency resolution and packaging.
 
 Each script accepts two arguments:
 
@@ -59,8 +59,8 @@ Example:
 
 ```bash
 # Resolve Qt dependencies for development (no archive)
-./tools/deploy.bat dynamic
+./scripts/deploy/deploy.bat dynamic
 
 # Create a distributable archive
-./tools/deploy.bat dynamic pack
+./scripts/deploy/deploy.bat dynamic pack
 ```

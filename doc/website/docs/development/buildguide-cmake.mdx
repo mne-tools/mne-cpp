@@ -29,6 +29,7 @@ These scripts download the MNE-CPP-maintained prerelease dependency bundles into
 
 - Qt 6 desktop binaries matching your platform and requested linkage
 - Eigen 5.0.1 as a clean CMake package bundle
+- [Skigen](https://github.com/skigen-project/skigen) — header-only ML library (scikit-learn algorithms on Eigen), cloned from the `staging` branch
 
 That keeps local development aligned with the dependency artifacts used in CI and release workflows. Qt downloads from the public `qt_binaries` prerelease tag. Eigen downloads from the public `eigen_artifacts` prerelease tag. No bundled Eigen copy is shipped in the repository.
 
@@ -184,8 +185,8 @@ ctest --output-on-failure
 To run compiled applications outside of Qt Creator (e.g. from the terminal or file manager), Qt runtime libraries must be bundled. MNE-CPP provides a cross-platform deployment script:
 
 ```bash
-./scripts/deploy.bat dynamic pack    # dynamic linking (recommended for development)
-./scripts/deploy.bat static pack     # static linking
+./scripts/deploy/deploy.bat dynamic pack    # dynamic linking (recommended for development)
+./scripts/deploy/deploy.bat static pack     # static linking
 ```
 
 The dynamically linked version is recommended for development. For more details, see the [Deployment](ci-deployment.mdx) page.

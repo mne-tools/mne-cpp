@@ -659,11 +659,12 @@ export default function Download(): JSX.Element {
                                     <div className="dl-sub-card">
                                         <Heading as="h3">Build from Source</Heading>
                                         <p className="dl-hint" style={{ marginBottom: '0.75rem' }}>
-                                            Requires CMake, Qt 6, and Eigen 3. Supports GCC, Clang, and MSVC.
+                                            Requires CMake, a C++20 compiler, Qt 6, and Eigen 5. Supports GCC, Clang, and MSVC.
                                         </p>
                                         <pre className="dl-code"><code>{`git clone https://github.com/mne-tools/mne-cpp.git
-cd mne-cpp && mkdir build && cd build
-cmake .. && cmake --build .`}</code></pre>
+cd mne-cpp
+./init.sh
+cmake --build build/developer-dynamic --parallel`}</code></pre>
                                         <Link to="/docs/development/buildguide-cmake" className="button button--outline button--primary button--sm">
                                             Build Guide
                                         </Link>

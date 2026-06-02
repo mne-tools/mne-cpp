@@ -39,13 +39,13 @@ brew install ninja
 
 ## Build with the Provided Script
 
-MNE-CPP provides a Wasm build script at `tools/wasm.sh`. From the repository root:
+MNE-CPP provides a Wasm build script at `scripts/wasm/wasm.sh`. From the repository root:
 
 ```bash
 # Set Qt6_DIR to the folder containing wasm_multithread/ and your host Qt (gcc_64/ or macos/)
 export Qt6_DIR=$HOME/Qt/6.10.2
 
-./tools/wasm.sh
+./scripts/wasm/wasm.sh
 ```
 
 The script will:
@@ -69,7 +69,7 @@ Build output is placed in `out/wasm/`.
 Example with explicit paths:
 
 ```bash
-./tools/wasm.sh --emsdk 4.0.7 --qt $HOME/Qt/6.10.2 --qt-host $HOME/Qt/6.10.2/gcc_64
+./scripts/wasm/wasm.sh --emsdk 4.0.7 --qt $HOME/Qt/6.10.2 --qt-host $HOME/Qt/6.10.2/gcc_64
 ```
 
 ## Build Manually
@@ -119,7 +119,7 @@ Multi-threaded Wasm requires the server to send the `Cross-Origin-Opener-Policy:
 **Automatic fix (recommended):** Run the post-build script to inject a [COI service worker](https://github.com/nickvdp/coi-serviceworker) that adds these headers client-side — this works on any static host including GitHub Pages:
 
 ```bash
-./tools/wasm/wasm_postbuild.sh out/wasm/apps
+./scripts/wasm/wasm_postbuild.sh out/wasm/apps
 ```
 
 The `wasm.sh` build script runs this automatically. If you build manually with CMake, run the command above after `cmake --build`.

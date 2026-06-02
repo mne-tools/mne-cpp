@@ -55,12 +55,15 @@ Make sure your changes do not break existing functionality:
 # Ensure the test data submodule is available
 git submodule update --init resources/data/mne-cpp-test-data
 
+# Bootstrap dependencies (Qt, Eigen) and configure
+./init.sh
+
 # Build with tests enabled
-cmake -B build -S . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
-cmake --build build --parallel
+cmake -B build/developer-dynamic -S . -DBUILD_TESTS=ON
+cmake --build build/developer-dynamic --parallel
 
 # Run all tests
-cd build
+cd build/developer-dynamic
 ctest --output-on-failure
 ```
 

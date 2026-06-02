@@ -36,7 +36,7 @@ In addition, MNE-CPP ships a set of [command-line tools](manual/tools-overview) 
 
 ## Libraries
 
-All applications are built on MNE-CPP's modular C++ libraries, which depend only on [Qt](https://www.qt.io/) and [Eigen](http://eigen.tuxfamily.org/). The libraries can be used independently to build custom neuroscience applications. See the [Library API documentation](/docs/api) for details.
+All applications are built on MNE-CPP's modular C++ libraries, which depend on [Qt 6](https://www.qt.io/) and [Eigen 5](https://eigen.tuxfamily.org/). Optional dependencies include [ONNX Runtime](https://onnxruntime.ai/) (for neural-network inference in the Ml library) and [Skigen](https://github.com/mne-tools/mne-cpp/tree/staging/src/external/skigen) (header-only ML primitives built on Eigen). Qt and Eigen are fetched automatically by the repository init scripts; neither is bundled in the source tree. The libraries can be used independently to build custom neuroscience applications. See the [Library API documentation](/docs/api) for details.
 
 | Library | Description |
 |---|---|
