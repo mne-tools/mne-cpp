@@ -6,7 +6,7 @@
 # @brief    Build file for the mne_doc_shots documentation screenshot tool.
 #==============================================================================================================
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.15)
 project(mne_doc_shots LANGUAGES CXX)
 
 # Eigen3 must be found explicitly — the src/-level find_package result
