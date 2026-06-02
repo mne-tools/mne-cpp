@@ -9,6 +9,10 @@
 cmake_minimum_required(VERSION 3.14)
 project(mne_doc_shots LANGUAGES CXX)
 
+# Eigen3 must be found explicitly — the src/-level find_package result
+# does not propagate into this subdirectory tree.
+find_package(Eigen3 REQUIRED)
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 

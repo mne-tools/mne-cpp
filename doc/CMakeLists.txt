@@ -30,8 +30,9 @@ else()
 endif()
 
 # Documentation screenshot generator (compiled C++ tool, NOT a user-facing CLI
-# tool — lives here rather than src/tools/).
+# tool — lives here rather than src/tools/).  Only built when the full C++
+# library tree is available (TARGET mne_fiff acts as the sentinel).
 option(BUILD_MNE_DOC_SHOTS "Build MNE documentation screenshot generator" ON)
-if(BUILD_MNE_DOC_SHOTS AND NOT WASM)
+if(BUILD_MNE_DOC_SHOTS AND NOT WASM AND TARGET mne_fiff)
     add_subdirectory(tools/doc_shots)
 endif()
