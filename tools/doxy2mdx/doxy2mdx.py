@@ -61,6 +61,8 @@ _XREF_MAP: Dict[str, str] = {}
 # Compiled regex matching any registered class name as a whole word.
 # Set by _build_xref_map().
 _XREF_RE: Optional[re.Pattern] = None
+# Doxygen refid → short class name, populated from XML.
+_REFID_MAP: Dict[str, str] = {}
 
 # Namespaces we never document, even if they appear in the XML.
 _EXCLUDED_NAMESPACES = {
@@ -80,15 +82,24 @@ def _load_registry(registry_path: Path) -> None:
         _CLASS_INDEX.setdefault(entry["name"], []).append(entry)
 
 
-def _build_xref_map() -> None:
-    """Populate ``_XREF_MAP`` and ``_XREF_RE`` from the loaded registry.
+def _build_xref_map(xml_dir: Optional[Path] = None) -> None:
+    """Populate ``_XREF_MAP`` and ``_XREF_RE`` from the loaded registry
+    **and** the Doxygen XML output directory.
 
-    Maps every documented short class name to a Docusaurus-relative link
-    path such as ``/docs/api/fiff/fiff-ch-info``.  Only entries with
-    ``documented: true`` are included.
+    Phase 1 — registry: every documented class gets its short name
+    (``FiffInfo``) and its qualified name (``FIFFLIB::FiffInfo``) mapped
+    to the Docusaurus page path.
+
+    Phase 2 — Doxygen XML: scan all ``class_*.xml`` / ``struct_*.xml``
+    files.  For compounds already in the registry the ``refid`` is cached
+    so that ``text_of()`` can resolve ``<ref refid=...>`` tags directly.
+    Unregistered compounds get no link (no page exists), but their refid
+    is still recorded so the hierarchy / member indices can reference
+    them.
     """
-    global _XREF_MAP, _XREF_RE
+    global _XREF_MAP, _XREF_RE, _REFID_MAP
     _XREF_MAP.clear()
+    _REFID_MAP.clear()
     for entry in _REGISTRY["classes"]:
         if not entry.get("documented", False):
             continue
@@ -97,11 +108,40 @@ def _build_xref_map() -> None:
         mod = _MODULES.get(mod_key, {})
         dir_slug = mod.get("dir_slug", mod_key)
         slug = page_slug(name, dir_slug)
-        # Relative path from any API page: ../dir_slug/slug
-        _XREF_MAP[name] = f"/docs/api/{dir_slug}/{slug}"
+        link = f"/docs/api/{dir_slug}/{slug}"
+        _XREF_MAP[name] = link
+        # Also register the qualified name (e.g. "FIFFLIB::FiffInfo")
+        qname = entry.get("qualified_name", "")
+        if qname and qname != name:
+            _XREF_MAP[qname] = link
+
+    # Phase 2: scan Doxygen XML for refid → short-name mapping.
+    if xml_dir and xml_dir.exists():
+        import os
+        for fn in os.listdir(xml_dir):
+            if not (fn.startswith(("class_", "struct_")) and fn.endswith(".xml")):
+                continue
+            try:
+                tree = ET.parse(xml_dir / fn)
+            except ET.ParseError:
+                continue
+            cd = tree.find(".//compounddef")
+            if cd is None:
+                continue
+            refid = cd.get("id", "")
+            qname = cd.findtext("compoundname", "").strip()
+            short = qname.split("::")[-1]
+            # Cache refid → short name (for text_of <ref> resolution)
+            _REFID_MAP[refid] = short
+            # If the short name is already in _XREF_MAP (from registry),
+            # also register the qualified variant and refid-based lookup.
+            if short in _XREF_MAP:
+                if qname and qname != short and qname not in _XREF_MAP:
+                    _XREF_MAP[qname] = _XREF_MAP[short]
+
     if _XREF_MAP:
         # Sort by length descending so longer names match first
-        # (e.g. "FiffChInfo" before "Fiff").
+        # (e.g. "FIFFLIB::FiffChInfo" before "FiffChInfo").
         sorted_names = sorted(_XREF_MAP.keys(), key=len, reverse=True)
         escaped = [re.escape(n) for n in sorted_names]
         _XREF_RE = re.compile(r"\b(" + "|".join(escaped) + r")\b")
@@ -249,12 +289,24 @@ def text_of(el) -> str:
             parts.append(f"*{text_of(child)}*")
         elif tag == "ref":
             ref_text = text_of(child)
-            # Strip namespace prefix for lookup (e.g. "FIFFLIB::FiffInfo" → "FiffInfo")
-            ref_short = ref_text.split("::")[-1] if "::" in ref_text else ref_text
-            if ref_short in _XREF_MAP:
-                parts.append(f"[`{ref_short}`]({_XREF_MAP[ref_short]})")
-            else:
-                parts.append(f"`{ref_text}`")
+            refid = child.get("refid", "")
+            kindref = child.get("kindref", "")
+            # Try refid-based resolution first (most precise).
+            resolved = False
+            if kindref == "compound" and refid:
+                short = _REFID_MAP.get(refid, "")
+                if short and short in _XREF_MAP:
+                    parts.append(f"[`{short}`]({_XREF_MAP[short]})")
+                    resolved = True
+            if not resolved:
+                # Fallback: match the text against the xref map.
+                ref_short = ref_text.split("::")[-1] if "::" in ref_text else ref_text
+                if ref_short in _XREF_MAP:
+                    parts.append(f"[`{ref_short}`]({_XREF_MAP[ref_short]})")
+                elif ref_text in _XREF_MAP:
+                    parts.append(f"[`{ref_text}`]({_XREF_MAP[ref_text]})")
+                else:
+                    parts.append(f"`{ref_text}`")
         elif tag == "ulink":
             url = child.get("url", "")
             parts.append(f"[{text_of(child)}]({url})")
@@ -1466,6 +1518,272 @@ def generate_file_list(xml_dir: Path, out_dir: Path) -> Path:
     return out_file
 
 
+def generate_class_hierarchy(xml_dir: Path, out_dir: Path) -> Path:
+    """Generate ``docs/api/hierarchy.mdx`` — a global inheritance tree
+    rendered as nested Markdown lists, mirroring the Doxygen Class
+    Hierarchy page."""
+    import os
+
+    # Build parent → [children] adjacency and collect root classes
+    # (those with no base class within the documented set).
+    children_of: Dict[str, List[str]] = defaultdict(list)
+    all_classes: Dict[str, str] = {}  # short_name → qualified_name
+    has_parent: set = set()
+
+    for fn in sorted(os.listdir(xml_dir)):
+        if not (fn.startswith(("class_", "struct_")) and fn.endswith(".xml")):
+            continue
+        try:
+            tree = ET.parse(xml_dir / fn)
+        except ET.ParseError:
+            continue
+        cd = tree.find(".//compounddef")
+        if cd is None:
+            continue
+        qname = cd.findtext("compoundname", "").strip()
+        short = qname.split("::")[-1]
+        if not short or short in _EXCLUDED_NAMESPACES:
+            continue
+        ns = qname.split("::")[0] if "::" in qname else ""
+        if ns in _EXCLUDED_NAMESPACES:
+            continue
+        all_classes[short] = qname
+
+        for base in cd.findall("basecompoundref"):
+            parent_name = (base.text or "").strip()
+            parent_short = parent_name.split("::")[-1]
+            if parent_short and parent_short not in _EXCLUDED_NAMESPACES:
+                children_of[parent_short].append(short)
+                has_parent.add(short)
+
+    roots = sorted(set(all_classes.keys()) - has_parent)
+
+    def _render_tree(name: str, depth: int, visited: set) -> List[str]:
+        if name in visited:
+            return []
+        visited.add(name)
+        indent = "  " * depth
+        if name in _XREF_MAP:
+            entry = f"{indent}- [{name}]({_XREF_MAP[name]})"
+        else:
+            entry = f"{indent}- {name}"
+        result = [entry]
+        for child in sorted(children_of.get(name, [])):
+            result.extend(_render_tree(child, depth + 1, visited))
+        return result
+
+    tree_lines: List[str] = []
+    visited: set = set()
+    for root in roots:
+        tree_lines.extend(_render_tree(root, 0, visited))
+
+    lines: List[str] = [
+        "---",
+        "id: hierarchy",
+        'title: "Class Hierarchy"',
+        "sidebar_label: Class Hierarchy",
+        "sidebar_position: 4",
+        "---",
+        "",
+        "# Class Hierarchy",
+        "",
+        "Inheritance hierarchy of all documented classes. "
+        "Classes with links have dedicated API pages.",
+        "",
+    ]
+    lines.extend(tree_lines)
+    lines.append("")
+
+    out_file = out_dir / "hierarchy.mdx"
+    out_file.write_text("\n".join(lines), encoding="utf-8")
+    LOG.info("generated class hierarchy %s", out_file)
+    return out_file
+
+
+def generate_class_members_index(xml_dir: Path, out_dir: Path) -> Path:
+    """Generate ``docs/api/class_members.mdx`` — an alphabetical index of
+    all public class members (functions, variables, typedefs, enums) across
+    every documented class, mirroring the Doxygen 'Class Members' page."""
+    import os
+
+    # member_name → [(class_short, member_kind, brief)]
+    members: Dict[str, List[Tuple[str, str, str]]] = defaultdict(list)
+
+    for fn in sorted(os.listdir(xml_dir)):
+        if not (fn.startswith(("class_", "struct_")) and fn.endswith(".xml")):
+            continue
+        try:
+            tree = ET.parse(xml_dir / fn)
+        except ET.ParseError:
+            continue
+        cd = tree.find(".//compounddef")
+        if cd is None:
+            continue
+        qname = cd.findtext("compoundname", "").strip()
+        short = qname.split("::")[-1]
+        ns = qname.split("::")[0] if "::" in qname else ""
+        if ns in _EXCLUDED_NAMESPACES or short in _EXCLUDED_NAMESPACES:
+            continue
+
+        for sec in cd.findall("sectiondef"):
+            sec_kind = sec.get("kind", "")
+            # Only public sections
+            if "public" not in sec_kind and sec_kind not in ("signal",):
+                continue
+            for m in sec.findall("memberdef"):
+                if m.get("prot") != "public":
+                    continue
+                mname = m.findtext("name", "").strip()
+                mkind = m.get("kind", "")
+                if not mname or mname.startswith("~"):
+                    continue
+                brief = text_of(m.find("briefdescription")).strip()
+                brief = brief.replace("|", "\\|")  # escape for table
+                members[mname].append((short, mkind, brief))
+
+    # Sort members alphabetically
+    sorted_members = sorted(members.items(), key=lambda x: x[0].lower())
+
+    # Group by first letter
+    letter_groups: Dict[str, List[Tuple[str, List[Tuple[str, str, str]]]]] = defaultdict(list)
+    for mname, locations in sorted_members:
+        letter = mname[0].upper() if mname[0].isalpha() else "#"
+        letter_groups[letter].append((mname, locations))
+
+    total = sum(len(locs) for locs in members.values())
+    lines: List[str] = [
+        "---",
+        "id: class-members",
+        'title: "Class Members"',
+        "sidebar_label: Class Members",
+        "sidebar_position: 5",
+        "---",
+        "",
+        "# Class Members",
+        "",
+        f"Index of {total} public class members (functions, variables, "
+        "typedefs, enums) across all documented classes.",
+        "",
+        "**Jump to:** "
+        + " · ".join(f"[{L}](#{L.lower()})" if L != "#" else f"[\\#](#section-hash)"
+                     for L in sorted(letter_groups.keys()))
+        + "",
+        "",
+    ]
+
+    for letter in sorted(letter_groups.keys()):
+        anchor = "section-hash" if letter == "#" else letter.lower()
+        lines.append(f"## {letter} {{#{anchor}}}")
+        lines.append("")
+        for mname, locations in letter_groups[letter]:
+            for cls_short, mkind, brief in sorted(locations, key=lambda x: x[0].lower()):
+                kind_badge = {"function": "fn", "variable": "var",
+                              "typedef": "type", "enum": "enum",
+                              "signal": "signal", "slot": "slot"}.get(mkind, mkind)
+                if cls_short in _XREF_MAP:
+                    cls_link = f"[{cls_short}]({_XREF_MAP[cls_short]})"
+                else:
+                    cls_link = f"`{cls_short}`"
+                brief_str = f" — {brief}" if brief else ""
+                lines.append(
+                    f"- **{mname}** `[{kind_badge}]` in {cls_link}{brief_str}"
+                )
+        lines.append("")
+
+    out_file = out_dir / "class-members.mdx"
+    out_file.write_text("\n".join(lines), encoding="utf-8")
+    LOG.info("generated class members index %s", out_file)
+    return out_file
+
+
+def generate_namespace_members_index(xml_dir: Path, out_dir: Path) -> Path:
+    """Generate ``docs/api/namespace-members.mdx`` — an index of all
+    namespace-level symbols (functions, typedefs, enums, variables),
+    mirroring the Doxygen 'Namespace Members' page."""
+    index_tree = ET.parse(xml_dir / "index.xml")
+
+    # member_name → [(namespace, kind, brief)]
+    members: Dict[str, List[Tuple[str, str, str]]] = defaultdict(list)
+
+    for compound in index_tree.getroot().findall("compound"):
+        if compound.get("kind") != "namespace":
+            continue
+        ns_name = compound.findtext("name", "").strip()
+        if not ns_name or ns_name in _EXCLUDED_NAMESPACES:
+            continue
+        if "::" in ns_name:
+            continue  # skip nested namespaces
+
+        refid = compound.get("refid", "")
+        ns_xml = xml_dir / f"{refid}.xml"
+        if not ns_xml.exists():
+            continue
+        ns_tree = ET.parse(ns_xml)
+        ns_def = ns_tree.find(".//compounddef")
+        if ns_def is None:
+            continue
+
+        for sec in ns_def.findall("sectiondef"):
+            for m in sec.findall("memberdef"):
+                if m.get("prot") not in ("public", None):
+                    continue
+                mname = m.findtext("name", "").strip()
+                mkind = m.get("kind", "")
+                if not mname:
+                    continue
+                # Skip class forward declarations that appear as members
+                if mkind in ("class", "struct", "namespace"):
+                    continue
+                brief = text_of(m.find("briefdescription")).strip()
+                brief = brief.replace("|", "\\|")
+                members[mname].append((ns_name, mkind, brief))
+
+    sorted_members = sorted(members.items(), key=lambda x: x[0].lower())
+
+    total = sum(len(locs) for locs in members.values())
+    lines: List[str] = [
+        "---",
+        "id: namespace-members",
+        'title: "Namespace Members"',
+        "sidebar_label: Namespace Members",
+        "sidebar_position: 6",
+        "---",
+        "",
+        "# Namespace Members",
+        "",
+        f"Index of {total} namespace-level symbols (functions, typedefs, "
+        "enums, variables) across all public namespaces.",
+        "",
+    ]
+
+    if not sorted_members:
+        lines.append("_No namespace-level members found._")
+        lines.append("")
+    else:
+        for mname, locations in sorted_members:
+            for ns, mkind, brief in sorted(locations, key=lambda x: x[0]):
+                kind_badge = {"function": "fn", "variable": "var",
+                              "typedef": "type", "enum": "enum",
+                              "enumvalue": "val"}.get(mkind, mkind)
+                # Link namespace to its library overview if possible
+                ns_link = f"`{ns}`"
+                for mk, mv in _MODULES.items():
+                    if mv.get("namespace") == ns:
+                        ds = mv.get("dir_slug", mk)
+                        ns_link = f"[{ns}](/docs/api/{ds}/)"
+                        break
+                brief_str = f" — {brief}" if brief else ""
+                lines.append(
+                    f"- **{mname}** `[{kind_badge}]` in {ns_link}{brief_str}"
+                )
+        lines.append("")
+
+    out_file = out_dir / "namespace-members.mdx"
+    out_file.write_text("\n".join(lines), encoding="utf-8")
+    LOG.info("generated namespace members index %s", out_file)
+    return out_file
+
+
 def generate_sidebar_fragment(sidebar_out: Path,
                               out_dir: Path,
                               repo_root: Path) -> None:
@@ -1546,6 +1864,9 @@ def generate_sidebar_fragment(sidebar_out: Path,
         "    'api/namespaces',\n"
         "    'api/classes',\n"
         "    'api/files',\n"
+        "    'api/hierarchy',\n"
+        "    'api/class-members',\n"
+        "    'api/namespace-members',\n"
         + ",\n".join(categories) + "\n"
         "];\n\n"
         "export default apiSidebar;\n"
@@ -1592,7 +1913,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
 
     _load_registry(args.registry)
-    _build_xref_map()
+    _build_xref_map(args.xml_dir)
     repo_root = (args.repo_root or args.registry.resolve().parent.parent).resolve()
 
     if not args.xml_dir.exists():
@@ -1715,11 +2036,14 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     LOG.info("generated %d MDX page(s)", len(generated))
 
-    # --- Global index pages (namespace list, class list, file list) ---
+    # --- Global index pages (namespace list, class list, file list, etc.) ---
     if only is None:
         generate_namespace_list(args.xml_dir, args.out_dir)
         generate_class_list(args.out_dir)
         generate_file_list(args.xml_dir, args.out_dir)
+        generate_class_hierarchy(args.xml_dir, args.out_dir)
+        generate_class_members_index(args.xml_dir, args.out_dir)
+        generate_namespace_members_index(args.xml_dir, args.out_dir)
 
     # --- Example coverage report (warnings only, never fatal) -----------
     if only is None:
