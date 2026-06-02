@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+
 # -*- coding: utf-8 -*-
 """
 Train the CMNE LSTM correction model and export to ONNX.

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2010-2026 MNE-CPP Authors
+
 //=============================================================================================================
 // test_inv_dipole_rap_mne.cpp — Tests for inverse dipole fitting, RAP-MUSIC, and minimum norm
 //

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2010-2026 MNE-CPP Authors
+
 //=============================================================================================================
 // test_inv_rt_library.cpp -- Tests for the Inverse and RT Processing libraries
 //

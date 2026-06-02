@@ -1,5 +1,9 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2010-2026 MNE-CPP Authors
+ *
+
  * @file     test_cortical_surface_picking.cpp
  * @brief    Tests vertex-picking + Time Course dock for the
  *           cortical_surface mne_analyze plugin.

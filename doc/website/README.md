@@ -19,7 +19,7 @@ are **not** versioned: they are produced on every docs build by the
 
 - Manifest: [`screenshots/manifest.json`](screenshots/manifest.json)
 - Output:   `static/img/manual/auto/` (ignored by git)
-- Tool:     `src/tools/doc_shots/` → `mne_doc_shots`
+- Tool:     `doc/tools/doc_shots/` → `mne_doc_shots`
 - CMake:    `cmake --build <build_dir> --target doc-shots`
 - Wrapper:  `make screenshots` (or `make screenshots-force`)
 
@@ -37,7 +37,7 @@ No PNG should ever be checked into `static/img/manual/auto/`.
 
 Some manifest entries use a shot `kind` that constructs the full application
 `MainWindow` under the offscreen QPA and grabs it. Shared plumbing lives in
-[`src/tools/doc_shots/shot_app_common.{h,cpp}`](../../src/tools/doc_shots/) —
+[`doc/tools/doc_shots/shot_app_common.{h,cpp}`](../tools/doc_shots/) —
 it forces every `QRhiWidget` descendant onto the Null backend (so the grab
 works on headless macOS/CI without Metal) and pumps the event loop until the
 window is laid out.

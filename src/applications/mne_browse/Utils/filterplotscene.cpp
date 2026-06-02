@@ -8,7 +8,8 @@
  * @version  2.1.0
  * @date     September, 2014
  *
- * @section  LICENSE
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * Copyright (C) 2014, Lars Debor, Christoph Dinh, Gabriel B Motta, Lorenz Esch. All rights reserved.
  *

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2010-2026 MNE-CPP Authors
+
 """Generate PWA icon PNGs from the MNE Inspect application icon.
 
 Resizes the 256x256 app icon to the sizes required by the PWA manifest

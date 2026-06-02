@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2010-2026 MNE-CPP Authors
+
 """
 Validator for doc/api_registry.json.
 

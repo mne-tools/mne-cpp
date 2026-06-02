@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2010-2026 MNE-CPP Authors
+
 #
 # Prepare the online-installer staging layout without invoking binarycreator or
 # repogen. This is mainly useful for debugging the Qt Installer Framework

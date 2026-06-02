@@ -9,7 +9,8 @@
  * @since    0.1.6
  * @date     October, 2020
  *
- * @section  LICENSE
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2020-2026 MNE-CPP Authors
  *
  * Copyright (C) 2020, Christoph Dinh, Lorenz Esch, Lars Debor, Simon Heinke. All rights reserved.
  *

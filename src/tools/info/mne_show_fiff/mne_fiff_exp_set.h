@@ -5,7 +5,8 @@
  * @version  dev
  * @date     December, 2016
  *
- * @section  LICENSE
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * Copyright (C) 2016, Christoph Dinh. All rights reserved.
  *

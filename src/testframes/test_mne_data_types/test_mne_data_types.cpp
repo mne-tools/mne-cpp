@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2010-2026 MNE-CPP Authors
+
 #include <QtTest/QtTest>
 #include <QBuffer>
 #include <QDir>

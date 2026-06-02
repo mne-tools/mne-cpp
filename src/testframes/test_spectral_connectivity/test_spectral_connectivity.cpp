@@ -7,7 +7,8 @@
  * @since    0.1.0
  * @date     May, 2018
  *
- * @section  LICENSE
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * Copyright (C) 2018, Gabriel B Motta, Daniel Strohmeier, Lorenz Esch. All rights reserved.
  *

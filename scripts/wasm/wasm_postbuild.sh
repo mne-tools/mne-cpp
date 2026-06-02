@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2010-2026 MNE-CPP Authors
+
 # ---------------------------------------------------------------------------
 #  wasm_postbuild.sh — Post-build step for MNE-CPP WASM deployment
 #

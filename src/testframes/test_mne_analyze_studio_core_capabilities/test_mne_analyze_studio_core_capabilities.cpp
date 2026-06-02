@@ -1,5 +1,9 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+
  * @file     test_mne_analyze_studio_core_capabilities.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @version  dev

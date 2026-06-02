@@ -1,5 +1,9 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2010-2026 MNE-CPP Authors
+ *
+
  * @file     test_fwd_bem_field_computation.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @brief    Tests for BEM field/potential computation, sphere model fields,

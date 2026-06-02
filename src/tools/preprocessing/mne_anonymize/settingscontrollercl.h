@@ -9,7 +9,8 @@
  * @since    0.1.0
  * @date     September, 2019
  *
- * @section  LICENSE
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2019-2026 MNE-CPP Authors
  *
  * Copyright (C) 2019, Juan Garcia-Prieto, Lorenz Esch, Matti Hamalainen, Wayne Mead, John C. Mosher. All rights reserved.
  *

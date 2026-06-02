@@ -1,5 +1,9 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2010-2026 MNE-CPP Authors
+ *
+
  * @file     test_cortical_surface_stc.cpp
  * @brief    Tests for STC overlay support in the cortical_surface mne_analyze plugin.
  *

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2010-2026 MNE-CPP Authors
+
 // test_setup_forward_model.cpp - Pattern 2 test for mne_setup_forward_model
 
 #include "../../tools/forward/mne_setup_forward_model/mne_setup_forward_model_settings.h"

@@ -1,5 +1,9 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+
  * @file     epochwindow.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @version  2.1.0

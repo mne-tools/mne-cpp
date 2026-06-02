@@ -5,7 +5,8 @@
  * @since    1.0.1
  * @date     Sept, 2021
  *
- * @section  LICENSE
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021-2026 MNE-CPP Authors
  *
  * Copyright (C) 2021, Juan GPC. All rights reserved.
  *

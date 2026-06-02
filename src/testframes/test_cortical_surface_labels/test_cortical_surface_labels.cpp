@@ -1,5 +1,9 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2010-2026 MNE-CPP Authors
+ *
+
  * @file     test_cortical_surface_labels.cpp
  * @brief    Tests the CorticalSurface plugin's Labels dock plumbing.
  *

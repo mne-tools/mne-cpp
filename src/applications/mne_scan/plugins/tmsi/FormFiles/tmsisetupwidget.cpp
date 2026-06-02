@@ -6,7 +6,8 @@
  * @since    0.1.0
  * @date     September 2013
  *
- * @section  LICENSE
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * Copyright (C) 2013, Christoph Dinh, Lorenz Esch. All rights reserved.
  *

@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2010-2026 MNE-CPP Authors
+
 #
 # install_release_archive.sh
 # Download and extract an MNE-CPP release archive into the installer target.

@@ -1,4 +1,7 @@
 @echo off
+REM SPDX-License-Identifier: BSD-3-Clause
+REM Copyright (c) 2010-2026 MNE-CPP Authors
+
 REM
 REM  configure_environment.bat
 REM  MNE-CPP Installer - PATH and Environment Variable Configuration

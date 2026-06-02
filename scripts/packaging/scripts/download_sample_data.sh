@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2010-2026 MNE-CPP Authors
+
 #
 #  download_sample_data.sh
 #  MNE-CPP Installer - Download MNE Sample Dataset

@@ -6,7 +6,8 @@
  * @since    0.1.8
  * @date     March, 2021
  *
- * @section  LICENSE
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021-2026 MNE-CPP Authors
  *
  * Copyright (C) 2021, Gabriel Motta, Juan Garcia-Prieto. All rights reserved.
  *

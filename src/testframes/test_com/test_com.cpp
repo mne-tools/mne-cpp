@@ -1,5 +1,9 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2010-2026 MNE-CPP Authors
+ *
+
  * @file     test_com.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0

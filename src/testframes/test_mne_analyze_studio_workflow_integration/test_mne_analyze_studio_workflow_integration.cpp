@@ -1,5 +1,9 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+
  * @file     test_mne_analyze_studio_workflow_integration.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @version  dev

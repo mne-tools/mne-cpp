@@ -28,3 +28,10 @@ if(DOXYGEN_FOUND)
 else()
     message(STATUS "Doxygen not found -- mne_cpp_docs_api target unavailable")
 endif()
+
+# Documentation screenshot generator (compiled C++ tool, NOT a user-facing CLI
+# tool — lives here rather than src/tools/).
+option(BUILD_MNE_DOC_SHOTS "Build MNE documentation screenshot generator" ON)
+if(BUILD_MNE_DOC_SHOTS AND NOT WASM)
+    add_subdirectory(tools/doc_shots)
+endif()

@@ -5,7 +5,8 @@
  * @since    0.1.0
  * @date     June, 2018
  *
- * @section  LICENSE
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * Copyright (C) 2018, Lorenz Esch. All rights reserved.
  *

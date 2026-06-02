@@ -1,4 +1,8 @@
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2010-2026 MNE-CPP Authors
+ *
+
  * @file test_fs_io.cpp
  * @brief Tests for FSLIB I/O and processing: FsSurface, FsAnnotation, FsLabel,
  *        FsSurfaceSet, FsAnnotationSet, compute_normals, read_curv.

@@ -1,4 +1,8 @@
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2010-2026 MNE-CPP Authors
+ *
+
  * @file test_fwd_extended.cpp
  * @brief Comprehensive tests for FWDLIB: FwdEegSphereModel, ComputeFwdSettings,
  *        FwdEegSphereLayer, and sphere-potential helpers.

@@ -1,5 +1,9 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2010-2026 MNE-CPP Authors
+ *
+
  * @file     test_mne_projections.cpp
  * @brief    Unit tests for MNEProjOp, MNEProjItem, MNECtfCompDataSet, and MNEDescriptionParser.
  */

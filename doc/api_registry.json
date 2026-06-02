@@ -154,7 +154,7 @@
     },
     "mna": {
       "dir": "src/libraries/mna",
-      "sidebar_label": "MNA Library (Modular Architecture)",
+      "sidebar_label": "MNA Library",
       "origin": "custom",
       "include": "mna",
       "dir_slug": "mna",

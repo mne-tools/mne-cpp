@@ -6,8 +6,9 @@
 * @version  1.0
 * @date     April, 2019
 *
-* @section  LICENSE
-*
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2019-2026 MNE-CPP Authors
+ *
 * Copyright (C) 2019, Simon Heinke and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that

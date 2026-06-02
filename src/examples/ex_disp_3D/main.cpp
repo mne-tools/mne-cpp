@@ -10,7 +10,8 @@
  * @since    0.1.0
  * @date     July, 2016
  *
- * @section  LICENSE
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * Copyright (C) 2016, Lars Debor, Christoph Dinh, Felix Griesau, Juan Garcia-Prieto, Lorenz Esch,
  *                     Simon Heinke. All rights reserved.

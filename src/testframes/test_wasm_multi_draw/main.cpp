@@ -1,4 +1,8 @@
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2010-2026 MNE-CPP Authors
+ *
+
  * @file main.cpp
  * @brief Minimal single-pass, multi-draw QRhi test for WASM/WebGL.
  *

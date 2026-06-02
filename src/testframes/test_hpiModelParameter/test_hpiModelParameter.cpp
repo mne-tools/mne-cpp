@@ -5,7 +5,8 @@
  * @since    0.1.9
  * @date     February, 2022
  *
- * @section  LICENSE
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2022-2026 MNE-CPP Authors
  *
  * Copyright (C) 2022, Ruben Dörfel. All rights reserved.
  *

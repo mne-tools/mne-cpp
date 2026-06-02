@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2010-2026 MNE-CPP Authors
+
 //=============================================================================================================
 // test_fiff_io_evoked_info.cpp — Tests for FIFF I/O, evoked data sets, and FiffInfo operations
 //

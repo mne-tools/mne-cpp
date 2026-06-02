@@ -1,3 +1,6 @@
+REM SPDX-License-Identifier: BSD-3-Clause
+REM Copyright (c) 2010-2026 MNE-CPP Authors
+
 
 :;# This script performs generates and copies the necesary library dependencies for running qt-projects both for 
 :;# dynamic and for staic builds. 
