@@ -55,6 +55,13 @@ _MODULES: Dict[str, dict] = {}
 _FILES_WITHOUT_AUTHOR: List[str] = []
 _CLASS_INDEX: Dict[str, List[dict]] = {}   # short-name -> list of entries
 
+# Cross-reference map: short class name → relative MDX link path.
+# Built by _build_xref_map() after registry load.
+_XREF_MAP: Dict[str, str] = {}
+# Compiled regex matching any registered class name as a whole word.
+# Set by _build_xref_map().
+_XREF_RE: Optional[re.Pattern] = None
+
 # Namespaces we never document, even if they appear in the XML.
 _EXCLUDED_NAMESPACES = {
     "std", "Eigen", "boost", "qt", "Qt",
@@ -71,6 +78,54 @@ def _load_registry(registry_path: Path) -> None:
     _CLASS_INDEX.clear()
     for entry in _REGISTRY["classes"]:
         _CLASS_INDEX.setdefault(entry["name"], []).append(entry)
+
+
+def _build_xref_map() -> None:
+    """Populate ``_XREF_MAP`` and ``_XREF_RE`` from the loaded registry.
+
+    Maps every documented short class name to a Docusaurus-relative link
+    path such as ``/docs/api/fiff/fiff-ch-info``.  Only entries with
+    ``documented: true`` are included.
+    """
+    global _XREF_MAP, _XREF_RE
+    _XREF_MAP.clear()
+    for entry in _REGISTRY["classes"]:
+        if not entry.get("documented", False):
+            continue
+        name = entry["name"]
+        mod_key = entry.get("module", "core")
+        mod = _MODULES.get(mod_key, {})
+        dir_slug = mod.get("dir_slug", mod_key)
+        slug = page_slug(name, dir_slug)
+        # Relative path from any API page: ../dir_slug/slug
+        _XREF_MAP[name] = f"/docs/api/{dir_slug}/{slug}"
+    if _XREF_MAP:
+        # Sort by length descending so longer names match first
+        # (e.g. "FiffChInfo" before "Fiff").
+        sorted_names = sorted(_XREF_MAP.keys(), key=len, reverse=True)
+        escaped = [re.escape(n) for n in sorted_names]
+        _XREF_RE = re.compile(r"\b(" + "|".join(escaped) + r")\b")
+    else:
+        _XREF_RE = None
+
+
+def linkify_type(type_str: str, *, self_name: str = "") -> str:
+    """Replace known MNE-CPP class names in *type_str* with MDX links.
+
+    ``FiffChInfo`` becomes ``[FiffChInfo](/docs/api/fiff/fiff-ch-info)``.
+    The class's own name (*self_name*) is never linked to avoid
+    self-referential links on a class's own page.
+    """
+    if not _XREF_RE or not type_str:
+        return type_str
+
+    def _replace(m: re.Match) -> str:
+        name = m.group(1)
+        if name == self_name:
+            return name
+        return f"[{name}]({_XREF_MAP[name]})"
+
+    return _XREF_RE.sub(_replace, type_str)
 
 
 def module_for(qualified: str) -> Optional[dict]:
@@ -193,7 +248,13 @@ def text_of(el) -> str:
         elif tag == "emphasis":
             parts.append(f"*{text_of(child)}*")
         elif tag == "ref":
-            parts.append(f"`{text_of(child)}`")
+            ref_text = text_of(child)
+            # Strip namespace prefix for lookup (e.g. "FIFFLIB::FiffInfo" → "FiffInfo")
+            ref_short = ref_text.split("::")[-1] if "::" in ref_text else ref_text
+            if ref_short in _XREF_MAP:
+                parts.append(f"[`{ref_short}`]({_XREF_MAP[ref_short]})")
+            else:
+                parts.append(f"`{ref_text}`")
         elif tag == "ulink":
             url = child.get("url", "")
             parts.append(f"[{text_of(child)}]({url})")
@@ -455,7 +516,7 @@ def _public_members(section) -> List:
 # Method rendering
 # ---------------------------------------------------------------------------
 
-def _render_method(func, lines: List[str]) -> None:
+def _render_method(func, lines: List[str], *, self_name: str = "") -> None:
     name = func.findtext("name", "")
     param_names = [p.findtext("declname", "") for p in func.findall("param")]
     param_names = [p for p in param_names if p]
@@ -486,7 +547,8 @@ def _render_method(func, lines: List[str]) -> None:
         for pname, pdesc in params:
             display_type = beautify_type(xml_params.get(pname, ""))
             if display_type:
-                lines.append(f"- **{pname}** : *{display_type}*")
+                linked = linkify_type(display_type, self_name=self_name)
+                lines.append(f"- **{pname}** : *{linked}*")
             else:
                 lines.append(f"- **{pname}**")
             if pdesc:
@@ -499,7 +561,8 @@ def _render_method(func, lines: List[str]) -> None:
         lines.append("**Returns:**")
         lines.append("")
         if display_ret:
-            lines.append(f"- *{display_ret}* — {ret}")
+            linked_ret = linkify_type(display_ret, self_name=self_name)
+            lines.append(f"- *{linked_ret}* — {ret}")
         else:
             lines.append(f"- {ret}")
         lines.append("")
@@ -744,7 +807,7 @@ def generate_class_mdx(compounddef,
         lines.append("## Signals")
         lines.append("")
         for f in signals:
-            _render_method(f, lines)
+            _render_method(f, lines, self_name=short_name)
 
     # --- Public slots ---
     pub_slots = []
@@ -754,7 +817,7 @@ def generate_class_mdx(compounddef,
         lines.append("## Public Slots")
         lines.append("")
         for f in pub_slots:
-            _render_method(f, lines)
+            _render_method(f, lines, self_name=short_name)
 
     # --- Generic public methods ---
     public_funcs: List = []
@@ -764,7 +827,7 @@ def generate_class_mdx(compounddef,
         lines.append("## Public Methods")
         lines.append("")
         for f in public_funcs:
-            _render_method(f, lines)
+            _render_method(f, lines, self_name=short_name)
 
     # --- Static methods ---
     static_funcs: List = []
@@ -774,7 +837,7 @@ def generate_class_mdx(compounddef,
         lines.append("## Static Methods")
         lines.append("")
         for f in static_funcs:
-            _render_method(f, lines)
+            _render_method(f, lines, self_name=short_name)
 
     # --- Example (sourced from src/examples/<ex_id>/main.cpp) ---
     _render_example_section(reg_entry, repo_root, lines)
@@ -847,7 +910,8 @@ def _render_free_function(func, lines: List[str]) -> None:
         for pname, pdesc in params:
             display_type = beautify_type(xml_params.get(pname, ""))
             if display_type:
-                lines.append(f"- **{pname}** : *{display_type}*")
+                linked = linkify_type(display_type)
+                lines.append(f"- **{pname}** : *{linked}*")
             else:
                 lines.append(f"- **{pname}**")
             if pdesc:
@@ -859,7 +923,8 @@ def _render_free_function(func, lines: List[str]) -> None:
         lines.append("**Returns:**")
         lines.append("")
         if ret_type:
-            lines.append(f"- *{ret_type}* — {ret}")
+            linked_ret = linkify_type(ret_type)
+            lines.append(f"- *{linked_ret}* — {ret}")
         else:
             lines.append(f"- {ret}")
         lines.append("")
@@ -1248,6 +1313,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
 
     _load_registry(args.registry)
+    _build_xref_map()
     repo_root = (args.repo_root or args.registry.resolve().parent.parent).resolve()
 
     if not args.xml_dir.exists():
@@ -1369,6 +1435,28 @@ def main(argv: Optional[List[str]] = None) -> int:
         warnings += 1
 
     LOG.info("generated %d MDX page(s)", len(generated))
+
+    # --- Example coverage report (warnings only, never fatal) -----------
+    if only is None:
+        no_example = [
+            e["name"] for e in _REGISTRY["classes"]
+            if e.get("documented", False) and not e.get("example")
+        ]
+        has_example = [
+            e["name"] for e in _REGISTRY["classes"]
+            if e.get("documented", False) and e.get("example")
+        ]
+        total_doc = len(no_example) + len(has_example)
+        if no_example:
+            LOG.warning(
+                "example coverage: %d/%d documented classes have an example "
+                "(%d without):",
+                len(has_example), total_doc, len(no_example),
+            )
+            for n in sorted(no_example):
+                LOG.warning("  no example: %s", n)
+        else:
+            LOG.info("example coverage: %d/%d (100%%)", len(has_example), total_doc)
 
     if args.generate_sidebars:
         if args.sidebar_out:
