@@ -513,6 +513,67 @@ def _public_members(section) -> List:
 
 
 # ---------------------------------------------------------------------------
+# Mermaid inheritance diagram
+# ---------------------------------------------------------------------------
+
+def _mermaid_safe(name: str) -> str:
+    """Strip namespace prefixes and make a Mermaid-safe identifier."""
+    short = name.split("::")[-1]
+    # Mermaid identifiers: alphanumeric + underscore
+    return re.sub(r"[^A-Za-z0-9_]", "_", short)
+
+
+def _render_inheritance_diagram(compounddef, short_name: str,
+                                 lines: List[str]) -> None:
+    """Emit a Mermaid ``classDiagram`` block showing base and derived
+    classes extracted from the Doxygen XML ``<basecompoundref>`` and
+    ``<derivedcompoundref>`` elements.  Skips the section entirely when
+    there are no inheritance relationships."""
+    bases = compounddef.findall("basecompoundref")
+    derived = compounddef.findall("derivedcompoundref")
+    if not bases and not derived:
+        return
+
+    me = _mermaid_safe(short_name)
+    diagram_lines: List[str] = ["classDiagram"]
+    seen_edges: set = set()
+
+    for b in bases:
+        parent = b.text or ""
+        parent_short = parent.split("::")[-1]
+        parent_id = _mermaid_safe(parent_short)
+        edge = (parent_id, me)
+        if edge not in seen_edges:
+            diagram_lines.append(f"    {parent_id} <|-- {me}")
+            seen_edges.add(edge)
+            # Link the parent if it's a registered class
+            if parent_short in _XREF_MAP:
+                diagram_lines.append(
+                    f'    click {parent_id} "{_XREF_MAP[parent_short]}"'
+                )
+
+    for d in derived:
+        child = d.text or ""
+        child_short = child.split("::")[-1]
+        child_id = _mermaid_safe(child_short)
+        edge = (me, child_id)
+        if edge not in seen_edges:
+            diagram_lines.append(f"    {me} <|-- {child_id}")
+            seen_edges.add(edge)
+            if child_short in _XREF_MAP:
+                diagram_lines.append(
+                    f'    click {child_id} "{_XREF_MAP[child_short]}"'
+                )
+
+    lines.append("### Inheritance")
+    lines.append("")
+    lines.append("```mermaid")
+    lines.extend(diagram_lines)
+    lines.append("```")
+    lines.append("")
+
+
+# ---------------------------------------------------------------------------
 # Method rendering
 # ---------------------------------------------------------------------------
 
@@ -797,6 +858,10 @@ def generate_class_mdx(compounddef,
     if body_text:
         lines.append(body_text)
         lines.append("")
+
+    # --- Inheritance diagram (Mermaid) ---
+    _render_inheritance_diagram(compounddef, short_name, lines)
+
     lines.append("---")
     lines.append("")
 
@@ -1190,6 +1255,217 @@ def generate_library_overview(module_key: str,
     return out_file
 
 
+# ---------------------------------------------------------------------------
+# Global index pages: namespaces, classes, files
+# ---------------------------------------------------------------------------
+
+def generate_namespace_list(xml_dir: Path, out_dir: Path) -> Path:
+    """Generate ``docs/api/namespaces.mdx`` listing every namespace with
+    its classes and a brief description."""
+    index_tree = ET.parse(xml_dir / "index.xml")
+    namespaces: List[Tuple[str, str, List[str]]] = []
+
+    for compound in index_tree.getroot().findall("compound"):
+        if compound.get("kind") != "namespace":
+            continue
+        ns_name = compound.findtext("name", "").strip()
+        if not ns_name or ns_name in _EXCLUDED_NAMESPACES:
+            continue
+        if "::" in ns_name:
+            continue  # skip nested namespaces (sub-enums etc.)
+
+        # Get brief from namespace XML
+        refid = compound.get("refid", "")
+        brief = ""
+        members: List[str] = []
+        ns_xml = xml_dir / f"{refid}.xml"
+        if ns_xml.exists():
+            ns_tree = ET.parse(ns_xml)
+            ns_def = ns_tree.find(".//compounddef")
+            if ns_def is not None:
+                brief = text_of(ns_def.find("briefdescription")).strip()
+                for ic in ns_def.findall("innerclass"):
+                    cname = (ic.text or "").split("::")[-1]
+                    if cname:
+                        members.append(cname)
+
+        # Map namespace to module
+        mod_entry = None
+        for mk, mv in _MODULES.items():
+            if mv.get("namespace") == ns_name:
+                mod_entry = mv
+                break
+
+        namespaces.append((ns_name, brief, sorted(members)))
+
+    namespaces.sort(key=lambda x: x[0])
+
+    lines: List[str] = [
+        "---",
+        "id: namespaces",
+        'title: "Namespace List"',
+        "sidebar_label: Namespaces",
+        "sidebar_position: 1",
+        "---",
+        "",
+        "# Namespace List",
+        "",
+        "All public namespaces in the MNE-CPP library tree.",
+        "",
+        "| Namespace | Classes | Description |",
+        "|-----------|---------|-------------|",
+    ]
+    for ns_name, brief, members in namespaces:
+        count = len(members)
+        # Link to the library overview if we have a module match
+        mod_link = ""
+        for mk, mv in _MODULES.items():
+            if mv.get("namespace") == ns_name:
+                ds = mv.get("dir_slug", mk)
+                mod_link = f"[`{ns_name}`](/docs/api/{ds}/)"
+                break
+        if not mod_link:
+            mod_link = f"`{ns_name}`"
+        lines.append(f"| {mod_link} | {count} | {brief} |")
+
+    lines.append("")
+
+    # Per-namespace class inventory with links
+    lines.append("## Class inventory by namespace")
+    lines.append("")
+    for ns_name, brief, members in namespaces:
+        if not members:
+            continue
+        lines.append(f"### {ns_name}")
+        lines.append("")
+        for m in members:
+            if m in _XREF_MAP:
+                lines.append(f"- [{m}]({_XREF_MAP[m]})")
+            else:
+                lines.append(f"- `{m}`")
+        lines.append("")
+
+    out_file = out_dir / "namespaces.mdx"
+    out_file.write_text("\n".join(lines), encoding="utf-8")
+    LOG.info("generated namespace list %s", out_file)
+    return out_file
+
+
+def generate_class_list(out_dir: Path) -> Path:
+    """Generate ``docs/api/classes.mdx`` — an alphabetical list of all
+    documented classes with links to their pages."""
+    documented = [
+        e for e in _REGISTRY["classes"]
+        if e.get("documented", False)
+    ]
+    documented.sort(key=lambda e: e["name"].lower())
+
+    lines: List[str] = [
+        "---",
+        "id: classes",
+        'title: "Class List"',
+        "sidebar_label: Classes",
+        "sidebar_position: 2",
+        "---",
+        "",
+        "# Class List",
+        "",
+        f"All {len(documented)} documented public classes in MNE-CPP, "
+        "sorted alphabetically.",
+        "",
+        "| Class | Library | Header |",
+        "|-------|---------|--------|",
+    ]
+    for e in documented:
+        name = e["name"]
+        mod_key = e.get("module", "core")
+        mod = _MODULES.get(mod_key, {})
+        label = mod.get("sidebar_label", mod_key)
+        header = e.get("header", "")
+        link = _XREF_MAP.get(name, "")
+        if link:
+            lines.append(f"| [{name}]({link}) | {label} | `{header}` |")
+        else:
+            lines.append(f"| `{name}` | {label} | `{header}` |")
+
+    lines.append("")
+    out_file = out_dir / "classes.mdx"
+    out_file.write_text("\n".join(lines), encoding="utf-8")
+    LOG.info("generated class list %s", out_file)
+    return out_file
+
+
+def generate_file_list(xml_dir: Path, out_dir: Path) -> Path:
+    """Generate ``docs/api/files.mdx`` — a list of all documented source
+    files grouped by library directory."""
+    index_tree = ET.parse(xml_dir / "index.xml")
+    files: List[Tuple[str, str]] = []
+
+    for compound in index_tree.getroot().findall("compound"):
+        if compound.get("kind") != "file":
+            continue
+        fname = compound.findtext("name", "").strip()
+        if not fname:
+            continue
+        # Get the file's location
+        refid = compound.get("refid", "")
+        loc = ""
+        fxml = xml_dir / f"{refid}.xml"
+        if fxml.exists():
+            ftree = ET.parse(fxml)
+            fdef = ftree.find(".//compounddef")
+            if fdef is not None:
+                loc_el = fdef.find("location")
+                if loc_el is not None:
+                    loc = loc_el.get("file", "")
+        files.append((fname, loc))
+
+    # Group by top-level directory (library)
+    grouped: Dict[str, List[Tuple[str, str]]] = defaultdict(list)
+    for fname, loc in sorted(files, key=lambda x: x[1] or x[0]):
+        # loc is relative to src/libraries/, e.g. "fiff/fiff_info.h"
+        parts = (loc or fname).split("/")
+        lib_dir = parts[0] if len(parts) > 1 else "other"
+        grouped[lib_dir].append((fname, loc))
+
+    lines: List[str] = [
+        "---",
+        "id: files",
+        'title: "File List"',
+        "sidebar_label: Files",
+        "sidebar_position: 3",
+        "---",
+        "",
+        "# File List",
+        "",
+        f"All {len(files)} documented header and source files in the "
+        "MNE-CPP library tree, grouped by library directory.",
+        "",
+    ]
+    for lib_dir in sorted(grouped.keys()):
+        entries = grouped[lib_dir]
+        # Find the module label
+        mod_label = lib_dir
+        for mk, mv in _MODULES.items():
+            if mv.get("include", mk) == lib_dir or mv.get("dir_slug", mk) == lib_dir:
+                mod_label = mv.get("sidebar_label", mk)
+                break
+        lines.append(f"### {mod_label} (`{lib_dir}/`)")
+        lines.append("")
+        lines.append("| File | Path |")
+        lines.append("|------|------|")
+        for fname, loc in entries:
+            gh_link = (f"[`{fname}`](https://github.com/mne-tools/mne-cpp/blob/"
+                       f"staging/src/libraries/{loc})")
+            lines.append(f"| {gh_link} | `{loc}` |")
+        lines.append("")
+
+    out_file = out_dir / "files.mdx"
+    out_file.write_text("\n".join(lines), encoding="utf-8")
+    LOG.info("generated file list %s", out_file)
+    return out_file
+
+
 def generate_sidebar_fragment(sidebar_out: Path,
                               out_dir: Path,
                               repo_root: Path) -> None:
@@ -1267,6 +1543,9 @@ def generate_sidebar_fragment(sidebar_out: Path,
         "import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';\n\n"
         "const apiSidebar: SidebarsConfig['apiSidebar'] = [\n"
         "    'api/index',\n"
+        "    'api/namespaces',\n"
+        "    'api/classes',\n"
+        "    'api/files',\n"
         + ",\n".join(categories) + "\n"
         "];\n\n"
         "export default apiSidebar;\n"
@@ -1435,6 +1714,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         warnings += 1
 
     LOG.info("generated %d MDX page(s)", len(generated))
+
+    # --- Global index pages (namespace list, class list, file list) ---
+    if only is None:
+        generate_namespace_list(args.xml_dir, args.out_dir)
+        generate_class_list(args.out_dir)
+        generate_file_list(args.xml_dir, args.out_dir)
 
     # --- Example coverage report (warnings only, never fatal) -----------
     if only is None:
