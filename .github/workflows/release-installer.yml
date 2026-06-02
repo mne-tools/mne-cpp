@@ -9,7 +9,7 @@ on:
 
 env:
   QIF_VERSION: "4.11.0"
-  MNE_CPP_VERSION: "2.2.1"
+  MNE_CPP_VERSION: "2.3.0"
 
 jobs:
   LinuxInstaller:

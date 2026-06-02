@@ -2,6 +2,113 @@
 
 All notable changes to MNE-CPP will be documented in this file.
 
+## [2.3.0] - 2026-06-02
+
+### Highlights
+
+- **MNE Inspect multimodal visualization** — Unified `MultimodalScene` integrating sEEG depth electrodes, ECoG grids/strips (`ElectrodeObject`), MRI orthogonal slices (`SliceObject`), cortical surfaces with STC overlays, dipoles, connectivity arcs, and sensor locations; cross-modality picking with shared `PickResult` and timeline; data-driven colormap controls.
+- **MNE Scan production hardening** — Plugin audit, real-time CMNE wiring (MNE/dSPM/sLORETA/CMNE method selector), recording/replay/resume, quickstart/hardware/deployment documentation, packaging refinements.
+- **MNE Analyze cortical workflow** — FreeSurfer surface plugin, STC overlay with threshold/mid/max colormap and time slider, vertex picking and timecourse display.
+- **MNE Align coregistration wizard** — 7-step wizard-guided coregistration tool with Polhemus FASTRAK serial driver, fiducial/HSP/EEG-cap digitization, Kabsch SVD + ICP alignment, `-trans.fif` export.
+- **MNE-Python algorithm parity (~92%)** — Covariance estimation (auto/shrunk/OAS/FA/PCA), inverse convenience API, preprocessing & artifact detection, standard montages (10-20/10-10/10-05), Maxwell movement compensation, multitaper TFR, Picard ICA, surface Laplacian, auto ICA classification, depth priors, resolution metrics, SourceMorph, TRAP-MUSIC, TF-MxNE, CSP/SPoC/SSD decoding, simulation API.
+- **Skigen integration** — ML algorithms (StandardScaler, MinMaxScaler, LOF, LedoitWolf, OAS, EmpiricalCovariance, FactorAnalysis, CSP, SPoC, SSD) delegated to skigen; API provenance registry with CI validation.
+- **SPDX license-header normalization** — 1013 files migrated to unified SPDX+Doxygen headers; CI gate enforces compliance on every PR.
+- **Doxygen-to-Docusaurus API docs** — Complete automated pipeline (`doxy2mdx.py`) generating 355 MDX pages (336 classes + 19 library indexes) with Mermaid inheritance diagrams and cross-reference hyperlinks.
+
+### New Features
+
+- **Covariance estimation parity** (TASK 12): Auto/shrunk/OAS/FA/PCA/regularize/whitener methods; `apply_inverse_epochs/raw/cov`, beamformer epochs, source PSD/power convenience API
+- **Preprocessing & artifact detection parity** (TASK 13): Maxwell bad-channel detection, EOG regression, EEG re-referencing, cHPI filter, stim artifact removal, muscle/amplitude annotation, bridged electrode detection, LOF bad-channel detection, fine calibration, annotation↔event conversion
+- **Source estimate types** (TASK 14): `VectorSourceEstimate`, `VolSourceEstimate`, `MixedSourceEstimate`; label operations (`extract_label_time_course` with 5 modes, stc↔label, grow/split labels)
+- **Decoding** (TASK 15): CSP/SPoC/SSD/SlidingEstimator/GeneralizingEstimator/ReceptiveField; I/O export (EDF/BrainVision), AEC/PEC connectivity, HTML Report, linear regression, RM-ANOVA, bootstrap CI, fixed-length epochs
+- **Standard montages** (TASK 6): 10-20/10-10/10-05 electrode montage support
+- **Maxwell movement compensation** (TASK 6): Full Maxwell filter movement compensation
+- **Multitaper TFR** (TASK 7): Multitaper time-frequency representation
+- **Picard ICA** (TASK 7): Picard-based ICA decomposition algorithm
+- **Surface Laplacian** (TASK 7): Current source density via surface Laplacian
+- **Auto ICA classification** (TASK 7): Automated ICA component labeling
+- **Depth priors & resolution metrics** (TASK 8): PSF/CTF resolution metrics for source estimation
+- **Full SourceMorph** (TASK 8): Complete cross-subject cortical morphing
+- **TRAP-MUSIC** (TASK 8): TRAP-MUSIC source localization algorithm
+- **TF-MxNE** (TASK 6): Time-frequency mixed-norm estimates
+- **Simulation API** (TASK 9): `simulate_raw`/`_stc`/`_evoked`, `addNoise`/`Ecg`/`Eog`/`Chpi` in new `sim` library
+- **MNE Inspect plugins**: Electrode visualization plugin (`inspect_electrodes`), MRI slices plugin (`inspect_mri_slices`)
+- **MNE Analyze Studio skills**: MNA-aware agent skills extension (`mna_skills`)
+- **MNE Analyze cortical surface plugin**: STC load with fThresh/fMid/fMax colormap, time slider, play/pause
+- **Real-time CMNE**: CMNE method added to MNE Scan minimum norm settings (combo: MNE/dSPM/sLORETA/CMNE) with model-checkpoint picker
+- **Polhemus FASTRAK driver**: Serial backend with auto-detection, pivot calibration, optical path calibration engine, Kabsch SVD registration with vertex disambiguation
+- **NIfTI reader**: NIfTI-1 single-file reader (`.nii`/`.nii.gz`) for MRI slice plugins
+- **Documentation screenshot tool**: `mne_doc_shots` manifest-driven screenshot generation for manual pages
+- **macOS .dmg generation**: `create-dmg` integration with codesign and notarization hooks
+- **API provenance registry**: `doc/api_registry.json` with 90+ entries; `tools/validate_api_registry.py` CI validation
+
+### MNE Inspect
+
+- **Multimodal visualization** — Integrated `MultimodalScene` with electrode, MRI slice, brain surface, STC overlay, dipole, connectivity, and sensor renderables
+- **Electrode plugin** — sEEG depth electrodes and ECoG grid/strip visualization with instanced contact spheres
+- **MRI slices plugin** — Orthogonal MRI slice rendering with voxel-to-world transforms and intensity windowing
+
+### MNE Scan
+
+- **Real-time CMNE** — Cascaded MNE method added to minimum norm plugin with MNE/dSPM/sLORETA/CMNE selector and ONNX model-checkpoint picker
+- **Quickstart documentation** — Hardware setup, deployment, and quickstart manual pages
+
+### MNE Align
+
+- **New coregistration application** — 7-step wizard: Load FIFF digitizer points → Verify → Acquire fiducials → Acquire head shape → Acquire EEG cap → ICP alignment → Save `-trans.fif`
+- **Polhemus FASTRAK integration** — Live serial acquisition with auto-detect, pivot calibration, hemisphere configuration
+- **3D visualization** — Interactive BrainView with signal-driven sync, session persistence, marker rendering
+
+### Skigen Integration
+
+- **Delegated algorithms**: StandardScaler, MinMaxScaler, LOF, LedoitWolf, OAS, EmpiricalCovariance, FactorAnalysis, CSP, SPoC, SSD
+- **Policy**: Never reimplement sklearn algorithms in mne-cpp; implement in skigen first
+- **Init scripts**: Updated `init.sh`/`init.bat` to clone skigen automatically
+- **CI**: API registry validation workflow
+
+### CI/CD
+
+- Fixed polyglot `.bat` SPDX headers causing bash syntax errors on Linux/macOS — `REM Copyright (c)` replaced with `:;#` comment style valid in both shells
+- Fixed `mne_doc_shots` link errors on Linux with code coverage (`__gcov_exit` unresolved) — added `--coverage` compile/link flags
+- Fixed `mne_doc_shots` MSVC RuntimeLibrary mismatch on Windows (`MD_DynamicRelease` vs `MT_StaticRelease`) — set `MSVC_RUNTIME_LIBRARY` to match project libraries
+- Added SPDX license-header CI gate (`license-headers.yml`)
+- Added API registry validation CI gate (`api-registry-validate.yml`)
+- Added Doxygen API docs CI pipeline (`api-docs.yml`)
+- Qt 6.11.1 toolchain across all CI workflows
+
+### Documentation
+
+- **SPDX license headers**: 1013 files migrated to unified SPDX+Doxygen format with chronological author order and rename history
+- **Doxygen API docs pipeline**: `tools/doxy2mdx/doxy2mdx.py` (1394 lines) generating 355 MDX pages with Mermaid inheritance diagrams, XML-backed cross-references, and per-library indexes
+- **MNE Align manual** (`mne-align.mdx`): 7-step wizard documentation
+- **MNE Scan manual** (`mne-scan-hardware.mdx`, `mne-scan-quickstart.mdx`, `mne-scan-deployment.mdx`): 18 plugins enumerated
+- **MNE Analyze Studio manual** (`mne-analyze-studio.mdx`): Agent-based workflow documentation
+- **MNE Inspect multimodal manual** (`mne-inspect-multimodal.mdx`): Multimodal visualization guide
+- **Build guide**: Updated for init-script workflow, Skigen dependency, and script paths
+- **Thin-plate-spline warp example** (Closes #475)
+
+### Refactoring
+
+- Renamed `conn` library to `connectivity` to match mne-python naming
+- Removed redundant null checks before `delete` (Closes #857)
+- Modernized header format: unified v3 SPDX+Doxygen with `@author`/`@since`/`@date` tags
+- Renamed FastTrak → Fastrak (correct product name)
+
+### Bug Fixes
+
+- Fixed `QWARN` deprecation warnings in `test_mne_io_coverage` (replaced with `qWarning()`)
+- Fixed FIFF coordinate transformations: retain all transforms read from a file
+- Fixed high-DPI rendering on fractional-scale monitors
+- Fixed HPI digitizer sphere visibility in disp3D
+- Fixed MNE Scan record action label/tooltip toggle
+- Fixed stale static-analysis findings
+- Fixed init.sh index error (#994)
+- Fixed segfault when opening FIF files saved from MNE Python (gantry angle type mismatch, #993)
+- Fixed cortical_surface plugin DLL resolution on Windows
+- Fixed connectivity registry header paths after library rename
+- Fixed WASM SerialPort, Doxygen MathJax, and deploy auth
+- Fixed Polhemus serial port disconnect, vertex-based frame flip, calibration flow
+
 ## [2.2.1] - 2026-04-28
 
 ### Bug Fixes

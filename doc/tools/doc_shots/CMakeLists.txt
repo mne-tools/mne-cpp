@@ -61,6 +61,20 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Eigen3::Eigen
 )
 
+# Match the runtime library used by src/ libraries (dynamic CRT on MSVC)
+if(MSVC)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+    )
+endif()
+
+# Propagate code-coverage instrumentation so that gcov symbols from the
+# libraries we link against (built with --coverage) can be resolved.
+if(WITH_CODE_COV)
+    target_compile_options(${PROJECT_NAME} PRIVATE --coverage)
+    target_link_options(${PROJECT_NAME} PRIVATE --coverage)
+endif()
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE FALSE
     WIN32_EXECUTABLE FALSE

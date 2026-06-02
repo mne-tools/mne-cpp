@@ -112,7 +112,7 @@ private slots:
             if(written) {
                 QVERIFY(QFileInfo(outFile).size() > 0);
             } else {
-                QWARN("write_raw returned false — code path exercised");
+                qWarning() << "write_raw returned false — code path exercised";
             }
         }
     }
@@ -137,7 +137,7 @@ private slots:
             QVERIFY(info->sfreq > 0);
             QVERIFY(!info->chInfo.isEmpty());
         } else {
-            QWARN("MNERawInfo::load failed — code path exercised");
+            qWarning() << "MNERawInfo::load failed — code path exercised";
         }
     }
 
@@ -256,7 +256,7 @@ private slots:
                 QCOMPARE(stcRead.data.cols(), nTimes);
             }
         } else {
-            QWARN("STC write failed — code path exercised");
+            qWarning() << "STC write failed — code path exercised";
         }
     }
 
