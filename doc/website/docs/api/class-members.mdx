@@ -206,7 +206,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **arrays** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **ArtifactSettingsView** `[fn]` in [ArtifactSettingsView](/docs/api/disp/artifact-settings-view)
 - **aspect_kind** `[var]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR.
-- **aspectKindToString** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Provides the python Evoked string formatted aspect_kind, which is stored in kind: "average" <-> FIFFV_ASPECT_AVERAGE, "standard_error" <-> FIFFV_ASPECT_STD_ERR or "unknown".
+- **aspectKindToString** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Provides the python Evoked string formatted aspect_kind, which is stored in kind: "average" &lt;-&gt; FIFFV_ASPECT_AVERAGE, "standard_error" &lt;-&gt; FIFFV_ASPECT_STD_ERR or "unknown".
 - **assemble_kernel** `[fn]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Assemble the inverse kernel matrix.
 - **assign_channels** `[fn]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Assign a channel name list to this projection operator, invalidating any previously compiled projector.
 - **assignedOperatorsChanged** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model) — Updates the fiff info.
@@ -451,7 +451,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **ch_kind** `[var]` in [MNEChSelection](/docs/api/mne/mne-ch-selection) — Kinds of the channels corresponding to picks.
 - **ch_major** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — If true, data rows are channels (not times).
 - **ch_name** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Descriptive name for the channel.
-- **ch_names** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Returns list of channel names stored in fiff info -> this is to stay consistent with python.
+- **ch_names** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Returns list of channel names stored in fiff info -&gt; this is to stay consistent with python.
 - **ch_names** `[var]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — List of all channel names.
 - **ch_names** `[var]` in `InvDipoleFitData` — List of all channel names.
 - **ch_names** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Channel names as a flat list.
@@ -1220,7 +1220,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **date** `[var]` in `BrainVisionMarker` — Optional date/time (for New Segment markers).
 - **dBaseMax** `[var]` in `EpochExtractorParams` — Baseline end in seconds (relative to event).
 - **dBaseMin** `[var]` in `EpochExtractorParams` — Baseline start in seconds (relative to event).
-- **dCorrThresh** `[var]` in `BadChannelDetectParams` — Mean absolute neighbour correlation below this -> isolated.
+- **dCorrThresh** `[var]` in `BadChannelDetectParams` — Mean absolute neighbour correlation below this -&gt; isolated.
 - **DebiasedSquaredWeightedPhaseLagIndex** `[fn]` in [DebiasedSquaredWeightedPhaseLagIndex](/docs/api/connectivity/debiased-squared-weighted-phase-lag-index) — Constructs a [`DebiasedSquaredWeightedPhaseLagIndex`](/docs/api/connectivity/debiased-squared-weighted-phase-lag-index) object.
 - **DebiasedSquaredWeightedPhaseLagIndex** `[fn]` in [DebiasedSquaredWeightedPhaseLagIndex](/docs/api/connectivity/debiased-squared-weighted-phase-lag-index) — Constructs a [`DebiasedSquaredWeightedPhaseLagIndex`](/docs/api/connectivity/debiased-squared-weighted-phase-lag-index) object.
 - **debugFirstDipolePosition** `[fn]` in `DipoleObject`
@@ -1294,8 +1294,8 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **dFilterHigh** `[var]` in `ArtifactDetectEogParams` — Low-pass cutoff (Hz).
 - **dFilterLow** `[var]` in `AnnotateMusclParams` — High-pass cutoff for muscle band (Hz).
 - **dFilterLow** `[var]` in `ArtifactDetectEcgParams` — Bandpass lower cutoff (Hz).
-- **dFlatMin** `[var]` in `AnnotateAmplitudeParams` — Flatness threshold — annotate if peak-to-peak in a window < this.
-- **dFlatThreshold** `[var]` in `BadChannelDetectParams` — Peak-to-peak below this -> flat (SI units; ~0.1 fT for MEG).
+- **dFlatMin** `[var]` in `AnnotateAmplitudeParams` — Flatness threshold — annotate if peak-to-peak in a window &lt; this.
+- **dFlatThreshold** `[var]` in `BadChannelDetectParams` — Peak-to-peak below this -&gt; flat (SI units; ~0.1 fT for MEG).
 - **dFMax** `[var]` in `InvTfMxneParams` — Maximum frequency (Hz) for Gabor atoms.
 - **dFMin** `[var]` in `InvTfMxneParams` — Minimum frequency (Hz) for Gabor atoms.
 - **dfWithin** `[var]` in `StatsFtestResult` — Within-groups degrees of freedom.
@@ -1426,7 +1426,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **duration** `[var]` in `BrainVisionMarker` — Duration in samples (0 = point marker).
 - **duration** `[var]` in `FiffAnnotation` — Duration in seconds (0 for point events).
 - **duration** `[var]` in `SimulateStcParams` — Duration (seconds).
-- **dVarZThresh** `[var]` in `BadChannelDetectParams` — Z-score of std-dev above this -> noisy.
+- **dVarZThresh** `[var]` in `BadChannelDetectParams` — Z-score of std-dev above this -&gt; noisy.
 - **dWindowSec** `[var]` in `AnnotateAmplitudeParams` — Sliding window duration in seconds for flatness check.
 - **dZThreshold** `[var]` in `BadChannelsMaxwellParams` — Z-score threshold for flagging bad channels.
 
@@ -1569,7 +1569,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **explain_comp** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Return a human-readable description string for a compensation kind constant.
 - **explanation** `[var]` in `MnaVerification` — Human-readable explanation of what this node does and why.
 - **expression** `[var]` in `MnaParamBinding` — Formula string, e.g. "clamp(ref('noise_est_01/snr') * 0.1, 0.01, 1.0)".
-- **expression** `[var]` in `MnaVerificationCheck` — Simple evaluable expression: "rank(covariance) > 0".
+- **expression** `[var]` in `MnaVerificationCheck` — Simple evaluable expression: "rank(covariance) &gt; 0".
 - **extension** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — File extension.
 - **externalToolVersion** `[var]` in `MnaProvenance` — e.g. "FreeSurfer 7.4.1", "Python 3.11.5"
 - **extract** `[fn]` in [EpochExtractor](/docs/api/utils/epoch-extractor) — Extract epochs from a continuous raw data matrix.
@@ -1883,8 +1883,8 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **fromCbor** `[fn]` in `MnaVerificationCheck`
 - **fromCbor** `[fn]` in `MnaVerificationResult`
 - **fromChannelPositions** `[fn]` in [StatsAdjacency](/docs/api/sts/stats-adjacency) — Build a spatial adjacency matrix from channel positions in FiffInfo.
-- **fromEigenSparse** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Create a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) from an Eigen::SparseMatrix<double>.
-- **fromEigenSparse** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Create a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) from an Eigen::SparseMatrix<float>.
+- **fromEigenSparse** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Create a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) from an Eigen::SparseMatrix&lt;double&gt;.
+- **fromEigenSparse** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Create a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) from an Eigen::SparseMatrix&lt;float&gt;.
 - **fromJson** `[fn]` in `MnaFileRef` — Deserialize from QJsonObject.
 - **fromJson** `[fn]` in [MnaGraph](/docs/api/mna/mna-graph)
 - **fromJson** `[fn]` in `MnaNode`
@@ -2440,7 +2440,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **hasInfo** `[var]` in `SensorLoadResult`
 - **hasLh** `[fn]` in `StcLoadingWorker` — Check if left hemisphere data was loaded.
 - **hasMappingFor** `[fn]` in `SensorFieldMapper` — Check whether the current mapping matrices can be reused for a new evoked data set (i.e., same sensor configuration: same channels, same SSP projectors, same bad channels).
-- **hasMergedContent** `[fn]` in `BrainRenderer` — Check if a merged group has drawable geometry (indexCount > 0).
+- **hasMergedContent** `[fn]` in `BrainRenderer` — Check if a merged group has drawable geometry (indexCount &gt; 0).
 - **hasModelFiducial** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
 - **hasModelVertex** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
 - **hasNode** `[fn]` in [MnaGraph](/docs/api/mna/mna-graph)
@@ -2844,8 +2844,8 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **khi2** `[var]` in `InvFocalDipole` — Chi-squared value of the fit.
 - **kind** `[var]` in `DigitizedPoint`
 - **kind** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Kind of channel.
-- **kind** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — Covariance kind -> `fiff_constants.h`.
-- **kind** `[var]` in [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) — [`Fiff`](/docs/api/fiff/fiff-class) kind -> `fiff_constants.h`.
+- **kind** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — Covariance kind -&gt; `fiff_constants.h`.
+- **kind** `[var]` in [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) — [`Fiff`](/docs/api/fiff/fiff-class) kind -&gt; `fiff_constants.h`.
 - **kind** `[var]` in [FiffDigPoint](/docs/api/fiff/fiff-dig-point) — FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA or FIFFV_POINT_EEG.
 - **kind** `[var]` in [FiffDirEntry](/docs/api/fiff/fiff-dir-entry) — Tag number.
 - **kind** `[var]` in `FiffExplainEntry`
@@ -2885,7 +2885,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **labelToString** `[fn]` in `IcaLabelResult`
 - **lambda** `[var]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model)
 - **lambda** `[var]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Eigenvalues of the covariance matrix.
-- **lambda2** `[var]` in `InvCMNESettings` — Tikhonov regularisation (SNR=3 -> lambda^2=1/9).
+- **lambda2** `[var]` in `InvCMNESettings` — Tikhonov regularisation (SNR=3 -&gt; lambda^2=1/9).
 - **lambda2** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Regularization parameter to be used (as a function of time).
 - **lambda2_est** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Regularization parameter estimated from available data.
 - **language** `[var]` in `MnaScript` — "python", "shell", "r", "matlab", "octave", "julia"
@@ -3171,10 +3171,10 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **matrix** `[var]` in `InvConnectivity` — [N x N] connectivity values between sources.
 - **matrix** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor) — Mutable row-major Eigen::Map for 2-D tensors.
 - **matrix** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor) — Const row-major Eigen::Map for 2-D tensors.
-- **Matrix6T** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix<T, 6, 6> as `Matrix6T` type.
-- **Matrix6XT** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix<T, 6, Eigen::Dynamic> as `Matrix6XT` type.
-- **MatrixX6T** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix<T, Eigen::Dynamic, 6> as `MatrixX6T` type.
-- **MatrixXT** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> as `MatrixXT` type.
+- **Matrix6T** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix&lt;T, 6, 6&gt; as `Matrix6T` type.
+- **Matrix6XT** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix&lt;T, 6, Eigen::Dynamic&gt; as `Matrix6XT` type.
+- **MatrixX6T** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix&lt;T, Eigen::Dynamic, 6&gt; as `MatrixX6T` type.
+- **MatrixXT** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix&lt;T, Eigen::Dynamic, Eigen::Dynamic&gt; as `MatrixXT` type.
 - **matRoiG** `[var]` in `RegionData` — Reshaped region gain matrix sources x sensors(x,y,z).
 - **matRoiGOrig** `[var]` in `RegionData` — Region gain matrix sensors x sources(x,y,z).
 - **matRoiGWhitened** `[var]` in `RegionData` — Reshaped whitened region gain matrix sources x sensors(x,y,z).
@@ -3215,8 +3215,8 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **meg_coils** `[var]` in `InvDipoleFitData` — MEG coil definitions.
 - **meg_eeg_fwd_one_source_space** `[fn]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Thread worker: compute the forward solution for one source space.
 - **meg_field** `[var]` in `dipoleFitFuncsRec` — MEG forward calculation function.
-- **meg_head_t** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — The meg <-> head transformation.
-- **meg_head_t** `[var]` in `InvDipoleFitData` — MEG <-> head coordinate transformation.
+- **meg_head_t** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — The meg &lt;-&gt; head transformation.
+- **meg_head_t** `[var]` in `InvDipoleFitData` — MEG &lt;-&gt; head coordinate transformation.
 - **meg_head_t** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — MEG device ↔ head coordinate transform.
 - **meg_vec_field** `[var]` in `dipoleFitFuncsRec` — MEG vectorized forward calculation function.
 - **megChannelIdx** `[var]` in `Basis` — Original channel indices in FiffInfo for the MEG rows.
@@ -3356,8 +3356,8 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **MNESurfacePatch** `[fn]` in [MNESurfacePatch](/docs/api/mne/mne-surface-patch) — Constructs a patch with `np` vertices.
 - **MNETriangle** `[fn]` in [MNETriangle](/docs/api/mne/mne-triangle) — Constructs an empty [`MNETriangle`](/docs/api/mne/mne-triangle) with zeroed geometry.
 - **MNEVolGeom** `[fn]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom) — Constructs the [`MNE`](/docs/api/mne/mne-class) Volume Geometry.
-- **MNI_tal_tal_gtz_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform MNI Talairach to FreeSurfer Talairach coordinates (z > 0).
-- **MNI_tal_tal_ltz_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0).
+- **MNI_tal_tal_gtz_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform MNI Talairach to FreeSurfer Talairach coordinates (z &gt; 0).
+- **MNI_tal_tal_ltz_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform MNI Talairach to FreeSurfer Talairach coordinates (z &lt; 0).
 - **modalitiesChanged** `[signal]` in [ModalitySelectionView](/docs/api/disp/modality-selection-view) — Emit this signal whenever the user changed the modality.
 - **modality** `[fn]` in `RtSensorStreamManager`
 - **modalityChanged** `[signal]` in [DipoleFitView](/docs/api/disp/dipole-fit-view) — Send new modality selection.
@@ -3393,7 +3393,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **mri_filename** `[var]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — MRI file name (parent provenance).
 - **mri_head_ident** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Are the head and MRI coordinates the same?
 - **mri_head_t** `[var]` in [FilterThreadArg](/docs/api/mne/filter-thread-arg) — MRI-to-head coordinate transformation.
-- **mri_head_t** `[var]` in `InvDipoleFitData` — MRI <-> head coordinate transformation.
+- **mri_head_t** `[var]` in `InvDipoleFitData` — MRI &lt;-&gt; head coordinate transformation.
 - **mri_head_t** `[var]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — MRI head coordinate transformation.
 - **mri_head_t** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — MRI-to-head coordinate transformation.
 - **mri_head_t** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — MRI ↔ head coordinate transform.
@@ -3402,8 +3402,8 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **MRI_vol_dims** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Dimensions of the associated MRI volume (width x height x depth).
 - **MRI_volume** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Path to the MRI volume file the interpolator is based on.
 - **MRI_voxel_surf_RAS_t** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Voxel-to-surface-RAS transform for the associated MRI volume.
-- **mriname** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — MRI file for head <-> MRI transformation.
-- **mriname** `[var]` in `InvDipoleFitSettings` — Gives the MRI <-> head transform.
+- **mriname** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — MRI file for head &lt;-&gt; MRI transformation.
+- **mriname** `[var]` in `InvDipoleFitSettings` — Gives the MRI &lt;-&gt; head transform.
 - **MriSlice** `[fn]` in `MriSlice` — Default constructor.
 - **MriVolData** `[fn]` in [MriVolData](/docs/api/mri/mri-vol-data) — Default constructor.
 - **mu** `[var]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) — The Berg-Scherg equivalence parameters.
@@ -3550,7 +3550,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **nfree** `[var]` in `InvEcd` — Degrees of freedom for the above.
 - **nfree** `[var]` in `InvFocalDipole` — Degrees of freedom.
 - **nfree** `[var]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Number of degrees of freedom used in estimation.
-- **nFreqs** `[fn]` in `InvBeamformer` — Returns the number of frequency bins (1 for LCMV, >= 1 for DICS).
+- **nFreqs** `[fn]` in `InvBeamformer` — Returns the number of frequency bins (1 for LCMV, &gt;= 1 for DICS).
 - **nguess** `[var]` in `InvGuessData` — How many sources.
 - **nitems** `[var]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Number of items.
 - **nIterations** `[var]` in `InfomaxResult` — Number of iterations performed.
@@ -3641,7 +3641,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **nuse** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Number of vertices in use.
 - **nuse_tri** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Number of triangles in the in-use triangulation.
 - **nvec** `[var]` in [MNENamedVector](/docs/api/mne/mne-named-vector) — Number of elements.
-- **nvec** `[var]` in [MNEProjItem](/docs/api/mne/mne-proj-item) — Number of projection vectors (== vecs->nrow when vecs is set).
+- **nvec** `[var]` in [MNEProjItem](/docs/api/mne/mne-proj-item) — Number of projection vectors (== vecs-&gt;nrow when vecs is set).
 - **nvec** `[var]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Number of orthogonalized vectors in the final projector.
 - **nvertex_colors** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Number of color components per vertex.
 - **nVertices** `[fn]` in [InvVectorSourceEstimate](/docs/api/inv/inv-vector-source-estimate) — Number of source vertices (data.rows() / 3).
@@ -3710,15 +3710,15 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **operate** `[signal]` in [RtHpi](/docs/api/dsp/rt-hpi)
 - **operate** `[signal]` in [RtInvOp](/docs/api/dsp/rt-inv-op) — Emit this signal whenver the worker should create a new inverse operator estimation.
 - **operate** `[signal]` in [RtNoise](/docs/api/dsp/rt-noise) — Internal signal to forward data to the worker thread.
-- **operator const Eigen::SparseMatrix< float > &** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Implicit conversion to const Eigen::SparseMatrix<float>&.
+- **operator const Eigen::SparseMatrix&lt; float &gt; &** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Implicit conversion to const Eigen::SparseMatrix&lt;float&gt;&.
 - **operator!=** `[fn]` in `InvHpiModelParameters`
 - **operator!=** `[fn]` in `InvSensorSet`
 - **operator+=** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Inputs a new data set and recalculates the average.
-- **operator<<** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Subscript operator << to add a new [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point).
-- **operator<<** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Subscript operator << to add a new [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point).
-- **operator<<** `[fn]` in `InvEcdSet` — Subscript operator << to add a new `InvEcd`.
-- **operator<<** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — Subscript operator << to add a new bem_surface.
-- **operator<<** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — Subscript operator << to add a new bem_surface.
+- **operator&lt;&lt;** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Subscript operator &lt;&lt; to add a new [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point).
+- **operator&lt;&lt;** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Subscript operator &lt;&lt; to add a new [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point).
+- **operator&lt;&lt;** `[fn]` in `InvEcdSet` — Subscript operator &lt;&lt; to add a new `InvEcd`.
+- **operator&lt;&lt;** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — Subscript operator &lt;&lt; to add a new bem_surface.
+- **operator&lt;&lt;** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — Subscript operator &lt;&lt; to add a new bem_surface.
 - **operator=** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **operator=** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data)
 - **operator=** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data)
@@ -3902,7 +3902,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **physicalMax** `[var]` in `EDFChannelInfo`
 - **physicalMin** `[var]` in `EDFChannelInfo`
 - **pick** `[var]` in `InvDipoleFitData` — Matrix to pick data from the full data set which may contain channels we are not interested in (currently unused).
-- **pick** `[var]` in [MNEChSelection](/docs/api/mne/mne-ch-selection) — Corresponding channels in raw data (< 0 indicates missing).
+- **pick** `[var]` in [MNEChSelection](/docs/api/mne/mne-ch-selection) — Corresponding channels in raw data (&lt; 0 indicates missing).
 - **pick** `[fn]` in [MNENamedMatrix](/docs/api/mne/mne-named-matrix) — Create a sub-matrix by picking named rows and columns.
 - **pick** `[fn]` in [MNENamedVector](/docs/api/mne/mne-named-vector) — Pick elements from this named vector by name matching, writing them into a result vector ordered according to the supplied name list.
 - **pick** `[fn]` in `RayPicker` — Cast a ray against all surfaces in the scene.
@@ -3973,7 +3973,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **ports** `[var]` in [MNELayout](/docs/api/mne/mne-layout) — Viewports.
 - **pos** `[var]` in `CoilParam`
 - **pos** `[var]` in `ElectrodePosition` — Position in metres (MNI head coords).
-- **pos** `[var]` in [FiffDirEntry](/docs/api/fiff/fiff-dir-entry) — Location in file; Note: the data is located at pos + FIFFC_DATA_OFFSET: 2GB restriction -> change this to fiff_long_t.
+- **pos** `[var]` in [FiffDirEntry](/docs/api/fiff/fiff-dir-entry) — Location in file; Note: the data is located at pos + FIFFC_DATA_OFFSET: 2GB restriction -&gt; change this to fiff_long_t.
 - **pos** `[var]` in [FsLabel](/docs/api/fs/fs-label) — Locations in meters.
 - **pos** `[fn]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Return a read-only map to the j-th integration point position (3 contiguous floats).
 - **pos** `[var]` in [MNEMshLight](/docs/api/mne/mne-msh-light)
@@ -5149,7 +5149,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **setYLabel** `[fn]` in [Graph](/docs/api/disp/graph) — Sets the label of the y axes.
 - **setYLabel** `[fn]` in [LinePlot](/docs/api/disp/line-plot) — Sets the label of the y axis.
 - **setZoom** `[fn]` in `CameraController` — Single-view zoom level.
-- **setZoom** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Set the zoom factor (> 1 = zoom in, < 1 = zoom out relative to default).
+- **setZoom** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Set the zoom factor (&gt; 1 = zoom in, &lt; 1 = zoom out relative to default).
 - **setZoom** `[fn]` in [FiffRawViewSettings](/docs/api/disp/fiff-raw-view-settings) — Sets the values of the zoomFactor spin box.
 - **setZoom** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Sets new zoom factor.
 - **setZScoreMode** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
@@ -5715,7 +5715,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **tmin** `[var]` in `InvFocalDipole` — Start of the time window (s) this dipole represents.
 - **tmin** `[var]` in `InvSourceCoupling` — Start of the time window (s) this coupling represents.
 - **tmin** `[var]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Time starting point.
-- **tmin** `[var]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — New start time (must be >= 0).
+- **tmin** `[var]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — New start time (must be &gt;= 0).
 - **tmin** `[var]` in [MNEMeasDataSet](/docs/api/mne/mne-meas-data-set) — Start time of the epoch (seconds).
 - **tmin** `[var]` in `SimulateStcParams` — Start time (seconds).
 - **tmin** `[fn]` in `SourceEstimateManager`
@@ -5744,7 +5744,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **toDigPoint** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff DIG POINT
 - **toDirEntry** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff OLD PACK
 - **toDouble** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Double Fast access; Data are deleted if tag gets deleted, and vice versa
-- **toEigenSparse** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Convert to Eigen::SparseMatrix<double> (cast from float).
+- **toEigenSparse** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Convert to Eigen::SparseMatrix&lt;double&gt; (cast from float).
 - **toFiffChInfo** `[fn]` in `BrainVisionChannelInfo`
 - **toFiffChInfo** `[fn]` in `EDFChannelInfo`
 - **toFiffCoordTrans** `[fn]` in `BidsCoordinateSystem` — Convert parsed transform to a FiffCoordTrans.
@@ -5818,8 +5818,8 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **trainLstm** `[fn]` in [InvCMNE](/docs/api/inv/inv-cmne) — Train the CMNE LSTM model by invoking the Python training script.
 - **trans** `[var]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — The forward transform.
 - **trans** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Extra 4x4 transformation matrix for this surface.
-- **trans** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Coordinate transformation FIFF_COORD_HEAD <-> FIFF_COORD_DEVICE.
-- **trans** `[var]` in `MriSlice` — Coordinate transform: slice -> MRI (surface RAS).
+- **trans** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Coordinate transformation FIFF_COORD_HEAD &lt;-&gt; FIFF_COORD_DEVICE.
+- **trans** `[var]` in `MriSlice` — Coordinate transform: slice -&gt; MRI (surface RAS).
 - **transducerType** `[var]` in `EDFChannelInfo`
 - **transferFunction** `[fn]` in [MvarModel](/docs/api/connectivity/mvar-model) — Computes the transfer function H(f) at the given normalized frequencies.
 - **transferFunction** `[fn]` in [MvarModel](/docs/api/connectivity/mvar-model) — Computes the transfer function H(f) at the given normalized frequencies.
@@ -6101,8 +6101,8 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **vecTapSpectra** `[var]` in `IntermediateTrialData`
 - **vecTapSpectra** `[var]` in `IntermediateTrialData`
 - **vecTimes** `[var]` in `MultitaperTfrResult` — Time axis in seconds (window centres).
-- **Vector6T** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix<T, 6, 1> as `Vector6T` type.
-- **VectorXT** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix<T, Eigen::Dynamic, 1> as `VectorXT` type.
+- **Vector6T** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix&lt;T, 6, 1&gt; as `Vector6T` type.
+- **VectorXT** `[type]` in [InvRapMusic](/docs/api/inv/inv-rap-music) — Defines Eigen::Matrix&lt;T, Eigen::Dynamic, 1&gt; as `VectorXT` type.
 - **venvDir** `[var]` in `PythonRunnerConfig` — Virtual-env directory (empty = no venv).
 - **venvPythonPath** `[fn]` in [PythonRunner](/docs/api/utils/python-runner) — Get the Python interpreter path inside the configured venv.
 - **verbose** `[var]` in `InvDipoleFitSettings` — Verbose output.
@@ -6165,7 +6165,7 @@ Index of 6275 public class members (functions, variables, typedefs, enums) acros
 - **voxel_size** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Voxel size in meters, derived from the voxel transform.
 - **voxel_surf_RAS_t** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Transform from voxel coordinates to surface RAS (MRI) coordinates.
 - **voxelDataAsFloat** `[fn]` in [MriVolData](/docs/api/mri/mri-vol-data) — Returns all voxel data as a contiguous float array in x-fastest order.
-- **voxelSurfRasT** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Voxel -> surface RAS (MRI) transform.
+- **voxelSurfRasT** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Voxel -&gt; surface RAS (MRI) transform.
 - **voxelToRas** `[fn]` in [MriSlicer](/docs/api/mri/mri-slicer) — Convert voxel index to RAS coordinate.
 - **voxelToRas** `[fn]` in [MriSlicer](/docs/api/mri/mri-slicer) — Convert voxel index to RAS coordinate using a volume's transform.
 - **vv** `[var]` in `fitUserRec`

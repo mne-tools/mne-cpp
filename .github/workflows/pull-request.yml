@@ -64,3 +64,32 @@ jobs:
       run: |
         cd doc/doxygen
         doxygen mne-cpp_doxyfile
+
+  # ── Validate API registry & website build ───────────────────────────────
+  Docs:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Validate API registry
+      run: python3 tools/validate_api_registry.py --repo-root "$GITHUB_WORKSPACE"
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: doc/website/package-lock.json
+
+    - name: Build Docusaurus site (build check only — no deploy)
+      run: |
+        cd doc/website
+        npm ci
+        npm run build

@@ -192,6 +192,14 @@ jobs:
         cache: 'npm'
         cache-dependency-path: doc/website/package-lock.json
 
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Validate API registry
+      run: python3 tools/validate_api_registry.py --repo-root "$GITHUB_WORKSPACE"
+
     - name: Build Docusaurus site (dev)
       env:
         MNECPP_SITE_ENV: dev
