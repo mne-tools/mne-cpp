@@ -200,6 +200,10 @@ jobs:
     - name: Validate API registry
       run: python3 tools/validate_api_registry.py --repo-root "$GITHUB_WORKSPACE"
 
+    - name: Validate SPDX license headers (advisory)
+      continue-on-error: true
+      run: python3 -m tools.license_headers.validate --strict || echo "::warning::SPDX header validation found issues — see log above"
+
     - name: Generate placeholder screenshots
       run: |
         # Create 1x1 PNG placeholders for any images referenced in the
