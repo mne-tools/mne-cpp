@@ -22,7 +22,6 @@ const config: Config = {
     projectName: 'mne-cpp.github.io',
 
     onBrokenLinks: 'warn',
-    onBrokenMarkdownLinks: 'warn',
 
     markdown: {
         mermaid: true,

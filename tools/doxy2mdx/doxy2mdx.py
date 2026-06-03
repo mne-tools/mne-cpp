@@ -1725,9 +1725,9 @@ def generate_class_members_index(xml_dir: Path, out_dir: Path) -> Path:
                     cls_link = f"[{cls_short}]({_XREF_MAP[cls_short]})"
                 else:
                     cls_link = f"`{cls_short}`"
-                # Escape bare <> so MDX doesn't parse them as JSX
-                safe_name = mname.replace("<", "&lt;").replace(">", "&gt;")
-                safe_brief = brief.replace("<", "&lt;").replace(">", "&gt;")
+                # Escape bare <>{} so MDX doesn't parse them as JSX
+                safe_name = mname.replace("<", "&lt;").replace(">", "&gt;").replace("{", "\\{").replace("}", "\\}")
+                safe_brief = brief.replace("<", "&lt;").replace(">", "&gt;").replace("{", "\\{").replace("}", "\\}")
                 brief_str = f" — {safe_brief}" if safe_brief else ""
                 lines.append(
                     f"- **{safe_name}** `[{kind_badge}]` in {cls_link}{brief_str}"
@@ -1816,9 +1816,9 @@ def generate_namespace_members_index(xml_dir: Path, out_dir: Path) -> Path:
                         ds = mv.get("dir_slug", mk)
                         ns_link = f"[{ns}](/docs/api/{ds}/)"
                         break
-                # Escape bare <> so MDX doesn't parse them as JSX
-                safe_name = mname.replace("<", "&lt;").replace(">", "&gt;")
-                safe_brief = brief.replace("<", "&lt;").replace(">", "&gt;")
+                # Escape bare <>{} so MDX doesn't parse them as JSX
+                safe_name = mname.replace("<", "&lt;").replace(">", "&gt;").replace("{", "\\{").replace("}", "\\}")
+                safe_brief = brief.replace("<", "&lt;").replace(">", "&gt;").replace("{", "\\{").replace("}", "\\}")
                 brief_str = f" — {safe_brief}" if safe_brief else ""
                 lines.append(
                     f"- **{safe_name}** `[{kind_badge}]` in {ns_link}{brief_str}"
