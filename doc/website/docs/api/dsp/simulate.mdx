@@ -36,12 +36,12 @@ simulateEvoked(): generate synthetic evoked data from forward model
 ### simulateStc(activeVertices, allVertices, params)
 
 ```cpp
-INVLIB::InvSourceEstimate simulateStc(const Eigen::VectorXi & activeVertices, const Eigen::VectorXi & allVertices, const SimulateStcParams & params);
+[InvSourceEstimate](/docs/api/inv/inv-source-estimate) simulateStc(const Eigen::VectorXi & activeVertices, const Eigen::VectorXi & allVertices, const SimulateStcParams & params);
 ```
 
 Create a synthetic source time course.
 
-Generates an InvSourceEstimate with Gaussian-envelope waveforms at specified source vertices. Each active source has a Gaussian temporal profile centered at different times.
+Generates an [InvSourceEstimate](/docs/api/inv/inv-source-estimate) with Gaussian-envelope waveforms at specified source vertices. Each active source has a Gaussian temporal profile centered at different times.
 
 **Parameters:**
 
@@ -56,14 +56,14 @@ Generates an InvSourceEstimate with Gaussian-envelope waveforms at specified sou
 
 **Returns:**
 
-- *INVLIB::InvSourceEstimate* — Simulated source estimate.
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Simulated source estimate.
 
 ---
 
 ### simulateStcFromWaveforms(waveforms, activeVertices, allVertices, tmin, tstep)
 
 ```cpp
-INVLIB::InvSourceEstimate simulateStcFromWaveforms(const Eigen::MatrixXd & waveforms, const Eigen::VectorXi & activeVertices, const Eigen::VectorXi & allVertices, float tmin, float tstep);
+[InvSourceEstimate](/docs/api/inv/inv-source-estimate) simulateStcFromWaveforms(const Eigen::MatrixXd & waveforms, const Eigen::VectorXi & activeVertices, const Eigen::VectorXi & allVertices, float tmin, float tstep);
 ```
 
 Create a synthetic source time course from custom waveforms.
@@ -87,17 +87,17 @@ Create a synthetic source time course from custom waveforms.
 
 **Returns:**
 
-- *INVLIB::InvSourceEstimate* — Simulated source estimate with zeros at inactive vertices.
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Simulated source estimate with zeros at inactive vertices.
 
 ---
 
 ### simulateEvoked(fwd, stc, info, noiseCov, nave, seed)
 
 ```cpp
-FIFFLIB::FiffEvoked simulateEvoked(const MNELIB::MNEForwardSolution & fwd, const INVLIB::InvSourceEstimate & stc, const FIFFLIB::FiffInfo & info, const FIFFLIB::FiffCov & noiseCov, int nave, int seed);
+[FiffEvoked](/docs/api/fiff/fiff-evoked) simulateEvoked(const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) & fwd, const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) & stc, const [FiffInfo](/docs/api/fiff/fiff-info) & info, const [FiffCov](/docs/api/fiff/fiff-cov) & noiseCov, int nave, int seed);
 ```
 
-Simulate evoked data from a source estimate and forward model.
+[Simulate](/docs/api/dsp/simulate) evoked data from a source estimate and forward model.
 
 Projects the source estimate through the forward model to generate sensor-space data, optionally adding noise from a noise covariance.
 
@@ -105,16 +105,16 @@ Equivalent to MNE-Python's mne.simulation.simulate_evoked().
 
 **Parameters:**
 
-- **fwd** : *const MNELIB::MNEForwardSolution &*
+- **fwd** : *const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) &*
   Forward solution (gain matrix).
 
-- **stc** : *const INVLIB::InvSourceEstimate &*
+- **stc** : *const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &*
   Source time course.
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info (for output channel info).
 
-- **noiseCov** : *const FIFFLIB::FiffCov &*
+- **noiseCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   Noise covariance for additive noise (optional).
 
 - **nave** : *int*
@@ -125,34 +125,34 @@ Equivalent to MNE-Python's mne.simulation.simulate_evoked().
 
 **Returns:**
 
-- *FIFFLIB::FiffEvoked* — Simulated evoked data.
+- *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — Simulated evoked data.
 
 ---
 
 ### simulateEvokedNoiseless(fwd, stc, info)
 
 ```cpp
-FIFFLIB::FiffEvoked simulateEvokedNoiseless(const MNELIB::MNEForwardSolution & fwd, const INVLIB::InvSourceEstimate & stc, const FIFFLIB::FiffInfo & info);
+[FiffEvoked](/docs/api/fiff/fiff-evoked) simulateEvokedNoiseless(const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) & fwd, const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) & stc, const [FiffInfo](/docs/api/fiff/fiff-info) & info);
 ```
 
-Simulate evoked data without noise.
+[Simulate](/docs/api/dsp/simulate) evoked data without noise.
 
 Projects source estimate through forward model (no noise added).
 
 **Parameters:**
 
-- **fwd** : *const MNELIB::MNEForwardSolution &*
+- **fwd** : *const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) &*
   Forward solution.
 
-- **stc** : *const INVLIB::InvSourceEstimate &*
+- **stc** : *const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &*
   Source time course.
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info.
 
 **Returns:**
 
-- *FIFFLIB::FiffEvoked* — Simulated noiseless evoked data.
+- *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — Simulated noiseless evoked data.
 
 ---
 

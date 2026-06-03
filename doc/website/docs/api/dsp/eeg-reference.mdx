@@ -34,7 +34,7 @@ Re-referencing is implemented as a single matrix multiplication so that channel 
 ### setEegReference(data, info, refChannels, projection)
 
 ```cpp
-void setEegReference(Eigen::MatrixXd & data, const FIFFLIB::FiffInfo & info, const QStringList & refChannels, bool projection);
+void setEegReference(Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, const QStringList & refChannels, bool projection);
 ```
 
 Re-reference EEG channels to average, specific channel(s), or REST.
@@ -46,7 +46,7 @@ Only modifies rows corresponding to EEG channels (kind == FIFFV_EEG_CH). Non-EEG
 - **data** : *Eigen::MatrixXd &*
   Data matrix (n_channels x n_times). Modified in-place.
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info (used to identify EEG channels).
 
 - **refChannels** : *const QStringList &*
@@ -60,7 +60,7 @@ Only modifies rows corresponding to EEG channels (kind == FIFFV_EEG_CH). Non-EEG
 ### addReferenceChannels(data, info, chNames)
 
 ```cpp
-void addReferenceChannels(Eigen::MatrixXd & data, FIFFLIB::FiffInfo & info, const QStringList & chNames);
+void addReferenceChannels(Eigen::MatrixXd & data, [FiffInfo](/docs/api/fiff/fiff-info) & info, const QStringList & chNames);
 ```
 
 Add reference channel(s) back as zero-filled rows.
@@ -72,7 +72,7 @@ When EEG data was recorded with a physical reference electrode, that channel is 
 - **data** : *Eigen::MatrixXd &*
   Data matrix. Rows are added at the end.
 
-- **info** : *FIFFLIB::FiffInfo &*
+- **info** : *[FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info. New EEG channels are appended.
 
 - **chNames** : *const QStringList &*
@@ -83,7 +83,7 @@ When EEG data was recorded with a physical reference electrode, that channel is 
 ### setBipolarReference(data, info, anodes, cathodes, dropOriginals)
 
 ```cpp
-void setBipolarReference(Eigen::MatrixXd & data, FIFFLIB::FiffInfo & info, const QStringList & anodes, const QStringList & cathodes, bool dropOriginals);
+void setBipolarReference(Eigen::MatrixXd & data, [FiffInfo](/docs/api/fiff/fiff-info) & info, const QStringList & anodes, const QStringList & cathodes, bool dropOriginals);
 ```
 
 Create bipolar derivations from EEG channels.
@@ -95,7 +95,7 @@ Creates new bipolar channels by subtracting cathode from anode for each pair. Th
 - **data** : *Eigen::MatrixXd &*
   Data matrix. Replaced with bipolar derivation rows.
 
-- **info** : *FIFFLIB::FiffInfo &*
+- **info** : *[FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info. Updated with new bipolar channel info.
 
 - **anodes** : *const QStringList &*

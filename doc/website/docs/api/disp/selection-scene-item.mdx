@@ -17,13 +17,20 @@ class DISPLIB::SelectionSceneItem
 
 Graphics item representing a selectable electrode or channel in a 2-D layout scene.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QGraphicsItem <|-- SelectionSceneItem
+```
+
 ---
 
 ## Public Methods
 
 ### SelectionSceneItem(channelName, channelNumber, channelPosition, channelKind, channelUnit, channelColor, bIsBadChannel)
 
-Constructs a `SelectionSceneItem`.
+Constructs a [`SelectionSceneItem`](/docs/api/disp/selection-scene-item).
 
 ---
 

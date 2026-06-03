@@ -19,11 +19,11 @@ sidebar_position: 4
 class DECODINGLIB::MlIcaLabel
 ```
 
-Static utility that labels ICA components against EOG/ECG references and a muscle spectral heuristic.
+Static utility that labels [ICA](/docs/api/dsp/ica) components against EOG/ECG references and a muscle spectral heuristic.
 
-`classify` walks the rows of the source matrix and applies, in order, the EOG correlation test, the ECG correlation test and the high-frequency muscle test; the first one whose score exceeds its threshold wins, otherwise the component is labelled `Brain`. The thresholds default to the canonical 0.3 used by the MNE-Python helpers and can be tightened or loosened per call. `findArtifactComponents` is the convenience that returns just the indices of the rejected components in the order expected by the ICA reconstruction code, making it a one-liner to wire automatic cleaning into a real-time pipeline.
+`classify` walks the rows of the source matrix and applies, in order, the EOG correlation test, the ECG correlation test and the high-frequency muscle test; the first one whose score exceeds its threshold wins, otherwise the component is labelled `Brain`. The thresholds default to the canonical 0.3 used by the MNE-Python helpers and can be tightened or loosened per call. `findArtifactComponents` is the convenience that returns just the indices of the rejected components in the order expected by the [ICA](/docs/api/dsp/ica) reconstruction code, making it a one-liner to wire automatic cleaning into a real-time pipeline.
 
-The two scoring primitives — `maxAbsCorrelation` and `muscleScore` — are exposed publicly so an interactive viewer can display the per-component evidence behind each decision and let the user override the label without having to recompute the ICA itself. The class has no state, deleted constructor, and no virtual methods; it is purely a namespaced collection of pure functions.
+The two scoring primitives — `maxAbsCorrelation` and `muscleScore` — are exposed publicly so an interactive viewer can display the per-component evidence behind each decision and let the user override the label without having to recompute the [ICA](/docs/api/dsp/ica) itself. The class has no state, deleted constructor, and no virtual methods; it is purely a namespaced collection of pure functions.
 
 ```cpp
 QList<IcaLabelResult> labels = MlIcaLabel::classify(
@@ -37,7 +37,7 @@ QVector<int> artIdx = MlIcaLabel::findArtifactComponents(labels);
 
 ### classify(matSources, matEog, matEcg, dSFreq, dEogThresh, dEcgThresh)
 
-Classify each ICA component using reference signals and spectral heuristics.
+Classify each [ICA](/docs/api/dsp/ica) component using reference signals and spectral heuristics.
 
 **Parameters:**
 

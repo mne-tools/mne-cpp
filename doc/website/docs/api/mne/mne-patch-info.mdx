@@ -15,7 +15,7 @@ sidebar_position: 42
 class MNELIB::MNEPatchInfo
 ```
 
-Implements an `MNE` Patch Information (Replaces *mnePatchInfo,mnePatchInfoRec; struct of MNE-C `mne_types.h`).
+Implements an [`MNE`](/docs/api/mne/mne-class) Patch Information (Replaces *mnePatchInfo,mnePatchInfoRec; struct of MNE-C `mne_types.h`).
 
 Patch information for a single source space point including vertex members and area.
 
@@ -25,13 +25,13 @@ Patch information for a single source space point including vertex members and a
 
 ### MNEPatchInfo()
 
-Constructs the `MNE` Patch Information Refactored: mne_new_patch (mne_source_space.c).
+Constructs the [`MNE`](/docs/api/mne/mne-class) Patch Information Refactored: mne_new_patch (mne_source_space.c).
 
 ---
 
 ### ~MNEPatchInfo()
 
-Destroys the `MNE` Patch Information Refactored: mne_free_patch (mne_source_space.c).
+Destroys the [`MNE`](/docs/api/mne/mne-class) Patch Information Refactored: mne_free_patch (mne_source_space.c).
 
 ---
 
@@ -45,7 +45,7 @@ Refactored from: calculate_patch_area (mne_patches.c).
 
 **Parameters:**
 
-- **s** : *MNESourceSpace **
+- **s** : *[MNESourceSpace](/docs/api/mne/mne-source-space) **
   Pointer to the source space containing the triangle mesh (neighbor triangles and triangle areas).
 
 ---
@@ -58,7 +58,7 @@ Computes the mean normal direction (ave_nn) by summing the normals of all member
 
 **Parameters:**
 
-- **s** : *MNESourceSpace **
+- **s** : *[MNESourceSpace](/docs/api/mne/mne-source-space) **
   Pointer to the source space containing vertex normals (nn) for each vertex in the mesh.
 
 ---

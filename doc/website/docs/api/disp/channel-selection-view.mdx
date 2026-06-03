@@ -17,7 +17,15 @@ class DISPLIB::ChannelSelectionView
 
 Interactive 2-D sensor-layout picker for building, loading and saving channel groups.
 
-Drives a `SelectionScene` of layout dots; lasso / click selection updates the named groups stored in MNE ``.sel files and emits the resulting visible-channel list to the raw and butterfly viewers.
+Drives a [`SelectionScene`](/docs/api/disp/selection-scene) of layout dots; lasso / click selection updates the named groups stored in [MNE](/docs/api/mne/mne-class) ``.sel files and emits the resulting visible-channel list to the raw and butterfly viewers.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- ChannelSelectionView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,23 +33,23 @@ Drives a `SelectionScene` of layout dots; lasso / click selection updates the na
 
 ### ChannelSelectionView(sSettingsPath, parent, pChannelInfoModel, f)
 
-Constructs a `ChannelSelectionView` which is a child of parent.
+Constructs a [`ChannelSelectionView`](/docs/api/disp/channel-selection-view) which is a child of parent.
 
 **Parameters:**
 
 - **parent** : *QWidget **
-  pointer to parent widget; If parent is 0, the new `ChannelSelectionView` becomes a window. If parent is another widget, `ChannelSelectionView` becomes a child window inside parent. `ChannelSelectionView` is deleted when its parent is deleted.
+  pointer to parent widget; If parent is 0, the new [`ChannelSelectionView`](/docs/api/disp/channel-selection-view) becomes a window. If parent is another widget, [`ChannelSelectionView`](/docs/api/disp/channel-selection-view) becomes a child window inside parent. [`ChannelSelectionView`](/docs/api/disp/channel-selection-view) is deleted when its parent is deleted.
 
-- **pChannelInfoModel** : *QSharedPointer&lt;ChannelInfoModel&gt;*
+- **pChannelInfoModel** : *QSharedPointer&lt;[ChannelInfoModel](/docs/api/disp/channel-info-model)&gt;*
   pointer to the channel info model.
 
 ---
 
 ### ~ChannelSelectionView()
 
-Destroys the `ChannelSelectionView`.
+Destroys the [`ChannelSelectionView`](/docs/api/disp/channel-selection-view).
 
-All `ChannelSelectionView`'s children are deleted first. The application exits if `ChannelSelectionView` is the main widget.
+All [`ChannelSelectionView`](/docs/api/disp/channel-selection-view)'s children are deleted first. The application exits if [`ChannelSelectionView`](/docs/api/disp/channel-selection-view) is the main widget.
 
 ---
 

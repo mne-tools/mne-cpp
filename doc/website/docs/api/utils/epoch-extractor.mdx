@@ -71,7 +71,7 @@ Epochs whose window extends outside the data boundaries are silently skipped.
 
 **Returns:**
 
-- *QVector&lt; MNELIB::MNEEpochData &gt;* — Vector of MNEEpochData (one per valid event). Rejected epochs are included with MNEEpochData::bReject == true so callers can choose whether to exclude them.
+- *QVector&lt; [MNEEpochData](/docs/api/mne/mne-epoch-data) &gt;* — Vector of MNEEpochData (one per valid event). Rejected epochs are included with MNEEpochData::bReject == true so callers can choose whether to exclude them.
 
 ---
 
@@ -81,7 +81,7 @@ Compute the grand average (ERP/ERF) across all non-rejected epochs.
 
 **Parameters:**
 
-- **epochs** : *const QVector&lt; MNELIB::MNEEpochData &gt; &*
+- **epochs** : *const QVector&lt; [MNEEpochData](/docs/api/mne/mne-epoch-data) &gt; &*
   Vector of extracted epochs (output of `extract()`).
 
 **Returns:**
@@ -96,12 +96,12 @@ Return only the epochs that are NOT marked for rejection.
 
 **Parameters:**
 
-- **epochs** : *const QVector&lt; MNELIB::MNEEpochData &gt; &*
+- **epochs** : *const QVector&lt; [MNEEpochData](/docs/api/mne/mne-epoch-data) &gt; &*
   Input epoch vector.
 
 **Returns:**
 
-- *QVector&lt; MNELIB::MNEEpochData &gt;* — Subset of epochs with bReject == false.
+- *QVector&lt; [MNEEpochData](/docs/api/mne/mne-epoch-data) &gt;* — Subset of epochs with bReject == false.
 
 ---
 

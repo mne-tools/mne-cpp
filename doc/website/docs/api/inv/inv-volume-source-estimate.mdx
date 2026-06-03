@@ -21,7 +21,15 @@ class INVLIB::InvVolumeSourceEstimate
 
 Volume source estimate: scalar values at voxel locations.
 
-Extends `InvSourceEstimate` with grid shape information to allow reshaping the flat data into a 3D volume.
+Extends [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) with grid shape information to allow reshaping the flat data into a 3D volume.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    InvSourceEstimate <|-- InvVolumeSourceEstimate
+    click InvSourceEstimate "/docs/api/inv/inv-source-estimate"
+```
 
 ---
 

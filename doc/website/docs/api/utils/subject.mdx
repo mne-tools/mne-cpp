@@ -17,7 +17,14 @@ class UTILSLIB::Subject
 
 DECLARE BASE CLASS SUBJECT.
 
-The `Subject` class provides the base class of every subject of the observer design pattern.
+The [`Subject`](/docs/api/utils/subject) class provides the base class of every subject of the observer design pattern.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    Subject <|-- CommandParser
+```
 
 ---
 
@@ -25,7 +32,7 @@ The `Subject` class provides the base class of every subject of the observer des
 
 ### ~Subject()
 
-Destroys the `Subject`.
+Destroys the [`Subject`](/docs/api/utils/subject).
 
 ---
 
@@ -35,7 +42,7 @@ Attaches an observer to the subject.
 
 **Parameters:**
 
-- **pObserver** : *IObserver **
+- **pObserver** : *[IObserver](/docs/api/utils/i-observer) **
   pointer to the observer which should be attached to the subject.
 
 ---
@@ -46,7 +53,7 @@ Detaches an observer of the subject.
 
 **Parameters:**
 
-- **pObserver** : *IObserver **
+- **pObserver** : *[IObserver](/docs/api/utils/i-observer) **
   pointer to the observer which should be detached of the subject.
 
 ---

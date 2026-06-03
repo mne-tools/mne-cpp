@@ -15,9 +15,16 @@ sidebar_position: 16
 class DISPLIB::ChannelLabelPanel
 ```
 
-Vertical column of channel-name labels synced with `ChannelDataView` row geometry.
+Vertical column of channel-name labels synced with [`ChannelDataView`](/docs/api/disp/channel-data-view) row geometry.
 
-Listens to the same `ChannelDataModel` as the central data view; bad channels are greyed and label clicks emit channel selection signals.
+Listens to the same [`ChannelDataModel`](/docs/api/disp/channel-data-model) as the central data view; bad channels are greyed and label clicks emit channel selection signals.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- ChannelLabelPanel
+```
 
 ---
 
@@ -33,13 +40,13 @@ Listens to the same `ChannelDataModel` as the central data view; bad channels ar
 
 ### setFirstVisibleChannel(ch)
 
-Set the index of the first visible channel row (kept in sync with `ChannelRhiView`).
+Set the index of the first visible channel row (kept in sync with [`ChannelRhiView`](/docs/api/disp/channel-rhi-view)).
 
 ---
 
 ### setVisibleChannelCount(count)
 
-Set how many channel rows are simultaneously visible (kept in sync with `ChannelRhiView`).
+Set how many channel rows are simultaneously visible (kept in sync with [`ChannelRhiView`](/docs/api/disp/channel-rhi-view)).
 
 ---
 

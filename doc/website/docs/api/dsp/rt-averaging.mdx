@@ -17,7 +17,14 @@ class RTPROCESSINGLIB::RtAveraging
 
 Real-time averaging.
 
-Controller that manages `RtAveragingWorker` for online epoch averaging with baseline correction.
+Controller that manages [`RtAveragingWorker`](/docs/api/dsp/rt-averaging-worker) for online epoch averaging with baseline correction.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- RtAveraging
+```
 
 ---
 
@@ -47,7 +54,7 @@ Creates the real-time averaging object.
 - **iTriggerIndex** : *quint32*
   Row in dex of channel which is to be scanned for triggers.
 
-- **pFiffInfo** : *FIFFLIB::FiffInfo::SPtr*
+- **pFiffInfo** : *[FIFFLIB::FiffInfo](/docs/api/fiff/fiff-info)::SPtr*
   Associated Fiff Information.
 
 - **parent** : *QObject **
@@ -96,7 +103,7 @@ Restarts the thread by interrupting its computation queue, quitting, waiting and
 - **iTriggerIndex** : *quint32*
   Row in dex of channel which is to be scanned for triggers.
 
-- **pFiffInfo** : *FIFFLIB::FiffInfo::SPtr*
+- **pFiffInfo** : *[FIFFLIB::FiffInfo](/docs/api/fiff/fiff-info)::SPtr*
   Associated Fiff Information.
 
 ---

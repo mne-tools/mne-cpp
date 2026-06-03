@@ -21,7 +21,7 @@ class FIFFLIB::FiffProj
 
 Single SSP projection item: kind, active flag, desired flag and the named projection vector matrix.
 
-Maps one `FIFFB_PROJ_ITEM` block to a C++ value: description, kind, `nvec`, `active`, plus a `FiffNamedMatrix` whose row names are the channels the projector acts on. Multiple `FiffProj` instances form the `info`['projs'] list and are combined into one projection operator by `make_projector` when raw / evoked data is loaded.
+Maps one `FIFFB_PROJ_ITEM` block to a C++ value: description, kind, `nvec`, `active`, plus a [`FiffNamedMatrix`](/docs/api/fiff/fiff-named-matrix) whose row names are the channels the projector acts on. Multiple [`FiffProj`](/docs/api/fiff/fiff-proj) instances form the `info`['projs'] list and are combined into one projection operator by `make_projector` when raw / evoked data is loaded.
 
 ---
 
@@ -52,7 +52,7 @@ Constructor.
 
 ### ~FiffProj()
 
-Destroys the `FiffProj`.
+Destroys the [`FiffProj`](/docs/api/fiff/fiff-proj).
 
 ---
 
@@ -64,7 +64,7 @@ Set all projections to active.
 
 **Parameters:**
 
-- **p_qListFiffProj** : *QList&lt; FiffProj &gt; &*
+- **p_qListFiffProj** : *QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt; &*
   activates projectors in place.
 
 ---
@@ -79,7 +79,7 @@ Make an SSP operator
 
 **Parameters:**
 
-- **projs** : *const QList&lt; FiffProj &gt; &*
+- **projs** : *const QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt; &*
   A set of projection vectors.
 
 - **ch_names** : *const QStringList &*
@@ -108,7 +108,7 @@ Create SSP (Signal-Space Projection) operators from raw data via SVD. Ported fro
 
 **Parameters:**
 
-- **raw** : *const FiffRawData &*
+- **raw** : *const [FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data.
 
 - **events** : *const Eigen::MatrixXi &*
@@ -137,7 +137,7 @@ Create SSP (Signal-Space Projection) operators from raw data via SVD. Ported fro
 
 **Returns:**
 
-- *QList&lt; FiffProj &gt;* — List of `FiffProj` items, or empty list on failure.
+- *QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt;* — List of [`FiffProj`](/docs/api/fiff/fiff-proj) items, or empty list on failure.
 
 ---
 

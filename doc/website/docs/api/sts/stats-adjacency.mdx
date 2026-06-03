@@ -29,13 +29,13 @@ Builds the sparse spatial and spatio-temporal neighbourhood graphs that define c
 
 ### fromChannelPositions(info, picks)
 
-Build a spatial adjacency matrix from channel positions in FiffInfo.
+Build a spatial adjacency matrix from channel positions in [FiffInfo](/docs/api/fiff/fiff-info).
 
 Uses a distance threshold of 3x the median nearest-neighbor distance.
 
 **Parameters:**
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   FiffInfo with channel positions.
 
 - **picks** : *const QStringList &*

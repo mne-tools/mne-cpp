@@ -19,13 +19,21 @@ SSP projector enable / disable checkbox list.
 
 One `QCheckBox` per `FiffProj` plus a master toggle; emits `projSelectionChanged` so the `rtprocessing` pipeline can (de)project the streaming data on the fly.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- ProjectorsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
 
 ### ProjectorsView(sSettingsPath, parent, f)
 
-Constructs a `ProjectorsView` which is a child of parent.
+Constructs a [`ProjectorsView`](/docs/api/disp/projectors-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `ProjectorsView` which is a child of parent.
 
 ### ~ProjectorsView()
 
-Destroys the `ProjectorsView`.
+Destroys the [`ProjectorsView`](/docs/api/disp/projectors-view).
 
 ---
 
@@ -46,7 +54,7 @@ Get the current projectors.
 
 **Returns:**
 
-- *QList&lt; FIFFLIB::FiffProj &gt;* — The current projectors.
+- *QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt;* — The current projectors.
 
 ---
 
@@ -56,7 +64,7 @@ Set the current projectors.
 
 **Parameters:**
 
-- **projs** : *const QList&lt; FIFFLIB::FiffProj &gt; &*
+- **projs** : *const QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt; &*
   The new projectors.
 
 ---

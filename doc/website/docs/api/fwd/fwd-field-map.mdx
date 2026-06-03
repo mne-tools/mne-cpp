@@ -17,7 +17,7 @@ class FWDLIB::FwdFieldMap
 
 Computes the per-vertex sensor-to-surface mapping matrix used to render a continuous scalp/cortex field that exactly reproduces the recorded MEG/EEG values.
 
-Uses Legendre-series lead-field dot products evaluated on a sphere fitted to the head together with an SVD-based pseudo-inverse with eigenvalue truncation — the classic MNE field-interpolation recipe.
+Uses Legendre-series lead-field dot products evaluated on a sphere fitted to the head together with an SVD-based pseudo-inverse with eigenvalue truncation — the classic [MNE](/docs/api/mne/mne-class) field-interpolation recipe.
 
 Ported from MNE-Python (BSD-3-Clause): `_do_self_dots`, `_do_surface_dots`, `_fast_sphere_dot_r0` (`_lead_dots.py`); `_compute_mapping_matrix`, `_pinv_trunc` (`_field_interpolation.py`).
 
@@ -31,7 +31,7 @@ Compute MEG sensor-to-surface mapping matrix.
 
 **Parameters:**
 
-- **coils** : *const FwdCoilSet &*
+- **coils** : *const [FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coils (already transformed to target coordinate frame).
 
 - **vertices** : *const Eigen::MatrixX3f &*
@@ -61,7 +61,7 @@ Compute MEG sensor-to-surface mapping matrix with SSP projection.
 
 **Parameters:**
 
-- **coils** : *const FwdCoilSet &*
+- **coils** : *const [FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coils (already transformed to target coordinate frame).
 
 - **vertices** : *const Eigen::MatrixX3f &*
@@ -73,7 +73,7 @@ Compute MEG sensor-to-surface mapping matrix with SSP projection.
 - **origin** : *const Eigen::Vector3f &*
   Sphere origin in the target coordinate frame.
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   FiffInfo with SSP projectors and channel names.
 
 - **chNames** : *const QStringList &*
@@ -99,7 +99,7 @@ The effective integration radius is intrad * 0.7, matching MNE-Python's internal
 
 **Parameters:**
 
-- **coils** : *const FwdCoilSet &*
+- **coils** : *const [FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   EEG electrodes (already transformed to target coordinate frame).
 
 - **vertices** : *const Eigen::MatrixX3f &*
@@ -126,7 +126,7 @@ Compute EEG electrode-to-surface mapping matrix with SSP projection and average 
 
 **Parameters:**
 
-- **coils** : *const FwdCoilSet &*
+- **coils** : *const [FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   EEG electrodes (already transformed to target coordinate frame).
 
 - **vertices** : *const Eigen::MatrixX3f &*
@@ -135,7 +135,7 @@ Compute EEG electrode-to-surface mapping matrix with SSP projection and average 
 - **origin** : *const Eigen::Vector3f &*
   Sphere origin in the target coordinate frame.
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   FiffInfo with SSP projectors and channel names.
 
 - **chNames** : *const QStringList &*

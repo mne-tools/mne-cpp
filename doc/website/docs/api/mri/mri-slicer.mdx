@@ -15,7 +15,7 @@ sidebar_position: 5
 class MRILIB::MriSlicer
 ```
 
-Orthogonal-plane resampler (axial / coronal / sagittal) from `MriVolData` to `MriSliceImage`.
+Orthogonal-plane resampler (axial / coronal / sagittal) from [`MriVolData`](/docs/api/mri/mri-vol-data) to `MriSliceImage`.
 
 Pure `static` methods  no instance state is owned. For a given orientation and slice index, samples the source volume at the matching row/column/depth plane, normalises voxel intensities into 8-bit grayscale via the volume's percentile-clipped window, and emits the result with the slice→RAS transform the viewer needs to draw rulers and crosshairs in millimetres.
 
@@ -112,11 +112,11 @@ Convert voxel index to RAS coordinate.
 
 ### extractSlice(vol, orientation, sliceIndex)
 
-Extract a 2D slice from an `MriVolData` volume.
+Extract a 2D slice from an [`MriVolData`](/docs/api/mri/mri-vol-data) volume.
 
 **Parameters:**
 
-- **vol** : *const MriVolData &*
+- **vol** : *const [MriVolData](/docs/api/mri/mri-vol-data) &*
   Loaded MRI volume.
 
 - **orientation** : *SliceOrientation*
@@ -137,7 +137,7 @@ Extract all three orthogonal slices at a given RAS point.
 
 **Parameters:**
 
-- **vol** : *const MriVolData &*
+- **vol** : *const [MriVolData](/docs/api/mri/mri-vol-data) &*
   Loaded MRI volume.
 
 - **rasPoint** : *const Eigen::Vector3f &*
@@ -155,7 +155,7 @@ Convert RAS coordinate to voxel index using a volume's transform.
 
 **Parameters:**
 
-- **vol** : *const MriVolData &*
+- **vol** : *const [MriVolData](/docs/api/mri/mri-vol-data) &*
   Loaded MRI volume.
 
 - **rasPoint** : *const Eigen::Vector3f &*
@@ -173,7 +173,7 @@ Convert voxel index to RAS coordinate using a volume's transform.
 
 **Parameters:**
 
-- **vol** : *const MriVolData &*
+- **vol** : *const [MriVolData](/docs/api/mri/mri-vol-data) &*
   Loaded MRI volume.
 
 - **voxel** : *const Eigen::Vector3i &*

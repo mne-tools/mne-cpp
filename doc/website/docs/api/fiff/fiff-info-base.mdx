@@ -17,7 +17,15 @@ class FIFFLIB::FiffInfoBase
 
 Stripped FIFF measurement info: channel list, sampling rate, device→head transform and bad-channel list.
 
-Owns just the fields needed to interpret a data matrix: `chs`, `ch_names`, `nchan`, `sfreq`, `bads`, `dev_head_t`, `ctf_head_t`. Base class of `FiffInfo`, used directly when the rest of the acquisition metadata is not available (e.g. realtime client streams, trimmed evoked files).
+Owns just the fields needed to interpret a data matrix: `chs`, `ch_names`, `nchan`, `sfreq`, `bads`, `dev_head_t`, `ctf_head_t`. Base class of [`FiffInfo`](/docs/api/fiff/fiff-info), used directly when the rest of the acquisition metadata is not available (e.g. realtime client streams, trimmed evoked files).
+
+### Inheritance
+
+```mermaid
+classDiagram
+    FiffInfoBase <|-- FiffInfo
+    click FiffInfo "/docs/api/fiff/fiff-info"
+```
 
 ---
 
@@ -90,7 +98,7 @@ Pick desired channels from measurement info
 
 **Returns:**
 
-- *FiffInfoBase* — Info modified according to sel.
+- *[FiffInfoBase](/docs/api/fiff/fiff-info-base)* — Info modified according to sel.
 
 ---
 
@@ -160,28 +168,28 @@ Classifies channels by kind (FIFFV_MEG_CH, FIFFV_REF_MEG_CH, FIFFV_EEG_CH) and r
 
 **Parameters:**
 
-- **megp** : *QList&lt; FiffChInfo &gt; &*
+- **megp** : *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   List of MEG channel info descriptors.
 
 - **nmegp** : *int &*
   Number of MEG channels found.
 
-- **meg_compp** : *QList&lt; FiffChInfo &gt; &*
+- **meg_compp** : *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   List of MEG compensation (reference) channel info descriptors.
 
 - **nmeg_compp** : *int &*
   Number of compensation channels found.
 
-- **eegp** : *QList&lt; FiffChInfo &gt; &*
+- **eegp** : *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   List of EEG channel info descriptors.
 
 - **neegp** : *int &*
   Number of EEG channels found.
 
-- **meg_head_t** : *FiffCoordTrans &*
+- **meg_head_t** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   Device-to-head coordinate transformation.
 
-- **idp** : *FiffId &*
+- **idp** : *[FiffId](/docs/api/fiff/fiff-id) &*
   Measurement ID.
 
 ---

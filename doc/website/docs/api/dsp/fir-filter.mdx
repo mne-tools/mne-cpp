@@ -19,9 +19,9 @@ sidebar_position: 2
 class UTILSLIB::FirFilter
 ```
 
-Discoverable façade over the `FilterKernel` FIR-filter engine.
+Discoverable façade over the [`FilterKernel`](/docs/api/dsp/filter-kernel) FIR-filter engine.
 
-Quick-start example — mirrors the `IirFilter` API: 
+Quick-start example — mirrors the [`IirFilter`](/docs/api/dsp/iir-filter) API: 
 ```cpp
 // Design a 256-tap band-pass filter
 FilterKernel bpf = FirFilter::design(256, FirFilter::BandPass, 1.0, 40.0, sFreq);
@@ -39,9 +39,9 @@ Eigen::MatrixXd clean = FirFilter::applyZeroPhaseMatrix(matData, bpf);
 
 ### design(iOrder, type, dCutoffLow, dCutoffHigh, dSFreq, dTransition, method)
 
-Design a linear-phase FIR filter using `FilterKernel` as the backend.
+Design a linear-phase FIR filter using [`FilterKernel`](/docs/api/dsp/filter-kernel) as the backend.
 
-Frequencies are given in Hz; the method converts them to the Nyquist-normalised form expected by `FilterKernel` internally.
+Frequencies are given in Hz; the method converts them to the Nyquist-normalised form expected by [`FilterKernel`](/docs/api/dsp/filter-kernel) internally.
 
 **Parameters:**
 
@@ -64,11 +64,11 @@ Frequencies are given in Hz; the method converts them to the Nyquist-normalised 
   Width of the transition band in Hz (Parks-McClellan steepness / Cosine roll-off width). Defaults to 5 Hz.
 
 - **method** : *DesignMethod*
-  Design method (Cosine or `ParksMcClellan`).
+  Design method (Cosine or [`ParksMcClellan`](/docs/api/utils/parks-mc-clellan)).
 
 **Returns:**
 
-- *FilterKernel* — A ready-to-use `FilterKernel` object.
+- *[FilterKernel](/docs/api/dsp/filter-kernel)* — A ready-to-use [`FilterKernel`](/docs/api/dsp/filter-kernel) object.
 
 ---
 
@@ -76,15 +76,15 @@ Frequencies are given in Hz; the method converts them to the Nyquist-normalised 
 
 Apply the filter to a single row vector.
 
-Uses overlap-add FFT convolution. The group delay of a symmetric FIR is removed by the `FilterKernel` engine (it takes the output segment starting at order/2), so the result is already approximately zero-phase for symmetric designs.
+Uses overlap-add FFT convolution. The group delay of a symmetric FIR is removed by the [`FilterKernel`](/docs/api/dsp/filter-kernel) engine (it takes the output segment starting at order/2), so the result is already approximately zero-phase for symmetric designs.
 
 **Parameters:**
 
 - **vecData** : *const Eigen::RowVectorXd &*
   Input row vector.
 
-- **kernel** : *FilterKernel &*
-  `FilterKernel` (prepareFilter is called if needed).
+- **kernel** : *[FilterKernel](/docs/api/dsp/filter-kernel) &*
+  [`FilterKernel`](/docs/api/dsp/filter-kernel) (prepareFilter is called if needed).
 
 **Returns:**
 
@@ -103,8 +103,8 @@ Runs the filter twice (forward then reverse) to achieve exactly zero phase shift
 - **vecData** : *const Eigen::RowVectorXd &*
   Input row vector.
 
-- **kernel** : *FilterKernel &*
-  `FilterKernel`.
+- **kernel** : *[FilterKernel](/docs/api/dsp/filter-kernel) &*
+  [`FilterKernel`](/docs/api/dsp/filter-kernel).
 
 **Returns:**
 
@@ -121,8 +121,8 @@ Apply the filter in a zero-phase forward-backward pass to every row of a matrix.
 - **matData** : *const Eigen::MatrixXd &*
   Input matrix (n_channels × n_samples).
 
-- **kernel** : *FilterKernel &*
-  `FilterKernel`.
+- **kernel** : *[FilterKernel](/docs/api/dsp/filter-kernel) &*
+  [`FilterKernel`](/docs/api/dsp/filter-kernel).
 
 - **vecPicks** : *const Eigen::RowVectorXi &*
   Optional row indices to filter; if empty, all rows are filtered.

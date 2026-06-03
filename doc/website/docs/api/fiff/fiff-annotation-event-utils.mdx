@@ -23,7 +23,7 @@ class; the functions live directly in the library namespace.
 
 SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
-Two representations coexist in MNE workflows: free-text FiffAnnotation entries (onset / duration / description) and integer (sample, prev, code) event triples extracted from a stim channel or fed to `mne.Epochs`. These free functions translate between the two: mapping annotation descriptions to event codes via a description→code table, exploding annotation durations into start / stop event pairs, and the reverse aggregation. They mirror `mne.events_from_annotations` and `mne.annotations_from_events` in MNE-Python.
+Two representations coexist in [MNE](/docs/api/mne/mne-class) workflows: free-text FiffAnnotation entries (onset / duration / description) and integer (sample, prev, code) event triples extracted from a stim channel or fed to `mne.Epochs`. These free functions translate between the two: mapping annotation descriptions to event codes via a description→code table, exploding annotation durations into start / stop event pairs, and the reverse aggregation. They mirror `mne.events_from_annotations` and `mne.annotations_from_events` in MNE-Python.
 
 ---
 
@@ -32,10 +32,10 @@ Two representations coexist in MNE workflows: free-text FiffAnnotation entries (
 ### annotationsFromEvents(events, sfreq, eventDescriptions, firstSample)
 
 ```cpp
-FiffAnnotations annotationsFromEvents(const Eigen::MatrixXi & events, double sfreq, const QMap< int, QString > & eventDescriptions, int firstSample);
+[FiffAnnotations](/docs/api/fiff/fiff-annotations) annotationsFromEvents(const Eigen::MatrixXi & events, double sfreq, const QMap< int, QString > & eventDescriptions, int firstSample);
 ```
 
-Convert a FIFF event matrix to `FiffAnnotations`.
+Convert a FIFF event matrix to [`FiffAnnotations`](/docs/api/fiff/fiff-annotations).
 
 Each event becomes an annotation with onset = (sample - firstSample) / sfreq and duration = 0. The description is looked up from eventDescriptions (event_id -&gt; label). If not found, the event id is used as a string.
 
@@ -55,23 +55,23 @@ Each event becomes an annotation with onset = (sample - firstSample) / sfreq and
 
 **Returns:**
 
-- *FiffAnnotations* — `FiffAnnotations` containing one annotation per event.
+- *[FiffAnnotations](/docs/api/fiff/fiff-annotations)* — [`FiffAnnotations`](/docs/api/fiff/fiff-annotations) containing one annotation per event.
 
 ---
 
 ### eventsFromAnnotations(annotations, sfreq, eventIds, firstSample)
 
 ```cpp
-Eigen::MatrixXi eventsFromAnnotations(const FiffAnnotations & annotations, double sfreq, const QMap< QString, int > & eventIds, int firstSample);
+Eigen::MatrixXi eventsFromAnnotations(const [FiffAnnotations](/docs/api/fiff/fiff-annotations) & annotations, double sfreq, const QMap< QString, int > & eventIds, int firstSample);
 ```
 
-Convert `FiffAnnotations` to a FIFF event matrix.
+Convert [`FiffAnnotations`](/docs/api/fiff/fiff-annotations) to a FIFF event matrix.
 
 Each annotation becomes an event row [sample, 0, event_id]. The event_id is looked up from eventIds (description -&gt; id). If not found, the description is parsed as an integer; if that also fails, event_id is set to 0.
 
 **Parameters:**
 
-- **annotations** : *const FiffAnnotations &*
+- **annotations** : *const [FiffAnnotations](/docs/api/fiff/fiff-annotations) &*
   The annotations to convert.
 
 - **sfreq** : *double*
@@ -92,14 +92,14 @@ Each annotation becomes an event row [sample, 0, event_id]. The event_id is look
 ### countAnnotations(annotations)
 
 ```cpp
-QMap< QString, int > countAnnotations(const FiffAnnotations & annotations);
+QMap< QString, int > countAnnotations(const [FiffAnnotations](/docs/api/fiff/fiff-annotations) & annotations);
 ```
 
 Count annotations by description.
 
 **Parameters:**
 
-- **annotations** : *const FiffAnnotations &*
+- **annotations** : *const [FiffAnnotations](/docs/api/fiff/fiff-annotations) &*
   The annotations to count.
 
 **Returns:**

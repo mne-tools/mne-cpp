@@ -19,11 +19,19 @@ sidebar_position: 6
 class CONNECTIVITYLIB::PartialDirectedCoherence
 ```
 
-Partial Directed `Coherence` estimator of Baccala & Sameshima (2001).
+Partial Directed [`Coherence`](/docs/api/connectivity/coherence) estimator of Baccala & Sameshima (2001).
 
-Computes `PDC_{ij}`(f) = |A_\{ij\}(f)| / sqrt( sum_k |A_\{kj\}(f)|^2 ) from the MVAR coefficients delivered by `MvarModel`, where `A(f)` is the frequency-domain inverse of the transfer matrix. Unlike `DirectedTransferFunction` this estimator counts only direct causal paths - relayed interactions `j` -&gt; k -&gt; i contribute 0 - so PDC and DTF together separate direct from indirect flow.
+Computes `PDC_{ij}`(f) = |A_\{ij\}(f)| / sqrt( sum_k |A_\{kj\}(f)|^2 ) from the MVAR coefficients delivered by [`MvarModel`](/docs/api/connectivity/mvar-model), where `A(f)` is the frequency-domain inverse of the transfer matrix. Unlike [`DirectedTransferFunction`](/docs/api/connectivity/directed-transfer-function) this estimator counts only direct causal paths - relayed interactions `j` -&gt; k -&gt; i contribute 0 - so PDC and DTF together separate direct from indirect flow.
 
-Partial Directed `Coherence` estimator (Baccala & Sameshima 2001); directional, direct paths only.
+Partial Directed [`Coherence`](/docs/api/connectivity/coherence) estimator (Baccala & Sameshima 2001); directional, direct paths only.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractMetric <|-- PartialDirectedCoherence
+    click AbstractMetric "/docs/api/connectivity/abstract-metric"
+```
 
 ---
 
@@ -31,7 +39,7 @@ Partial Directed `Coherence` estimator (Baccala & Sameshima 2001); directional, 
 
 ### PartialDirectedCoherence()
 
-Constructs a `PartialDirectedCoherence` object.
+Constructs a [`PartialDirectedCoherence`](/docs/api/connectivity/partial-directed-coherence) object.
 
 ---
 
@@ -39,16 +47,16 @@ Constructs a `PartialDirectedCoherence` object.
 
 ### calculate(connectivitySettings)
 
-Calculates Partial Directed `Coherence` between all channel pairs.
+Calculates Partial Directed [`Coherence`](/docs/api/connectivity/coherence) between all channel pairs.
 
 **Parameters:**
 
-- **connectivitySettings** : *ConnectivitySettings &*
+- **connectivitySettings** : *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings) &*
   The input data and parameters.
 
 **Returns:**
 
-- *Network* — The connectivity information in form of a network structure.
+- *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
 

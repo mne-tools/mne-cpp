@@ -19,13 +19,21 @@ Labelled `QProgressBar` with optional auto-hide on completion.
 
 Standard progress widget used by `DISPLIB` plugins to report long-running jobs (BEM solving, recording write-out, …).
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- ProgressView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
 
 ### ProgressView(bHorizontalMessage, sStyleSheet)
 
-Creates an instance of a `ProgressView` object.
+Creates an instance of a [`ProgressView`](/docs/api/disp/progress-view) object.
 
 **Parameters:**
 
@@ -39,7 +47,7 @@ Creates an instance of a `ProgressView` object.
 
 ### ~ProgressView()
 
-Deletes this instance of a `ProgressView` object.
+Deletes this instance of a [`ProgressView`](/docs/api/disp/progress-view) object.
 
 ---
 

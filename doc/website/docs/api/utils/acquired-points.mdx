@@ -19,6 +19,13 @@ In-memory store of all points captured during a session.
 
 The wizard hands one of these to the 3-D view (for visualisation) and later to the export step (for FIFF write). Single-threaded, no locking.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- AcquiredPoints
+```
+
 ---
 
 ## Public Methods

@@ -19,6 +19,13 @@ Real-time averaging worker.
 
 Background worker thread that accumulates and averages epochs in real time.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- RtAveragingWorker
+```
+
 ---
 
 ## Public Methods
@@ -47,7 +54,7 @@ Creates the real-time averaging object.
 - **iTriggerIndex** : *quint32*
   Row in dex of channel which is to be scanned for triggers.
 
-- **pFiffInfo** : *FIFFLIB::FiffInfo::SPtr*
+- **pFiffInfo** : *[FIFFLIB::FiffInfo](/docs/api/fiff/fiff-info)::SPtr*
   Associated Fiff Information.
 
 ---

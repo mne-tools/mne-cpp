@@ -15,9 +15,16 @@ sidebar_position: 65
 class DISPLIB::TimeRulerWidget
 ```
 
-Horizontal time-axis ruler displayed beneath `ChannelDataView`.
+Horizontal time-axis ruler displayed beneath [`ChannelDataView`](/docs/api/disp/channel-data-view).
 
 Tick spacing adapts to the current zoom so labels stay readable from milliseconds to minutes; supports left-click drag for window scrolling and right-click context actions (jump to event, set marker).
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- TimeRulerWidget
+```
 
 ---
 

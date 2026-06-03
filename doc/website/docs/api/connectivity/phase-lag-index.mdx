@@ -25,13 +25,21 @@ For every channel pair the estimator averages `sign`(Im(S_\{xy\}(f))) across DPS
 
 Phase Lag Index estimator (Stam et al. 2007); rejects zero-lag volume-conduction mixing.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractMetric <|-- PhaseLagIndex
+    click AbstractMetric "/docs/api/connectivity/abstract-metric"
+```
+
 ---
 
 ## Public Methods
 
 ### PhaseLagIndex()
 
-Constructs a `PhaseLagIndex` object.
+Constructs a [`PhaseLagIndex`](/docs/api/connectivity/phase-lag-index) object.
 
 ---
 
@@ -43,12 +51,12 @@ Calculates the PLI between the rows of the data matrix.
 
 **Parameters:**
 
-- **connectivitySettings** : *ConnectivitySettings &*
+- **connectivitySettings** : *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings) &*
   The input data and parameters.
 
 **Returns:**
 
-- *Network* — The connectivity information in form of a network structure.
+- *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
 

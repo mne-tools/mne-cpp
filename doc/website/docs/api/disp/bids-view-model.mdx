@@ -17,7 +17,14 @@ class DISPLIB::BidsViewModel
 
 QStandardItemModel mirroring the BIDS dataset hierarchy (subjects / sessions / runs / derivatives).
 
-Rebuilds itself from a top-level dataset path; item roles carry the absolute path, BIDS entity type and loadable-by-this-app flag so the host `BidsView` can dispatch double-clicks without re-walking the file system.
+Rebuilds itself from a top-level dataset path; item roles carry the absolute path, BIDS entity type and loadable-by-this-app flag so the host [`BidsView`](/docs/api/disp/bids-view) can dispatch double-clicks without re-walking the file system.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QStandardItemModel <|-- BidsViewModel
+```
 
 ---
 

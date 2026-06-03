@@ -17,7 +17,14 @@ class DISPLIB::ChannelRhiView
 
 QRhi-based GPU-accelerated channel time-series renderer used by the modern raw browser.
 
-Manages its own pipeline, samplers, resource bindings and a small `CrosshairOverlay` for the time / amplitude cursor; exposes callbacks for the host `ChannelDataView` to push samples, change scaling or update the visible window.
+Manages its own pipeline, samplers, resource bindings and a small `CrosshairOverlay` for the time / amplitude cursor; exposes callbacks for the host [`ChannelDataView`](/docs/api/disp/channel-data-view) to push samples, change scaling or update the visible window.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QRhiWidget <|-- ChannelRhiView
+```
 
 ---
 
@@ -39,7 +46,7 @@ The view does NOT take ownership.
 
 **Parameters:**
 
-- **model** : *ChannelDataModel **
+- **model** : *[ChannelDataModel](/docs/api/disp/channel-data-model) **
   The channel data model to render.
 
 ---
@@ -299,7 +306,7 @@ Show or hide the time and amplitude grid overlay.
 
 Set the sampling frequency (Hz) used to place time-grid tick lines.
 
-Call this from `ChannelDataView::init()` after FiffInfo is available.
+Call this from `ChannelDataView::init()` after [FiffInfo](/docs/api/fiff/fiff-info) is available.
 
 ---
 

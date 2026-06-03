@@ -19,7 +19,7 @@ Loads MNA operation schemas from declarative JSON registry manifests files.
 
 Registry files follow the mna-registry.json format with "mna_registry_version", "provider", and "ops" array. The loader supports a master manifest plus drop-in files from a mna-registry.d/ directory.
 
-Reads MNA op-schema manifests and feeds them into `MnaOpRegistry`, with drop-in directory merge support.
+Reads MNA op-schema manifests and feeds them into [`MnaOpRegistry`](/docs/api/mna/mna-op-registry), with drop-in directory merge support.
 
 ---
 
@@ -34,7 +34,7 @@ Load a single registry manifest file and register all ops.
 - **path** : *const QString &*
   Path to the JSON manifest file.
 
-- **registry** : *MnaOpRegistry &*
+- **registry** : *[MnaOpRegistry](/docs/api/mna/mna-op-registry) &*
   Registry to populate.
 
 **Returns:**
@@ -54,7 +54,7 @@ Loads mna-registry.json first, then all *.json files from mna-registry.d/ in alp
 - **registryDir** : *const QString &*
   Directory containing mna-registry.json.
 
-- **registry** : *MnaOpRegistry &*
+- **registry** : *[MnaOpRegistry](/docs/api/mna/mna-op-registry) &*
   Registry to populate.
 
 **Returns:**
@@ -75,7 +75,7 @@ Serialize current registry schemas to a JSON manifest file.
 - **provider** : *const QString &*
   Provider name for the manifest header.
 
-- **registry** : *const MnaOpRegistry &*
+- **registry** : *const [MnaOpRegistry](/docs/api/mna/mna-op-registry) &*
   Registry to serialize.
 
 **Returns:**

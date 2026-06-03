@@ -17,7 +17,14 @@ class DISPLIB::ButterflyView
 
 QRhi-accelerated butterfly viewer overlaying every channel of one or more averaged conditions.
 
-Renders all visible traces in a single shader pass for smooth zoom / pan; visibility per modality and per condition is driven by `ModalitySelectionView` and `AverageSelectionView`. Used as the main evoked viewer in MNE-Scan.
+Renders all visible traces in a single shader pass for smooth zoom / pan; visibility per modality and per condition is driven by [`ModalitySelectionView`](/docs/api/disp/modality-selection-view) and [`AverageSelectionView`](/docs/api/disp/average-selection-view). Used as the main evoked viewer in MNE-Scan.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QRhiWidget <|-- ButterflyView
+```
 
 ---
 
@@ -31,7 +38,7 @@ The constructor.
 
 ### ~ButterflyView()
 
-Destroys the `ButterflyView`.
+Destroys the [`ButterflyView`](/docs/api/disp/butterfly-view).
 
 ---
 
@@ -49,18 +56,18 @@ Set the evoked set model.
 
 **Parameters:**
 
-- **model** : *QSharedPointer&lt;EvokedSetModel&gt;*
+- **model** : *QSharedPointer&lt;[EvokedSetModel](/docs/api/disp/evoked-set-model)&gt;*
   The new evoked set model.
 
 ---
 
 ### getEvokedSetModel()
 
-Returns the currently set `EvokedSetModel`.
+Returns the currently set [`EvokedSetModel`](/docs/api/disp/evoked-set-model).
 
 **Returns:**
 
-- *QSharedPointer&lt;EvokedSetModel&gt;* — the currently set `EvokedSetModel`.
+- *QSharedPointer&lt;[EvokedSetModel](/docs/api/disp/evoked-set-model)&gt;* — the currently set [`EvokedSetModel`](/docs/api/disp/evoked-set-model).
 
 ---
 
@@ -212,7 +219,7 @@ Set the channel info model.
 
 **Parameters:**
 
-- **pChannelInfoModel** : *QSharedPointer&lt;ChannelInfoModel&gt; &*
+- **pChannelInfoModel** : *QSharedPointer&lt;[ChannelInfoModel](/docs/api/disp/channel-info-model)&gt; &*
   The new channel info model.
 
 ---

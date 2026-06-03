@@ -17,7 +17,7 @@ class FIFFLIB::FiffDirEntry
 
 Directory entry: tag kind + on-disk type + byte size + absolute file offset (16-byte record).
 
-Exact memory image of the legacy ``fiffDirEntryRec`:` kind (32-bit), type (32-bit), size (32-bit), pos (32-bit). The arrays of these records materialize the `FIFF_DIR` tag at the tail of every well-formed FIFF file and drive random-access tag lookup in `FiffStream`.
+Exact memory image of the legacy ``fiffDirEntryRec`:` kind (32-bit), type (32-bit), size (32-bit), pos (32-bit). The arrays of these records materialize the `FIFF_DIR` tag at the tail of every well-formed FIFF file and drive random-access tag lookup in [`[FiffStream](/docs/api/fiff/fiff-stream)`](/docs/api/fiff/fiff-stream).
 
 ---
 

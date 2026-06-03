@@ -15,9 +15,16 @@ sidebar_position: 9
 class DISPLIB::Bar
 ```
 
-`Bar` chart / histogram QWidget rendering Eigen class-limit + frequency vectors with QPainter.
+[`Bar`](/docs/api/disp/bar) chart / histogram QWidget rendering Eigen class-limit + frequency vectors with QPainter.
 
 Templated on the value type so callers can pass either integer or floating bin limits. Use `setData` to install a new dataset and `updatePlot` to refresh an existing chart in place; both call `splitCoefficientAndExponent` internally to format the tick labels with a configurable number of significant digits.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- Bar
+```
 
 ---
 
@@ -25,7 +32,7 @@ Templated on the value type so callers can pass either integer or floating bin l
 
 ### Bar(title, parent)
 
-The constructor for `Bar`.
+The constructor for [`Bar`](/docs/api/disp/bar).
 
 ---
 

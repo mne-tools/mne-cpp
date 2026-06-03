@@ -21,7 +21,7 @@ class INVLIB::InvDipoleFit
 
 High-level driver for sequential dipole fitting.
 
-`InvDipoleFit` orchestrates the complete dipole-fit pipeline: it sets up the forward model via `InvDipoleFitData`, computes initial guess grids via `InvGuessData`, reads averaged or raw data, and fits an equivalent current dipole (ECD) at each requested time point.
+[`InvDipoleFit`](/docs/api/inv/inv-dipole-fit) orchestrates the complete dipole-fit pipeline: it sets up the forward model via `InvDipoleFitData`, computes initial guess grids via `InvGuessData`, reads averaged or raw data, and fits an equivalent current dipole (ECD) at each requested time point.
 
 Refactored from fit_dipoles.c / dipole_fit_setup.c (MNE-C).
 
@@ -69,7 +69,7 @@ Refactored: fit_dipoles (fit_dipoles.c)
 - **dataname** : *const QString &*
   Data file name.
 
-- **data** : *MNELIB::MNEMeasData **
+- **data** : *[MNEMeasData](/docs/api/mne/mne-meas-data) **
   The measured data.
 
 - **fit** : *InvDipoleFitData **
@@ -115,7 +115,7 @@ Refactored: fit_dipoles_raw (fit_dipoles.c)
 - **dataname** : *const QString &*
   Data file name.
 
-- **raw** : *MNELIB::MNERawData **
+- **raw** : *[MNERawData](/docs/api/mne/mne-raw-data) **
   The raw data description.
 
 - **sel** : *MNELIB::mneChSelection*
@@ -162,7 +162,7 @@ Refactored: fit_dipoles_raw (fit_dipoles.c)
 - **dataname** : *const QString &*
   Data file name.
 
-- **raw** : *MNELIB::MNERawData **
+- **raw** : *[MNERawData](/docs/api/mne/mne-raw-data) **
   The raw data description.
 
 - **sel** : *MNELIB::mneChSelection*

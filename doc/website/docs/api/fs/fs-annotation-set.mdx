@@ -15,9 +15,9 @@ sidebar_position: 5
 class FSLIB::FsAnnotationSet
 ```
 
-Container holding the lh and/or rh `FsAnnotation` for one parcellation atlas.
+Container holding the lh and/or rh [`FsAnnotation`](/docs/api/fs/fs-annotation) for one parcellation atlas.
 
-Keyed on hemisphere id (0 = lh, 1 = rh). When loaded from a single atlas name both hemispheres share the same colortable layout, so cross-hemisphere region lookup is consistent. The set is intended to be aligned one-to-one with an `FsSurfaceSet` sharing the same subject and vertex count per hemisphere.
+Keyed on hemisphere id (0 = lh, 1 = rh). When loaded from a single atlas name both hemispheres share the same colortable layout, so cross-hemisphere region lookup is consistent. The set is intended to be aligned one-to-one with an [`FsSurfaceSet`](/docs/api/fs/fs-surface-set) sharing the same subject and vertex count per hemisphere.
 
 ---
 
@@ -72,10 +72,10 @@ Constructs an annotation set by assembling given annotations.
 
 **Parameters:**
 
-- **p_LHAnnotation** : *const FsAnnotation &*
+- **p_LHAnnotation** : *const [FsAnnotation](/docs/api/fs/fs-annotation) &*
   Left hemisphere annotation.
 
-- **p_RHAnnotation** : *const FsAnnotation &*
+- **p_RHAnnotation** : *const [FsAnnotation](/docs/api/fs/fs-annotation) &*
   Right hemisphere annotation.
 
 ---
@@ -102,27 +102,27 @@ Destroys the annotation set.
 
 ### clear()
 
-Initializes the `FsAnnotationSet`.
+Initializes the [`FsAnnotationSet`](/docs/api/fs/fs-annotation-set).
 
 ---
 
 ### data()
 
-Returns The `FsAnnotation` set map.
+Returns The [`FsAnnotation`](/docs/api/fs/fs-annotation) set map.
 
 **Returns:**
 
-- *QMap&lt; qint32, FsAnnotation &gt; &* — the annotation set map.
+- *QMap&lt; qint32, [FsAnnotation](/docs/api/fs/fs-annotation) &gt; &* — the annotation set map.
 
 ---
 
 ### isEmpty()
 
-True if `FsAnnotationSet` is empty.
+True if [`FsAnnotationSet`](/docs/api/fs/fs-annotation-set) is empty.
 
 **Returns:**
 
-- *bool* — true if `FsAnnotationSet` is empty.
+- *bool* — true if [`FsAnnotationSet`](/docs/api/fs/fs-annotation-set) is empty.
 
 ---
 
@@ -132,8 +132,8 @@ Insert an annotation.
 
 **Parameters:**
 
-- **p_Annotation** : *const FsAnnotation &*
-  `FsAnnotation` to insert.
+- **p_Annotation** : *const [FsAnnotation](/docs/api/fs/fs-annotation) &*
+  [`FsAnnotation`](/docs/api/fs/fs-annotation) to insert.
 
 ---
 
@@ -145,10 +145,10 @@ Converts annotation to a label list and colortable
 
 **Parameters:**
 
-- **p_surfSet** : *const FsSurfaceSet &*
-  the `FsSurfaceSet` to read the vertex positions from.
+- **p_surfSet** : *const [FsSurfaceSet](/docs/api/fs/fs-surface-set) &*
+  the [`FsSurfaceSet`](/docs/api/fs/fs-surface-set) to read the vertex positions from.
 
-- **p_qListLabels** : *QList&lt; FsLabel &gt; &*
+- **p_qListLabels** : *QList&lt; [FsLabel](/docs/api/fs/fs-label) &gt; &*
   the converted labels are appended to a given list. Stored data are not affected.
 
 - **p_qListLabelRGBAs** : *QList&lt; Eigen::RowVector4i &gt; &*
@@ -174,7 +174,7 @@ Subscript operator [] to access annotation by index.
 
 **Returns:**
 
-- *FsAnnotation &* — `FsAnnotation` related to the parameter index.
+- *[FsAnnotation](/docs/api/fs/fs-annotation) &* — [`FsAnnotation`](/docs/api/fs/fs-annotation) related to the parameter index.
 
 ---
 
@@ -189,7 +189,7 @@ Subscript operator [] to access annotation by index.
 
 **Returns:**
 
-- *const FsAnnotation* — `FsAnnotation` related to the parameter index.
+- *const [FsAnnotation](/docs/api/fs/fs-annotation)* — [`FsAnnotation`](/docs/api/fs/fs-annotation) related to the parameter index.
 
 ---
 
@@ -204,7 +204,7 @@ Subscript operator [] to access annotation by identifier.
 
 **Returns:**
 
-- *FsAnnotation &* — `FsAnnotation` related to the parameter identifier.
+- *[FsAnnotation](/docs/api/fs/fs-annotation) &* — [`FsAnnotation`](/docs/api/fs/fs-annotation) related to the parameter identifier.
 
 ---
 
@@ -219,7 +219,7 @@ Subscript operator [] to access annotation by identifier.
 
 **Returns:**
 
-- *const FsAnnotation* — `FsAnnotation` related to the parameter identifier.
+- *const [FsAnnotation](/docs/api/fs/fs-annotation)* — [`FsAnnotation`](/docs/api/fs/fs-annotation) related to the parameter identifier.
 
 ---
 
@@ -237,7 +237,7 @@ Returns number of loaded hemispheres.
 
 ### read(p_sLHFileName, p_sRHFileName, p_AnnotationSet)
 
-Reads different annotation files and assembles them to a `FsAnnotationSet`.
+Reads different annotation files and assembles them to a [`FsAnnotationSet`](/docs/api/fs/fs-annotation-set).
 
 **Parameters:**
 
@@ -247,7 +247,7 @@ Reads different annotation files and assembles them to a `FsAnnotationSet`.
 - **p_sRHFileName** : *const QString &*
   Right hemisphere annotation file.
 
-- **p_AnnotationSet** : *FsAnnotationSet &*
+- **p_AnnotationSet** : *[FsAnnotationSet](/docs/api/fs/fs-annotation-set) &*
   The read annotation set.
 
 **Returns:**

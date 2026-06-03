@@ -144,7 +144,8 @@ def _build_xref_map(xml_dir: Optional[Path] = None) -> None:
         # (e.g. "FIFFLIB::FiffChInfo" before "FiffChInfo").
         sorted_names = sorted(_XREF_MAP.keys(), key=len, reverse=True)
         escaped = [re.escape(n) for n in sorted_names]
-        _XREF_RE = re.compile(r"\b(" + "|".join(escaped) + r")\b")
+        # Negative lookahead (?!-) prevents matching "MNE" in "MNE-Python"
+        _XREF_RE = re.compile(r"\b(" + "|".join(escaped) + r")(?![-])\b")
     else:
         _XREF_RE = None
 
@@ -155,6 +156,10 @@ def linkify_type(type_str: str, *, self_name: str = "") -> str:
     ``FiffChInfo`` becomes ``[FiffChInfo](/docs/api/fiff/fiff-ch-info)``.
     The class's own name (*self_name*) is never linked to avoid
     self-referential links on a class's own page.
+
+    Existing markdown links ``[...](...)``, inline code spans, and fenced
+    code blocks are preserved verbatim so that already-resolved ``<ref>``
+    cross-references are not double-linked.
     """
     if not _XREF_RE or not type_str:
         return type_str
@@ -165,7 +170,27 @@ def linkify_type(type_str: str, *, self_name: str = "") -> str:
             return name
         return f"[{name}]({_XREF_MAP[name]})"
 
-    return _XREF_RE.sub(_replace, type_str)
+    # Split the input into protected spans (markdown links, inline code,
+    # fenced code blocks) and free text.  Only apply the regex to free text.
+    _PROTECTED_RE = re.compile(
+        r"```[\s\S]*?```"       # fenced code blocks
+        r"|`[^`]+`"             # inline code spans
+        r"|\[[^\]]*\]\([^)]*\)" # markdown links
+    )
+    parts: List[str] = []
+    last = 0
+    for pm in _PROTECTED_RE.finditer(type_str):
+        # Process the gap before this protected span
+        gap = type_str[last:pm.start()]
+        if gap:
+            parts.append(_XREF_RE.sub(_replace, gap))
+        parts.append(pm.group(0))  # keep protected span unchanged
+        last = pm.end()
+    # Process trailing text after the last protected span
+    tail = type_str[last:]
+    if tail:
+        parts.append(_XREF_RE.sub(_replace, tail))
+    return "".join(parts)
 
 
 def module_for(qualified: str) -> Optional[dict]:
@@ -539,7 +564,23 @@ def extract_body_text(detail_el) -> str:
                 else:
                     text_parts.append(f"${f}$")
             elif sub.tag == "ref":
-                text_parts.append(f"`{text_of(sub)}`")
+                ref_text = text_of(sub)
+                refid = sub.get("refid", "")
+                kindref = sub.get("kindref", "")
+                resolved = False
+                if kindref == "compound" and refid:
+                    short = _REFID_MAP.get(refid, "")
+                    if short and short in _XREF_MAP:
+                        text_parts.append(f"[`{short}`]({_XREF_MAP[short]})")
+                        resolved = True
+                if not resolved:
+                    ref_short = ref_text.split("::")[-1] if "::" in ref_text else ref_text
+                    if ref_short in _XREF_MAP:
+                        text_parts.append(f"[`{ref_short}`]({_XREF_MAP[ref_short]})")
+                    elif ref_text in _XREF_MAP:
+                        text_parts.append(f"[`{ref_text}`]({_XREF_MAP[ref_text]})")
+                    else:
+                        text_parts.append(f"`{ref_text}`")
             elif sub.tag == "ulink":
                 text_parts.append(f"[{text_of(sub)}]({sub.get('url','')})")
             elif sub.tag == "programlisting":
@@ -641,10 +682,10 @@ def _render_method(func, lines: List[str], *, self_name: str = "") -> None:
     detail_el = func.find("detaileddescription")
     body = extract_body_text(detail_el)
     if brief:
-        lines.append(brief)
+        lines.append(linkify_type(brief, self_name=self_name))
         lines.append("")
     if body:
-        lines.append(body)
+        lines.append(linkify_type(body, self_name=self_name))
         lines.append("")
 
     xml_params: Dict[str, str] = {}
@@ -905,10 +946,10 @@ def generate_class_mdx(compounddef,
     lines.append("")
 
     if brief:
-        lines.append(brief)
+        lines.append(linkify_type(brief, self_name=short_name))
         lines.append("")
     if body_text:
-        lines.append(body_text)
+        lines.append(linkify_type(body_text, self_name=short_name))
         lines.append("")
 
     # --- Inheritance diagram (Mermaid) ---
@@ -1008,10 +1049,10 @@ def _render_free_function(func, lines: List[str]) -> None:
     detail_el = func.find("detaileddescription")
     body = extract_body_text(detail_el)
     if brief:
-        lines.append(brief)
+        lines.append(linkify_type(brief))
         lines.append("")
     if body:
-        lines.append(body)
+        lines.append(linkify_type(body))
         lines.append("")
 
     xml_params: Dict[str, str] = {}
@@ -1170,10 +1211,10 @@ def generate_module_mdx(xml_dir: Path,
     lines.append("")
 
     if brief:
-        lines.append(brief)
+        lines.append(linkify_type(brief))
         lines.append("")
     if body_text:
-        lines.append(body_text)
+        lines.append(linkify_type(body_text))
         lines.append("")
     lines.append("---")
     lines.append("")

@@ -19,6 +19,14 @@ Settings panel exposing the noise-covariance estimation window length.
 
 Holds a single `QSpinBox` forwarded as `changeMinNumberSamples` to the `rtprocessing` covariance estimator.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- CovarianceSettingsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
@@ -29,7 +37,7 @@ Holds a single `QSpinBox` forwarded as `changeMinNumberSamples` to the `rtproces
 
 ### ~CovarianceSettingsView()
 
-Destroys the `CovarianceSettingsView`.
+Destroys the [`CovarianceSettingsView`](/docs/api/disp/covariance-settings-view).
 
 ---
 

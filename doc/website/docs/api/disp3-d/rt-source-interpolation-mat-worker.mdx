@@ -15,12 +15,12 @@ sidebar_position: 8
 class DISP3DLIB::RtSourceInterpolationMatWorker
 ```
 
-`RtSourceInterpolationMatWorker` computes sparse source-to-vertex interpolation matrices in a background thread.
+[`RtSourceInterpolationMatWorker`](/docs/api/disp3-d/rt-source-interpolation-mat-worker) computes sparse source-to-vertex interpolation matrices in a background thread.
 
 This worker encapsulates the expensive `GeometryInfo::scdc()` (geodesic distance computation) and `Interpolation::createInterpolationMat()` calls that were previously performed either in `StcLoadingWorker` (at load time only) or not recomputed at all when parameters changed at runtime.
 
 The worker for each hemisphere stores:
-FsSurface vertex positions and neighbor topology
+[FsSurface](/docs/api/fs/fs-surface) vertex positions and neighbor topology
 
 
 Source vertex indices (from the STC file)
@@ -31,6 +31,13 @@ Cancel distance and interpolation function
 When any parameter changes, `computeInterpolationMatrix()` can be called (typically via a queued connection) to recompute the sparse interpolation matrix on the worker thread. When done, the result is emitted via newInterpolationMatrixAvailable().
 
 Background worker for computing source interpolation matrices.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- RtSourceInterpolationMatWorker
+```
 
 ---
 
@@ -131,7 +138,7 @@ Required for AnnotationBased visualization.
 - **vecLabelIds** : *const Eigen::VectorXi &*
   Per-vertex label IDs for the surface.
 
-- **lLabels** : *const QList&lt; FSLIB::FsLabel &gt; &*
+- **lLabels** : *const QList&lt; [FsLabel](/docs/api/fs/fs-label) &gt; &*
   List of FreeSurfer Labels.
 
 - **vecVertNo** : *const Eigen::VectorXi &*
@@ -148,7 +155,7 @@ Set annotation info for the right hemisphere.
 - **vecLabelIds** : *const Eigen::VectorXi &*
   Per-vertex label IDs for the surface.
 
-- **lLabels** : *const QList&lt; FSLIB::FsLabel &gt; &*
+- **lLabels** : *const QList&lt; [FsLabel](/docs/api/fs/fs-label) &gt; &*
   List of FreeSurfer Labels.
 
 - **vecVertNo** : *const Eigen::VectorXi &*

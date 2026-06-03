@@ -15,9 +15,17 @@ sidebar_position: 55
 class DISPLIB::ScalingView
 ```
 
-Per-modality y-scale spinbox panel built from `ScaleControl` widgets.
+Per-modality y-scale spinbox panel built from [`ScaleControl`](/docs/api/disp/scale-control) widgets.
 
-One `ScaleControl` per channel modality in the active `FiffInfo`; edits are emitted as `scalingChanged` maps consumed by `RtFiffRawView`, `ChannelDataView` and `ButterflyView`.
+One [`ScaleControl`](/docs/api/disp/scale-control) per channel modality in the active `FiffInfo`; edits are emitted as `scalingChanged` maps consumed by [`RtFiffRawView`](/docs/api/disp/rt-fiff-raw-view), [`ChannelDataView`](/docs/api/disp/channel-data-view) and [`ButterflyView`](/docs/api/disp/butterfly-view).
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- ScalingView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,7 +33,7 @@ One `ScaleControl` per channel modality in the active `FiffInfo`; edits are emit
 
 ### ScalingView(sSettingsPath, parent, f, lChannelsToShow)
 
-Constructs a `ScalingView` which is a child of parent.
+Constructs a [`ScalingView`](/docs/api/disp/scaling-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `ScalingView` which is a child of parent.
 
 ### ~ScalingView()
 
-Destroys the `ScalingView`.
+Destroys the [`ScalingView`](/docs/api/disp/scaling-view).
 
 ---
 

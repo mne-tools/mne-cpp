@@ -15,9 +15,9 @@ sidebar_position: 11
 class FWDLIB::FwdEegSphereModelSet
 ```
 
-Definitions for the EEG Sphere Model Set (replaces `fwdEegSphereModelSet` / `fwdEegSphereModelSetRec` from MNE-C ``fwd_types.h``).
+Definitions for the EEG [Sphere](/docs/api/math/sphere) Model Set (replaces `fwdEegSphereModelSet` / `fwdEegSphereModelSetRec` from MNE-C ``fwd_types.h``).
 
-Name-indexed collection of `FwdEegSphereModel` objects parsed from an `mne_setup_eeg_sphere_model` parameter file so callers can resolve textual model names ("Default", "Stok", …) into ready-to-use analytic head models.
+Name-indexed collection of [`FwdEegSphereModel`](/docs/api/fwd/fwd-eeg-sphere-model) objects parsed from an `mne_setup_eeg_sphere_model` parameter file so callers can resolve textual model names ("Default", "Stok", …) into ready-to-use analytic head models.
 
 ---
 
@@ -25,13 +25,13 @@ Name-indexed collection of `FwdEegSphereModel` objects parsed from an `mne_setup
 
 ### FwdEegSphereModelSet()
 
-Constructs a Forward EEG Sphere Model Set object.
+Constructs a Forward EEG [Sphere](/docs/api/math/sphere) Model Set object.
 
 ---
 
 ### ~FwdEegSphereModelSet()
 
-Destroys the Forward EEG Sphere Model Set description.
+Destroys the Forward EEG [Sphere](/docs/api/math/sphere) Model Set description.
 
 ---
 
@@ -62,7 +62,7 @@ Find a model with a given name and return a duplicate Refactored from: fwd_eeg_s
 
 **Returns:**
 
-- *FwdEegSphereModel ** — A duplicat of the found model.
+- *[FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) ** — A duplicat of the found model.
 
 ---
 
@@ -88,15 +88,15 @@ The model will be owned by the set.
 
 **Parameters:**
 
-- **s** : *FwdEegSphereModelSet **
+- **s** : *[FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) **
   The model set (created if nullptr).
 
-- **m** : *FwdEegSphereModel::UPtr*
+- **m** : *[FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model)::UPtr*
   The model to add (ownership transferred).
 
 **Returns:**
 
-- *FwdEegSphereModelSet ** — The model set.
+- *[FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) ** — The model set.
 
 ---
 
@@ -106,12 +106,12 @@ Choose and setup the default EEG sphere model Refactored from: fwd_eeg_sphere_mo
 
 **Parameters:**
 
-- **s** : *FwdEegSphereModelSet **
+- **s** : *[FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) **
   The model set to which loaded models are added.
 
 **Returns:**
 
-- *FwdEegSphereModelSet ** — The model set with the default model (s + default models).
+- *[FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) ** — The model set with the default model (s + default models).
 
 ---
 
@@ -124,12 +124,12 @@ Load all models available in the specified file Refactored from: fwd_eeg_sphere_
 - **p_sFileName** : *const QString &*
   file name to load models from.
 
-- **now** : *FwdEegSphereModelSet **
+- **now** : *[FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) **
   The model set to which loaded models are added.
 
 **Returns:**
 
-- *FwdEegSphereModelSet ** — The loaded model set (now + loaded models).
+- *[FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) ** — The loaded model set (now + loaded models).
 
 ---
 

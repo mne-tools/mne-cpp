@@ -17,7 +17,7 @@ class FSLIB::FsColortable
 
 FreeSurfer colour lookup table: region name + RGBA + packed label, indexed by entry.
 
-Backs the colour/structure mapping used by `FsAnnotation` and by any caller that needs to translate a packed ``.annot label into the matching anatomical name and RGBA colour. The container is a thin value object: rows of `table` align with `struct_names`, and the label column matches the per-vertex integer stored in ``.annot files so direct equality lookup is sufficient.
+Backs the colour/structure mapping used by [`FsAnnotation`](/docs/api/fs/fs-annotation) and by any caller that needs to translate a packed ``.annot label into the matching anatomical name and RGBA colour. The container is a thin value object: rows of `table` align with `struct_names`, and the label column matches the per-vertex integer stored in ``.annot files so direct equality lookup is sufficient.
 
 ---
 

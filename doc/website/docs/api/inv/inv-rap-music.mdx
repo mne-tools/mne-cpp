@@ -25,19 +25,26 @@ Implements the RAP MUSIC scanning algorithm which iteratively identifies correla
 
 Reference: Mosher & Leahy, IEEE Trans. Signal Process. 47(2), 332-340, 1999.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    InvRapMusic <|-- InvPwlRapMusic
+```
+
 ---
 
 ## Public Methods
 
 ### InvRapMusic()
 
-Default constructor creates an empty `InvRapMusic` algorithm which still needs to be initialized.
+Default constructor creates an empty [`InvRapMusic`](/docs/api/inv/inv-rap-music) algorithm which still needs to be initialized.
 
 ---
 
 ### InvRapMusic(p_pFwd, p_bSparsed, p_iN, p_dThr)
 
-Constructor which initializes the `InvRapMusic` algorithm with the given model.
+Constructor which initializes the [`InvRapMusic`](/docs/api/inv/inv-rap-music) algorithm with the given model.
 
 **Parameters:**
 

@@ -17,7 +17,15 @@ class UTILSLIB::ICommand
 
 Declare interface command.
 
-The `ICommand` interface provides the base class of every command of the command design pattern.
+The [`ICommand`](/docs/api/utils/i-command) interface provides the base class of every command of the command design pattern.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    ICommand <|-- Command
+    ICommand <|-- RawCommand
+```
 
 ---
 
@@ -25,13 +33,13 @@ The `ICommand` interface provides the base class of every command of the command
 
 ### ~ICommand()
 
-Destroys the `ICommand`.
+Destroys the [`ICommand`](/docs/api/utils/i-command).
 
 ---
 
 ### execute()
 
-Executes the `ICommand`.
+Executes the [`ICommand`](/docs/api/utils/i-command).
 
 ---
 

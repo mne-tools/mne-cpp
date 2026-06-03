@@ -17,7 +17,15 @@ class DISPLIB::SpectrumSettingsView
 
 Lower / upper-bound frequency sliders for the FFT spectrum viewer.
 
-Two `QSliders` emit `lowerFreqChanged` / `upperFreqChanged` so the connected `SpectrumView` can crop the displayed frequency axis.
+Two `QSliders` emit `lowerFreqChanged` / `upperFreqChanged` so the connected [`SpectrumView`](/docs/api/disp/spectrum-view) can crop the displayed frequency axis.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- SpectrumSettingsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Two `QSliders` emit `lowerFreqChanged` / `upperFreqChanged` so the connected `Sp
 
 ### SpectrumSettingsView(sSettingsPath, parent, f)
 
-Constructs a `SpectrumSettingsView` which is a child of parent.
+Constructs a [`SpectrumSettingsView`](/docs/api/disp/spectrum-settings-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `SpectrumSettingsView` which is a child of parent.
 
 ### ~SpectrumSettingsView()
 
-Destroys the `SpectrumSettingsView`.
+Destroys the [`SpectrumSettingsView`](/docs/api/disp/spectrum-settings-view).
 
 ---
 

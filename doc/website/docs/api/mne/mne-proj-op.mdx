@@ -17,7 +17,7 @@ class MNELIB::MNEProjOp
 
 Projection operator managing a set of linear projection items and the final compiled projector matrix.
 
-`MNEProjOp` aggregates zero or more `MNEProjItem` entries, each holding a named matrix of projection vectors. When the operator is compiled (make_projector), the individual items are orthogonalised into a single dense projector stored in `proj_data`.
+[`MNEProjOp`](/docs/api/mne/mne-proj-op) aggregates zero or more [`MNEProjItem`](/docs/api/mne/mne-proj-item) entries, each holding a named matrix of projection vectors. When the operator is compiled (make_projector), the individual items are orthogonalised into a single dense projector stored in `proj_data`.
 
 ---
 
@@ -53,12 +53,12 @@ Each item's active_file flag is preserved.
 
 **Parameters:**
 
-- **from** : *MNEProjOp **
+- **from** : *[MNEProjOp](/docs/api/mne/mne-proj-op) **
   Source operator whose items are copied.
 
 **Returns:**
 
-- *MNEProjOp ** — Pointer to this operator.
+- *[MNEProjOp](/docs/api/mne/mne-proj-op) ** — Pointer to this operator.
 
 ---
 
@@ -70,7 +70,7 @@ The projection kind (MEG/EEG) is auto-detected from channel names.
 
 **Parameters:**
 
-- **vecs** : *const MNENamedMatrix **
+- **vecs** : *const [MNENamedMatrix](/docs/api/mne/mne-named-matrix) **
   Named matrix holding the projection vectors.
 
 - **kind** : *int*
@@ -92,7 +92,7 @@ Convenience wrapper around `add_item_active()` with `is_active` = TRUE.
 
 **Parameters:**
 
-- **vecs** : *const MNENamedMatrix **
+- **vecs** : *const [MNENamedMatrix](/docs/api/mne/mne-named-matrix) **
   Named matrix holding the projection vectors.
 
 - **kind** : *int*
@@ -111,7 +111,7 @@ Copies all items, their vectors, descriptions, and active states.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNEProjOp &gt;* — A newly allocated copy. Caller takes ownership.
+- *std::unique_ptr&lt; [MNEProjOp](/docs/api/mne/mne-proj-op) &gt;* — A newly allocated copy. Caller takes ownership.
 
 ---
 
@@ -141,7 +141,7 @@ Convenience wrapper that extracts channel names and delegates to `affect()`.
 
 **Parameters:**
 
-- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+- **chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   Channel information list.
 
 - **nch** : *int*
@@ -280,7 +280,7 @@ Apply this projection operator to a covariance matrix from both sides: C' = (I -
 
 **Parameters:**
 
-- **c** : *MNECovMatrix **
+- **c** : *[MNECovMatrix](/docs/api/mne/mne-cov-matrix) **
   The covariance matrix to project.
 
 **Returns:**
@@ -299,7 +299,7 @@ Builds a uniform-weight vector ( $$1/\sqrt\{N_\{\text\{EEG\}\}\}$$) across all E
 
 **Parameters:**
 
-- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+- **chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   Channel information list.
 
 - **nch** : *int*
@@ -307,7 +307,7 @@ Builds a uniform-weight vector ( $$1/\sqrt\{N_\{\text\{EEG\}\}\}$$) across all E
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNEProjOp &gt;* — A new projection operator, or NULL if no EEG channels are found. Caller takes ownership.
+- *std::unique_ptr&lt; [MNEProjOp](/docs/api/mne/mne-proj-op) &gt;* — A new projection operator, or NULL if no EEG channels are found. Caller takes ownership.
 
 ---
 
@@ -317,15 +317,15 @@ Read all linear projection items from a FIFF tree node.
 
 **Parameters:**
 
-- **stream** : *FIFFLIB::FiffStream::SPtr &*
+- **stream** : *[FIFFLIB::FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   An open FIFF stream.
 
-- **start** : *const FIFFLIB::FiffDirNode::SPtr &*
+- **start** : *const [FIFFLIB::FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The tree node to search for projection blocks.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNEProjOp &gt;* — A populated projection operator (possibly with zero items), or NULL on error. Caller takes ownership.
+- *std::unique_ptr&lt; [MNEProjOp](/docs/api/mne/mne-proj-op) &gt;* — A populated projection operator (possibly with zero items), or NULL on error. Caller takes ownership.
 
 ---
 
@@ -342,7 +342,7 @@ Convenience wrapper that opens the file and delegates to `read_from_node()`.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNEProjOp &gt;* — The loaded projection operator, or NULL on error. Caller takes ownership.
+- *std::unique_ptr&lt; [MNEProjOp](/docs/api/mne/mne-proj-op) &gt;* — The loaded projection operator, or NULL on error. Caller takes ownership.
 
 ---
 
@@ -359,13 +359,13 @@ Refactored: make_projection (dipole_fit_setup.c)
 - **projnames** : *const QList&lt; QString &gt; &*
   List of FIFF file paths containing projection data.
 
-- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+- **chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   Channel information list.
 
 - **nch** : *int*
   Number of channels.
 
-- **result** : *std::unique_ptr&lt; MNEProjOp &gt; &*
+- **result** : *std::unique_ptr&lt; [MNEProjOp](/docs/api/mne/mne-proj-op) &gt; &*
   The combined projection operator (nullptr when no projection is needed).
 
 **Returns:**

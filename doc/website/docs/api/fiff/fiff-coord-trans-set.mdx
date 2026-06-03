@@ -17,7 +17,7 @@ class FIFFLIB::FiffCoordTransSet
 
 Container for the FIFF coordinate transforms found in (or written to) a FIFFB_MRI / FIFFB_HPI_MEAS block.
 
-Owns the list of `FiffCoordTrans` and the metadata that travels with them (fiducial points, registration comments). Provides lookup by (`from`, `to`) frame pair so consumers can ask for, e.g., `FIFFV_COORD_HEAD` → `FIFFV_COORD_MRI` without iterating manually.
+Owns the list of [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans) and the metadata that travels with them (fiducial points, registration comments). Provides lookup by (`from`, `to`) frame pair so consumers can ask for, e.g., `FIFFV_COORD_HEAD` → `FIFFV_COORD_MRI` without iterating manually.
 
 ---
 
@@ -25,13 +25,13 @@ Owns the list of `FiffCoordTrans` and the metadata that travels with them (fiduc
 
 ### FiffCoordTransSet()
 
-Constructs the `FiffCoordTransSet`.
+Constructs the [`FiffCoordTransSet`](/docs/api/fiff/fiff-coord-trans-set).
 
 ---
 
 ### ~FiffCoordTransSet()
 
-Destroys the `FiffCoordTransSet`.
+Destroys the [`FiffCoordTransSet`](/docs/api/fiff/fiff-coord-trans-set).
 
 ---
 

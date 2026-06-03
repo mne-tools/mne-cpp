@@ -19,6 +19,13 @@ Circular-buffer QAbstractTableModel feeding the real-time FIFF raw browser.
 
 Keeps the last few seconds of streaming FIFF data in a per-channel ring buffer and forwards bad-channel flips, trigger detections and annotation edits back to the underlying `FiffInfo` / event list.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QAbstractTableModel <|-- RtFiffRawViewModel
+```
+
 ---
 
 ## Public Methods
@@ -36,7 +43,7 @@ Constructs an real-time multi sample array table model for the given parent.
 
 ### ~RtFiffRawViewModel()
 
-Destructs `RtFiffRawViewModel` and stops the use of Shared Memory within the Event Manager.
+Destructs [`RtFiffRawViewModel`](/docs/api/disp/rt-fiff-raw-view-model) and stops the use of Shared Memory within the Event Manager.
 
 ---
 
@@ -117,7 +124,7 @@ Sets corresponding fiff information.
 
 **Parameters:**
 
-- **p_pFiffInfo** : *QSharedPointer&lt;FIFFLIB::FiffInfo&gt; &*
+- **p_pFiffInfo** : *QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt; &*
   The corresponding fiff information.
 
 ---
@@ -306,7 +313,7 @@ Update the SSP projection.
 
 **Parameters:**
 
-- **projs** : *const QList&lt; FIFFLIB::FiffProj &gt; &*
+- **projs** : *const QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt; &*
   The new projectors.
 
 ---
@@ -356,7 +363,7 @@ Set new filter parameters.
 
 **Parameters:**
 
-- **filterData** : *QList&lt; UTILSLIB::FilterKernel &gt;*
+- **filterData** : *QList&lt; [FilterKernel](/docs/api/dsp/filter-kernel) &gt;*
   list of the new filter.
 
 ---
@@ -604,7 +611,7 @@ Get offset of first drawn sample in the window.
 
 Get maximum range of respective channel type.
 
-range value in FiffChInfo does not seem to contain a reasonable value
+range value in [FiffChInfo](/docs/api/fiff/fiff-ch-info) does not seem to contain a reasonable value
 
 **Parameters:**
 

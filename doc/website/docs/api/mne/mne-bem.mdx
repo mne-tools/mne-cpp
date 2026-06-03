@@ -19,7 +19,7 @@ sidebar_position: 4
 class MNELIB::MNEBem
 ```
 
-Boundary element model: aggregates the inner-skull, outer-skull and scalp `MNEBemSurface` objects of a head conductor model.
+Boundary element model: aggregates the inner-skull, outer-skull and scalp [`MNEBemSurface`](/docs/api/mne/mne-bem-surface) objects of a head conductor model.
 
 Aggregated boundary element model loaded from a `-bem.fif` file.
 
@@ -40,7 +40,7 @@ Copy constructor.
 **Parameters:**
 
 - **p_MNEBem** : *const MNEBem &*
-  `MNE` BEM.
+  [`MNE`](/docs/api/mne/mne-class) BEM.
 
 ---
 
@@ -52,23 +52,23 @@ Default constructor.
 
 ### ~MNEBem()
 
-Destroys the `MNE` Bem.
+Destroys the [`MNE`](/docs/api/mne/mne-class) Bem.
 
 ---
 
 ### clear()
 
-Initializes `MNE` Bem.
+Initializes [`MNE`](/docs/api/mne/mne-class) Bem.
 
 ---
 
 ### isEmpty()
 
-True if `MNE` Bem is empty.
+True if [`MNE`](/docs/api/mne/mne-class) Bem is empty.
 
 **Returns:**
 
-- *bool* — true if `MNE` Bem is empty.
+- *bool* — true if [`MNE`](/docs/api/mne/mne-class) Bem is empty.
 
 ---
 
@@ -84,7 +84,7 @@ Returns the number of stored bem surfaces.
 
 ### write(p_IODevice)
 
-`MNE` Toolbox function mne_write_bem_surfaces_block.
+[`MNE`](/docs/api/mne/mne-class) Toolbox function mne_write_bem_surfaces_block.
 
 Write the Bem to a FIF file
 
@@ -97,13 +97,13 @@ Write the Bem to a FIF file
 
 ### writeToStream(p_pStream)
 
-`MNE` Toolbox function mne_write_bem_surfaces_block.
+[`MNE`](/docs/api/mne/mne-class) Toolbox function mne_write_bem_surfaces_block.
 
 Write the Bem to a FIF stream
 
 **Parameters:**
 
-- **p_pStream** : *FIFFLIB::FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   The stream to write to.
 
 ---
@@ -119,7 +119,7 @@ Subscript operator [] to access bem_surface by index.
 
 **Returns:**
 
-- *const MNEBemSurface &* — `MNEBemSurface` related to the parameter index.
+- *const [MNEBemSurface](/docs/api/mne/mne-bem-surface) &* — [`MNEBemSurface`](/docs/api/mne/mne-bem-surface) related to the parameter index.
 
 ---
 
@@ -134,7 +134,7 @@ Subscript operator [] to access bem_surface by index.
 
 **Returns:**
 
-- *MNEBemSurface &* — `MNEBemSurface` related to the parameter index.
+- *[MNEBemSurface](/docs/api/mne/mne-bem-surface) &* — [`MNEBemSurface`](/docs/api/mne/mne-bem-surface) related to the parameter index.
 
 ---
 
@@ -144,12 +144,12 @@ Subscript operator &lt;&lt; to add a new bem_surface.
 
 **Parameters:**
 
-- **surf** : *const MNEBemSurface &*
+- **surf** : *const [MNEBemSurface](/docs/api/mne/mne-bem-surface) &*
   BemSurface to be added.
 
 **Returns:**
 
-- *MNEBem &* — `MNEBem`.
+- *[MNEBem](/docs/api/mne/mne-bem) &* — [`MNEBem`](/docs/api/mne/mne-bem).
 
 ---
 
@@ -159,18 +159,18 @@ Subscript operator &lt;&lt; to add a new bem_surface.
 
 **Parameters:**
 
-- **surf** : *const MNEBemSurface **
+- **surf** : *const [MNEBemSurface](/docs/api/mne/mne-bem-surface) **
   BemSurface to be added.
 
 **Returns:**
 
-- *MNEBem &* — `MNEBem`.
+- *[MNEBem](/docs/api/mne/mne-bem) &* — [`MNEBem`](/docs/api/mne/mne-bem).
 
 ---
 
 ### warp(sLm, dLm)
 
-Warp the Bem.
+[Warp](/docs/api/math/warp) the Bem.
 
 **Parameters:**
 
@@ -188,7 +188,7 @@ Transform the Bem.
 
 **Parameters:**
 
-- **trans** : *const FIFFLIB::FiffCoordTrans &*
+- **trans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The Transformation Matrix.
 
 ---
@@ -199,7 +199,7 @@ Transform the Bem using the inverse.
 
 **Parameters:**
 
-- **trans** : *const FIFFLIB::FiffCoordTrans &*
+- **trans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The Transformation Matrix.
 
 ---
@@ -210,7 +210,7 @@ Transform the Bem using the inverse.
 
 **Parameters:**
 
-- **p_pStream** : *FIFFLIB::FiffStream::SPtr &*
+- **p_pStream** : *[FIFFLIB::FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   The opened fif file.
 
 - **add_geom** : *bool*

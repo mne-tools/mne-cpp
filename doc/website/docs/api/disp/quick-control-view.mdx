@@ -17,7 +17,15 @@ class DISPLIB::QuickControlView
 
 Floating frameless container hosting modular Quick-Control settings tabs.
 
-Owns a `QTabWidget` into which application code drops arbitrary `AbstractView` panels grouped by name. Supports opacity, transparency and "pinned" behaviour and persists the current tab through `QSettings`.
+Owns a `QTabWidget` into which application code drops arbitrary [`AbstractView`](/docs/api/disp/abstract-view) panels grouped by name. Supports opacity, transparency and "pinned" behaviour and persists the current tab through `QSettings`.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    DraggableFramelessWidget <|-- QuickControlView
+    click DraggableFramelessWidget "/docs/api/disp/draggable-frameless-widget"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Owns a `QTabWidget` into which application code drops arbitrary `AbstractView` p
 
 ### QuickControlView(sSettingsPath, name, flags, parent, bDraggable)
 
-Constructs a `QuickControlView` which is a child of parent.
+Constructs a [`QuickControlView`](/docs/api/disp/quick-control-view) which is a child of parent.
 
 **Parameters:**
 
@@ -45,7 +53,7 @@ Constructs a `QuickControlView` which is a child of parent.
 
 ### ~QuickControlView()
 
-Destructs a `QuickControlView`.
+Destructs a [`QuickControlView`](/docs/api/disp/quick-control-view).
 
 ---
 
@@ -61,7 +69,7 @@ Clear this widget by removing all of its child widgets.
 
 ### addWidgets(lWidgets, sTabName, bAddToEnd)
 
-This convenience function adds control widgets to the `QuickControlView` based on their set objects names.
+This convenience function adds control widgets to the [`QuickControlView`](/docs/api/disp/quick-control-view) based on their set objects names.
 
 Takes ownership of the QWidgets.
 

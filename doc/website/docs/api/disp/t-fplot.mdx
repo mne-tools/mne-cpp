@@ -19,13 +19,20 @@ Time-frequency spectrogram QWidget rendering an Eigen matrix as a colour image.
 
 Two constructors accept either a full or a frequency-cropped `MatrixXd` spectrogram together with a sample rate and a ColorMaps enum entry; ``calc_plot()`` builds the cached `QImage` that subsequent `paintEvents` draw.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- TFplot
+```
+
 ---
 
 ## Public Methods
 
 ### TFplot(tf_matrix, sample_rate, lower_frq, upper_frq, cmap)
 
-Constructs `TFplot` class.
+Constructs [`TFplot`](/docs/api/disp/t-fplot) class.
 
 **Parameters:**
 
@@ -48,7 +55,7 @@ Constructs `TFplot` class.
 
 ### TFplot(tf_matrix, sample_rate, cmap)
 
-Constructs `TFplot` class.
+Constructs [`TFplot`](/docs/api/disp/t-fplot) class.
 
 **Parameters:**
 

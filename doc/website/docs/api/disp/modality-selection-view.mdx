@@ -17,7 +17,15 @@ class DISPLIB::ModalitySelectionView
 
 Per-modality visibility toggle panel (one `QCheckBox` per channel modality).
 
-Builds itself from the active `FiffInfo` modalities and emits `modalitiesChanged` so `ButterflyView` and `AverageLayoutView` can hide entire modalities at once.
+Builds itself from the active `FiffInfo` modalities and emits `modalitiesChanged` so [`ButterflyView`](/docs/api/disp/butterfly-view) and [`AverageLayoutView`](/docs/api/disp/average-layout-view) can hide entire modalities at once.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- ModalitySelectionView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Builds itself from the active `FiffInfo` modalities and emits `modalitiesChanged
 
 ### ModalitySelectionView(lChannelList, sSettingsPath, parent, f)
 
-Constructs a `ModalitySelectionView` which is a child of parent.
+Constructs a [`ModalitySelectionView`](/docs/api/disp/modality-selection-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `ModalitySelectionView` which is a child of parent.
 
 ### ~ModalitySelectionView()
 
-Destroys the `ModalitySelectionView`.
+Destroys the [`ModalitySelectionView`](/docs/api/disp/modality-selection-view).
 
 ---
 

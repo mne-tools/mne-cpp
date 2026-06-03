@@ -19,6 +19,13 @@ Circular-buffer Qt model exposing a rolling window of the live FIFF stream as a 
 
 Keeps a per-channel `Eigen::MatrixXd` ring buffer of the most recent N seconds, tracks bad-channel flags, trigger annotations and the active SSP / compensation / filter operators so the delegate can render the pre-processed signal without touching the raw buffer.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- ChannelDataModel
+```
+
 ---
 
 ## Public Methods
@@ -29,11 +36,11 @@ Keeps a per-channel `Eigen::MatrixXd` ring buffer of the most recent N seconds, 
 
 ### init(pFiffInfo)
 
-Initialise with channel metadata from a FiffInfo.
+Initialise with channel metadata from a [FiffInfo](/docs/api/fiff/fiff-info).
 
 **Parameters:**
 
-- **pFiffInfo** : *QSharedPointer&lt;FIFFLIB::FiffInfo&gt;*
+- **pFiffInfo** : *QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt;*
   The FiffInfo describing the channels.
 
 ---
@@ -178,7 +185,7 @@ When enabled each channel's mean amplitude over the requested window is subtract
 
 ### sfreq()
 
-Sampling frequency in Hz; 0 if no FiffInfo attached.
+Sampling frequency in Hz; 0 if no [FiffInfo](/docs/api/fiff/fiff-info) attached.
 
 ---
 

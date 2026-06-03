@@ -15,9 +15,17 @@ sidebar_position: 10
 class DISPLIB::BidsView
 ```
 
-QTreeView wrapper around a `BidsViewModel` for browsing a BIDS dataset.
+QTreeView wrapper around a [`BidsViewModel`](/docs/api/disp/bids-view-model) for browsing a BIDS dataset.
 
 Forwards double-click activations on data files / derivatives as `loadItem` signals so the surrounding plugin can open the chosen resource.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- BidsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 

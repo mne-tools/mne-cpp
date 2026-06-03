@@ -19,6 +19,14 @@ Tree-view control panel for the 3-D scene (visibility, colour, alpha, threshold 
 
 Hosts a `QTreeView` bound to the `Data3DTreeModel` and a custom `QStyledItemDelegate` that paints colour swatches and slider editors inline so edits propagate directly to the renderer.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- Control3DView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
@@ -41,7 +49,7 @@ Default constructor.
 
 ### ~Control3DView()
 
-Destroys the `Control3DView`.
+Destroys the [`Control3DView`](/docs/api/disp/control3-d-view).
 
 ---
 

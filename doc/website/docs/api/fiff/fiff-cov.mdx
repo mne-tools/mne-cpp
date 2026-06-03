@@ -23,6 +23,13 @@ FIFF noise / data covariance: matrix, channel names, kind, applied projectors, b
 
 Round-trips with `*-cov.fif` files and with `mne.Covariance` in MNE-Python. Carries both the raw matrix and the metadata needed to regularize, project away SSP subspaces, and pre-whiten downstream forward / inverse computations.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QSharedData <|-- FiffCov
+```
+
 ---
 
 ## Public Methods
@@ -93,7 +100,7 @@ Pick channels from covariance matrix
 
 **Returns:**
 
-- *FiffCov* — Covariance solution restricted to selected channels.
+- *[FiffCov](/docs/api/fiff/fiff-cov)* — Covariance solution restricted to selected channels.
 
 ---
 
@@ -105,7 +112,7 @@ Before creating inverse operator.
 
 **Parameters:**
 
-- **p_info** : *const FiffInfo &*
+- **p_info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   measurement info.
 
 - **p_chNames** : *const QStringList &*
@@ -113,7 +120,7 @@ Before creating inverse operator.
 
 **Returns:**
 
-- *FiffCov* — the prepared noise covariance matrix.
+- *[FiffCov](/docs/api/fiff/fiff-cov)* — the prepared noise covariance matrix.
 
 ---
 
@@ -125,7 +132,7 @@ This method works by adding a constant to the diagonal for each channel type sep
 
 **Parameters:**
 
-- **p_info** : *const FiffInfo &*
+- **p_info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   The measurement info (used to get channel types and bad channels).
 
 - **p_fMag** : *double*
@@ -145,7 +152,7 @@ This method works by adding a constant to the diagonal for each channel type sep
 
 **Returns:**
 
-- *FiffCov* — the regularized covariance matrix.
+- *[FiffCov](/docs/api/fiff/fiff-cov)* — the regularized covariance matrix.
 
 ---
 
@@ -170,12 +177,12 @@ Assignment Operator.
 
 **Parameters:**
 
-- **rhs** : *const FiffCov &*
-  `FiffCov` which should be assigned.
+- **rhs** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
+  [`FiffCov`](/docs/api/fiff/fiff-cov) which should be assigned.
 
 **Returns:**
 
-- *FiffCov &* — the copied covariance matrix.
+- *[FiffCov](/docs/api/fiff/fiff-cov) &* — the copied covariance matrix.
 
 ---
 
@@ -189,7 +196,7 @@ Ported from compute_cov.c (MNE-C).
 
 **Parameters:**
 
-- **raw** : *const FiffRawData &*
+- **raw** : *const [FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data.
 
 - **events** : *const Eigen::MatrixXi &*
@@ -224,7 +231,7 @@ Ported from compute_cov.c (MNE-C).
 
 **Returns:**
 
-- *FiffCov* — The computed noise covariance matrix, or empty `FiffCov` on failure.
+- *[FiffCov](/docs/api/fiff/fiff-cov)* — The computed noise covariance matrix, or empty [`FiffCov`](/docs/api/fiff/fiff-cov) on failure.
 
 ---
 
@@ -234,12 +241,12 @@ Compute a weighted grand-average covariance from multiple covariance matrices, w
 
 **Parameters:**
 
-- **covs** : *const QList&lt; FiffCov &gt; &*
+- **covs** : *const QList&lt; [FiffCov](/docs/api/fiff/fiff-cov) &gt; &*
   List of covariance matrices to combine.
 
 **Returns:**
 
-- *FiffCov* — The grand-average covariance matrix, or empty `FiffCov` if covs is empty.
+- *[FiffCov](/docs/api/fiff/fiff-cov)* — The grand-average covariance matrix, or empty [`FiffCov`](/docs/api/fiff/fiff-cov) if covs is empty.
 
 ---
 

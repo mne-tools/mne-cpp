@@ -15,13 +15,20 @@ sidebar_position: 5
 class DISP3DLIB::RtSensorDataWorker
 ```
 
-`RtSensorDataWorker` processes incoming sensor measurement data in a background thread.
+[`RtSensorDataWorker`](/docs/api/disp3-d/rt-sensor-data-worker) processes incoming sensor measurement data in a background thread.
 
 It manages a data queue, performs averaging, applies a dense mapping matrix (MEG or EEG sensor → surface vertex), normalises values symmetrically, and converts them to per-vertex ABGR colours for rendering.
 
-This worker is driven by a timer in the `RtSensorDataController` and follows the same architecture as `RtSourceDataWorker`, adapted for dense sensor-to-surface mapping instead of sparse source interpolation.
+This worker is driven by a timer in the `RtSensorDataController` and follows the same architecture as [`RtSourceDataWorker`](/docs/api/disp3-d/rt-source-data-worker), adapted for dense sensor-to-surface mapping instead of sparse source interpolation.
 
 Background worker for real-time sensor data streaming.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- RtSensorDataWorker
+```
 
 ---
 

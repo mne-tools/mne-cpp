@@ -15,9 +15,17 @@ sidebar_position: 3
 class MLLIB::MlOnnxModel
 ```
 
-`MlModel` backend that runs ``.onnx graphs through ONNX Runtime with a cached CPU session.
+[`MlModel`](/docs/api/ml/ml-model) backend that runs ``.onnx graphs through ONNX Runtime with a cached CPU session.
 
 When mne-cpp is configured without `USE_ONNXRUNTIME` every method either throws `std::runtime_error` (`predict`) or returns false / logs a warning (`load`, `save`), so the same client code compiles and links on minimal builds and on WebAssembly without conditional call sites.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    MlModel <|-- MlOnnxModel
+    click MlModel "/docs/api/ml/ml-model"
+```
 
 ---
 
@@ -41,12 +49,12 @@ Run inference on the given input tensor.
 
 **Parameters:**
 
-- **input** : *const MlTensor &*
+- **input** : *const [MlTensor](/docs/api/ml/ml-tensor) &*
   The input data.
 
 **Returns:**
 
-- *MlTensor* — The prediction result.
+- *[MlTensor](/docs/api/ml/ml-tensor)* — The prediction result.
 
 ---
 

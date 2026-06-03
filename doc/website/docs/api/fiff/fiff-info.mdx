@@ -21,7 +21,15 @@ class FIFFLIB::FiffInfo
 
 Full FIFF measurement info: per-channel descriptors, sampling and filter setup, projectors, compensators, transforms and dig points.
 
-Materializes the union of the tags found in `FIFFB_MEAS` / `FIFFB_MEAS_INFO:` `sfreq`, `lowpass` / `highpass` / `line_freq`, `meas_date`, `experimenter`, `projs` (`FiffProj`), `comps` (`FiffCtfComp`), `dig` (`FiffDigPoint`), `hpi_results` / `hpi_meas`, `dev_head_t` / `ctf_head_t`, plus the `FiffInfoBase` channel / bads / sfreq subset. Drop-in counterpart of `mne.Info` in MNE-Python.
+Materializes the union of the tags found in `FIFFB_MEAS` / `FIFFB_MEAS_INFO:` `sfreq`, `lowpass` / `highpass` / `line_freq`, `meas_date`, `experimenter`, `projs` ([`FiffProj`](/docs/api/fiff/fiff-proj)), `comps` ([`FiffCtfComp`](/docs/api/fiff/fiff-ctf-comp)), `dig` ([`FiffDigPoint`](/docs/api/fiff/fiff-dig-point)), `hpi_results` / `hpi_meas`, `dev_head_t` / `ctf_head_t`, plus the [`FiffInfoBase`](/docs/api/fiff/fiff-info-base) channel / bads / sfreq subset. Drop-in counterpart of `mne.Info` in MNE-Python.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    FiffInfoBase <|-- FiffInfo
+    click FiffInfoBase "/docs/api/fiff/fiff-info-base"
+```
 
 ---
 
@@ -70,7 +78,7 @@ Create a compensation matrix to bring the data from one compensation state to an
 - **to** : *fiff_int_t*
   desired compensation in the output.
 
-- **ctf_comp** : *FiffCtfComp &*
+- **ctf_comp** : *[FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) &*
   Compensation Matrix.
 
 - **exclude_comp_chs** : *bool*
@@ -144,7 +152,7 @@ Pick desired channels from measurement info
 
 **Returns:**
 
-- *FiffInfo* — Info modified according to sel.
+- *[FiffInfo](/docs/api/fiff/fiff-info)* — Info modified according to sel.
 
 ---
 
@@ -165,7 +173,7 @@ Writes the fiff information to a FIF stream.
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   The stream to write to.
 
 ---
@@ -182,7 +190,7 @@ Prints class contents.
 
 mne_set_current_comp
 
-Consider taking the member function of `set_current_comp(fiff_int_t value)`, when compensation should be applied to the channels of `FiffInfo`
+Consider taking the member function of `set_current_comp(fiff_int_t value)`, when compensation should be applied to the channels of [`FiffInfo`](/docs/api/fiff/fiff-info)
 
 Set the current compensation value in the channel info structures
 
@@ -196,7 +204,7 @@ Set the current compensation value in the channel info structures
 
 **Returns:**
 
-- *QList&lt; FiffChInfo &gt;* — the current compensation.
+- *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt;* — the current compensation.
 
 ---
 
@@ -220,7 +228,7 @@ Opens the file, reads measurement info, and splits channels into MEG and EEG lis
 - **bads** : *const QStringList &*
   List of bad channel names to exclude.
 
-- **chsp** : *QList&lt; FiffChInfo &gt; &*
+- **chsp** : *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   Combined list of accepted channels (MEG first, then EEG).
 
 - **nmegp** : *int &*

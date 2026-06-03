@@ -35,7 +35,7 @@ Eigen::MatrixXd ds = Resample::resampleMatrix(matData, 250.0, 1000.0);
 
 ### resample(vecData, dNewSFreq, dOldSFreq, iNZeros)
 
-`Resample` a single-channel row vector from `dOldSFreq` to `dNewSFreq`.
+[`Resample`](/docs/api/dsp/resample) a single-channel row vector from `dOldSFreq` to `dNewSFreq`.
 
 The ratio is reduced to its lowest terms p/q via GCD, then a polyphase Hamming-windowed sinc filter is applied. The output length is ceil(nSamples · p / q).
 
@@ -61,7 +61,7 @@ The ratio is reduced to its lowest terms p/q via GCD, then a polyphase Hamming-w
 
 ### resampleMatrix(matData, dNewSFreq, dOldSFreq, vecPicks, iNZeros)
 
-`Resample` every row of a data matrix.
+[`Resample`](/docs/api/dsp/resample) every row of a data matrix.
 
 **Parameters:**
 

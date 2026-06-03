@@ -19,6 +19,13 @@ QAbstractTableModel exposing per-channel FIFF metadata (name, type, unit, positi
 
 Each row maps a FIFF channel to its presentation attributes and listens for live edits from the channel-selection / mapping dialogs so the underlying `FiffInfo` is updated in place.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QAbstractTableModel <|-- ChannelInfoModel
+```
+
 ---
 
 ## Public Methods
@@ -82,7 +89,7 @@ Updates the fiff info.
 
 **Parameters:**
 
-- **assignedOperators** : *const QMultiMap&lt; int, QSharedPointer&lt;MNEOperator&gt; &gt; &*
+- **assignedOperators** : *const QMultiMap&lt; int, QSharedPointer&lt;[MNEOperator](/docs/api/disp/mne-operator)&gt; &gt; &*
   the filter operators which are currently active.
 
 ---

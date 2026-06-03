@@ -39,13 +39,20 @@ No Python embedding or linkage is required.
 
 Python script launcher with logging and progress support.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- PythonRunner
+```
+
 ---
 
 ## Public Methods
 
 ### PythonRunner(pParent)
 
-Construct a `PythonRunner` with default configuration.
+Construct a [`PythonRunner`](/docs/api/utils/python-runner) with default configuration.
 
 **Parameters:**
 
@@ -56,7 +63,7 @@ Construct a `PythonRunner` with default configuration.
 
 ### PythonRunner(config, pParent)
 
-Construct a `PythonRunner` with explicit configuration.
+Construct a [`PythonRunner`](/docs/api/utils/python-runner) with explicit configuration.
 
 **Parameters:**
 

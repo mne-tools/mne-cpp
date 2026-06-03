@@ -17,7 +17,14 @@ class FIFFLIB::FiffNamedMatrix
 
 FIFF named matrix: dense / sparse Eigen matrix plus row-name and column-name string lists.
 
-Used wherever the on-disk FIFF block pairs a matrix with channel-name metadata: SSP projectors (`FIFFB_PROJ_ITEM`), CTF compensators (`FIFFB_MNE_CTF_COMP_DATA`), forward gain matrices, MNE inverse operators, noise covariances. The name lists let downstream code index the matrix by name instead of by position, which is what the `pick_channels` / `apply_proj` paths rely on.
+Used wherever the on-disk FIFF block pairs a matrix with channel-name metadata: SSP projectors (`FIFFB_PROJ_ITEM`), CTF compensators (`FIFFB_MNE_CTF_COMP_DATA`), forward gain matrices, [MNE](/docs/api/mne/mne-class) inverse operators, noise covariances. The name lists let downstream code index the matrix by name instead of by position, which is what the `pick_channels` / `apply_proj` paths rely on.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QSharedData <|-- FiffNamedMatrix
+```
 
 ---
 
@@ -89,7 +96,7 @@ Returns true if named matrix contains no data.
 
 ### transpose_named_matrix()
 
-Transpose a named matrix (`FiffNamedMatrix`).
+Transpose a named matrix ([`FiffNamedMatrix`](/docs/api/fiff/fiff-named-matrix)).
 
 ---
 

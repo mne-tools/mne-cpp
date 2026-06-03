@@ -25,7 +25,7 @@ SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
 LOF (Breunig et al., SIGMOD 2000) scores each channel by the ratio between its own local density (reachability distance to its `k` nearest channels in the chosen feature space) and the average local density of those neighbours. Values close to 1 indicate a sample that belongs to a dense cluster, values noticeably above 1 mark density outliers. For MEG / EEG each channel is summarised by per-segment statistics (RMS, variance, higher-order moments) so that genuinely flat, very noisy or amplifier- saturated sensors stand out in the LOF score and can be flagged at a single threshold (default 2.0).
 
-The detector follows MNE-Python's `mne.preprocessing.find_bad_channels_lof` so MEG / EEG pipelines can switch between the two without changing the downstream interpolation / SSS step.
+The detector follows MNE-Python's `mne.preprocessing.find_bad_channels_lof` so MEG / EEG pipelines can switch between the two without changing the downstream interpolation / [SSS](/docs/api/dsp/sss) step.
 
 ---
 
@@ -34,7 +34,7 @@ The detector follows MNE-Python's `mne.preprocessing.find_bad_channels_lof` so M
 ### findBadChannelsLof(data, info, params)
 
 ```cpp
-QStringList findBadChannelsLof(const Eigen::MatrixXd & data, const FIFFLIB::FiffInfo & info, const LofBadChannelParams & params);
+QStringList findBadChannelsLof(const Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, const LofBadChannelParams & params);
 ```
 
 Detect bad channels using Local Outlier Factor (LOF).
@@ -46,7 +46,7 @@ Computes features for each channel (standard deviation, kurtosis, max absolute a
 - **data** : *const Eigen::MatrixXd &*
   Data matrix (n_channels x n_times).
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   FiffInfo with channel types.
 
 - **params** : *const LofBadChannelParams &*

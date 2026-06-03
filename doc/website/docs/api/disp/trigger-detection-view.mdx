@@ -17,7 +17,15 @@ class DISPLIB::TriggerDetectionView
 
 Stim-channel chooser plus threshold spinbox for on-line trigger detection.
 
-Picks the stim channel to monitor, sets the rising-edge threshold and resets the detected-event list; detected events feed the averaging pipeline and the `ChannelDataView` trigger overlay.
+Picks the stim channel to monitor, sets the rising-edge threshold and resets the detected-event list; detected events feed the averaging pipeline and the [`ChannelDataView`](/docs/api/disp/channel-data-view) trigger overlay.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- TriggerDetectionView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Picks the stim channel to monitor, sets the rising-edge threshold and resets the
 
 ### TriggerDetectionView(sSettingsPath, parent, f)
 
-Constructs a `TriggerDetectionView` which is a child of parent.
+Constructs a [`TriggerDetectionView`](/docs/api/disp/trigger-detection-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `TriggerDetectionView` which is a child of parent.
 
 ### ~TriggerDetectionView()
 
-Destroys the `TriggerDetectionView`.
+Destroys the [`TriggerDetectionView`](/docs/api/disp/trigger-detection-view).
 
 ---
 

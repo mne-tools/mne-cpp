@@ -15,9 +15,9 @@ sidebar_position: 7
 class MNELIB::MNE
 ```
 
-DECLARE `MNE` WRAPPER CLASS.
+DECLARE [`MNE`](/docs/api/mne/mne-class) WRAPPER CLASS.
 
-The `MNE` class provides wrapper functions to stay consistent with mne matlab toolbox.
+The [`MNE`](/docs/api/mne/mne-class) class provides wrapper functions to stay consistent with mne matlab toolbox.
 
 ---
 
@@ -52,7 +52,7 @@ mne_find_source_space_hemi
 
 **Parameters:**
 
-- **p_Hemisphere** : *MNEHemisphere &*
+- **p_Hemisphere** : *[MNEHemisphere](/docs/api/mne/mne-hemisphere) &*
   The hemisphere to investigate.
 
 **Returns:**
@@ -67,7 +67,7 @@ mne_get_current_comp
 
 **Parameters:**
 
-- **info** : *FIFFLIB::FiffInfo **
+- **info** : *[FiffInfo](/docs/api/fiff/fiff-info) **
   Fiff measurement info.
 
 **Returns:**
@@ -100,7 +100,7 @@ mne_make_compensator
 
 **Parameters:**
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   measurement info as returned by the fif reading routines.
 
 - **from** : *FIFFLIB::fiff_int_t*
@@ -109,7 +109,7 @@ mne_make_compensator
 - **to** : *FIFFLIB::fiff_int_t*
   desired compensation in the output.
 
-- **ctf_comp** : *FIFFLIB::FiffCtfComp &*
+- **ctf_comp** : *[FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) &*
   Compensation Matrix.
 
 - **exclude_comp_chs** : *bool*
@@ -127,7 +127,7 @@ make_projector
 
 **Parameters:**
 
-- **projs** : *const QList&lt; FIFFLIB::FiffProj &gt; &*
+- **projs** : *const QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt; &*
   A set of projection vectors.
 
 - **ch_names** : *const QStringList &*
@@ -154,7 +154,7 @@ mne_make_projector_info
 
 **Parameters:**
 
-- **info** : *FIFFLIB::FiffInfo &*
+- **info** : *[FiffInfo](/docs/api/fiff/fiff-info) &*
   Fiff measurement info.
 
 - **proj** : *Eigen::MatrixXd &*
@@ -172,7 +172,7 @@ mne_patch_info
 
 **Parameters:**
 
-- **p_Hemisphere** : *MNEHemisphere &*
+- **p_Hemisphere** : *[MNEHemisphere](/docs/api/mne/mne-hemisphere) &*
   The source space.
 
 **Returns:**
@@ -274,7 +274,7 @@ compute_epoch_covariance
 
 **Parameters:**
 
-- **raw** : *const FIFFLIB::FiffRawData &*
+- **raw** : *const FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data.
 
 - **events** : *const Eigen::MatrixXi &*
@@ -303,7 +303,7 @@ compute_epoch_covariance
 
 **Returns:**
 
-- *FIFFLIB::FiffCov* — The computed noise covariance matrix, or empty FiffCov on failure.
+- *[FiffCov](/docs/api/fiff/fiff-cov)* — The computed noise covariance matrix, or empty FiffCov on failure.
 
 ---
 
@@ -313,7 +313,7 @@ compute_proj
 
 **Parameters:**
 
-- **raw** : *const FIFFLIB::FiffRawData &*
+- **raw** : *const FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data.
 
 - **events** : *const Eigen::MatrixXi &*
@@ -342,7 +342,7 @@ compute_proj
 
 **Returns:**
 
-- *QList&lt; FIFFLIB::FiffProj &gt;* — List of FiffProj items, or empty list on failure.
+- *QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt;* — List of FiffProj items, or empty list on failure.
 
 ---
 
@@ -352,7 +352,7 @@ save_raw
 
 **Parameters:**
 
-- **raw** : *const FIFFLIB::FiffRawData &*
+- **raw** : *const FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data to save.
 
 - **p_IODevice** : *QIODevice &*
@@ -386,16 +386,16 @@ mne_read_cov
 
 **Parameters:**
 
-- **p_pStream** : *FIFFLIB::FiffStream::SPtr &*
+- **p_pStream** : *[FIFFLIB::FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   an open fiff file.
 
-- **p_Node** : *const FIFFLIB::FiffDirNode::SPtr &*
+- **p_Node** : *const [FIFFLIB::FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   look for the matrix in here.
 
 - **cov_kind** : *FIFFLIB::fiff_int_t*
   what kind of a covariance matrix do we want?.
 
-- **p_covData** : *FIFFLIB::FiffCov &*
+- **p_covData** : *[FiffCov](/docs/api/fiff/fiff-cov) &*
   the read covariance matrix.
 
 **Returns:**
@@ -410,13 +410,13 @@ mne_read_source_spaces
 
 **Parameters:**
 
-- **p_pStream** : *FIFFLIB::FiffStream::SPtr &*
+- **p_pStream** : *[FIFFLIB::FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   The open fiff file.
 
 - **add_geom** : *bool*
   Add geometry information to the source spaces.
 
-- **p_SourceSpace** : *MNESourceSpaces &*
+- **p_SourceSpace** : *[MNESourceSpaces](/docs/api/mne/mne-source-spaces) &*
   The read source spaces.
 
 **Returns:**
@@ -431,7 +431,7 @@ mne_set_current_comp
 
 **Parameters:**
 
-- **chs** : *QList&lt; FIFFLIB::FiffChInfo &gt; &*
+- **chs** : *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   fiff channel info list.
 
 - **value** : *FIFFLIB::fiff_int_t*
@@ -439,7 +439,7 @@ mne_set_current_comp
 
 **Returns:**
 
-- *QList&lt; FIFFLIB::FiffChInfo &gt;* — the current compensation.
+- *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt;* — the current compensation.
 
 ---
 
@@ -449,13 +449,13 @@ mne_transform_source_space_to
 
 **Parameters:**
 
-- **p_pMNESourceSpaces** : *MNESourceSpaces &*
+- **p_pMNESourceSpaces** : *[MNESourceSpaces](/docs/api/mne/mne-source-spaces) &*
   the source space which is should be transformed.
 
 - **dest** : *FIFFLIB::fiff_int_t*
   destination check code.
 
-- **trans** : *FIFFLIB::FiffCoordTrans &*
+- **trans** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   transformation information.
 
 **Returns:**
@@ -470,7 +470,7 @@ mne_transpose_named_matrix
 
 **Parameters:**
 
-- **mat** : *FIFFLIB::FiffNamedMatrix &*
+- **mat** : *[FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) &*
   FiffNamedMatrix which shoul be transposed.
 
 ---

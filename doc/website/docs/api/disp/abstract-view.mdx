@@ -19,13 +19,82 @@ Base widget for every dockable settings panel in `DISPLIB`; centralises GUI / pr
 
 Subclasses override `updateGuiMode`, `updateProcessingMode` and `saveSettings` / `loadSettings` to react to mode changes and to round-trip their state through `QSettings`. The class deliberately exposes no domain-specific API.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- AbstractView
+    AbstractView <|-- ApplyToView
+    click ApplyToView "/docs/api/disp/apply-to-view"
+    AbstractView <|-- ArtifactSettingsView
+    click ArtifactSettingsView "/docs/api/disp/artifact-settings-view"
+    AbstractView <|-- AverageLayoutView
+    click AverageLayoutView "/docs/api/disp/average-layout-view"
+    AbstractView <|-- AverageSelectionView
+    click AverageSelectionView "/docs/api/disp/average-selection-view"
+    AbstractView <|-- AveragingSettingsView
+    click AveragingSettingsView "/docs/api/disp/averaging-settings-view"
+    AbstractView <|-- BidsView
+    click BidsView "/docs/api/disp/bids-view"
+    AbstractView <|-- ChannelDataView
+    click ChannelDataView "/docs/api/disp/channel-data-view"
+    AbstractView <|-- ChannelSelectionView
+    click ChannelSelectionView "/docs/api/disp/channel-selection-view"
+    AbstractView <|-- CompensatorView
+    click CompensatorView "/docs/api/disp/compensator-view"
+    AbstractView <|-- ConnectivitySettingsView
+    click ConnectivitySettingsView "/docs/api/disp/connectivity-settings-view"
+    AbstractView <|-- Control3DView
+    click Control3DView "/docs/api/disp/control3-d-view"
+    AbstractView <|-- CoregSettingsView
+    click CoregSettingsView "/docs/api/disp/coreg-settings-view"
+    AbstractView <|-- CovarianceSettingsView
+    click CovarianceSettingsView "/docs/api/disp/covariance-settings-view"
+    AbstractView <|-- DipoleFitView
+    click DipoleFitView "/docs/api/disp/dipole-fit-view"
+    AbstractView <|-- FiffRawViewSettings
+    click FiffRawViewSettings "/docs/api/disp/fiff-raw-view-settings"
+    AbstractView <|-- FilterDesignView
+    click FilterDesignView "/docs/api/disp/filter-design-view"
+    AbstractView <|-- FilterSettingsView
+    click FilterSettingsView "/docs/api/disp/filter-settings-view"
+    AbstractView <|-- FwdSettingsView
+    click FwdSettingsView "/docs/api/disp/fwd-settings-view"
+    AbstractView <|-- HpiSettingsView
+    click HpiSettingsView "/docs/api/disp/hpi-settings-view"
+    AbstractView <|-- MinimumNormSettingsView
+    click MinimumNormSettingsView "/docs/api/disp/minimum-norm-settings-view"
+    AbstractView <|-- ModalitySelectionView
+    click ModalitySelectionView "/docs/api/disp/modality-selection-view"
+    AbstractView <|-- ProgressView
+    click ProgressView "/docs/api/disp/progress-view"
+    AbstractView <|-- ProjectSettingsView
+    click ProjectSettingsView "/docs/api/disp/project-settings-view"
+    AbstractView <|-- ProjectorsView
+    click ProjectorsView "/docs/api/disp/projectors-view"
+    AbstractView <|-- RtFiffRawView
+    click RtFiffRawView "/docs/api/disp/rt-fiff-raw-view"
+    AbstractView <|-- ScalingView
+    click ScalingView "/docs/api/disp/scaling-view"
+    AbstractView <|-- SpectrumSettingsView
+    click SpectrumSettingsView "/docs/api/disp/spectrum-settings-view"
+    AbstractView <|-- SpectrumView
+    click SpectrumView "/docs/api/disp/spectrum-view"
+    AbstractView <|-- SpharaSettingsView
+    click SpharaSettingsView "/docs/api/disp/sphara-settings-view"
+    AbstractView <|-- TfSettingsView
+    click TfSettingsView "/docs/api/disp/tf-settings-view"
+    AbstractView <|-- TriggerDetectionView
+    click TriggerDetectionView "/docs/api/disp/trigger-detection-view"
+```
+
 ---
 
 ## Public Methods
 
 ### AbstractView(parent, f)
 
-Constructs a `AbstractView` which is a child of parent.
+Constructs a [`AbstractView`](/docs/api/disp/abstract-view) which is a child of parent.
 
 **Parameters:**
 

@@ -19,9 +19,9 @@ sidebar_position: 4
 class FSLIB::FsLabelUtils
 ```
 
-Stateless utilities that grow, split and convert `FsLabel` objects on a FreeSurfer triangular surface.
+Stateless utilities that grow, split and convert [`FsLabel`](/docs/api/fs/fs-label) objects on a FreeSurfer triangular surface.
 
-All operations take an `FsSurface` as the topology source and treat its triangle faces as the vertex adjacency graph. The helpers are static because labels carry their own state and the surface is supplied per call, mirroring the function-based API used by MNE-Python.
+All operations take an [`FsSurface`](/docs/api/fs/fs-surface) as the topology source and treat its triangle faces as the vertex adjacency graph. The helpers are static because labels carry their own state and the surface is supplied per call, mirroring the function-based API used by MNE-Python.
 
 ---
 
@@ -35,10 +35,10 @@ Starting from the seed vertices in the label, expands outward by nSteps along su
 
 **Parameters:**
 
-- **label** : *const FsLabel &*
+- **label** : *const [FsLabel](/docs/api/fs/fs-label) &*
   The seed label to grow from.
 
-- **surface** : *const FsSurface &*
+- **surface** : *const [FsSurface](/docs/api/fs/fs-surface) &*
   The surface providing vertex adjacency.
 
 - **nSteps** : *int*
@@ -46,7 +46,7 @@ Starting from the seed vertices in the label, expands outward by nSteps along su
 
 **Returns:**
 
-- *FsLabel* — Grown label containing original + expanded vertices.
+- *[FsLabel](/docs/api/fs/fs-label)* — Grown label containing original + expanded vertices.
 
 ---
 
@@ -58,15 +58,15 @@ Uses the surface mesh to identify connected sub-labels.
 
 **Parameters:**
 
-- **label** : *const FsLabel &*
+- **label** : *const [FsLabel](/docs/api/fs/fs-label) &*
   The label to split.
 
-- **surface** : *const FsSurface &*
+- **surface** : *const [FsSurface](/docs/api/fs/fs-surface) &*
   The surface providing vertex adjacency.
 
 **Returns:**
 
-- *QList&lt; FsLabel &gt;* — List of sub-labels (connected components).
+- *QList&lt; [FsLabel](/docs/api/fs/fs-label) &gt;* — List of sub-labels (connected components).
 
 ---
 
@@ -84,7 +84,7 @@ Vertices whose absolute value exceeds the threshold at any time point are groupe
 - **vertices** : *const Eigen::VectorXi &*
   Vertex indices in the source estimate.
 
-- **surface** : *const FsSurface &*
+- **surface** : *const [FsSurface](/docs/api/fs/fs-surface) &*
   The surface providing positions and adjacency.
 
 - **dThreshold** : *double*
@@ -95,7 +95,7 @@ Vertices whose absolute value exceeds the threshold at any time point are groupe
 
 **Returns:**
 
-- *QList&lt; FsLabel &gt;* — List of labels (connected components above threshold).
+- *QList&lt; [FsLabel](/docs/api/fs/fs-label) &gt;* — List of labels (connected components above threshold).
 
 ---
 
@@ -107,7 +107,7 @@ Creates a matrix of ones for vertices inside the labels, zeros otherwise.
 
 **Parameters:**
 
-- **labels** : *const QList&lt; FsLabel &gt; &*
+- **labels** : *const QList&lt; [FsLabel](/docs/api/fs/fs-label) &gt; &*
   Labels to convert.
 
 - **stcVertices** : *const Eigen::VectorXi &*

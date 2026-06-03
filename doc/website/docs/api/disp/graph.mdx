@@ -17,7 +17,18 @@ class DISPLIB::Graph
 
 Common base widget providing title, axis labels and resize handling for `DISPLIB`'s QPainter plots.
 
-Subclasses such as `Plot` and `ImageSc` paint inside the content rectangle that `Graph` leaves free after stamping the title bar at the top and the x / y axis labels on the bottom and left margins.
+Subclasses such as [`Plot`](/docs/api/disp/plot) and [`ImageSc`](/docs/api/disp/image-sc) paint inside the content rectangle that [`Graph`](/docs/api/disp/graph) leaves free after stamping the title bar at the top and the x / y axis labels on the bottom and left margins.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- Graph
+    Graph <|-- ImageSc
+    click ImageSc "/docs/api/disp/image-sc"
+    Graph <|-- Plot
+    click Plot "/docs/api/disp/plot"
+```
 
 ---
 

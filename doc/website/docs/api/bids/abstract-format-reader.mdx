@@ -15,9 +15,19 @@ sidebar_position: 3
 class BIDSLIB::AbstractFormatReader
 ```
 
-The `AbstractFormatReader` class provides a common interface for reading raw neurophysiology data from various file formats (EDF, BrainVision, etc.) used in BIDS datasets.
+The [`AbstractFormatReader`](/docs/api/bids/abstract-format-reader) class provides a common interface for reading raw neurophysiology data from various file formats (EDF, BrainVision, etc.) used in BIDS datasets.
 
 Subclasses implement format-specific parsing and expose the data uniformly as FIFF structures.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractFormatReader <|-- BrainVisionReader
+    click BrainVisionReader "/docs/api/bids/brain-vision-reader"
+    AbstractFormatReader <|-- EDFReader
+    click EDFReader "/docs/api/bids/edf-reader"
+```
 
 ---
 
@@ -48,11 +58,11 @@ Must be called before reading data.
 
 ### getInfo()
 
-Return measurement metadata as FiffInfo.
+Return measurement metadata as [FiffInfo](/docs/api/fiff/fiff-info).
 
 **Returns:**
 
-- *FIFFLIB::FiffInfo* — FiffInfo populated from the native format header.
+- *[FiffInfo](/docs/api/fiff/fiff-info)* — FiffInfo populated from the native format header.
 
 ---
 
@@ -94,11 +104,11 @@ Return the number of measurement channels.
 
 ### toFiffRawData()
 
-Convert the entire dataset to a FiffRawData structure.
+Convert the entire dataset to a [FiffRawData](/docs/api/fiff/fiff-raw-data) structure.
 
 **Returns:**
 
-- *FIFFLIB::FiffRawData* — FiffRawData populated with info, calibrations, and sample bounds.
+- *FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data)* — FiffRawData populated with info, calibrations, and sample bounds.
 
 ---
 

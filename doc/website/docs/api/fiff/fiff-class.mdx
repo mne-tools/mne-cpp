@@ -17,7 +17,7 @@ class FIFFLIB::Fiff
 
 MATLAB-style static facade re-exporting every public `FIFFLIB` reader/writer for parity with the mne-matlab toolbox.
 
-Only wrappers — no state. Each method forwards to the matching method on `FiffStream` / FiffRawData / `FiffEvoked` / `FiffEvokedSet` / `FiffCov` / `FiffInfo`. Prefer the underlying classes for new code; this class exists so Matlab-style ports compile unchanged.
+Only wrappers — no state. Each method forwards to the matching method on [`FiffStream`](/docs/api/fiff/fiff-stream) / [FiffRawData](/docs/api/fiff/fiff-raw-data) / [`FiffEvoked`](/docs/api/fiff/fiff-evoked) / `FiffEvokedSet` / [`FiffCov`](/docs/api/fiff/fiff-cov) / [`FiffInfo`](/docs/api/fiff/fiff-info). Prefer the underlying classes for new code; this class exists so Matlab-style ports compile unchanged.
 
 ---
 
@@ -41,16 +41,16 @@ Copies directory subtrees from fidin to fidout
 
 **Parameters:**
 
-- **p_pStreamIn** : *FiffStream::SPtr*
+- **p_pStreamIn** : *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr*
   fiff file to copy from.
 
-- **in_id** : *const FiffId &*
+- **in_id** : *const [FiffId](/docs/api/fiff/fiff-id) &*
   file id description.
 
-- **p_Nodes** : *const QList&lt; FiffDirNode::SPtr &gt; &*
+- **p_Nodes** : *const QList&lt; [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &gt; &*
   subtree directories to be copied.
 
-- **p_pStreamOut** : *FiffStream::SPtr &*
+- **p_pStreamOut** : *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   fiff file to write to.
 
 **Returns:**
@@ -63,13 +63,13 @@ Copies directory subtrees from fidin to fidout
 
 fiff_end_block
 
-Wrapper for the `FiffStream` end_block member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) end_block member function
 
 Writes a FIFF_BLOCK_END tag
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   the opened fiff file.
 
 - **kind** : *fiff_int_t*
@@ -81,13 +81,13 @@ Writes a FIFF_BLOCK_END tag
 
 fiff_end_file
 
-Wrapper for the `FiffStream` end_file member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) end_file member function
 
 Writes the closing tags to a fif file and closes the file
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   the opened fiff file.
 
 ---
@@ -96,13 +96,13 @@ Writes the closing tags to a fif file and closes the file
 
 fiff_finish_writing_raw
 
-Wrapper for the `FiffStream` finish_writing_raw member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) finish_writing_raw member function
 
 Finishes a raw file by writing all necessary end tags.
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   the opened fiff file.
 
 ---
@@ -111,13 +111,13 @@ Finishes a raw file by writing all necessary end tags.
 
 fiff_dir_tree_find
 
-Wrapper for the `FiffDirNode` dir_tree_find member function
+Wrapper for the [`FiffDirNode`](/docs/api/fiff/fiff-dir-node) dir_tree_find member function
 
 Find nodes of the given kind from a directory tree structure
 
 **Parameters:**
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The directory tree structure.
 
 - **p_kind** : *fiff_int_t*
@@ -125,7 +125,7 @@ Find nodes of the given kind from a directory tree structure
 
 **Returns:**
 
-- *QList&lt; FiffDirNode::SPtr &gt;* — the found nodes.
+- *QList&lt; [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &gt;* — the found nodes.
 
 ---
 
@@ -139,7 +139,7 @@ Invert a coordinate transformation
 
 **Parameters:**
 
-- **p_Transform** : *FiffCoordTrans &*
+- **p_Transform** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The transformation which should be inverted.
 
 **Returns:**
@@ -152,7 +152,7 @@ Invert a coordinate transformation
 
 fiff_open
 
-Wrapper for the `FiffStream` open member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) open member function
 
 Opens a fif file and provides the directory of tags
 
@@ -161,7 +161,7 @@ Opens a fif file and provides the directory of tags
 - **p_IODevice** : *QIODevice &*
   A fiff IO device like a fiff QFile or QTCPSocket.
 
-- **p_pStream** : *FiffStream::SPtr &*
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   file which is openened.
 
 **Returns:**
@@ -243,13 +243,13 @@ Find evoked data sets
 
 fiff_pick_info
 
-Wrapper for the `FiffInfo` pick_info member function
+Wrapper for the [`FiffInfo`](/docs/api/fiff/fiff-info) pick_info member function
 
 Pick desired channels from measurement info
 
 **Parameters:**
 
-- **info** : *const FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   The original data.
 
 - **sel** : *const Eigen::RowVectorXi &*
@@ -257,7 +257,7 @@ Pick desired channels from measurement info
 
 **Returns:**
 
-- *FiffInfo* — Info modified according to sel.
+- *[FiffInfo](/docs/api/fiff/fiff-info)* — Info modified according to sel.
 
 ---
 
@@ -265,13 +265,13 @@ Pick desired channels from measurement info
 
 fiff_pick_types
 
-Wrapper for the `FiffInfo` pick_types member function
+Wrapper for the [`FiffInfo`](/docs/api/fiff/fiff-info) pick_types member function
 
 Create a selector to pick desired channel types from data
 
 **Parameters:**
 
-- **info** : *FiffInfo &*
+- **info** : *[FiffInfo](/docs/api/fiff/fiff-info) &*
   The measurement info.
 
 - **meg** : *bool*
@@ -299,16 +299,16 @@ Create a selector to pick desired channel types from data
 
 fiff_read_bad_channels
 
-Wrapper for the `FiffStream` read_bad_channels member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) read_bad_channels member function
 
 Reads the bad channel list from a node if it exists
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream::SPtr &*
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   The opened fif file to read from.
 
-- **p_Node** : *FiffDirNode::SPtr &*
+- **p_Node** : *[FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The node of interest.
 
 **Returns:**
@@ -321,24 +321,24 @@ Reads the bad channel list from a node if it exists
 
 fiff_read_ctf_comp
 
-Wrapper for the `FiffStream` read_ctf_comp member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) read_ctf_comp member function
 
 Read the CTF software compensation data from the given node
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream::SPtr &*
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   The opened fif file to read from.
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The node of interest.
 
-- **p_Chs** : *const QList&lt; FiffChInfo &gt; &*
+- **p_Chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   channels with the calibration info.
 
 **Returns:**
 
-- *QList&lt; FiffCtfComp &gt;* — the CTF software compensation data.
+- *QList&lt; [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) &gt;* — the CTF software compensation data.
 
 ---
 
@@ -355,7 +355,7 @@ Read one evoked data set
 - **p_IODevice** : *QIODevice &*
   A fiff IO device like a fiff QFile or QTCPSocket.
 
-- **data** : *FiffEvoked &*
+- **data** : *[FiffEvoked](/docs/api/fiff/fiff-evoked) &*
   The read evoked data.
 
 - **setno** : *QVariant*
@@ -398,22 +398,22 @@ Read all evoked data from one file.
 
 fiff_read_meas_info
 
-Wrapper for the `FiffStream` read_meas_info member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) read_meas_info member function
 
 Read the measurement info Source is assumed to be an open fiff stream.
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream::SPtr &*
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   The opened fiff stream to read from.
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The node of interest.
 
-- **p_Info** : *FiffInfo &*
+- **p_Info** : *[FiffInfo](/docs/api/fiff/fiff-info) &*
   The read measurement info.
 
-- **p_NodeInfo** : *FiffDirNode::SPtr &*
+- **p_NodeInfo** : *[FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The to measurement corresponding fiff_dir_tree.
 
 **Returns:**
@@ -426,22 +426,22 @@ Read the measurement info Source is assumed to be an open fiff stream.
 
 fiff_read_named_matrix
 
-Wrapper for the `FiffStream` read_named_matrix member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) read_named_matrix member function
 
 Reads a named matrix.
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream::SPtr &*
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   The opened fif file to read from.
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The node of interest.
 
 - **matkind** : *fiff_int_t*
   The matrix kind to look for.
 
-- **mat** : *FiffNamedMatrix &*
+- **mat** : *[FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) &*
   The named matrix.
 
 **Returns:**
@@ -456,19 +456,19 @@ Reads a named matrix.
 
 Read the SSP data under a given directory node
 
-Wrapper for the `FiffStream` read_proj member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) read_proj member function
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream::SPtr &*
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   The opened fif file to read from.
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The node of interest.
 
 **Returns:**
 
-- *QList&lt; FiffProj &gt;* — a list of SSP projectors.
+- *QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt;* — a list of SSP projectors.
 
 ---
 
@@ -476,13 +476,13 @@ Wrapper for the `FiffStream` read_proj member function
 
 fiff_read_raw_segment
 
-Wrapper for the FiffRawData read_raw_segment member function
+Wrapper for the [FiffRawData](/docs/api/fiff/fiff-raw-data) read_raw_segment member function
 
 Read a specific raw data segment
 
 **Parameters:**
 
-- **raw** : *FiffRawData &*
+- **raw** : *[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   structure returned by fiff_setup_read_raw.
 
 - **data** : *Eigen::MatrixXd &*
@@ -510,13 +510,13 @@ Read a specific raw data segment
 
 fiff_read_raw_segment
 
-Wrapper for the FiffRawData read_raw_segment member function
+Wrapper for the [FiffRawData](/docs/api/fiff/fiff-raw-data) read_raw_segment member function
 
 Read a specific raw data segment
 
 **Parameters:**
 
-- **raw** : *FiffRawData &*
+- **raw** : *[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   structure returned by fiff_setup_read_raw.
 
 - **data** : *Eigen::MatrixXd &*
@@ -547,16 +547,16 @@ Read a specific raw data segment
 
 fiff_read_tag
 
-Wrapper for the FiffTag::read_tag function
+Wrapper for the [FiffTag](/docs/api/fiff/fiff-tag)::read_tag function
 
 Read one tag from a fif file. if pos is not provided, reading starts from the current file position
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream::SPtr &*
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   opened fif file.
 
-- **p_pTag** : *FiffTag::UPtr &*
+- **p_pTag** : *[FiffTag](/docs/api/fiff/fiff-tag)::UPtr &*
   the read tag.
 
 - **pos** : *qint64*
@@ -572,16 +572,16 @@ Read one tag from a fif file. if pos is not provided, reading starts from the cu
 
 fiff_read_tag_info
 
-Wrapper for the FiffTag::read_tag_info function
+Wrapper for the [FiffTag](/docs/api/fiff/fiff-tag)::read_tag_info function
 
 Read tag information of one tag from a fif file. if pos is not provided, reading starts from the current file position
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream::SPtr &*
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   opened fif file.
 
-- **p_pTag** : *FiffTag::UPtr &*
+- **p_pTag** : *[FiffTag](/docs/api/fiff/fiff-tag)::UPtr &*
   the read tag info.
 
 **Returns:**
@@ -603,7 +603,7 @@ Read information about raw data file
 - **p_IODevice** : *QIODevice &*
   A fiff IO device like a fiff QFile or QTCPSocket.
 
-- **data** : *FiffRawData &*
+- **data** : *[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data information - contains the opened fiff file.
 
 - **allow_maxshield** : *bool*
@@ -638,13 +638,13 @@ Splits a string by looking for seperator ":"
 
 fiff_start_block
 
-Wrapper for the `FiffStream` start_block member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) start_block member function
 
 Writes a FIFF_BLOCK_START tag
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file to write to.
 
 - **kind** : *fiff_int_t*
@@ -667,7 +667,7 @@ Opens a fiff file for writing and writes the compulsory header tags
 
 **Returns:**
 
-- *FiffStream::SPtr* — The opened file.
+- *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr* — The opened file.
 
 ---
 
@@ -684,7 +684,7 @@ function [fid,cals] = fiff_start_writing_raw(name,info,sel)
 - **p_IODevice** : *QIODevice &*
   A fiff IO device like a fiff QFile or QTCPSocket.
 
-- **info** : *const FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   The measurement info block of the source file.
 
 - **cals** : *Eigen::RowVectorXd &*
@@ -695,7 +695,7 @@ function [fid,cals] = fiff_start_writing_raw(name,info,sel)
 
 **Returns:**
 
-- *FiffStream::SPtr* — the started fiff file.
+- *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr* — the started fiff file.
 
 ---
 
@@ -703,16 +703,16 @@ function [fid,cals] = fiff_start_writing_raw(name,info,sel)
 
 fiff_write_ch_info
 
-Wrapper for the `FiffStream` write_ch_info member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_ch_info member function
 
-Writes a channel information record to a fif file The type, cal, unit, and pos members are explained in Table 9.5 of the MNE manual
+Writes a channel information record to a fif file The type, cal, unit, and pos members are explained in Table 9.5 of the [MNE](/docs/api/mne/mne-class) manual
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
-- **ch** : *const FiffChInfo &*
+- **ch** : *const [FiffChInfo](/docs/api/fiff/fiff-ch-info) &*
   The channel information structure to write.
 
 ---
@@ -721,16 +721,16 @@ Writes a channel information record to a fif file The type, cal, unit, and pos m
 
 fiff_write_coord_trans
 
-Wrapper for the `FiffStream` write_coord_trans member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_coord_trans member function
 
 Writes a coordinate transformation structure
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
-- **trans** : *FiffCoordTrans &*
+- **trans** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The coordinate transfomation structure.
 
 ---
@@ -739,16 +739,16 @@ Writes a coordinate transformation structure
 
 fiff_write_ctf_comp
 
-Wrapper for the `FiffStream` write_ctf_comp member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_ctf_comp member function
 
 Writes the CTF compensation data into a fif file
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
-- **comps** : *QList&lt; FiffCtfComp &gt; &*
+- **comps** : *QList&lt; [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) &gt; &*
   The compensation data to write.
 
 ---
@@ -757,16 +757,16 @@ Writes the CTF compensation data into a fif file
 
 fiff_write_dig_point
 
-Wrapper for the `FiffStream` write_dig_point member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_dig_point member function
 
 Writes a digitizer data point into a fif file
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
-- **dig** : *FiffDigPoint &*
+- **dig** : *[FiffDigPoint](/docs/api/fiff/fiff-dig-point) &*
   The point to write.
 
 ---
@@ -775,19 +775,19 @@ Writes a digitizer data point into a fif file
 
 fiff_write_id
 
-Wrapper for the `FiffStream` write_id member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_id member function
 
 Writes fiff id If the id argument is missing it will be generated here
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
 - **kind** : *fiff_int_t*
   The tag kind.
 
-- **id** : *FiffId &*
+- **id** : *[FiffId](/docs/api/fiff/fiff-id) &*
   The id to write.
 
 ---
@@ -796,13 +796,13 @@ Writes fiff id If the id argument is missing it will be generated here
 
 fiff_write_int
 
-Wrapper for the `FiffStream` write_int member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_int member function
 
 Writes a 32-bit integer tag to a fif file
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
 - **kind** : *fiff_int_t*
@@ -820,13 +820,13 @@ Writes a 32-bit integer tag to a fif file
 
 fiff_write_float
 
-Wrapper for the `FiffStream` write_float member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_float member function
 
 Writes a single-precision floating point tag to a fif file
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
 - **kind** : *fiff_int_t*
@@ -844,13 +844,13 @@ Writes a single-precision floating point tag to a fif file
 
 fiff_write_float_matrix
 
-Wrapper for the `FiffStream` write_float_matrix member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_float_matrix member function
 
 Writes a single-precision floating-point matrix tag
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
 - **kind** : *fiff_int_t*
@@ -865,13 +865,13 @@ Writes a single-precision floating-point matrix tag
 
 fiff_write_name_list
 
-Wrapper for the `FiffStream` write_name_list member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_name_list member function
 
 Writes a colon-separated list of names
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
 - **kind** : *fiff_int_t*
@@ -886,19 +886,19 @@ Writes a colon-separated list of names
 
 fiff_write_named_matrix
 
-Wrapper for the `FiffStream` write_named_matrix member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_named_matrix member function
 
 Writes a named single-precision floating-point matrix
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
 - **kind** : *fiff_int_t*
   The tag kind to use for the data.
 
-- **mat** : *FiffNamedMatrix &*
+- **mat** : *[FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) &*
   The data matrix.
 
 ---
@@ -907,16 +907,16 @@ Writes a named single-precision floating-point matrix
 
 fiff_write_proj
 
-Wrapper for the `FiffStream` write_proj member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_proj member function
 
 Writes the projection data into a fif file
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
-- **projs** : *QList&lt; FiffProj &gt; &*
+- **projs** : *QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt; &*
   The compensation data to write.
 
 ---
@@ -925,13 +925,13 @@ Writes the projection data into a fif file
 
 fiff_write_raw_buffer
 
-Wrapper for the `FiffStream` write_raw_buffer member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_raw_buffer member function
 
 Writes a raw buffer.
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
 - **buf** : *const Eigen::MatrixXd &*
@@ -950,13 +950,13 @@ Writes a raw buffer.
 
 fiff_write_string
 
-Wrapper for the `FiffStream` write_string member function
+Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) write_string member function
 
 Writes a string tag
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   An open fif file.
 
 - **kind** : *fiff_int_t*

@@ -15,11 +15,11 @@ sidebar_position: 18
 class CONNECTIVITYLIB::NetworkNode
 ```
 
-Node of a `Network`.
+Node of a [`Network`](/docs/api/connectivity/network).
 
 Stores a unique ID, a 3D anatomical position (sensor coordinate or source vertex) and the lists of incident edges partitioned by direction (in / out) and by threshold state (full / thresholded), so that graph-theoretic measures can be read off without rescanning the global edge list.
 
-Graph node carrying a 3D position and its incident in/out, full/thresholded edge lists.
+[Graph](/docs/api/disp/graph) node carrying a 3D position and its incident in/out, full/thresholded edge lists.
 
 ---
 
@@ -27,7 +27,7 @@ Graph node carrying a 3D position and its incident in/out, full/thresholded edge
 
 ### NetworkNode(iId, vecVert)
 
-Constructs a `NetworkNode` object.
+Constructs a [`NetworkNode`](/docs/api/connectivity/network-node) object.
 
 **Parameters:**
 
@@ -45,7 +45,7 @@ Returns the ingoing edges corresponding to the full network.
 
 **Returns:**
 
-- *const QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt; &* — Returns the list with all ingoing edges.
+- *const QList&lt; QSharedPointer&lt;[NetworkEdge](/docs/api/connectivity/network-edge)&gt; &gt; &* — Returns the list with all ingoing edges.
 
 ---
 
@@ -55,7 +55,7 @@ Returns all edges corresponding to the thresholded network.
 
 **Returns:**
 
-- *QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt;* — Returns the list with all ingoing edges.
+- *QList&lt; QSharedPointer&lt;[NetworkEdge](/docs/api/connectivity/network-edge)&gt; &gt;* — Returns the list with all ingoing edges.
 
 ---
 
@@ -65,7 +65,7 @@ Returns the ingoing edges corresponding to the full network.
 
 **Returns:**
 
-- *QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt;* — Returns the list with all ingoing edges.
+- *QList&lt; QSharedPointer&lt;[NetworkEdge](/docs/api/connectivity/network-edge)&gt; &gt;* — Returns the list with all ingoing edges.
 
 ---
 
@@ -75,7 +75,7 @@ Returns the ingoing edges corresponding to the thresholded network.
 
 **Returns:**
 
-- *QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt;* — Returns the list with all ingoing edges.
+- *QList&lt; QSharedPointer&lt;[NetworkEdge](/docs/api/connectivity/network-edge)&gt; &gt;* — Returns the list with all ingoing edges.
 
 ---
 
@@ -85,7 +85,7 @@ Returns the outgoing edges corresponding to the full network.
 
 **Returns:**
 
-- *QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt;* — Returns the list with all outgoing edges.
+- *QList&lt; QSharedPointer&lt;[NetworkEdge](/docs/api/connectivity/network-edge)&gt; &gt;* — Returns the list with all outgoing edges.
 
 ---
 
@@ -95,7 +95,7 @@ Returns the outgoing edges corresponding to the thresholded network.
 
 **Returns:**
 
-- *QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt;* — Returns the list with all outgoing edges.
+- *QList&lt; QSharedPointer&lt;[NetworkEdge](/docs/api/connectivity/network-edge)&gt; &gt;* — Returns the list with all outgoing edges.
 
 ---
 
@@ -268,7 +268,7 @@ Automatically decides whether to add to the in or out edges.
 
 **Parameters:**
 
-- **newEdge** : *QSharedPointer&lt;NetworkEdge&gt;*
+- **newEdge** : *QSharedPointer&lt;[NetworkEdge](/docs/api/connectivity/network-edge)&gt;*
   The new edge item.
 
 ---

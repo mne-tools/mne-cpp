@@ -19,13 +19,21 @@ Time-frequency analysis configuration panel (trials, window length, overlap).
 
 Spinboxes drive the on-line STFT / Wavelet estimator; values are emitted as Qt signals on every edit.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- TfSettingsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
 
 ### TfSettingsView(sSettingsPath, parent, f)
 
-Constructs a `TfSettingsView` which is a child of parent.
+Constructs a [`TfSettingsView`](/docs/api/disp/tf-settings-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `TfSettingsView` which is a child of parent.
 
 ### ~TfSettingsView()
 
-Destroys the `TfSettingsView`.
+Destroys the [`TfSettingsView`](/docs/api/disp/tf-settings-view).
 
 ---
 

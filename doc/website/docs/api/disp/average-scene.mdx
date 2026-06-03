@@ -15,9 +15,17 @@ sidebar_position: 5
 class DISPLIB::AverageScene
 ```
 
-Sensor-layout `QGraphicsScene` placing one `AverageSceneItem` per visible channel.
+Sensor-layout `QGraphicsScene` placing one [`AverageSceneItem`](/docs/api/disp/average-scene-item) per visible channel.
 
-Extends `LayoutScene` with the per-condition colour table, the cached `FiffInfo` channel map and the dispatcher that creates / refreshes one `AverageSceneItem` per visible sensor.
+Extends [`LayoutScene`](/docs/api/disp/layout-scene) with the per-condition colour table, the cached `FiffInfo` channel map and the dispatcher that creates / refreshes one [`AverageSceneItem`](/docs/api/disp/average-scene-item) per visible sensor.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    LayoutScene <|-- AverageScene
+    click LayoutScene "/docs/api/disp/layout-scene"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Extends `LayoutScene` with the per-condition colour table, the cached `FiffInfo`
 
 ### AverageScene(view, parent)
 
-Constructs a `AverageScene`.
+Constructs a [`AverageScene`](/docs/api/disp/average-scene).
 
 ---
 
@@ -53,11 +61,11 @@ Repaints all items from the layout data in the scene.
 
 ### repaintSelectionItems(selectedChannelItems)
 
-Repaints all items from the layout data in the scene from a `SelectionItem` object.
+Repaints all items from the layout data in the scene from a [`SelectionItem`](/docs/api/disp/selection-item) object.
 
 **Parameters:**
 
-- **selectedChannelItems** : *const DISPLIB::SelectionItem &*
+- **selectedChannelItems** : *const [SelectionItem](/docs/api/disp/selection-item) &*
   data about items which are to be painted.
 
 ---

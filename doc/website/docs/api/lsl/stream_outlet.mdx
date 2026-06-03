@@ -23,14 +23,14 @@ Server-side LSL endpoint: binds a TCP data server, advertises the stream on the 
 
 ### stream_outlet(info)
 
-Construct a `stream_outlet` for the given `stream_info`.
+Construct a [`stream_outlet`](/docs/api/lsl/stream_outlet) for the given [`stream_info`](/docs/api/lsl/stream_info).
 
 This immediately starts the TCP data server and begins UDP discovery broadcasts.
 
 **Parameters:**
 
-- **info** : *const stream_info &*
-  The `stream_info` describing this outlet's stream.
+- **info** : *const [stream_info](/docs/api/lsl/stream_info) &*
+  The [`stream_info`](/docs/api/lsl/stream_info) describing this outlet's stream.
 
 ---
 
@@ -66,11 +66,11 @@ Push a chunk of multichannel samples into the outlet.
 
 ### info()
 
-Get the `stream_info` associated with this outlet (including the assigned data port).
+Get the [`stream_info`](/docs/api/lsl/stream_info) associated with this outlet (including the assigned data port).
 
 **Returns:**
 
-- *stream_info* — The `stream_info` for this outlet.
+- *[stream_info](/docs/api/lsl/stream_info)* — The [`stream_info`](/docs/api/lsl/stream_info) for this outlet.
 
 ---
 

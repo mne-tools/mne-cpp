@@ -17,7 +17,7 @@ class MRILIB::MriMghIO
 
 Stateless decoder for FreeSurfer MGH and MGZ volume containers.
 
-Parses the 284-byte big-endian header, decodes the column-major voxel buffer for every supported MRI type (uchar, int, float, short) and reads the optional tag footer (scan parameters, `talairach.xfm` path) into an `MriVolData`. ``.mgz inputs are inflated in-memory through zlib's `MAX_WBITS+16` gunzip mode before parsing, so callers never need to know whether they are looking at the compressed or uncompressed variant.
+Parses the 284-byte big-endian header, decodes the column-major voxel buffer for every supported MRI type (uchar, int, float, short) and reads the optional tag footer (scan parameters, `talairach.xfm` path) into an [`MriVolData`](/docs/api/mri/mri-vol-data). ``.mgz inputs are inflated in-memory through zlib's `MAX_WBITS+16` gunzip mode before parsing, so callers never need to know whether they are looking at the compressed or uncompressed variant.
 
 Format reference: [https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat](https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat)
 
@@ -40,10 +40,10 @@ For .mgz files, automatic gzip decompression is performed via zlib.
 - **mgzFile** : *const QString &*
   Path to the .mgz or .mgh file.
 
-- **volData** : *MriVolData &*
-  `MriVolData` structure to populate.
+- **volData** : *[MriVolData](/docs/api/mri/mri-vol-data) &*
+  [`MriVolData`](/docs/api/mri/mri-vol-data) structure to populate.
 
-- **additionalTrans** : *QVector&lt; FIFFLIB::FiffCoordTrans &gt; &*
+- **additionalTrans** : *QVector&lt; [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &gt; &*
   Additional coordinate transforms found in footer (e.g., Talairach).
 
 - **subjectMriDir** : *const QString &*

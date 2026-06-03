@@ -19,13 +19,21 @@ Continuous HPI head-position-indicator configuration panel.
 
 Coil-frequency table, GoF threshold spinbox, continuous HPI toggle and single-shot `Fit` trigger; emits coil-list and head-movement vectors back to the live pipeline.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- HpiSettingsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
 
 ### HpiSettingsView(sSettingsPath, parent, f)
 
-Constructs a `HpiSettingsView` object.
+Constructs a [`HpiSettingsView`](/docs/api/disp/hpi-settings-view) object.
 
 **Parameters:**
 
@@ -159,7 +167,7 @@ Display digitizer metadata bsed on input pointList.
 
 **Parameters:**
 
-- **pointList** : *QList&lt; FIFFLIB::FiffDigPoint &gt;*
+- **pointList** : *QList&lt; [FiffDigPoint](/docs/api/fiff/fiff-dig-point) &gt;*
   list of digitizer points
 
 ---

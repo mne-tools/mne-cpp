@@ -15,9 +15,9 @@ sidebar_position: 8
 class FSLIB::FsSurfaceSet
 ```
 
-Container holding the lh and/or rh `FsSurface` for one subject and one surface kind.
+Container holding the lh and/or rh [`FsSurface`](/docs/api/fs/fs-surface) for one subject and one surface kind.
 
-The set is keyed on the hemisphere id (0 = lh, 1 = rh) so callers can do `set`[0] / `set`[1] or iterate over `set.data()`. All member surfaces are loaded with the same `surf` name (e.g. `pial`), so the set is homogeneous across hemispheres and stays aligned with a paired `FsAnnotationSet` sharing the same vertex indexing.
+The set is keyed on the hemisphere id (0 = lh, 1 = rh) so callers can do `set`[0] / `set`[1] or iterate over `set.data()`. All member surfaces are loaded with the same `surf` name (e.g. `pial`), so the set is homogeneous across hemispheres and stays aligned with a paired [`FsAnnotationSet`](/docs/api/fs/fs-annotation-set) sharing the same vertex indexing.
 
 ---
 
@@ -72,10 +72,10 @@ Constructs a surface set by assembling given surfaces.
 
 **Parameters:**
 
-- **p_LHSurface** : *const FsSurface &*
+- **p_LHSurface** : *const [FsSurface](/docs/api/fs/fs-surface) &*
   Left hemisphere surface.
 
-- **p_RHSurface** : *const FsSurface &*
+- **p_RHSurface** : *const [FsSurface](/docs/api/fs/fs-surface) &*
   Right hemisphere surface.
 
 ---
@@ -96,13 +96,13 @@ Constructs an annotation set by reading from annotation files.
 
 ### ~FsSurfaceSet()
 
-Destroys the `FsSurfaceSet` class.
+Destroys the [`FsSurfaceSet`](/docs/api/fs/fs-surface-set) class.
 
 ---
 
 ### clear()
 
-Initializes the `FsAnnotationSet`.
+Initializes the [`FsAnnotationSet`](/docs/api/fs/fs-annotation-set).
 
 ---
 
@@ -112,17 +112,17 @@ Returns The surface set map.
 
 **Returns:**
 
-- *QMap&lt; qint32, FsSurface &gt; &* — the surface set map.
+- *QMap&lt; qint32, [FsSurface](/docs/api/fs/fs-surface) &gt; &* — the surface set map.
 
 ---
 
 ### isEmpty()
 
-True if `FsSurfaceSet` is empty.
+True if [`FsSurfaceSet`](/docs/api/fs/fs-surface-set) is empty.
 
 **Returns:**
 
-- *bool* — true if `FsSurfaceSet` is empty.
+- *bool* — true if [`FsSurfaceSet`](/docs/api/fs/fs-surface-set) is empty.
 
 ---
 
@@ -132,14 +132,14 @@ Insert a surface.
 
 **Parameters:**
 
-- **p_Surface** : *const FsSurface &*
-  `FsSurface` to insert.
+- **p_Surface** : *const [FsSurface](/docs/api/fs/fs-surface) &*
+  [`FsSurface`](/docs/api/fs/fs-surface) to insert.
 
 ---
 
 ### surf()
 
-The kind of Surfaces which are held by the `FsSurfaceSet` (eg.
+The kind of Surfaces which are held by the [`FsSurfaceSet`](/docs/api/fs/fs-surface-set) (eg.
 
 inflated, orig ...)
 
@@ -160,7 +160,7 @@ Subscript operator [] to access surface by index.
 
 **Returns:**
 
-- *const FsSurface &* — `FsSurface` related to the parameter index.
+- *const [FsSurface](/docs/api/fs/fs-surface) &* — [`FsSurface`](/docs/api/fs/fs-surface) related to the parameter index.
 
 ---
 
@@ -175,7 +175,7 @@ Subscript operator [] to access surface by index.
 
 **Returns:**
 
-- *FsSurface &* — `FsSurface` related to the parameter index.
+- *[FsSurface](/docs/api/fs/fs-surface) &* — [`FsSurface`](/docs/api/fs/fs-surface) related to the parameter index.
 
 ---
 
@@ -190,7 +190,7 @@ Subscript operator [] to access surface by identifier.
 
 **Returns:**
 
-- *const FsSurface &* — `FsSurface` related to the parameter identifier.
+- *const [FsSurface](/docs/api/fs/fs-surface) &* — [`FsSurface`](/docs/api/fs/fs-surface) related to the parameter identifier.
 
 ---
 
@@ -205,7 +205,7 @@ Subscript operator [] to access surface by identifier.
 
 **Returns:**
 
-- *FsSurface &* — `FsSurface` related to the parameter identifier.
+- *[FsSurface](/docs/api/fs/fs-surface) &* — [`FsSurface`](/docs/api/fs/fs-surface) related to the parameter identifier.
 
 ---
 
@@ -223,7 +223,7 @@ Returns number of loaded hemispheres.
 
 ### read(p_sLHFileName, p_sRHFileName, p_SurfaceSet)
 
-Reads different surface files and assembles them to a `FsSurfaceSet`.
+Reads different surface files and assembles them to a [`FsSurfaceSet`](/docs/api/fs/fs-surface-set).
 
 **Parameters:**
 
@@ -233,7 +233,7 @@ Reads different surface files and assembles them to a `FsSurfaceSet`.
 - **p_sRHFileName** : *const QString &*
   Right hemisphere surface file.
 
-- **p_SurfaceSet** : *FsSurfaceSet &*
+- **p_SurfaceSet** : *[FsSurfaceSet](/docs/api/fs/fs-surface-set) &*
   The read surface set.
 
 **Returns:**

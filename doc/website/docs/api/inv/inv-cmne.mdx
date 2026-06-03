@@ -78,7 +78,7 @@ Apply LSTM-based temporal correction to z-scored rectified dSPM data.
 
 Train the CMNE LSTM model by invoking the Python training script.
 
-This is a convenience wrapper that calls `scripts/ml/training/train_cmne_lstm.py` via `UTILSLIB::PythonRunner`. The heavy lifting (PyTorch LSTM training + ONNX export) happens in Python; C++ only launches the process and streams its output.
+This is a convenience wrapper that calls `scripts/ml/training/train_cmne_lstm.py` via [`PythonRunner`](/docs/api/utils/python-runner). The heavy lifting (PyTorch LSTM training + ONNX export) happens in Python; C++ only launches the process and streams its output.
 
 **Parameters:**
 

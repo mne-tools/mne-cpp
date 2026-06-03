@@ -15,9 +15,17 @@ sidebar_position: 5
 class BIDSLIB::BrainVisionReader
 ```
 
-The `BrainVisionReader` reads BrainVision file triplets (.vhdr/.vmrk/.eeg) and exposes them through the `AbstractFormatReader` interface.
+The [`BrainVisionReader`](/docs/api/bids/brain-vision-reader) reads BrainVision file triplets (.vhdr/.vmrk/.eeg) and exposes them through the [`AbstractFormatReader`](/docs/api/bids/abstract-format-reader) interface.
 
 BrainVision is the most common format for iEEG (sEEG/ECoG) recordings in BIDS datasets. The format stores data as little-endian binary (INT_16, INT_32, or IEEE_FLOAT_32), either MULTIPLEXED (channels interleaved per time point) or VECTORIZED (channels contiguous).
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractFormatReader <|-- BrainVisionReader
+    click AbstractFormatReader "/docs/api/bids/abstract-format-reader"
+```
 
 ---
 
@@ -52,11 +60,11 @@ Must be called before reading data.
 
 ### getInfo()
 
-Return measurement metadata as FiffInfo.
+Return measurement metadata as [FiffInfo](/docs/api/fiff/fiff-info).
 
 **Returns:**
 
-- *FIFFLIB::FiffInfo* — FiffInfo populated from the native format header.
+- *[FiffInfo](/docs/api/fiff/fiff-info)* — FiffInfo populated from the native format header.
 
 ---
 
@@ -98,11 +106,11 @@ Return the number of measurement channels.
 
 ### toFiffRawData()
 
-Convert the entire dataset to a FiffRawData structure.
+Convert the entire dataset to a [FiffRawData](/docs/api/fiff/fiff-raw-data) structure.
 
 **Returns:**
 
-- *FIFFLIB::FiffRawData* — FiffRawData populated with info, calibrations, and sample bounds.
+- *FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data)* — FiffRawData populated with info, calibrations, and sample bounds.
 
 ---
 

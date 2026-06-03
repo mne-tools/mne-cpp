@@ -17,7 +17,14 @@ class FIFFLIB::FiffTag
 
 FIFF tag: 16-byte header (kind, type, size, next) plus payload, with typed decoders for every FIFFT_* type.
 
-Holds the four header fields exactly as stored on disk and a `QByteArray` with the raw payload. Decoders convert the payload to the appropriate C++ representation: scalars via `toInt` / `toFloat` / `toDouble`, dense and sparse matrices via `toFloatMatrix` / `toSparseFloatMatrix`, and the structured FIFF records into their class wrappers (`toFiffId`, `toCoordTrans`, `toChInfo`, `toChPos`, `toDigPoint`, ...). Used by `FiffStream` both for streaming reads and for assembling tags before write_tag.
+Holds the four header fields exactly as stored on disk and a `QByteArray` with the raw payload. Decoders convert the payload to the appropriate C++ representation: scalars via `toInt` / `toFloat` / `toDouble`, dense and sparse matrices via `toFloatMatrix` / `toSparseFloatMatrix`, and the structured FIFF records into their class wrappers (`toFiffId`, `toCoordTrans`, `toChInfo`, `toChPos`, `toDigPoint`, ...). Used by [`FiffStream`](/docs/api/fiff/fiff-stream) both for streaming reads and for assembling tags before write_tag.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QByteArray <|-- FiffTag
+```
 
 ---
 
@@ -25,7 +32,7 @@ Holds the four header fields exactly as stored on disk and a `QByteArray` with t
 
 ### FiffTag()
 
-Constructs a default `FiffTag`.
+Constructs a default [`FiffTag`](/docs/api/fiff/fiff-tag).
 
 ---
 
@@ -36,7 +43,7 @@ Copy constructor.
 **Parameters:**
 
 - **p_FiffTag** : *const FiffTag &*
-  `FiffTag` to copy.
+  [`FiffTag`](/docs/api/fiff/fiff-tag) to copy.
 
 ---
 
@@ -60,7 +67,7 @@ Move assignment operator.
 
 ### ~FiffTag()
 
-Destroys the `FiffTag`.
+Destroys the [`FiffTag`](/docs/api/fiff/fiff-tag).
 
 ---
 
@@ -228,7 +235,7 @@ to fiff ID
 
 **Returns:**
 
-- *FiffId* — `Fiff` universially unique identifier.
+- *[FiffId](/docs/api/fiff/fiff-id)* — [`Fiff`](/docs/api/fiff/fiff-class) universially unique identifier.
 
 ---
 
@@ -238,7 +245,7 @@ to fiff DIG POINT
 
 **Returns:**
 
-- *FiffDigPoint* — `Fiff` point descriptor.
+- *[FiffDigPoint](/docs/api/fiff/fiff-dig-point)* — [`Fiff`](/docs/api/fiff/fiff-class) point descriptor.
 
 ---
 
@@ -248,7 +255,7 @@ to fiff COORD TRANS
 
 **Returns:**
 
-- *FiffCoordTrans* — `Fiff` coordinate transformation descriptor.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — [`Fiff`](/docs/api/fiff/fiff-class) coordinate transformation descriptor.
 
 ---
 
@@ -260,7 +267,7 @@ to fiff CH INFO STRUCT
 
 **Returns:**
 
-- *FiffChInfo* — `Fiff` channel info descriptor.
+- *[FiffChInfo](/docs/api/fiff/fiff-ch-info)* — [`Fiff`](/docs/api/fiff/fiff-class) channel info descriptor.
 
 ---
 
@@ -272,7 +279,7 @@ to fiff DIR ENTRY
 
 **Returns:**
 
-- *QList&lt; QSharedPointer&lt;FiffDirEntry&gt; &gt;* — List of directory entry descriptors.
+- *QList&lt; QSharedPointer&lt;[FiffDirEntry](/docs/api/fiff/fiff-dir-entry)&gt; &gt;* — List of directory entry descriptors.
 
 ---
 
@@ -318,7 +325,7 @@ Convert coil position descriptor.
 
 **Parameters:**
 
-- **pos** : *FiffChPos **
+- **pos** : *[FiffChPos](/docs/api/fiff/fiff-ch-pos) **
   coil position descriptor to convert.
 
 ---

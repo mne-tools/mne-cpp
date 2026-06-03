@@ -25,7 +25,7 @@ SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
 `apply_inverse_*` / `compute_source_psd` helpers.
 
-Free functions in this header glue together the lower-level `INVLIB` classes so users can match the MNE-Python ergonomics: `INVLIB::applyInverseEpochs` applies a precomputed inverse operator across an epoch list, applyInverseRaw streams raw data through the kernel in blocks, estimateSnr returns the source-space SNR trace from an evoked + inverse pair, computeWhitener produces the diagonal whitener from a noise covariance, and computeSourcePsd / computeSourceBandPower run Welch-based spectral analysis directly on InvSourceEstimate output. All methods are headers-only orchestration on top of InvMinimumNorm and the underlying FIFF / MNE primitives.
+Free functions in this header glue together the lower-level `INVLIB` classes so users can match the MNE-Python ergonomics: `INVLIB::applyInverseEpochs` applies a precomputed inverse operator across an epoch list, applyInverseRaw streams raw data through the kernel in blocks, estimateSnr returns the source-space SNR trace from an evoked + inverse pair, computeWhitener produces the diagonal whitener from a noise covariance, and computeSourcePsd / computeSourceBandPower run Welch-based spectral analysis directly on [InvSourceEstimate](/docs/api/inv/inv-source-estimate) output. All methods are headers-only orchestration on top of [InvMinimumNorm](/docs/api/inv/inv-minimum-norm) and the underlying FIFF / [MNE](/docs/api/mne/mne-class) primitives.
 
 ---
 
@@ -34,7 +34,7 @@ Free functions in this header glue together the lower-level `INVLIB` classes so 
 ### applyInverseEpochs(epochs, inverse, lambda2, method, tmin, tstep, pickNormal)
 
 ```cpp
-QList< InvSourceEstimate > applyInverseEpochs(const QList< Eigen::MatrixXd > & epochs, const MNELIB::MNEInverseOperator & inverse, float lambda2, const QString & method, float tmin, float tstep, bool pickNormal);
+QList< [InvSourceEstimate](/docs/api/inv/inv-source-estimate) > applyInverseEpochs(const QList< Eigen::MatrixXd > & epochs, const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) & inverse, float lambda2, const QString & method, float tmin, float tstep, bool pickNormal);
 ```
 
 Apply inverse operator to each epoch in a list.
@@ -46,7 +46,7 @@ For each epoch (data matrix), applies the minimum norm inverse and returns a lis
 - **epochs** : *const QList&lt; Eigen::MatrixXd &gt; &*
   List of epoch data matrices (n_channels x n_times each).
 
-- **inverse** : *const MNELIB::MNEInverseOperator &*
+- **inverse** : *const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*
   Pre-computed inverse operator.
 
 - **lambda2** : *float*
@@ -66,14 +66,14 @@ For each epoch (data matrix), applies the minimum norm inverse and returns a lis
 
 **Returns:**
 
-- *QList&lt; InvSourceEstimate &gt;* — List of source estimates, one per epoch.
+- *QList&lt; [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &gt;* — List of source estimates, one per epoch.
 
 ---
 
 ### applyInverseRaw(raw, inverse, lambda2, method, from, to, pickNormal)
 
 ```cpp
-InvSourceEstimate applyInverseRaw(const FIFFLIB::FiffRawData & raw, const MNELIB::MNEInverseOperator & inverse, float lambda2, const QString & method, int from, int to, bool pickNormal);
+[InvSourceEstimate](/docs/api/inv/inv-source-estimate) applyInverseRaw(const FIFFLIB::FiffRawData & raw, const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) & inverse, float lambda2, const QString & method, int from, int to, bool pickNormal);
 ```
 
 Apply inverse operator to raw data in blocks.
@@ -82,10 +82,10 @@ Reads and processes the raw data in chunks, applying the inverse operator to pro
 
 **Parameters:**
 
-- **raw** : *const FIFFLIB::FiffRawData &*
+- **raw** : *const FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   Raw data object.
 
-- **inverse** : *const MNELIB::MNEInverseOperator &*
+- **inverse** : *const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*
   Pre-computed inverse operator.
 
 - **lambda2** : *float*
@@ -105,14 +105,14 @@ Reads and processes the raw data in chunks, applying the inverse operator to pro
 
 **Returns:**
 
-- *InvSourceEstimate* — Source estimate spanning the requested time range.
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Source estimate spanning the requested time range.
 
 ---
 
 ### estimateSnr(evoked, inverse, method)
 
 ```cpp
-QPair< Eigen::VectorXd, Eigen::RowVectorXf > estimateSnr(const FIFFLIB::FiffEvoked & evoked, const MNELIB::MNEInverseOperator & inverse, const QString & method);
+QPair< Eigen::VectorXd, Eigen::RowVectorXf > estimateSnr(const [FiffEvoked](/docs/api/fiff/fiff-evoked) & evoked, const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) & inverse, const QString & method);
 ```
 
 Estimate SNR from evoked data and inverse operator.
@@ -121,10 +121,10 @@ Computes source-space SNR estimate using the GFP (Global Field Power) of the evo
 
 **Parameters:**
 
-- **evoked** : *const FIFFLIB::FiffEvoked &*
+- **evoked** : *const [FiffEvoked](/docs/api/fiff/fiff-evoked) &*
   Evoked data.
 
-- **inverse** : *const MNELIB::MNEInverseOperator &*
+- **inverse** : *const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*
   Inverse operator.
 
 - **method** : *const QString &*
@@ -139,7 +139,7 @@ Computes source-space SNR estimate using the GFP (Global Field Power) of the evo
 ### computeWhitener(noiseCov, rank)
 
 ```cpp
-QPair< Eigen::MatrixXd, int > computeWhitener(const FIFFLIB::FiffCov & noiseCov, int rank);
+QPair< Eigen::MatrixXd, int > computeWhitener(const [FiffCov](/docs/api/fiff/fiff-cov) & noiseCov, int rank);
 ```
 
 Compute whitening matrix from a noise covariance.
@@ -148,7 +148,7 @@ Returns a whitening matrix W such that W * data has identity covariance. Matches
 
 **Parameters:**
 
-- **noiseCov** : *const FIFFLIB::FiffCov &*
+- **noiseCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   Noise covariance matrix.
 
 - **rank** : *int*
@@ -163,7 +163,7 @@ Returns a whitening matrix W such that W * data has identity covariance. Matches
 ### computeSourcePsd(stc, sfreq, fmin, fmax, nFft)
 
 ```cpp
-QPair< Eigen::MatrixXd, Eigen::VectorXd > computeSourcePsd(const InvSourceEstimate & stc, float sfreq, float fmin, float fmax, int nFft);
+QPair< Eigen::MatrixXd, Eigen::VectorXd > computeSourcePsd(const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) & stc, float sfreq, float fmin, float fmax, int nFft);
 ```
 
 Compute PSD for a source estimate using Welch's method.
@@ -172,7 +172,7 @@ Takes a source estimate (n_sources x n_times) and computes the power spectral de
 
 **Parameters:**
 
-- **stc** : *const InvSourceEstimate &*
+- **stc** : *const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &*
   Source estimate.
 
 - **sfreq** : *float*
@@ -196,7 +196,7 @@ Takes a source estimate (n_sources x n_times) and computes the power spectral de
 ### computeSourceBandPower(stc, sfreq, bands)
 
 ```cpp
-QMap< QString, Eigen::VectorXd > computeSourceBandPower(const InvSourceEstimate & stc, float sfreq, const QMap< QString, QPair< float, float > > & bands);
+QMap< QString, Eigen::VectorXd > computeSourceBandPower(const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) & stc, float sfreq, const QMap< QString, QPair< float, float > > & bands);
 ```
 
 Compute band power for source estimate.
@@ -205,7 +205,7 @@ Integrates source PSD within specified frequency bands.
 
 **Parameters:**
 
-- **stc** : *const InvSourceEstimate &*
+- **stc** : *const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &*
   Source estimate.
 
 - **sfreq** : *float*

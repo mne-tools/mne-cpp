@@ -19,9 +19,17 @@ Computes the debiased squared Weighted Phase Lag Index of Vinck et al.
 
 (NeuroImage 2011) for every channel pair.
 
-The estimator subtracts the analytically known diagonal variance from both numerator and denominator of `WeightedPhaseLagIndex`, producing an estimator whose expectation equals `wPLI^2` even for very small trial counts. It is the preferred PLI-family metric when the number of trials is low and is the volume-conduction-robust counterpart of magnitude-squared coherence.
+The estimator subtracts the analytically known diagonal variance from both numerator and denominator of [`WeightedPhaseLagIndex`](/docs/api/connectivity/weighted-phase-lag-index), producing an estimator whose expectation equals `wPLI^2` even for very small trial counts. It is the preferred PLI-family metric when the number of trials is low and is the volume-conduction-robust counterpart of magnitude-squared coherence.
 
 Debiased squared Weighted Phase Lag Index (Vinck et al. 2011); low-bias volume-conduction-robust estimator.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractMetric <|-- DebiasedSquaredWeightedPhaseLagIndex
+    click AbstractMetric "/docs/api/connectivity/abstract-metric"
+```
 
 ---
 
@@ -29,7 +37,7 @@ Debiased squared Weighted Phase Lag Index (Vinck et al. 2011); low-bias volume-c
 
 ### DebiasedSquaredWeightedPhaseLagIndex()
 
-Constructs a `DebiasedSquaredWeightedPhaseLagIndex` object.
+Constructs a [`DebiasedSquaredWeightedPhaseLagIndex`](/docs/api/connectivity/debiased-squared-weighted-phase-lag-index) object.
 
 ---
 
@@ -41,12 +49,12 @@ Calculates the debiased squared weighted phase lag index between the rows of the
 
 **Parameters:**
 
-- **connectivitySettings** : *ConnectivitySettings &*
+- **connectivitySettings** : *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings) &*
   The input data and parameters.
 
 **Returns:**
 
-- *Network* — The connectivity information in form of a network structure.
+- *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
 

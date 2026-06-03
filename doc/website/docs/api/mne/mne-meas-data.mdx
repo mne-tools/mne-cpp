@@ -15,9 +15,9 @@ sidebar_position: 26
 class MNELIB::MNEMeasData
 ```
 
-Measurement data container for `MNE` inverse and dipole-fit computations.
+Measurement data container for [`MNE`](/docs/api/mne/mne-class) inverse and dipole-fit computations.
 
-Replaces `*mneMeasData` / `mneMeasDataRec` from MNE-C ``mne_types.h``. Holds channel information, coordinate transforms, projection operators, and one or more `MNEMeasDataSet` epochs loaded from a FIFF evoked-response file.
+Replaces `*mneMeasData` / `mneMeasDataRec` from MNE-C ``mne_types.h``. Holds channel information, coordinate transforms, projection operators, and one or more [`[MNEMeasDataSet](/docs/api/mne/mne-meas-data-set)`](/docs/api/mne/mne-meas-data-set) epochs loaded from a FIFF evoked-response file.
 
 ---
 
@@ -63,7 +63,7 @@ Refactored from `mne_adjust_baselines` (mne_apply_baselines.c).
 
 Read an evoked-response data set and append it to an existing container.
 
-If `add_to` is `nullptr` a new `MNEMeasData` is created; otherwise the loaded epoch is appended to `add_to's` set list.
+If `add_to` is `nullptr` a new [`MNEMeasData`](/docs/api/mne/mne-meas-data) is created; otherwise the loaded epoch is appended to `add_to's` set list.
 
 Refactored from `mne_read_meas_data_add` (mne_read_data.c).
 
@@ -75,10 +75,10 @@ Refactored from `mne_read_meas_data_add` (mne_read_data.c).
 - **set** : *int*
   1-based data-set index to load.
 
-- **op** : *MNEInverseOperator **
+- **op** : *[MNEInverseOperator](/docs/api/mne/mne-inverse-operator) **
   Inverse operator for consistency checks (may be `nullptr`).
 
-- **fwd** : *MNENamedMatrix **
+- **fwd** : *[MNENamedMatrix](/docs/api/mne/mne-named-matrix) **
   Forward operator for consistency checks (may be `nullptr`).
 
 - **namesp** : *const QStringList &*
@@ -87,12 +87,12 @@ Refactored from `mne_read_meas_data_add` (mne_read_data.c).
 - **nnamesp** : *int*
   Number of entries in `namesp`.
 
-- **add_to** : *MNEMeasData **
+- **add_to** : *[MNEMeasData](/docs/api/mne/mne-meas-data) **
   Existing container to append to, or `nullptr` to create a new one.
 
 **Returns:**
 
-- *MNEMeasData ** — Pointer to the (new or existing) container, or `nullptr` on failure.
+- *[MNEMeasData](/docs/api/mne/mne-meas-data) ** — Pointer to the (new or existing) container, or `nullptr` on failure.
 
 ---
 
@@ -110,10 +110,10 @@ Convenience wrapper around `mne_read_meas_data_add()` with `add_to` = `nullptr`.
 - **set** : *int*
   1-based data-set index to load.
 
-- **op** : *MNEInverseOperator **
+- **op** : *[MNEInverseOperator](/docs/api/mne/mne-inverse-operator) **
   Inverse operator for consistency checks (may be `nullptr`).
 
-- **fwd** : *MNENamedMatrix **
+- **fwd** : *[MNENamedMatrix](/docs/api/mne/mne-named-matrix) **
   Forward operator for consistency checks (may be `nullptr`).
 
 - **namesp** : *const QStringList &*
@@ -124,7 +124,7 @@ Convenience wrapper around `mne_read_meas_data_add()` with `add_to` = `nullptr`.
 
 **Returns:**
 
-- *MNEMeasData ** — Pointer to the new container, or `nullptr` on failure.
+- *[MNEMeasData](/docs/api/mne/mne-meas-data) ** — Pointer to the new container, or `nullptr` on failure.
 
 ---
 

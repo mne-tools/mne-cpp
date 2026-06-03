@@ -33,14 +33,14 @@ QVector<int> blinks = ArtifactDetect::detectEog(matData, fiffInfo, sFreq);
 
 Detect ECG R-peak events.
 
-The function searches FiffInfo for a channel with kind == FIFFV_ECG_CH. If none is found it synthesises an ECG proxy by averaging the absolute gradient-magnetometer data (MEG channels), which often shows a clear cardiac artefact.
+The function searches [FiffInfo](/docs/api/fiff/fiff-info) for a channel with kind == FIFFV_ECG_CH. If none is found it synthesises an ECG proxy by averaging the absolute gradient-magnetometer data (MEG channels), which often shows a clear cardiac artefact.
 
 **Parameters:**
 
 - **matData** : *const Eigen::MatrixXd &*
   Raw data matrix (n_channels × n_samples), calibrated (SI units).
 
-- **fiffInfo** : *const FIFFLIB::FiffInfo &*
+- **fiffInfo** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info (channel kinds, names).
 
 - **dSFreq** : *double*
@@ -59,14 +59,14 @@ The function searches FiffInfo for a channel with kind == FIFFV_ECG_CH. If none 
 
 Detect EOG blink/saccade events.
 
-The function searches FiffInfo for channels with kind == FIFFV_EOG_CH. If multiple EOG channels are present the channel with the largest peak-to-peak amplitude is used. Returns an empty vector if no EOG channel is found.
+The function searches [FiffInfo](/docs/api/fiff/fiff-info) for channels with kind == FIFFV_EOG_CH. If multiple EOG channels are present the channel with the largest peak-to-peak amplitude is used. Returns an empty vector if no EOG channel is found.
 
 **Parameters:**
 
 - **matData** : *const Eigen::MatrixXd &*
   Raw data matrix (n_channels × n_samples), calibrated (SI units).
 
-- **fiffInfo** : *const FIFFLIB::FiffInfo &*
+- **fiffInfo** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info.
 
 - **dSFreq** : *double*

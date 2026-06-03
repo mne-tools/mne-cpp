@@ -19,7 +19,7 @@ sidebar_position: 3
 class FWDLIB::FwdEegSphereModel
 ```
 
-Implements `FwdEegSphereModel` (replaces `fwdEegSphereModel` / `fwdEegSphereModelRec` from MNE-C ``fwd_types.h``).
+Implements [`FwdEegSphereModel`](/docs/api/fwd/fwd-eeg-sphere-model) (replaces `fwdEegSphereModel` / `fwdEegSphereModelRec` from MNE-C ``fwd_types.h``).
 
 Multi-shell concentric-sphere head model holding the Berg-Scherg equivalent-source parameters that accelerate the de Munck Legendre series for EEG, plus the Sarvas closed-form coefficients used for the spherically-symmetric MEG forward solution.
 
@@ -29,7 +29,7 @@ Multi-shell concentric-sphere head model holding the Berg-Scherg equivalent-sour
 
 ### FwdEegSphereModel()
 
-Constructs the Forward EEG Sphere Model.
+Constructs the Forward EEG [Sphere](/docs/api/math/sphere) Model.
 
 ---
 
@@ -258,7 +258,7 @@ Based on the formulas in Zhang (1995) and Mosher et al. (1996).
   Computed potential values at each electrode.
 
 - **client** : *void **
-  Pointer to the `FwdEegSphereModel`.
+  Pointer to the [`FwdEegSphereModel`](/docs/api/fwd/fwd-eeg-sphere-model).
 
 **Returns:**
 
@@ -278,14 +278,14 @@ Calculate EEG potentials at compound electrodes (coils) by summing weighted cont
 - **Q** : *const Eigen::Vector3f &*
   Dipole moment.
 
-- **els** : *FwdCoilSet &*
+- **els** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   Set of coils/electrodes.
 
 - **Vval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
   Computed potentials (one per coil).
 
 - **client** : *void **
-  Pointer to the `FwdEegSphereModel`.
+  Pointer to the [`FwdEegSphereModel`](/docs/api/fwd/fwd-eeg-sphere-model).
 
 **Returns:**
 
@@ -301,7 +301,7 @@ This routine calculates the fields for all dipole directions.
 
 The code is based on the formulas presented in
 
-J.C. Moscher, R.M. Leahy, and P.S. Lewis, Matrix Kernels for Modeling of EEG and MEG Data, Los Alamos Technical Report, LA-UR-96-1993, 1996.
+J.C. Moscher, R.M. Leahy, and P.S. Lewis, Matrix Kernels for Modeling of EEG and MEG Data, Los Alamos Technical [Report](/docs/api/utils/report), LA-UR-96-1993, 1996.
 
 This routine uses the acceleration with help of equivalent sources in the homogeneous sphere.
 
@@ -338,7 +338,7 @@ This routine uses the acceleration with help of equivalent sources in the homoge
 - **rd** : *const Eigen::Vector3f &*
   Dipole position.
 
-- **els** : *FwdCoilSet &*
+- **els** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   Electrode positions.
 
 - **Vval_vec** : *Eigen::Ref&lt; Eigen::MatrixXf &gt;*
@@ -364,7 +364,7 @@ Compute potentials and spatial gradients of the potential field at coils using f
 - **Q** : *const Eigen::Vector3f &*
   Dipole moment.
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   Set of coils/electrodes.
 
 - **Vval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
@@ -380,7 +380,7 @@ Compute potentials and spatial gradients of the potential field at coils using f
   Gradient with respect to z dipole coordinate.
 
 - **client** : *void **
-  Pointer to the `FwdEegSphereModel`.
+  Pointer to the [`FwdEegSphereModel`](/docs/api/fwd/fwd-eeg-sphere-model).
 
 **Returns:**
 
@@ -435,7 +435,7 @@ Calculate the EEG in the sphere model using the megCoil structure MEG channels a
 - **Q** : *const Eigen::Vector3f &*
   Dipole moment.
 
-- **els** : *FwdCoilSet &*
+- **els** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   Electrode positions.
 
 - **Vval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*

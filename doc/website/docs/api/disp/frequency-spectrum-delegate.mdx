@@ -15,9 +15,16 @@ sidebar_position: 32
 class DISPLIB::FrequencySpectrumDelegate
 ```
 
-QAbstractItemDelegate painting one `SpectrumView` row as a horizontal frequency band.
+QAbstractItemDelegate painting one [`SpectrumView`](/docs/api/disp/spectrum-view) row as a horizontal frequency band.
 
 Maps the per-row FFT amplitudes through a Hot / Jet colour table and draws the resulting pixel strip plus the lower / upper frequency cursors during ``paint()``.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QAbstractItemDelegate <|-- FrequencySpectrumDelegate
+```
 
 ---
 

@@ -19,9 +19,19 @@ sidebar_position: 3
 class MNELIB::MNESourceSpace
 ```
 
-Implements the `MNE` Source Space (Replaces typedef mneSurfaceOrVolume mneSourceSpace; struct of MNE-C `mne_types.h`).
+Implements the [`MNE`](/docs/api/mne/mne-class) Source Space (Replaces typedef mneSurfaceOrVolume mneSourceSpace; struct of MNE-C `mne_types.h`).
 
 This defines a source space
+
+### Inheritance
+
+```mermaid
+classDiagram
+    MNESurfaceOrVolume <|-- MNESourceSpace
+    click MNESurfaceOrVolume "/docs/api/mne/mne-surface-or-volume"
+    MNESourceSpace <|-- MNEHemisphere
+    click MNEHemisphere "/docs/api/mne/mne-hemisphere"
+```
 
 ---
 
@@ -29,13 +39,13 @@ This defines a source space
 
 ### MNESourceSpace(np)
 
-Constructs the `MNE` Source Space.
+Constructs the [`MNE`](/docs/api/mne/mne-class) Source Space.
 
 ---
 
 ### ~MNESourceSpace()
 
-Destroys the `MNE` Source Space.
+Destroys the [`MNE`](/docs/api/mne/mne-class) Source Space.
 
 ---
 
@@ -92,7 +102,7 @@ Transform this source space into another coordinate frame.
 
 **Parameters:**
 
-- **t** : *const FIFFLIB::FiffCoordTrans &*
+- **t** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The coordinate transformation to apply.
 
 **Returns:**
@@ -123,7 +133,7 @@ Write this source space to a FIFF stream.
 
 **Parameters:**
 
-- **stream** : *FIFFLIB::FiffStream::SPtr &*
+- **stream** : *[FIFFLIB::FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   The FIFF output stream.
 
 - **selected_only** : *bool*
@@ -148,7 +158,7 @@ Create a new source space with np vertices and all associated data initialized t
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNESourceSpace &gt;* — Unique pointer to the newly allocated source space.
+- *std::unique_ptr&lt; [MNESourceSpace](/docs/api/mne/mne-source-space) &gt;* — Unique pointer to the newly allocated source space.
 
 ---
 
@@ -166,7 +176,7 @@ Load a FreeSurfer surface from disk, adding full geometry information.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNESourceSpace &gt;* — Unique pointer to the loaded source space, or nullptr on error.
+- *std::unique_ptr&lt; [MNESourceSpace](/docs/api/mne/mne-source-space) &gt;* — Unique pointer to the loaded source space, or nullptr on error.
 
 ---
 
@@ -190,7 +200,7 @@ Load a FreeSurfer surface from disk, optionally adding geometry information.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNESourceSpace &gt;* — Unique pointer to the loaded source space, or nullptr on error.
+- *std::unique_ptr&lt; [MNESourceSpace](/docs/api/mne/mne-source-space) &gt;* — Unique pointer to the loaded source space, or nullptr on error.
 
 ---
 
@@ -200,7 +210,7 @@ Create a volumetric source space by laying out a 3D grid of points within the bo
 
 **Parameters:**
 
-- **surf** : *const MNESurface &*
+- **surf** : *const [MNESurface](/docs/api/mne/mne-surface) &*
   The bounding surface (e.g. inner skull).
 
 - **grid** : *float*
@@ -214,7 +224,7 @@ Create a volumetric source space by laying out a 3D grid of points within the bo
 
 **Returns:**
 
-- *MNESourceSpace ** — A new volumetric source space, or NULL on failure. Caller takes ownership.
+- *[MNESourceSpace](/docs/api/mne/mne-source-space) ** — A new volumetric source space, or NULL on failure. Caller takes ownership.
 
 ---
 
@@ -254,7 +264,7 @@ For each vertex of the icosahedron at the requested grade, the nearest vertex in
 
 **Parameters:**
 
-- **hemi** : *const MNEHemisphere &*
+- **hemi** : *const [MNEHemisphere](/docs/api/mne/mne-hemisphere) &*
   The hemisphere to downsample.
 
 - **icoGrade** : *int*
@@ -262,7 +272,7 @@ For each vertex of the icosahedron at the requested grade, the nearest vertex in
 
 **Returns:**
 
-- *MNEHemisphere* — A new `MNEHemisphere` with the downsampled vertex selection.
+- *[MNEHemisphere](/docs/api/mne/mne-hemisphere)* — A new [`MNEHemisphere`](/docs/api/mne/mne-hemisphere) with the downsampled vertex selection.
 
 ---
 

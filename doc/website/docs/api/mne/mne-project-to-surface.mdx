@@ -25,26 +25,26 @@ Projects 3-D points onto a triangulated surface mesh and returns nearest vertice
 
 ### MNEProjectToSurface()
 
-Constructs a `MNEProjectToSurface` object.
+Constructs a [`MNEProjectToSurface`](/docs/api/mne/mne-project-to-surface) object.
 
 ---
 
 ### MNEProjectToSurface(p_MNEBemSurf)
 
-Constructs a `MNEProjectToSurface` with the data of a `MNEBemSurface` object.
+Constructs a [`MNEProjectToSurface`](/docs/api/mne/mne-project-to-surface) with the data of a [`MNEBemSurface`](/docs/api/mne/mne-bem-surface) object.
 
 Build a projector that snaps points onto the triangulation of `p_MNEBemSurf`.
 
 **Parameters:**
 
-- **p_MNEBemSurf** : *const MNELIB::MNEBemSurface &*
-  The `MNEBemSurface` to which is to be projected.
+- **p_MNEBemSurf** : *const [MNEBemSurface](/docs/api/mne/mne-bem-surface) &*
+  The [`MNEBemSurface`](/docs/api/mne/mne-bem-surface) to which is to be projected.
 
 ---
 
 ### find_closest_on_surface(r, np, rTri, nearest, dist)
 
-Projects a set of points r on the FsSurface.
+Projects a set of points r on the [FsSurface](/docs/api/fs/fs-surface).
 
 Project a set of points onto the surface and return the nearest triangle and signed distance per point.
 

@@ -15,7 +15,7 @@ sidebar_position: 48
 class MNELIB::MNERawData
 ```
 
-Implements the `MNE` Raw Data (Replaces *mneRawData,mneRawDataRec; struct of MNE-C `mne_types.h`).
+Implements the [`MNE`](/docs/api/mne/mne-class) Raw Data (Replaces *mneRawData,mneRawDataRec; struct of MNE-C `mne_types.h`).
 
 A comprehensive raw data structure
 
@@ -25,13 +25,13 @@ A comprehensive raw data structure
 
 ### MNERawData()
 
-Constructs the `MNE` Raw Data Refactored: new_raw_data (mne_raw_data.c).
+Constructs the [`MNE`](/docs/api/mne/mne-class) Raw Data Refactored: new_raw_data (mne_raw_data.c).
 
 ---
 
 ### ~MNERawData()
 
-Destroys the `MNE` Raw Data Refactored: mne_raw_free_data (mne_raw_data.c).
+Destroys the [`MNE`](/docs/api/mne/mne-class) Raw Data Refactored: mne_raw_free_data (mne_raw_data.c).
 
 ---
 
@@ -58,7 +58,7 @@ Read a single raw data buffer from the FIFF file into memory, allocating from th
 
 **Parameters:**
 
-- **buf** : *MNERawBufDef **
+- **buf** : *[MNERawBufDef](/docs/api/mne/mne-raw-buf-def) **
   The buffer definition to load.
 
 **Returns:**
@@ -73,7 +73,7 @@ Apply CTF compensation to a loaded raw data buffer if its compensation status di
 
 **Parameters:**
 
-- **buf** : *MNERawBufDef **
+- **buf** : *[MNERawBufDef](/docs/api/mne/mne-raw-buf-def) **
   The buffer to compensate.
 
 **Returns:**
@@ -136,7 +136,7 @@ Load a single filter-sized buffer by picking projected unfiltered data with tape
 
 **Parameters:**
 
-- **buf** : *MNERawBufDef **
+- **buf** : *[MNERawBufDef](/docs/api/mne/mne-raw-buf-def) **
   The filter buffer definition to load.
 
 **Returns:**
@@ -175,7 +175,7 @@ Pick filtered data for a channel selection by loading filter buffers, applying t
 
 Open a raw FIFF file with explicit compensation grade.
 
-Reads channel info, compensation data, SSS data, sets up data/filter buffers and bad channels, and returns a fully initialized raw data object.
+Reads channel info, compensation data, [SSS](/docs/api/dsp/sss) data, sets up data/filter buffers and bad channels, and returns a fully initialized raw data object.
 
 **Parameters:**
 
@@ -188,7 +188,7 @@ Reads channel info, compensation data, SSS data, sets up data/filter buffers and
 - **allow_maxshield** : *int*
   If non-zero, allow MaxShield data.
 
-- **filter** : *const MNEFilterDef &*
+- **filter** : *const [MNEFilterDef](/docs/api/mne/mne-filter-def) &*
   Filter definition to apply.
 
 - **comp_set** : *int*
@@ -196,7 +196,7 @@ Reads channel info, compensation data, SSS data, sets up data/filter buffers and
 
 **Returns:**
 
-- *MNERawData ** — A new raw data object, or NULL on failure. Caller takes ownership.
+- *[MNERawData](/docs/api/mne/mne-raw-data) ** — A new raw data object, or NULL on failure. Caller takes ownership.
 
 ---
 
@@ -217,12 +217,12 @@ Convenience wrapper for `open_file_comp()` with comp_set = -1.
 - **allow_maxshield** : *int*
   If non-zero, allow MaxShield data.
 
-- **filter** : *const MNEFilterDef &*
+- **filter** : *const [MNEFilterDef](/docs/api/mne/mne-filter-def) &*
   Filter definition to apply.
 
 **Returns:**
 
-- *MNERawData ** — A new raw data object, or NULL on failure. Caller takes ownership.
+- *[MNERawData](/docs/api/mne/mne-raw-data) ** — A new raw data object, or NULL on failure. Caller takes ownership.
 
 ---
 

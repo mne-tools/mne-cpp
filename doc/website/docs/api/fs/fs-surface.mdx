@@ -21,7 +21,7 @@ class FSLIB::FsSurface
 
 In-memory FreeSurfer triangular cortical surface for one hemisphere.
 
-Owns the vertex coordinate matrix (n_vertices × 3, Tk-surface RAS mm), the triangle index matrix (n_faces × 3, zero-based into the vertex array) and the hemisphere id (0 = `lh`, 1 = `rh`). Construction is purely an I/O operation: each constructor either takes a direct path to a `lh.pial` / `rh.white` / `lh.inflated` style binary surface file, or the `subject_id` / `hemi` / `surf` shorthand resolved against `$SUBJECTS_DIR`. The instance is intended to be paired with an `FsAnnotation` or `FsLabel` sharing the same vertex indexing.
+Owns the vertex coordinate matrix (n_vertices × 3, Tk-surface RAS mm), the triangle index matrix (n_faces × 3, zero-based into the vertex array) and the hemisphere id (0 = `lh`, 1 = `rh`). Construction is purely an I/O operation: each constructor either takes a direct path to a `lh.pial` / `rh.white` / `lh.inflated` style binary surface file, or the `subject_id` / `hemi` / `surf` shorthand resolved against `$SUBJECTS_DIR`. The instance is intended to be paired with an [`FsAnnotation`](/docs/api/fs/fs-annotation) or [`FsLabel`](/docs/api/fs/fs-label) sharing the same vertex indexing.
 
 ---
 
@@ -40,7 +40,7 @@ Construts the surface by reading it of the given file.
 **Parameters:**
 
 - **p_sFile** : *const QString &*
-  `FsSurface` file name with path.
+  [`FsSurface`](/docs/api/fs/fs-surface) file name with path.
 
 ---
 
@@ -87,13 +87,13 @@ Construts the surface by reading it of the given file.
 
 ### ~FsSurface()
 
-Destroys the `FsSurface` class.
+Destroys the [`FsSurface`](/docs/api/fs/fs-surface) class.
 
 ---
 
 ### clear()
 
-Initializes the `FsSurface`.
+Initializes the [`FsSurface`](/docs/api/fs/fs-surface).
 
 ---
 
@@ -109,7 +109,7 @@ Returns the hemisphere id (0 = lh; 1 = rh).
 
 ### isEmpty()
 
-Returns whether `FsSurface` is empty.
+Returns whether [`FsSurface`](/docs/api/fs/fs-surface) is empty.
 
 **Returns:**
 
@@ -231,7 +231,7 @@ Reads a FreeSurfer surface file
 - **subjects_dir** : *const QString &*
   Subjects directory.
 
-- **p_Surface** : *FsSurface &*
+- **p_Surface** : *[FsSurface](/docs/api/fs/fs-surface) &*
   The read surface.
 
 - **p_bLoadCurvature** : *bool*
@@ -260,7 +260,7 @@ Reads a FreeSurfer surface file
 - **surf** : *const QString &*
   Name of the surface to load (eg. inflated, orig ...).
 
-- **p_Surface** : *FsSurface &*
+- **p_Surface** : *[FsSurface](/docs/api/fs/fs-surface) &*
   The read surface.
 
 - **p_bLoadCurvature** : *bool*
@@ -283,7 +283,7 @@ Reads a FreeSurfer surface file
 - **p_sFileName** : *const QString &*
   The file to read.
 
-- **p_Surface** : *FsSurface &*
+- **p_Surface** : *[FsSurface](/docs/api/fs/fs-surface) &*
   The read surface.
 
 - **p_bLoadCurvature** : *bool*

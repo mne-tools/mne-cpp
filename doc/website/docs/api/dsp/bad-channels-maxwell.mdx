@@ -23,7 +23,7 @@ class; the functions live directly in the library namespace.
 
 SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
-Channels whose SSS reconstruction error is anomalously high are flagged as bad. This mirrors MNE-Python's mne.preprocessing.find_bad_channels_maxwell().
+Channels whose [SSS](/docs/api/dsp/sss) reconstruction error is anomalously high are flagged as bad. This mirrors MNE-Python's mne.preprocessing.find_bad_channels_maxwell().
 
 Reference: Taulu, S., Kajola, M. (2005). J. Appl. Phys. 97, 124905.
 
@@ -34,19 +34,19 @@ Reference: Taulu, S., Kajola, M. (2005). J. Appl. Phys. 97, 124905.
 ### findBadChannelsMaxwell(matData, info, params)
 
 ```cpp
-BadChannelsMaxwellResult findBadChannelsMaxwell(const Eigen::MatrixXd & matData, const FIFFLIB::FiffInfo & info, const BadChannelsMaxwellParams & params);
+BadChannelsMaxwellResult findBadChannelsMaxwell(const Eigen::MatrixXd & matData, const [FiffInfo](/docs/api/fiff/fiff-info) & info, const BadChannelsMaxwellParams & params);
 ```
 
-Detect bad MEG channels using SSS reconstruction residuals.
+Detect bad MEG channels using [SSS](/docs/api/dsp/sss) reconstruction residuals.
 
-Computes the SSS reconstruction of the data, then flags channels whose residual (difference between original and reconstructed) is anomalously large relative to the population of channels.
+Computes the [SSS](/docs/api/dsp/sss) reconstruction of the data, then flags channels whose residual (difference between original and reconstructed) is anomalously large relative to the population of channels.
 
 **Parameters:**
 
 - **matData** : *const Eigen::MatrixXd &*
   MEG data (n_channels x n_times). Should include all channels (MEG and non-MEG).
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info with channel positions.
 
 - **params** : *const BadChannelsMaxwellParams &*

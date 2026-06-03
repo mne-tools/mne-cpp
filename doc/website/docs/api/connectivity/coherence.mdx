@@ -21,9 +21,17 @@ class CONNECTIVITYLIB::Coherence
 
 Computes magnitude-squared coherence between every pair of channels.
 
-The actual cross-spectral and auto-spectral accumulation is shared with `Coherency`; this class only wraps the absolute-value branch and exposes a single `calculate` entry point that returns a `Network` whose edge weights are the band-averaged |coherency|^2 values in [0, 1].
+The actual cross-spectral and auto-spectral accumulation is shared with [`Coherency`](/docs/api/connectivity/coherency); this class only wraps the absolute-value branch and exposes a single `calculate` entry point that returns a [`Network`](/docs/api/connectivity/network) whose edge weights are the band-averaged |coherency|^2 values in [0, 1].
 
 Magnitude-squared coherence estimator (symmetric, sensitive to zero-lag coupling).
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractMetric <|-- Coherence
+    click AbstractMetric "/docs/api/connectivity/abstract-metric"
+```
 
 ---
 
@@ -31,7 +39,7 @@ Magnitude-squared coherence estimator (symmetric, sensitive to zero-lag coupling
 
 ### Coherence()
 
-Constructs a `Coherence` object.
+Constructs a [`Coherence`](/docs/api/connectivity/coherence) object.
 
 ---
 
@@ -43,12 +51,12 @@ Calculates the coherence between the rows of the data matrix.
 
 **Parameters:**
 
-- **connectivitySettings** : *ConnectivitySettings &*
+- **connectivitySettings** : *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings) &*
   The input data and parameters.
 
 **Returns:**
 
-- *Network* — The connectivity information in form of a network structure.
+- *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
 

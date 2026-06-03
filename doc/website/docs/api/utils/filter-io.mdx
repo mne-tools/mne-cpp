@@ -25,7 +25,7 @@ Processes txt files which hold filter coefficients.
 
 ### FilterIO()
 
-Constructs a `FilterIO` object.
+Constructs a [`FilterIO`](/docs/api/utils/filter-io) object.
 
 ---
 
@@ -42,7 +42,7 @@ Pls see sample file for file syntax.
 - **path** : *QString*
   holds the file path of the txt file which is to be read.
 
-- **filter** : *FilterKernel &*
+- **filter** : *[FilterKernel](/docs/api/dsp/filter-kernel) &*
   holds the filter which the read parameters are to be saved to.
 
 **Returns:**
@@ -60,7 +60,7 @@ Writes a given filter to txt file .
 - **path** : *const QString &*
   holds the file path of the txt file which is to be written to.
 
-- **filter** : *const FilterKernel &*
+- **filter** : *const [FilterKernel](/docs/api/dsp/filter-kernel) &*
   holds the filter which is to be written to file.
 
 **Returns:**

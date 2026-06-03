@@ -19,13 +19,21 @@ Mutually-exclusive checkbox list picking the active MEG gradient compensation gr
 
 One checkbox per compensation matrix advertised in the active `FiffInfo`; toggling emits `compSelectionChanged` with the new grade so the live pipeline can (un)apply the matrix.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- CompensatorView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
 
 ### CompensatorView(sSettingsPath, parent, f)
 
-Constructs a `CompensatorView` which is a child of parent.
+Constructs a [`CompensatorView`](/docs/api/disp/compensator-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `CompensatorView` which is a child of parent.
 
 ### ~CompensatorView()
 
-Destroys the `CompensatorView`.
+Destroys the [`CompensatorView`](/docs/api/disp/compensator-view).
 
 ---
 
@@ -46,7 +54,7 @@ Get the current compensators.
 
 **Returns:**
 
-- *QList&lt; FIFFLIB::FiffCtfComp &gt;* — The current compensators.
+- *QList&lt; [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) &gt;* — The current compensators.
 
 ---
 
@@ -66,7 +74,7 @@ Set the current compensators.
 
 **Parameters:**
 
-- **comps** : *const QList&lt; FIFFLIB::FiffCtfComp &gt; &*
+- **comps** : *const QList&lt; [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) &gt; &*
   The new compensators.
 
 ---

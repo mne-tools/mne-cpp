@@ -19,6 +19,14 @@ False-colour heat-map QWidget visualising an Eigen matrix with selectable colour
 
 Accepts `MatrixXd`, `MatrixXf` and `MatrixXi` inputs; ``init()`` rebuilds the cached `QImage` from the current matrix and the active colour map, and ``updateData()`` / ``paintEvent()`` keep the rendering in sync with the data.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    Graph <|-- ImageSc
+    click Graph "/docs/api/disp/graph"
+```
+
 ---
 
 ## Public Methods
@@ -78,13 +86,13 @@ Creates the scaled image view with a given integer matrix.
 
 ### ~ImageSc()
 
-Destructs the `ImageSc` object.
+Destructs the [`ImageSc`](/docs/api/disp/image-sc) object.
 
 ---
 
 ### init()
 
-Initializes the `ImageSc` object.
+Initializes the [`ImageSc`](/docs/api/disp/image-sc) object.
 
 ---
 

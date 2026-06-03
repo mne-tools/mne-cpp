@@ -27,11 +27,11 @@ class UTILSLIB::SSS
 
 Build the SSS spherical-harmonic basis from MEG sensor geometry.
 
-Only channels with kind == FIFFV_MEG_CH or FIFFV_REF_MEG_CH are used. Sensor positions and normals are taken from FiffChInfo::chpos (coil-centre single-point model).
+Only channels with kind == FIFFV_MEG_CH or FIFFV_REF_MEG_CH are used. Sensor positions and normals are taken from [FiffChInfo](/docs/api/fiff/fiff-ch-info)::chpos (coil-centre single-point model).
 
 **Parameters:**
 
-- **fiffInfo** : *const FIFFLIB::FiffInfo &*
+- **fiffInfo** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info containing channel positions.
 
 - **params** : *const Params &*

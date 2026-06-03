@@ -17,7 +17,15 @@ class DISPLIB::SpectrumView
 
 Per-channel frequency-spectrum heat-map QTableView (rows = channels, columns = freq bins).
 
-Wraps a `QTableView` around a `FrequencySpectrumModel` and paints each row with `FrequencySpectrumDelegate` so the live FFT amplitudes appear as a rolling colour band per channel.
+Wraps a `QTableView` around a [`FrequencySpectrumModel`](/docs/api/disp/frequency-spectrum-model) and paints each row with [`FrequencySpectrumDelegate`](/docs/api/disp/frequency-spectrum-delegate) so the live FFT amplitudes appear as a rolling colour band per channel.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- SpectrumView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Wraps a `QTableView` around a `FrequencySpectrumModel` and paints each row with 
 
 ### SpectrumView(sSettingsPath, parent, f)
 
-Constructs a `SpectrumView` which is a child of parent.
+Constructs a [`SpectrumView`](/docs/api/disp/spectrum-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,17 +44,17 @@ Constructs a `SpectrumView` which is a child of parent.
 
 ### ~SpectrumView()
 
-Destroys the `ArtifactSettingsView`.
+Destroys the [`ArtifactSettingsView`](/docs/api/disp/artifact-settings-view).
 
 ---
 
 ### init(info, iScaleType)
 
-Initializes the view based on the FiffInfo and scale type.
+Initializes the view based on the [FiffInfo](/docs/api/fiff/fiff-info) and scale type.
 
 **Parameters:**
 
-- **info** : *QSharedPointer&lt;FIFFLIB::FiffInfo&gt; &*
+- **info** : *QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt; &*
   The FiffInfo.
 
 - **iScaleType** : *int*

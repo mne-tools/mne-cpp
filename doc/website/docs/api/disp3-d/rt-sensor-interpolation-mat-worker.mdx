@@ -15,7 +15,7 @@ sidebar_position: 6
 class DISP3DLIB::RtSensorInterpolationMatWorker
 ```
 
-`RtSensorInterpolationMatWorker` computes dense sensor-to-surface field-mapping matrices in a background thread.
+[`RtSensorInterpolationMatWorker`](/docs/api/disp3-d/rt-sensor-interpolation-mat-worker) computes dense sensor-to-surface field-mapping matrices in a background thread.
 
 This worker encapsulates the expensive `FieldMap::computeMegMapping()` and computeEegMapping() calls that were previously performed synchronously on the main thread inside BrainView::buildSensorFieldMapping().
 
@@ -24,6 +24,13 @@ The worker stores all relevant parameters (evoked info, surface geometry, transf
 Thread-safety: all public setters are mutex-protected and schedule a recomputation via the `computeMapping()` slot.
 
 Background worker for computing sensor field mapping matrices.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- RtSensorInterpolationMatWorker
+```
 
 ---
 
@@ -46,7 +53,7 @@ Set the evoked data that contains channel info and sensor definitions.
 
 **Parameters:**
 
-- **evoked** : *const FIFFLIB::FiffEvoked &*
+- **evoked** : *const [FiffEvoked](/docs/api/fiff/fiff-evoked) &*
   The evoked dataset.
 
 ---
@@ -57,7 +64,7 @@ Set the head-to-MRI coordinate transform.
 
 **Parameters:**
 
-- **trans** : *const FIFFLIB::FiffCoordTrans &*
+- **trans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The transform.
 
 - **applySensorTrans** : *bool*

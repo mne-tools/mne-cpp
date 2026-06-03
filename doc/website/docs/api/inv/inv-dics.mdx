@@ -46,10 +46,10 @@ Compute DICS beamformer spatial filters for one or more frequencies.
 
 **Parameters:**
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info.
 
-- **forward** : *const MNELIB::MNEForwardSolution &*
+- **forward** : *const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) &*
   Forward solution containing the leadfield.
 
 - **csdMatrices** : *const std::vector&lt; Eigen::MatrixXd &gt; &*
@@ -64,7 +64,7 @@ Compute DICS beamformer spatial filters for one or more frequencies.
 - **realFilter** : *bool*
   If true, take real part of CSD before computing filter (default true).
 
-- **noiseCov** : *const FIFFLIB::FiffCov &*
+- **noiseCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   Noise covariance for whitening. If empty, identity whitening.
 
 - **pickOri** : *BeamformerPickOri*
@@ -104,7 +104,7 @@ power_i(f) = trace(W_f_i @ CSD_f @ W_f_i^T)
 
 **Returns:**
 
-- *InvSourceEstimate* — Source estimate where data has shape (n_sources, n_freqs) with power values.
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Source estimate where data has shape (n_sources, n_freqs) with power values.
 
 ---
 
@@ -133,7 +133,7 @@ This is an approximate application — for accurate frequency-domain source esti
 
 **Returns:**
 
-- *InvSourceEstimate* — Source time-course estimate.
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Source time-course estimate.
 
 ---
 
@@ -160,7 +160,7 @@ Apply DICS beamformer to each epoch in a list.
 
 **Returns:**
 
-- *QList&lt; InvSourceEstimate &gt;* — List of source estimates, one per epoch.
+- *QList&lt; [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &gt;* — List of source estimates, one per epoch.
 
 ---
 

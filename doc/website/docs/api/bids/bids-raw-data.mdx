@@ -21,14 +21,14 @@ class BIDSLIB::BidsRawData
 
 Central container for a BIDS raw dataset, bundling electrophysiological data with all associated sidecar metadata.
 
-`BidsRawData` is the primary data object of the BIDS library, analogous to FiffRawData for the FIFF library. It owns both the data and the I/O logic:
+[`BidsRawData`](/docs/api/bids/bids-raw-data) is the primary data object of the BIDS library, analogous to [FiffRawData](/docs/api/fiff/fiff-raw-data) for the FIFF library. It owns both the data and the I/O logic:
 
 **`read()`** — static factory that loads a BIDS dataset from disk.
 
 
 **`write()`** — member that writes the current dataset to a BIDS directory.
 
-Sidecar and coordinate-system fields that are derivable from FiffInfo (sampling frequency, channel counts) are computed on write and applied to FiffInfo on read. Only fields carrying independent information are stored as explicit members.
+Sidecar and coordinate-system fields that are derivable from [FiffInfo](/docs/api/fiff/fiff-info) (sampling frequency, channel counts) are computed on write and applied to [FiffInfo](/docs/api/fiff/fiff-info) on read. Only fields carrying independent information are stored as explicit members.
 
 Example: 
 ```cpp
@@ -52,7 +52,7 @@ if(data.isValid()) {
 
 Default constructor.
 
-Creates an empty, invalid `BidsRawData`.
+Creates an empty, invalid [`BidsRawData`](/docs/api/bids/bids-raw-data).
 
 ---
 
@@ -105,8 +105,8 @@ dataset_description.json
 
 **Parameters:**
 
-- **bidsPath** : *const BIDSPath &*
-  Target `BIDSPath` (root, subject, task, datatype, suffix, extension).
+- **bidsPath** : *const [BIDSPath](/docs/api/bids/bids-path) &*
+  Target [`BIDSPath`](/docs/api/bids/bids-path) (root, subject, task, datatype, suffix, extension).
 
 - **sourcePath** : *const QString &*
   Path to the original raw data file to copy. If empty, the raw data file is not copied.
@@ -116,7 +116,7 @@ dataset_description.json
 
 **Returns:**
 
-- *BIDSPath* — `BIDSPath` of the written data file, or empty `BIDSPath` on failure.
+- *[BIDSPath](/docs/api/bids/bids-path)* — [`BIDSPath`](/docs/api/bids/bids-path) of the written data file, or empty [`BIDSPath`](/docs/api/bids/bids-path) on failure.
 
 ---
 
@@ -165,16 +165,16 @@ Raw data file via the appropriate format reader (EDF, BrainVision, …)
 
 *_\{datatype\}.json → line frequency and recording metadata
 
-The `BIDSPath` must have at minimum: root, subject, datatype, suffix, extension.
+The [`BIDSPath`](/docs/api/bids/bids-path) must have at minimum: root, subject, datatype, suffix, extension.
 
 **Parameters:**
 
-- **bidsPath** : *const BIDSPath &*
-  Fully specified `BIDSPath` pointing to the raw data file.
+- **bidsPath** : *const [BIDSPath](/docs/api/bids/bids-path) &*
+  Fully specified [`BIDSPath`](/docs/api/bids/bids-path) pointing to the raw data file.
 
 **Returns:**
 
-- *BidsRawData* — Populated `BidsRawData`. Check `isValid()` to determine success.
+- *[BidsRawData](/docs/api/bids/bids-raw-data)* — Populated [`BidsRawData`](/docs/api/bids/bids-raw-data). Check `isValid()` to determine success.
 
 ---
 
@@ -189,7 +189,7 @@ Create the appropriate format reader for a given file extension.
 
 **Returns:**
 
-- *AbstractFormatReader::UPtr* — Shared pointer to the reader, or nullptr if unsupported.
+- *[AbstractFormatReader](/docs/api/bids/abstract-format-reader)::UPtr* — Shared pointer to the reader, or nullptr if unsupported.
 
 ---
 

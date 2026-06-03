@@ -19,6 +19,14 @@ Per-modality peak-to-peak artefact-rejection threshold panel.
 
 Builds one `QCheckBox` + `QDoubleSpinBox` row per supported channel modality and emits `changeArtifactThreshold(QMap)` when any threshold or activation flag changes.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- ArtifactSettingsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
@@ -29,7 +37,7 @@ Builds one `QCheckBox` + `QDoubleSpinBox` row per supported channel modality and
 
 ### ~ArtifactSettingsView()
 
-Destroys the `ArtifactSettingsView`.
+Destroys the [`ArtifactSettingsView`](/docs/api/disp/artifact-settings-view).
 
 ---
 

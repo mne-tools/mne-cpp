@@ -17,7 +17,7 @@ class FIFFLIB::FiffId
 
 128-bit FIFF identifier: hardware machine ID plus creation time, stamped on every file and block.
 
-On-disk layout is a 20-byte record (version + 2x4-byte machine ID + 8-byte `FiffTime`). The `machid` is filled from the host MAC address by ``FiffStream::write_id`` when generating new identifiers, matching the Neuromag acquisition stack so file lineage stays reconstructible.
+On-disk layout is a 20-byte record (version + 2x4-byte machine ID + 8-byte [`FiffTime`](/docs/api/fiff/fiff-time)). The `machid` is filled from the host MAC address by ``FiffStream::write_id`` when generating new identifiers, matching the Neuromag acquisition stack so file lineage stays reconstructible.
 
 ---
 
@@ -98,7 +98,7 @@ Constructs a (hopefully) unique file id.
 
 **Returns:**
 
-- *FiffId* — A new unique `FiffId`.
+- *[FiffId](/docs/api/fiff/fiff-id)* — A new unique [`FiffId`](/docs/api/fiff/fiff-id).
 
 ---
 
@@ -119,11 +119,11 @@ Returns the machine ID consisting of a two integer number.
 
 ### getDefault()
 
-Returns a default `FiffId` object to be used as a mutable placeholder for a default instance of the class.
+Returns a default [`FiffId`](/docs/api/fiff/fiff-id) object to be used as a mutable placeholder for a default instance of the class.
 
 **Returns:**
 
-- *FiffId &* — Reference to the default `FiffId` instance.
+- *[FiffId](/docs/api/fiff/fiff-id) &* — Reference to the default [`FiffId`](/docs/api/fiff/fiff-id) instance.
 
 ---
 

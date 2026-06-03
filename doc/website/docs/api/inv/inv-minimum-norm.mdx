@@ -44,7 +44,7 @@ Constructs minimum norm inverse algorithm.
 
 **Parameters:**
 
-- **p_inverseOperator** : *const MNELIB::MNEInverseOperator &*
+- **p_inverseOperator** : *const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*
   The inverse operator.
 
 - **lambda** : *float*
@@ -65,7 +65,7 @@ Constructs minimum norm inverse algorithm.
 
 **Parameters:**
 
-- **p_inverseOperator** : *const MNELIB::MNEInverseOperator &*
+- **p_inverseOperator** : *const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*
   The inverse operator.
 
 - **lambda** : *float*
@@ -93,7 +93,7 @@ Computes a L2-norm inverse solution Actual code using these principles might be 
 
 **Parameters:**
 
-- **p_fiffEvoked** : *const FIFFLIB::FiffEvoked &*
+- **p_fiffEvoked** : *const [FiffEvoked](/docs/api/fiff/fiff-evoked) &*
   Evoked data.
 
 - **pick_normal** : *bool*
@@ -101,7 +101,7 @@ Computes a L2-norm inverse solution Actual code using these principles might be 
 
 **Returns:**
 
-- *InvSourceEstimate* — the calculated source estimation.
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — the calculated source estimation.
 
 ---
 
@@ -139,7 +139,7 @@ Get the source space corresponding to this inverse operator.
 
 **Returns:**
 
-- *const MNELIB::MNESourceSpaces &* — the source space corresponding to this inverse operator.
+- *const [MNESourceSpaces](/docs/api/mne/mne-source-spaces) &* — the source space corresponding to this inverse operator.
 
 ---
 
@@ -149,13 +149,13 @@ Get the prepared inverse operator.
 
 **Returns:**
 
-- *MNELIB::MNEInverseOperator &* — the prepared inverse operator.
+- *[MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &* — the prepared inverse operator.
 
 ---
 
 ### setMethod(method)
 
-Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA" | "eLORETA").
+Set minimum norm algorithm method ("[MNE](/docs/api/mne/mne-class)" | "dSPM" | "sLORETA" | "eLORETA").
 
 **Parameters:**
 
@@ -166,7 +166,7 @@ Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA" | "eLORETA").
 
 ### setMethod(dSPM, sLORETA, eLoreta)
 
-Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA" | "eLORETA").
+Set minimum norm algorithm method ("[MNE](/docs/api/mne/mne-class)" | "dSPM" | "sLORETA" | "eLORETA").
 
 **Parameters:**
 

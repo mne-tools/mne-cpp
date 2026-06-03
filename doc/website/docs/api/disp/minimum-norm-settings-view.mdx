@@ -15,9 +15,17 @@ sidebar_position: 41
 class DISPLIB::MinimumNormSettingsView
 ```
 
-Inverse-method / regularisation panel (MNE, dSPM, sLORETA) for the on-line source estimator.
+Inverse-method / regularisation panel ([MNE](/docs/api/mne/mne-class), dSPM, sLORETA) for the on-line source estimator.
 
 Combo boxes pick the inverse method, spinboxes set the SNR lambda and the time-frame window; edits propagate via Qt signals to the `rtprocessing` inverse job.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- MinimumNormSettingsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Combo boxes pick the inverse method, spinboxes set the SNR lambda and the time-f
 
 ### MinimumNormSettingsView(sSettingsPath, sMethod, parent, f)
 
-Constructs a `MinimumNormSettingsView` which is a child of parent.
+Constructs a [`MinimumNormSettingsView`](/docs/api/disp/minimum-norm-settings-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,13 +44,13 @@ Constructs a `MinimumNormSettingsView` which is a child of parent.
 
 ### ~MinimumNormSettingsView()
 
-Destroys the `MinimumNormSettingsView`.
+Destroys the [`MinimumNormSettingsView`](/docs/api/disp/minimum-norm-settings-view).
 
 ---
 
 ### setTriggerTypes(lTriggerTypes)
 
-Destroys the `MinimumNormSettingsView`.
+Destroys the [`MinimumNormSettingsView`](/docs/api/disp/minimum-norm-settings-view).
 
 **Parameters:**
 

@@ -17,7 +17,14 @@ class DISPLIB::ScaleControl
 
 Composite slider + spinbox widget for picking a (possibly logarithmic) scale value.
 
-Supports linear and log10 mapping, configurable min / max and an optional inverted direction; building block of `ScalingView` and several other settings panels.
+Supports linear and log10 mapping, configurable min / max and an optional inverted direction; building block of [`ScalingView`](/docs/api/disp/scaling-view) and several other settings panels.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- ScaleControl
+```
 
 ---
 
@@ -25,7 +32,7 @@ Supports linear and log10 mapping, configurable min / max and an optional invert
 
 ### ScaleControl(label)
 
-Constructs a `ScaleControl` object who's Qlabel element will be set.
+Constructs a [`ScaleControl`](/docs/api/disp/scale-control) object who's Qlabel element will be set.
 
 **Parameters:**
 
@@ -36,7 +43,7 @@ Constructs a `ScaleControl` object who's Qlabel element will be set.
 
 ### ScaleControl(label, parent)
 
-Constructs a `ScaleControl` object who's Qlabel element will be set, and sets the parent of the underlying QWidget.
+Constructs a [`ScaleControl`](/docs/api/disp/scale-control) object who's Qlabel element will be set, and sets the parent of the underlying QWidget.
 
 **Parameters:**
 
@@ -50,7 +57,7 @@ Constructs a `ScaleControl` object who's Qlabel element will be set, and sets th
 
 ### ScaleControl(label, parent, min, max)
 
-Constructs a `ScaleControl` object who's Qlabel element will be set, and sets the parent of the underlying QWidget.
+Constructs a [`ScaleControl`](/docs/api/disp/scale-control) object who's Qlabel element will be set, and sets the parent of the underlying QWidget.
 
 The min and max values for the control will also be initialized.
 
@@ -72,7 +79,7 @@ The min and max values for the control will also be initialized.
 
 ### getUI()
 
-getUI Return a pointer to the GUI of the `ScaleControl`.
+getUI Return a pointer to the GUI of the [`ScaleControl`](/docs/api/disp/scale-control).
 
 **Returns:**
 

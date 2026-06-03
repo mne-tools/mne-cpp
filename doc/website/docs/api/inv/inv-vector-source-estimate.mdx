@@ -23,6 +23,14 @@ Vector source estimate: each vertex carries a 3D orientation vector across time.
 
 data has shape (n_vertices*3 x n_times). Rows are interleaved: [x0,y0,z0, x1,y1,z1, ...]. Use `magnitude()` to collapse to scalar (n_vertices x n_times) for visualisation.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    InvSourceEstimate <|-- InvVectorSourceEstimate
+    click InvSourceEstimate "/docs/api/inv/inv-source-estimate"
+```
+
 ---
 
 ## Public Methods
@@ -63,7 +71,7 @@ Compute the magnitude (L2 norm) at each vertex across time.
 
 **Returns:**
 
-- *InvSourceEstimate* — Scalar source estimate (n_vertices x n_times).
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Scalar source estimate (n_vertices x n_times).
 
 ---
 
@@ -93,7 +101,7 @@ Project the 3D vectors onto surface normals to produce a signed scalar estimate.
 
 **Returns:**
 
-- *InvSourceEstimate* — Scalar source estimate (n_vertices x n_times).
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Scalar source estimate (n_vertices x n_times).
 
 ---
 

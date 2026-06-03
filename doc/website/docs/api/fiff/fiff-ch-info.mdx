@@ -17,7 +17,7 @@ class FIFFLIB::FiffChInfo
 
 Per-channel FIFF descriptor: identifiers, kind, calibration, coil type, channel-frame coil position and SI unit.
 
-Holds the exact field set of the on-disk `fiffChInfoRec:` `scanno`, `logno`, `kind`, `range`, `cal`, `coil_type`, the embedded `FiffChPos` coil location, `unit` and `unit_mul`. The `ch_name` string lives next to the record because the FIFF stream stores it as a separate `FIFF_CH_NAME` tag in modern files.
+Holds the exact field set of the on-disk `fiffChInfoRec:` `scanno`, `logno`, `kind`, `range`, `cal`, `coil_type`, the embedded [`FiffChPos`](/docs/api/fiff/fiff-ch-pos) coil location, `unit` and `unit_mul`. The `ch_name` string lives next to the record because the FIFF stream stores it as a separate `FIFF_CH_NAME` tag in modern files.
 
 ---
 
@@ -74,11 +74,11 @@ Size of the old struct (fiffChInfoRec) 20*int + 16 = 20*4 + 16 = 96.
 
 Check that all EEG channels in the list have reasonable (non-origin) locations.
 
-Formerly mne_check_chinfo (MNE C).
+Formerly mne_check_chinfo ([MNE](/docs/api/mne/mne-class) C).
 
 **Parameters:**
 
-- **chs** : *const QList&lt; FiffChInfo &gt; &*
+- **chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   The list of channel info structures to check.
 
 - **nch** : *int*

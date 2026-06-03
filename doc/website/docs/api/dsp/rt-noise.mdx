@@ -15,7 +15,14 @@ sidebar_position: 39
 class RTPROCESSINGLIB::RtNoise
 ```
 
-Controller that manages `RtNoiseWorker` for real-time noise spectrum estimation.
+Controller that manages [`RtNoiseWorker`](/docs/api/dsp/rt-noise-worker) for real-time noise spectrum estimation.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- RtNoise
+```
 
 ---
 
@@ -30,7 +37,7 @@ Creates the real-time noise estimation object.
 - **iFftLength** : *qint32*
   Number of samples per FFT window.
 
-- **pFiffInfo** : *FIFFLIB::FiffInfo::SPtr*
+- **pFiffInfo** : *[FIFFLIB::FiffInfo](/docs/api/fiff/fiff-info)::SPtr*
   Associated Fiff Information.
 
 - **iDataLength** : *qint32*

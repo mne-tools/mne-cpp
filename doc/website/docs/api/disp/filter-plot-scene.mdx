@@ -17,7 +17,15 @@ class DISPLIB::FilterPlotScene
 
 QGraphicsScene rendering the magnitude (and optional phase) response of a designed FIR / IIR filter.
 
-Used by `FilterDesignView` to preview the currently designed filter; re-renders itself every time the host view edits a kernel parameter.
+Used by [`FilterDesignView`](/docs/api/disp/filter-design-view) to preview the currently designed filter; re-renders itself every time the host view edits a kernel parameter.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    LayoutScene <|-- FilterPlotScene
+    click LayoutScene "/docs/api/disp/layout-scene"
+```
 
 ---
 
@@ -25,12 +33,12 @@ Used by `FilterDesignView` to preview the currently designed filter; re-renders 
 
 ### FilterPlotScene(view, parent)
 
-Constructs a `FilterPlotScene` dialog which is a child of parent.
+Constructs a [`FilterPlotScene`](/docs/api/disp/filter-plot-scene) dialog which is a child of parent.
 
 **Parameters:**
 
 - **parent** : *QObject **
-  pointer to parent widget; If parent is 0, the new `FilterPlotScene` becomes a window. If parent is another widget, `FilterPlotScene` becomes a child window inside parent. `FilterPlotScene` is deleted when its parent is deleted.
+  pointer to parent widget; If parent is 0, the new [`FilterPlotScene`](/docs/api/disp/filter-plot-scene) becomes a window. If parent is another widget, [`FilterPlotScene`](/docs/api/disp/filter-plot-scene) becomes a child window inside parent. [`FilterPlotScene`](/docs/api/disp/filter-plot-scene) is deleted when its parent is deleted.
 
 ---
 
@@ -40,7 +48,7 @@ Updates the current filter.
 
 **Parameters:**
 
-- **operatorFilter** : *const UTILSLIB::FilterKernel &*
+- **operatorFilter** : *const [FilterKernel](/docs/api/dsp/filter-kernel) &*
   pointer to the current filter operator which is to be plotted.
 
 - **samplingFreq** : *int*

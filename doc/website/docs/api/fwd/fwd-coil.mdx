@@ -15,7 +15,7 @@ sidebar_position: 7
 class FWDLIB::FwdCoil
 ```
 
-Implements `FwdCoil` (replaces `fwdCoil` / `fwdCoilRec` from MNE-C ``fwd_types.h``).
+Implements [`FwdCoil`](/docs/api/fwd/fwd-coil) (replaces `fwdCoil` / `fwdCoilRec` from MNE-C ``fwd_types.h``).
 
 Single MEG sensor coil or EEG electrode — stores the coil-local frame and the ``(r_mag, cos_mag, w) integration-point triples that approximate the Biot-Savart surface integral over the coil area.
 
@@ -36,7 +36,7 @@ Copy constructor.
 **Parameters:**
 
 - **p_FwdCoil** : *const FwdCoil &*
-  `FwdCoil` which should be copied.
+  [`FwdCoil`](/docs/api/fwd/fwd-coil) which should be copied.
 
 ---
 
@@ -108,10 +108,10 @@ Transform coordinate frame if so desired.
 
 **Parameters:**
 
-- **ch** : *const FIFFLIB::FiffChInfo &*
+- **ch** : *const [FiffChInfo](/docs/api/fiff/fiff-ch-info) &*
   Channel information to use.
 
-- **t** : *const FIFFLIB::FiffCoordTrans &*
+- **t** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   Transform the points using this.
 
 **Returns:**

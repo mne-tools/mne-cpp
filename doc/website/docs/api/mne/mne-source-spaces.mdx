@@ -17,7 +17,7 @@ class MNELIB::MNESourceSpaces
 
 Container pairing the left and right cortical source spaces (and optional discrete / volume source spaces) of a subject as written by `mne_setup_source_space`.
 
-List of `MNESourceSpace` objects forming a subject source space.
+List of [`MNESourceSpace`](/docs/api/mne/mne-source-space) objects forming a subject source space.
 
 ---
 
@@ -36,29 +36,29 @@ Copy constructor.
 **Parameters:**
 
 - **p_MNESourceSpaces** : *const MNESourceSpaces &*
-  `MNE` forward solution.
+  [`MNE`](/docs/api/mne/mne-class) forward solution.
 
 ---
 
 ### ~MNESourceSpaces()
 
-Destroys the `MNE` forward solution.
+Destroys the [`MNE`](/docs/api/mne/mne-class) forward solution.
 
 ---
 
 ### clear()
 
-Initializes `MNE` source space.
+Initializes [`MNE`](/docs/api/mne/mne-class) source space.
 
 ---
 
 ### isEmpty()
 
-True if `MNE` Source Space is empty.
+True if [`MNE`](/docs/api/mne/mne-class) Source Space is empty.
 
 **Returns:**
 
-- *bool* — true if `MNE` Source Space is empty.
+- *bool* — true if [`MNE`](/docs/api/mne/mne-class) Source Space is empty.
 
 ---
 
@@ -96,12 +96,12 @@ Reduces a source space to selected regions.
 
 **Parameters:**
 
-- **p_qListLabels** : *const QList&lt; FSLIB::FsLabel &gt; &*
+- **p_qListLabels** : *const QList&lt; [FsLabel](/docs/api/fs/fs-label) &gt; &*
   ROIs.
 
 **Returns:**
 
-- *MNESourceSpaces* — the reduced source space.
+- *[MNESourceSpaces](/docs/api/mne/mne-source-spaces)* — the reduced source space.
 
 ---
 
@@ -122,7 +122,7 @@ Returns the number of stored hemispheres 0, 1 or 2.
 - **dest** : *FIFFLIB::fiff_int_t*
   destination check code.
 
-- **trans** : *FIFFLIB::FiffCoordTrans &*
+- **trans** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   transformation information.
 
 **Returns:**
@@ -135,7 +135,7 @@ Returns the number of stored hemispheres 0, 1 or 2.
 
 **Parameters:**
 
-- **p_pStream** : *FIFFLIB::FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   The stream to write to.
 
 ---
@@ -146,7 +146,7 @@ Appends a deep copy of the given source space.
 
 **Parameters:**
 
-- **space** : *const MNESourceSpace &*
+- **space** : *const [MNESourceSpace](/docs/api/mne/mne-source-space) &*
   The source space to append.
 
 ---
@@ -162,7 +162,7 @@ Subscript operator [] to access source spaces by index.
 
 **Returns:**
 
-- *MNESourceSpace &* — Reference to the source space at the given index.
+- *[MNESourceSpace](/docs/api/mne/mne-source-space) &* — Reference to the source space at the given index.
 
 ---
 
@@ -177,7 +177,7 @@ Subscript operator [] to access source spaces by index.
 
 **Returns:**
 
-- *const MNESourceSpace &* — Const reference to the source space at the given index.
+- *const [MNESourceSpace](/docs/api/mne/mne-source-space) &* — Const reference to the source space at the given index.
 
 ---
 
@@ -192,7 +192,7 @@ Subscript operator [] to access source spaces by hemisphere identifier.
 
 **Returns:**
 
-- *MNESourceSpace &* — Reference to the source space for the given hemisphere.
+- *[MNESourceSpace](/docs/api/mne/mne-source-space) &* — Reference to the source space for the given hemisphere.
 
 ---
 
@@ -207,13 +207,13 @@ Subscript operator [] to access source spaces by hemisphere identifier.
 
 **Returns:**
 
-- *const MNESourceSpace &* — Const reference to the source space for the given hemisphere.
+- *const [MNESourceSpace](/docs/api/mne/mne-source-space) &* — Const reference to the source space for the given hemisphere.
 
 ---
 
 ### hemisphereAt(idx)
 
-Safe downcast to `MNEHemisphere` at the given index.
+Safe downcast to [`MNEHemisphere`](/docs/api/mne/mne-hemisphere) at the given index.
 
 **Parameters:**
 
@@ -222,13 +222,13 @@ Safe downcast to `MNEHemisphere` at the given index.
 
 **Returns:**
 
-- *MNEHemisphere ** — Pointer to `MNEHemisphere`, or nullptr if the element is not a hemisphere.
+- *[MNEHemisphere](/docs/api/mne/mne-hemisphere) ** — Pointer to [`MNEHemisphere`](/docs/api/mne/mne-hemisphere), or nullptr if the element is not a hemisphere.
 
 ---
 
 ### hemisphereAt(idx)
 
-Safe downcast to `MNEHemisphere` at the given index (const).
+Safe downcast to [`MNEHemisphere`](/docs/api/mne/mne-hemisphere) at the given index (const).
 
 **Parameters:**
 
@@ -237,7 +237,7 @@ Safe downcast to `MNEHemisphere` at the given index (const).
 
 **Returns:**
 
-- *const MNEHemisphere ** — Const pointer to `MNEHemisphere`, or nullptr if the element is not a hemisphere.
+- *const [MNEHemisphere](/docs/api/mne/mne-hemisphere) ** — Const pointer to [`MNEHemisphere`](/docs/api/mne/mne-hemisphere), or nullptr if the element is not a hemisphere.
 
 ---
 
@@ -252,7 +252,7 @@ Access the underlying shared_ptr at the given index.
 
 **Returns:**
 
-- *std::shared_ptr&lt; MNESourceSpace &gt; &* — shared_ptr to the `MNESourceSpace`.
+- *std::shared_ptr&lt; [MNESourceSpace](/docs/api/mne/mne-source-space) &gt; &* — shared_ptr to the [`MNESourceSpace`](/docs/api/mne/mne-source-space).
 
 ---
 
@@ -267,7 +267,7 @@ Access the underlying shared_ptr at the given index (const).
 
 **Returns:**
 
-- *const std::shared_ptr&lt; MNESourceSpace &gt; &* — const shared_ptr to the `MNESourceSpace`.
+- *const std::shared_ptr&lt; [MNESourceSpace](/docs/api/mne/mne-source-space) &gt; &* — const shared_ptr to the [`MNESourceSpace`](/docs/api/mne/mne-source-space).
 
 ---
 
@@ -290,7 +290,7 @@ Access the underlying shared_ptr at the given index (const).
 
 **Parameters:**
 
-- **p_Hemisphere** : *MNEHemisphere &*
+- **p_Hemisphere** : *[MNEHemisphere](/docs/api/mne/mne-hemisphere) &*
   The source space.
 
 **Returns:**
@@ -303,13 +303,13 @@ Access the underlying shared_ptr at the given index (const).
 
 **Parameters:**
 
-- **p_pStream** : *FIFFLIB::FiffStream::SPtr &*
+- **p_pStream** : *[FIFFLIB::FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   The opened fif file.
 
 - **add_geom** : *bool*
   Add geometry information to the source spaces.
 
-- **p_SourceSpace** : *MNESourceSpaces &*
+- **p_SourceSpace** : *[MNESourceSpaces](/docs/api/mne/mne-source-spaces) &*
   The read source spaces.
 
 **Returns:**

@@ -21,7 +21,7 @@ class FIFFLIB::FiffEvoked
 
 Single averaged evoked response: time axis, data, baseline, channel info and averaging metadata.
 
-Holds one `FIFFB_EVOKED` block: `times`, `data`, `first` / `last` sample indices, `baseline`, `kind`, `nave`, `comment` and the `FiffInfo` describing the channels. Use `FiffEvokedSet` for recordings that contain multiple averaging conditions.
+Holds one `FIFFB_EVOKED` block: `times`, `data`, `first` / `last` sample indices, `baseline`, `kind`, `nave`, `comment` and the [`FiffInfo`](/docs/api/fiff/fiff-info) describing the channels. Use `FiffEvokedSet` for recordings that contain multiple averaging conditions.
 
 ---
 
@@ -63,13 +63,13 @@ Copy constructor.
 **Parameters:**
 
 - **p_FiffEvoked** : *const FiffEvoked &*
-  `Fiff` evoked data which should be copied.
+  [`Fiff`](/docs/api/fiff/fiff-class) evoked data which should be copied.
 
 ---
 
 ### ~FiffEvoked()
 
-Destroys the `FiffEvoked`.
+Destroys the [`FiffEvoked`](/docs/api/fiff/fiff-evoked).
 
 ---
 
@@ -101,7 +101,7 @@ Provides the python Evoked string formatted aspect_kind, which is stored in kind
 
 ### isEmpty()
 
-Returns whether `FiffEvoked` is empty.
+Returns whether [`FiffEvoked`](/docs/api/fiff/fiff-evoked) is empty.
 
 **Returns:**
 
@@ -125,7 +125,7 @@ Pick desired channels from evoked-response data
 
 **Returns:**
 
-- *FiffEvoked* — the desired fiff evoked data.
+- *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — the desired fiff evoked data.
 
 ---
 
@@ -135,7 +135,7 @@ Set a new fiff measurement info.
 
 **Parameters:**
 
-- **p_info** : *const FiffInfo &*
+- **p_info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Info to set.
 
 - **proj** : *bool*
@@ -156,7 +156,7 @@ This function also iterates the nave parameter by one.
 
 **Returns:**
 
-- *FiffEvoked &* — the updated `FiffEvoked`.
+- *[FiffEvoked](/docs/api/fiff/fiff-evoked) &* — the updated [`FiffEvoked`](/docs/api/fiff/fiff-evoked).
 
 ---
 
@@ -186,7 +186,7 @@ Read one evoked data set
 - **p_IODevice** : *QIODevice &*
   An fiff IO device like a fiff QFile or QTCPSocket.
 
-- **p_FiffEvoked** : *FiffEvoked &*
+- **p_FiffEvoked** : *[FiffEvoked](/docs/api/fiff/fiff-evoked) &*
   The read evoked data.
 
 - **setno** : *QVariant*

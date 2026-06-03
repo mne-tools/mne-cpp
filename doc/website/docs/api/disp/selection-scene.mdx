@@ -15,9 +15,17 @@ sidebar_position: 57
 class DISPLIB::SelectionScene
 ```
 
-QGraphicsScene of sensor-layout dots used by `ChannelSelectionView` for interactive channel picking.
+QGraphicsScene of sensor-layout dots used by [`ChannelSelectionView`](/docs/api/disp/channel-selection-view) for interactive channel picking.
 
-Places one `SelectionSceneItem` per sensor, supports rubber-band selection and lasso grouping, and emits the resulting channel-name lists so the host view can store them as named ``.sel groups.
+Places one [`SelectionSceneItem`](/docs/api/disp/selection-scene-item) per sensor, supports rubber-band selection and lasso grouping, and emits the resulting channel-name lists so the host view can store them as named ``.sel groups.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    LayoutScene <|-- SelectionScene
+    click LayoutScene "/docs/api/disp/layout-scene"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Places one `SelectionSceneItem` per sensor, supports rubber-band selection and l
 
 ### SelectionScene(view, parent)
 
-Constructs a `SelectionScene`.
+Constructs a [`SelectionScene`](/docs/api/disp/selection-scene).
 
 ---
 

@@ -15,9 +15,16 @@ sidebar_position: 44
 class DISPLIB::MultiViewWindow
 ```
 
-QDockWidget wrapper used as the building block of `MultiView` layouts.
+QDockWidget wrapper used as the building block of [`MultiView`](/docs/api/disp/multi-view) layouts.
 
-Stores the wrapped widget plus a stable name / floating flag so `MultiView` can re-arrange, retab and persist the dock layout consistently.
+Stores the wrapped widget plus a stable name / floating flag so [`MultiView`](/docs/api/disp/multi-view) can re-arrange, retab and persist the dock layout consistently.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QDockWidget <|-- MultiViewWindow
+```
 
 ---
 
@@ -25,13 +32,13 @@ Stores the wrapped widget plus a stable name / floating flag so `MultiView` can 
 
 ### MultiViewWindow(parent, flags)
 
-Constructs an `MultiViewWindow`.
+Constructs an [`MultiViewWindow`](/docs/api/disp/multi-view-window).
 
 ---
 
 ### ~MultiViewWindow()
 
-Destructs an `MultiViewWindow`.
+Destructs an [`MultiViewWindow`](/docs/api/disp/multi-view-window).
 
 ---
 

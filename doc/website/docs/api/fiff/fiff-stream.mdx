@@ -21,7 +21,14 @@ class FIFFLIB::FiffStream
 
 FIFF tag-stream reader/writer: wraps a QIODevice and exposes typed read_* / write_* methods for every FIFF block and record kind.
 
-Reads or writes one `QIODevice`. Builds the FIFF directory and `FiffDirNode` block tree on `open` and exposes typed loaders / emitters for every structured record (id, channel info, coord trans, named matrix, dig point, projector, CTF comp, raw segment, evoked, covariance). The on-disk format is the Elekta/Neuromag FIFF specification — files emitted here round-trip through `mne.io.fiff` in MNE-Python without modification.
+Reads or writes one `QIODevice`. Builds the FIFF directory and [`FiffDirNode`](/docs/api/fiff/fiff-dir-node) block tree on `open` and exposes typed loaders / emitters for every structured record (id, channel info, coord trans, named matrix, dig point, projector, CTF comp, raw segment, evoked, covariance). The on-disk format is the Elekta/Neuromag FIFF specification — files emitted here round-trip through `mne.io.fiff` in MNE-Python without modification.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QDataStream <|-- FiffStream
+```
 
 ---
 
@@ -70,7 +77,7 @@ Returns the file identifier.
 
 **Returns:**
 
-- *FiffId* — The file identifier.
+- *[FiffId](/docs/api/fiff/fiff-id)* — The file identifier.
 
 ---
 
@@ -80,7 +87,7 @@ Returns the directory compiled into a tree dir is set when `open()` was called.
 
 **Returns:**
 
-- *QList&lt; FiffDirEntry::SPtr &gt; &* — the directory.
+- *QList&lt; [FiffDirEntry](/docs/api/fiff/fiff-dir-entry)::SPtr &gt; &* — the directory.
 
 ---
 
@@ -90,7 +97,7 @@ Returns the directory compiled into a tree dir is set when `open()` was called.
 
 **Returns:**
 
-- *const QList&lt; FiffDirEntry::SPtr &gt; &* — the directory.
+- *const QList&lt; [FiffDirEntry](/docs/api/fiff/fiff-dir-entry)::SPtr &gt; &* — the directory.
 
 ---
 
@@ -110,7 +117,7 @@ Returns the directory compiled into a tree tree is set when `open()` was called.
 
 **Returns:**
 
-- *const FiffDirNode::SPtr &* — the compiled directory.
+- *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &* — the compiled directory.
 
 ---
 
@@ -150,7 +157,7 @@ Helper to get all evoked entries.
 
 **Parameters:**
 
-- **evoked_node** : *const QList&lt; FiffDirNode::SPtr &gt; &*
+- **evoked_node** : *const QList&lt; [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &gt; &*
   evoked tree nodes.
 
 - **comments** : *QStringList &*
@@ -203,12 +210,12 @@ Create the directory tree structure.
 
 **Parameters:**
 
-- **dentry** : *QList&lt; FiffDirEntry::SPtr &gt; &*
+- **dentry** : *QList&lt; [FiffDirEntry](/docs/api/fiff/fiff-dir-entry)::SPtr &gt; &*
   The dir entries of which the tree should be constructed.
 
 **Returns:**
 
-- *FiffDirNode::SPtr* — The created dir tree.
+- *[FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr* — The created dir tree.
 
 ---
 
@@ -216,11 +223,11 @@ Create the directory tree structure.
 
 fiff_read_bad_channels
 
-Reads the bad channel list from a node if it exists Note: In difference to mne-matlab this is not a static function. This is a method of the `FiffDirNode` class, that's why a tree object doesn't need to be handed to the function.
+Reads the bad channel list from a node if it exists Note: In difference to mne-matlab this is not a static function. This is a method of the [`FiffDirNode`](/docs/api/fiff/fiff-dir-node) class, that's why a tree object doesn't need to be handed to the function.
 
 **Parameters:**
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The node of interest.
 
 **Returns:**
@@ -244,9 +251,9 @@ Write a bad channel list as a FIFFB_MNE_BAD_CHANNELS block.
 
 Attach environment metadata (working directory, command line) to this stream.
 
-Formerly mne_attach_env (SVN MNE).
+Formerly mne_attach_env (SVN [MNE](/docs/api/mne/mne-class)).
 
-The stream must already be opened for update (via open_update). Finds the first known top-level block (MNE, MEAS, MRI, or BEM) and inserts a FIFFB_MNE_ENV block with working directory and command-line string.
+The stream must already be opened for update (via open_update). Finds the first known top-level block ([MNE](/docs/api/mne/mne-class), MEAS, MRI, or BEM) and inserts a FIFFB_MNE_ENV block with working directory and command-line string.
 
 **Parameters:**
 
@@ -270,13 +277,13 @@ Reads a covariance matrix from a fiff file
 
 **Parameters:**
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   look for the matrix in here.
 
 - **cov_kind** : *fiff_int_t*
   what kind of a covariance matrix do we want?.
 
-- **p_covData** : *FiffCov &*
+- **p_covData** : *[FiffCov](/docs/api/fiff/fiff-cov) &*
   the read covariance matrix.
 
 **Returns:**
@@ -293,15 +300,15 @@ Read the CTF software compensation data from the given node
 
 **Parameters:**
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The node of interest.
 
-- **p_Chs** : *const QList&lt; FiffChInfo &gt; &*
+- **p_Chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   channels with the calibration info.
 
 **Returns:**
 
-- *QList&lt; FiffCtfComp &gt;* — the CTF software compensation data.
+- *QList&lt; [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) &gt;* — the CTF software compensation data.
 
 ---
 
@@ -313,10 +320,10 @@ Read the digitizer data from the given node.
 
 **Parameters:**
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The node of interest.
 
-- **p_digData** : *FiffDigitizerData &*
+- **p_digData** : *[FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) &*
   The read digitizer data.
 
 **Returns:**
@@ -333,13 +340,13 @@ Read the measurement info Source is assumed to be an open fiff file.
 
 **Parameters:**
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The node of interest.
 
-- **p_Info** : *FiffInfo &*
+- **p_Info** : *[FiffInfo](/docs/api/fiff/fiff-info) &*
   The read measurement info.
 
-- **p_NodeInfo** : *FiffDirNode::SPtr &*
+- **p_NodeInfo** : *[FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The to measurement corresponding fiff_dir_node.
 
 **Returns:**
@@ -356,10 +363,10 @@ Read light measurement info from forward operator.
 
 **Parameters:**
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The node of interest.
 
-- **p_InfoForward** : *FiffInfoBase &*
+- **p_InfoForward** : *[FiffInfoBase](/docs/api/fiff/fiff-info-base) &*
   The read light measurement info.
 
 **Returns:**
@@ -376,13 +383,13 @@ Reads a named matrix.
 
 **Parameters:**
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The node of interest.
 
 - **matkind** : *fiff_int_t*
   The matrix kind to look for.
 
-- **mat** : *FiffNamedMatrix &*
+- **mat** : *[FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) &*
   The named matrix.
 
 **Returns:**
@@ -397,12 +404,12 @@ Read the SSP data under a given directory node.
 
 **Parameters:**
 
-- **p_Node** : *const FiffDirNode::SPtr &*
+- **p_Node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The node of interest.
 
 **Returns:**
 
-- *QList&lt; FiffProj &gt;* — a list of SSP projectors.
+- *QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt;* — a list of SSP projectors.
 
 ---
 
@@ -414,7 +421,7 @@ if pos is not provided, reading starts from the current file position
 
 **Parameters:**
 
-- **p_pTag** : *std::unique_ptr&lt; FiffTag &gt; &*
+- **p_pTag** : *std::unique_ptr&lt; [FiffTag](/docs/api/fiff/fiff-tag) &gt; &*
   the read tag.
 
 - **pos** : *fiff_long_t*
@@ -434,7 +441,7 @@ if pos is not provided, reading starts from the current file position
 
 **Parameters:**
 
-- **p_pTag** : *std::unique_ptr&lt; FiffTag &gt; &*
+- **p_pTag** : *std::unique_ptr&lt; [FiffTag](/docs/api/fiff/fiff-tag) &gt; &*
   the read tag info.
 
 - **p_bDoSkip** : *bool*
@@ -454,7 +461,7 @@ difference to the other read tag functions is: that this function has blocking b
 
 **Parameters:**
 
-- **p_pTag** : *std::unique_ptr&lt; FiffTag &gt; &*
+- **p_pTag** : *std::unique_ptr&lt; [FiffTag](/docs/api/fiff/fiff-tag) &gt; &*
   the read tag.
 
 **Returns:**
@@ -471,7 +478,7 @@ if pos is not provided, reading starts from the current file position
 
 **Parameters:**
 
-- **p_pTag** : *std::unique_ptr&lt; FiffTag &gt; &*
+- **p_pTag** : *std::unique_ptr&lt; [FiffTag](/docs/api/fiff/fiff-tag) &gt; &*
   the read tag.
 
 - **pos** : *fiff_long_t*
@@ -504,7 +511,7 @@ Write one tag to file including its data Data is not written if it is nullptr.
 
 **Parameters:**
 
-- **p_pTag** : *const std::unique_ptr&lt; FiffTag &gt; &*
+- **p_pTag** : *const std::unique_ptr&lt; [FiffTag](/docs/api/fiff/fiff-tag) &gt; &*
   Tag to write;.
 
 - **pos** : *fiff_long_t*
@@ -518,11 +525,11 @@ Write one tag to file including its data Data is not written if it is nullptr.
 
 ### write_ch_info(ch)
 
-Writes a channel information record to a fif file The type, cal, unit, and pos members are explained in Table 9.5 of the MNE manual.
+Writes a channel information record to a fif file The type, cal, unit, and pos members are explained in Table 9.5 of the [MNE](/docs/api/mne/mne-class) manual.
 
 **Parameters:**
 
-- **ch** : *const FiffChInfo &*
+- **ch** : *const [FiffChInfo](/docs/api/fiff/fiff-ch-info) &*
   The channel information structure to write.
 
 **Returns:**
@@ -537,7 +544,7 @@ Writes a channel position to a fif file.
 
 **Parameters:**
 
-- **chpos** : *const FiffChPos &*
+- **chpos** : *const [FiffChPos](/docs/api/fiff/fiff-ch-pos) &*
   Channel position structure to write.
 
 **Returns:**
@@ -552,7 +559,7 @@ Writes a coordinate transformation structure.
 
 **Parameters:**
 
-- **trans** : *const FiffCoordTrans &*
+- **trans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The coordinate transfomation structure.
 
 **Returns:**
@@ -567,7 +574,7 @@ Write a noise covariance matrix.
 
 **Parameters:**
 
-- **p_FiffCov** : *const FiffCov &*
+- **p_FiffCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   The noise covariance matrix to write.
 
 **Returns:**
@@ -584,7 +591,7 @@ Writes the CTF compensation data into a fif file
 
 **Parameters:**
 
-- **comps** : *const QList&lt; FiffCtfComp &gt; &*
+- **comps** : *const QList&lt; [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) &gt; &*
   The compensation data to write.
 
 **Returns:**
@@ -601,7 +608,7 @@ Writes a digitizer data point into a fif file
 
 **Parameters:**
 
-- **dig** : *const FiffDigPoint &*
+- **dig** : *const [FiffDigPoint](/docs/api/fiff/fiff-dig-point) &*
   The point to write.
 
 **Returns:**
@@ -637,7 +644,7 @@ Writes a list of dir entries to a fif file, as a FIFFT_DIR_ENTRY_STRUCT Returns 
 
 **Parameters:**
 
-- **dir** : *const QList&lt; FiffDirEntry::SPtr &gt; &*
+- **dir** : *const QList&lt; [FiffDirEntry](/docs/api/fiff/fiff-dir-entry)::SPtr &gt; &*
   The dir entries to write.
 
 - **pos** : *fiff_long_t*
@@ -679,7 +686,7 @@ Writes fiff id If the id argument is missing it will be generated here.
 - **kind** : *fiff_int_t*
   The tag kind.
 
-- **id** : *const FiffId &*
+- **id** : *const [FiffId](/docs/api/fiff/fiff-id) &*
   The id to write.
 
 **Returns:**
@@ -694,7 +701,7 @@ Write measurement info stored in forward solution.
 
 **Parameters:**
 
-- **p_FiffInfoBase** : *const FiffInfoBase &*
+- **p_FiffInfoBase** : *const [FiffInfoBase](/docs/api/fiff/fiff-info-base) &*
   The measurement info.
 
 **Returns:**
@@ -857,7 +864,7 @@ Writes a named single-precision floating-point matrix
 - **kind** : *fiff_int_t*
   The tag kind to use for the data.
 
-- **mat** : *const FiffNamedMatrix &*
+- **mat** : *const [FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) &*
   The data matrix.
 
 **Returns:**
@@ -891,7 +898,7 @@ Writes the projection data into a fif stream (file)
 
 **Parameters:**
 
-- **projs** : *const QList&lt; FiffProj &gt; &*
+- **projs** : *const QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt; &*
   The compensation data to write.
 
 **Returns:**
@@ -1002,7 +1009,7 @@ Read information about raw data file
 - **p_IODevice** : *QIODevice &*
   An fiff IO device like a fiff QFile or QTCPSocket.
 
-- **data** : *FiffRawData &*
+- **data** : *[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data information - contains the opened fiff file.
 
 - **allow_maxshield** : *bool*
@@ -1072,7 +1079,7 @@ function [fid,cals] = fiff_start_writing_raw(name,info,sel)
 - **p_IODevice** : *QIODevice &*
   A fiff IO device like a fiff QFile or QTCPSocket.
 
-- **info** : *const FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   The measurement info block of the source file.
 
 - **cals** : *Eigen::RowVectorXd &*

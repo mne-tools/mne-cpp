@@ -15,9 +15,9 @@ sidebar_position: 52
 class MNELIB::MNESssData
 ```
 
-Implements `MNE` SSS Data (Replaces *mneSssData,mneSssDataRec struct of MNE-C `mne_types.h`).
+Implements [`MNE`](/docs/api/mne/mne-class) [SSS](/docs/api/dsp/sss) Data (Replaces *mneSssData,mneSssDataRec struct of MNE-C `mne_types.h`).
 
-Container for Signal Space Separation (SSS/Maxwell filtering) expansion coefficients and metadata.
+Container for Signal Space Separation ([SSS](/docs/api/dsp/sss)/Maxwell filtering) expansion coefficients and metadata.
 
 ---
 
@@ -25,7 +25,7 @@ Container for Signal Space Separation (SSS/Maxwell filtering) expansion coeffici
 
 ### MNESssData()
 
-Constructs the `MNE` SSS Data.
+Constructs the [`MNE`](/docs/api/mne/mne-class) [SSS](/docs/api/dsp/sss) Data.
 
 ---
 
@@ -38,19 +38,19 @@ Refactored: mne_dup_sss_data (mne_sss_data.c)
 **Parameters:**
 
 - **p_MneSssData** : *const MNESssData &*
-  `MNE` SSS Data which should be copied.
+  [`MNE`](/docs/api/mne/mne-class) SSS Data which should be copied.
 
 ---
 
 ### ~MNESssData()
 
-Destroys the `MNE` SSS Data description.
+Destroys the [`MNE`](/docs/api/mne/mne-class) [SSS](/docs/api/dsp/sss) Data description.
 
 ---
 
 ### print(out)
 
-Output the SSS information for debugging purposes.
+Output the [SSS](/docs/api/dsp/sss) information for debugging purposes.
 
 Refactored: mne_print_sss_data (mne_sss_data.c)
 
@@ -65,7 +65,7 @@ Refactored: mne_print_sss_data (mne_sss_data.c)
 
 ### read(name)
 
-Read SSS data from anywhere in a file Refactored: mne_read (mne_sss_data.c).
+Read [SSS](/docs/api/dsp/sss) data from anywhere in a file Refactored: mne_read (mne_sss_data.c).
 
 **Parameters:**
 
@@ -74,25 +74,25 @@ Read SSS data from anywhere in a file Refactored: mne_read (mne_sss_data.c).
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNESssData &gt;* — The read SSS data.
+- *std::unique_ptr&lt; [MNESssData](/docs/api/mne/mne-sss-data) &gt;* — The read SSS data.
 
 ---
 
 ### read_from_node(stream, start)
 
-Read the SSS data from the given node of an open fiff stream Refactored: mne_read_from_node (mne_sss_data.c).
+Read the [SSS](/docs/api/dsp/sss) data from the given node of an open fiff stream Refactored: mne_read_from_node (mne_sss_data.c).
 
 **Parameters:**
 
-- **stream** : *QSharedPointer&lt;FIFFLIB::FiffStream&gt; &*
+- **stream** : *QSharedPointer&lt;[FiffStream](/docs/api/fiff/fiff-stream)&gt; &*
   The open fiff stream.
 
-- **start** : *const QSharedPointer&lt;FIFFLIB::FiffDirNode&gt; &*
+- **start** : *const QSharedPointer&lt;[FiffDirNode](/docs/api/fiff/fiff-dir-node)&gt; &*
   The node/tree to read the SSS data from.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNESssData &gt;* — The read SSS data.
+- *std::unique_ptr&lt; [MNESssData](/docs/api/mne/mne-sss-data) &gt;* — The read SSS data.
 
 ---
 

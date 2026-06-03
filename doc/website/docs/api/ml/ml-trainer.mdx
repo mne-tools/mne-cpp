@@ -15,7 +15,7 @@ sidebar_position: 4
 class MLLIB::MLTrainer
 ```
 
-Launches Python training scripts via `UTILSLIB::PythonRunner` with automatic venv handling and prerequisite checks.
+Launches Python training scripts via [`PythonRunner`](/docs/api/utils/python-runner) with automatic venv handling and prerequisite checks.
 
 Training logic (PyTorch, scikit-learn, MNE-Python, …) lives entirely in the ``.py scripts under `scripts/ml/training/` and runs in a child process; no Python embedding or `libpython` linkage is required. If the configured `UTILSLIB::PythonRunnerConfig` carries a `venvDir`, the runner creates and updates the venv before each script invocation so dependencies are pinned per training job.
 
@@ -25,13 +25,13 @@ Training logic (PyTorch, scikit-learn, MNE-Python, …) lives entirely in the ``
 
 ### MLTrainer()
 
-Construct an `MLTrainer` with default PythonRunner configuration.
+Construct an [`MLTrainer`](/docs/api/ml/ml-trainer) with default [PythonRunner](/docs/api/utils/python-runner) configuration.
 
 ---
 
 ### MLTrainer(config)
 
-Construct an `MLTrainer` with explicit PythonRunner configuration.
+Construct an [`MLTrainer`](/docs/api/ml/ml-trainer) with explicit [PythonRunner](/docs/api/utils/python-runner) configuration.
 
 **Parameters:**
 
@@ -42,11 +42,11 @@ Construct an `MLTrainer` with explicit PythonRunner configuration.
 
 ### runner()
 
-Access the underlying PythonRunner for callback/config changes.
+Access the underlying [PythonRunner](/docs/api/utils/python-runner) for callback/config changes.
 
 **Returns:**
 
-- *UTILSLIB::PythonRunner &* — Reference to the PythonRunner instance.
+- *[PythonRunner](/docs/api/utils/python-runner) &* — Reference to the PythonRunner instance.
 
 ---
 
@@ -54,7 +54,7 @@ Access the underlying PythonRunner for callback/config changes.
 
 Run a training script.
 
-If the PythonRunner is configured with a venvDir and packageDir, the venv is created/updated automatically before the script runs.
+If the [PythonRunner](/docs/api/utils/python-runner) is configured with a venvDir and packageDir, the venv is created/updated automatically before the script runs.
 
 **Parameters:**
 

@@ -17,7 +17,14 @@ class RTPROCESSINGLIB::RtInvOpWorker
 
 Real-time inverse operator worker.
 
-Background worker thread that recomputes the MNE inverse operator when covariance updates arrive.
+Background worker thread that recomputes the [MNE](/docs/api/mne/mne-class) inverse operator when covariance updates arrive.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- RtInvOpWorker
+```
 
 ---
 

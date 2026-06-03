@@ -17,7 +17,7 @@ class FIFFLIB::FiffDigitizerData
 
 Registration-ready digitization data: dig points, device→head transform and HPI fit metadata.
 
-Pairs a `FiffDigPointSet` with the `FiffCoordTrans` that maps it into the head frame, plus optional HPI goodness-of-fit values. Used by the coregistration GUI and by every downstream tool that needs a single self-contained record describing where a subject's head sat in the helmet for one measurement.
+Pairs a [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) with the [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans) that maps it into the head frame, plus optional HPI goodness-of-fit values. Used by the coregistration GUI and by every downstream tool that needs a single self-contained record describing where a subject's head sat in the helmet for one measurement.
 
 ---
 
@@ -25,7 +25,7 @@ Pairs a `FiffDigPointSet` with the `FiffCoordTrans` that maps it into the head f
 
 ### FiffDigitizerData()
 
-Constructs the `FiffDigitizerData`.
+Constructs the [`FiffDigitizerData`](/docs/api/fiff/fiff-digitizer-data).
 
 ---
 
@@ -46,18 +46,18 @@ Copy assignment operator (deep-copies unique_ptr members).
 
 **Parameters:**
 
-- **rhs** : *const FiffDigitizerData &*
+- **rhs** : *const [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) &*
   Digitization point descriptor to assign from.
 
 **Returns:**
 
-- *FiffDigitizerData &* — Reference to this object.
+- *[FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) &* — Reference to this object.
 
 ---
 
 ### FiffDigitizerData(p_IODevice)
 
-Constructs a `FiffDigitizerData` by reading from an IO device.
+Constructs a [`FiffDigitizerData`](/docs/api/fiff/fiff-digitizer-data) by reading from an IO device.
 
 **Parameters:**
 
@@ -82,7 +82,7 @@ Prints class contents.
 
 Returns the number of MRI fiducial points (cardinal points transformed into MRI coordinates via head_mri_t_adj).
 
-Kept as `nfids()` for API compatibility with the original MNE C code (digitizerDataRec.nfids in mne_analyze/analyze_types.h).
+Kept as `nfids()` for API compatibility with the original [MNE](/docs/api/mne/mne-class) C code (digitizerDataRec.nfids in mne_analyze/analyze_types.h).
 
 **Returns:**
 

@@ -25,6 +25,16 @@ Carries the dense ``(n_sources × n_times) data matrix plus vertex indices, time
 
 Source-space inverse-solution container with dense grid plus optional focal-dipole, coupling and connectivity layers.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    InvSourceEstimate <|-- InvVectorSourceEstimate
+    click InvVectorSourceEstimate "/docs/api/inv/inv-vector-source-estimate"
+    InvSourceEstimate <|-- InvVolumeSourceEstimate
+    click InvVolumeSourceEstimate "/docs/api/inv/inv-volume-source-estimate"
+```
+
 ---
 
 ## Public Methods
@@ -133,12 +143,12 @@ Assignment Operator.
 
 **Parameters:**
 
-- **rhs** : *const InvSourceEstimate &*
+- **rhs** : *const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &*
   SourceEstimate which should be assigned.
 
 **Returns:**
 
-- *InvSourceEstimate &* — the copied source estimate.
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate) &* — the copied source estimate.
 
 ---
 
@@ -158,7 +168,7 @@ Returns the indices of sources in the data matrix based on their beloning label.
 
 **Parameters:**
 
-- **lPickedLabels** : *const QList&lt; FSLIB::FsLabel &gt; &*
+- **lPickedLabels** : *const QList&lt; [FsLabel](/docs/api/fs/fs-label) &gt; &*
   The labels base the selection on.
 
 - **bIsClustered** : *bool*
@@ -235,7 +245,7 @@ Reads a source estimate from a given file
 - **p_IODevice** : *QIODevice &*
   IO device to red the stc from.
 
-- **p_stc** : *InvSourceEstimate &*
+- **p_stc** : *[InvSourceEstimate](/docs/api/inv/inv-source-estimate) &*
   the read stc.
 
 **Returns:**
@@ -257,7 +267,7 @@ The .w format stores vertex indices (3-byte big-endian) and float values (4-byte
 
 **Returns:**
 
-- *InvSourceEstimate* — The source estimate with single-column data.
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — The source estimate with single-column data.
 
 ---
 

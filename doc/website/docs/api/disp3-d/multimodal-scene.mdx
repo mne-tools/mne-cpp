@@ -31,6 +31,13 @@ Maintain the most recent `PickResult` and emit `picked` when a layer producer re
 
 The class is **non-virtual** on purpose: it is a pure data/dispatch hub with no rendering logic. The renderer (``BrainRenderer`` or a future `MultimodalRenderer`) reads layers via `layers()` and per-kind downcasts the payload pointer.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- MultimodalScene
+```
+
 ---
 
 ## Public Methods
@@ -188,7 +195,7 @@ The values are clamped to fmin &lt;= fmid &lt;= fmax. Emits `overlayThresholdsCh
 
 ### reportPick(pick)
 
-Report a pick result from a layer's renderer or hit-tester.
+[Report](/docs/api/utils/report) a pick result from a layer's renderer or hit-tester.
 
 Emits `picked`. Used by both real ray-cast picking and synthetic picks (e.g. wizard "show this contact" navigation).
 

@@ -19,19 +19,29 @@ Defines a source space or a surface.
 
 Holds vertex positions, normals, triangulation, patch statistics, neighborhood connectivity, and optional volume-grid metadata for MEG/EEG source-space analysis.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    MNESurfaceOrVolume <|-- MNESourceSpace
+    click MNESourceSpace "/docs/api/mne/mne-source-space"
+    MNESurfaceOrVolume <|-- MNESurface
+    click MNESurface "/docs/api/mne/mne-surface"
+```
+
 ---
 
 ## Public Methods
 
 ### MNESurfaceOrVolume()
 
-Constructs the `MNE` FsSurface or Volume.
+Constructs the [`MNE`](/docs/api/mne/mne-class) [FsSurface](/docs/api/fs/fs-surface) or Volume.
 
 ---
 
 ### ~MNESurfaceOrVolume()
 
-Destroys the `MNE` FsSurface or Volume description.
+Destroys the [`MNE`](/docs/api/mne/mne-class) [FsSurface](/docs/api/fs/fs-surface) or Volume description.
 
 ---
 
@@ -59,7 +69,7 @@ Set all vertex curvature values to 1.0 (uniform curvature), if not already prese
 
 ### add_triangle_data()
 
-Populate the `MNETriangle` structures for both the full and in-use triangulations by computing edge vectors, normals, and areas.
+Populate the [`MNETriangle`](/docs/api/mne/mne-triangle) structures for both the full and in-use triangulations by computing edge vectors, normals, and areas.
 
 Accumulates the total surface area into tot_area.
 
@@ -184,7 +194,7 @@ Equivalent to the old `MNEHemisphere::nearest` (VectorXi).
 
 Extract the nearest distances from the nearest vector as doubles.
 
-Equivalent to the old MNEHemisphere::nearest_dist (VectorXd).
+Equivalent to the old [MNEHemisphere](/docs/api/mne/mne-hemisphere)::nearest_dist (VectorXd).
 
 **Returns:**
 
@@ -237,7 +247,7 @@ Compute the solid angle subtended by a triangle as seen from a given point using
 - **from** : *const Eigen::Vector3f &*
   The observation point (3-element float array).
 
-- **tri** : *const MNELIB::MNETriangle &*
+- **tri** : *const [MNETriangle](/docs/api/mne/mne-triangle) &*
   The triangle whose solid angle is computed.
 
 **Returns:**

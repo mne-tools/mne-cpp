@@ -15,9 +15,16 @@ sidebar_position: 52
 class DISPLIB::RtFiffRawViewDelegate
 ```
 
-QAbstractItemDelegate painting one FIFF channel's signal trace inside `RtFiffRawView`.
+QAbstractItemDelegate painting one FIFF channel's signal trace inside [`RtFiffRawView`](/docs/api/disp/rt-fiff-raw-view).
 
-Transforms each visible row of the `RtFiffRawViewModel` into a polyline drawn inside the cell rectangle, applying the active y-scaling, SSP / compensation operators, trigger overlays and bad-channel greying.
+Transforms each visible row of the [`RtFiffRawViewModel`](/docs/api/disp/rt-fiff-raw-view-model) into a polyline drawn inside the cell rectangle, applying the active y-scaling, SSP / compensation operators, trigger overlays and bad-channel greying.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QAbstractItemDelegate <|-- RtFiffRawViewDelegate
+```
 
 ---
 
@@ -29,7 +36,7 @@ Creates a new abstract item delegate with the given parent.
 
 **Parameters:**
 
-- **parent** : *RtFiffRawView **
+- **parent** : *[RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) **
   Parent of the delegate.
 
 ---

@@ -17,6 +17,14 @@ class MLLIB::MlModel
 
 Backend-agnostic inference interface: load, predict, save plus model/task descriptors.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    MlModel <|-- MlOnnxModel
+    click MlOnnxModel "/docs/api/ml/ml-onnx-model"
+```
+
 ---
 
 ## Public Methods
@@ -33,12 +41,12 @@ Run inference on the given input tensor.
 
 **Parameters:**
 
-- **input** : *const MlTensor &*
+- **input** : *const [MlTensor](/docs/api/ml/ml-tensor) &*
   The input data.
 
 **Returns:**
 
-- *MlTensor* — The prediction result.
+- *[MlTensor](/docs/api/ml/ml-tensor)* — The prediction result.
 
 ---
 

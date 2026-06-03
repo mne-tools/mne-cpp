@@ -19,11 +19,11 @@ sidebar_position: 1
 class CONNECTIVITYLIB::Connectivity
 ```
 
-Dispatcher that runs one or more functional-connectivity estimators over a batch of pre-processed trials and returns one `Network` per estimator.
+Dispatcher that runs one or more functional-connectivity estimators over a batch of pre-processed trials and returns one [`Network`](/docs/api/connectivity/network) per estimator.
 
-The selected methods are read from ConnectivitySettings::getConnectivityMethods and matched by string against the supported metric set ("COR", "XCOR", "COH", "IMAGCOH", "PLI", "USPLI", "WPLI", "DSWPLI", "PLV", "GC", "DTF", "PDC"). All spectral metrics share the same DPSS tapered FFT and CSD accumulator inside `ConnectivitySettings`, so running e.g. PLI + wPLI + dwPLI in one call costs only one FFT pass.
+The selected methods are read from [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)::getConnectivityMethods and matched by string against the supported metric set ("COR", "XCOR", "COH", "IMAGCOH", "PLI", "USPLI", "WPLI", "DSWPLI", "PLV", "GC", "DTF", "PDC"). All spectral metrics share the same DPSS tapered FFT and CSD accumulator inside [`ConnectivitySettings`](/docs/api/connectivity/connectivity-settings), so running e.g. PLI + wPLI + dwPLI in one call costs only one FFT pass.
 
-Runs the selected functional-connectivity metrics over a `ConnectivitySettings` batch.
+Runs the selected functional-connectivity metrics over a [`ConnectivitySettings`](/docs/api/connectivity/connectivity-settings) batch.
 
 ---
 
@@ -31,7 +31,7 @@ Runs the selected functional-connectivity metrics over a `ConnectivitySettings` 
 
 ### Connectivity()
 
-Constructs a `Connectivity` object.
+Constructs a [`Connectivity`](/docs/api/connectivity/connectivity-class) object.
 
 ---
 
@@ -43,7 +43,7 @@ Computes the network based on the current settings.
 
 **Returns:**
 
-- *QList&lt; Network &gt;* — Returns the list with calculated networks for each provided method.
+- *QList&lt; [Network](/docs/api/connectivity/network) &gt;* — Returns the list with calculated networks for each provided method.
 
 ---
 

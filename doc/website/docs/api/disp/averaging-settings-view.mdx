@@ -17,7 +17,15 @@ class DISPLIB::AveragingSettingsView
 
 Settings panel driving the on-line / off-line averaging engine.
 
-Holds stim-channel and trigger-type pickers, pre / post-stimulus spinboxes (ms), baseline-correction toggles and an embedded `ArtifactSettingsView`. Parameter edits are forwarded as Qt signals to the `rtprocessing` averaging job.
+Holds stim-channel and trigger-type pickers, pre / post-stimulus spinboxes (ms), baseline-correction toggles and an embedded [`ArtifactSettingsView`](/docs/api/disp/artifact-settings-view). Parameter edits are forwarded as Qt signals to the `rtprocessing` averaging job.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- AveragingSettingsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -29,7 +37,7 @@ Holds stim-channel and trigger-type pickers, pre / post-stimulus spinboxes (ms),
 
 ### ~AveragingSettingsView()
 
-Destroys the `AveragingSettingsView`.
+Destroys the [`AveragingSettingsView`](/docs/api/disp/averaging-settings-view).
 
 ---
 

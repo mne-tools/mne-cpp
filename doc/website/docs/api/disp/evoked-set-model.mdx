@@ -17,7 +17,14 @@ class DISPLIB::EvokedSetModel
 
 QAbstractTableModel wrapping a `FiffEvokedSet` (one row per channel, one column per condition).
 
-Propagates baseline-correction, SSP-projection and bad-channel updates so connected views (`ButterflyView`, `AverageLayoutView`) stay in sync with the latest pre-processing settings.
+Propagates baseline-correction, SSP-projection and bad-channel updates so connected views ([`ButterflyView`](/docs/api/disp/butterfly-view), [`AverageLayoutView`](/docs/api/disp/average-layout-view)) stay in sync with the latest pre-processing settings.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QAbstractTableModel <|-- EvokedSetModel
+```
 
 ---
 

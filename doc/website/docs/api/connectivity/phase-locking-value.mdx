@@ -23,9 +23,17 @@ Computes the Phase Locking Value of Lachaux et al.
 
 (HBM 1999).
 
-Each cross-spectral sample is divided by its magnitude (yielding a unit complex number that encodes only the instantaneous phase difference) and averaged across trials; PLV is the magnitude of that average. Per- trial normalised cross-spectra are accumulated in `ConnectivitySettings::IntermediateSumData` and the resulting edge weights are averaged over the frequency window defined on `AbstractMetric`.
+Each cross-spectral sample is divided by its magnitude (yielding a unit complex number that encodes only the instantaneous phase difference) and averaged across trials; PLV is the magnitude of that average. Per- trial normalised cross-spectra are accumulated in `ConnectivitySettings::IntermediateSumData` and the resulting edge weights are averaged over the frequency window defined on [`AbstractMetric`](/docs/api/connectivity/abstract-metric).
 
 Phase Locking Value estimator (Lachaux et al. 1999); amplitude-independent phase coupling, sensitive to zero-lag.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractMetric <|-- PhaseLockingValue
+    click AbstractMetric "/docs/api/connectivity/abstract-metric"
+```
 
 ---
 
@@ -33,7 +41,7 @@ Phase Locking Value estimator (Lachaux et al. 1999); amplitude-independent phase
 
 ### PhaseLockingValue()
 
-Constructs a `PhaseLockingValue` object.
+Constructs a [`PhaseLockingValue`](/docs/api/connectivity/phase-locking-value) object.
 
 ---
 
@@ -45,12 +53,12 @@ Calculates the phase locking value between the rows of the data matrix.
 
 **Parameters:**
 
-- **connectivitySettings** : *ConnectivitySettings &*
+- **connectivitySettings** : *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings) &*
   The input data and parameters.
 
 **Returns:**
 
-- *Network* — The connectivity information in form of a network structure.
+- *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
 

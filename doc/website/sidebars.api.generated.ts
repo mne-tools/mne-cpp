@@ -5,6 +5,12 @@ import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
 
 const apiSidebar: SidebarsConfig['apiSidebar'] = [
     'api/index',
+    'api/namespaces',
+    'api/classes',
+    'api/files',
+    'api/hierarchy',
+    'api/class-members',
+    'api/namespace-members',
     {
       type: 'category',
       label: "FIFF Library",

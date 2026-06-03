@@ -46,19 +46,19 @@ Compute LCMV beamformer spatial filters.
 
 **Parameters:**
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info (for channel matching).
 
-- **forward** : *const MNELIB::MNEForwardSolution &*
+- **forward** : *const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) &*
   Forward solution containing the leadfield.
 
-- **dataCov** : *const FIFFLIB::FiffCov &*
+- **dataCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   Data covariance matrix (from recording epoch).
 
 - **reg** : *double*
   Regularization parameter (default 0.05 = 5% of trace).
 
-- **noiseCov** : *const FIFFLIB::FiffCov &*
+- **noiseCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   Noise covariance for whitening. If empty, identity whitening.
 
 - **pickOri** : *BeamformerPickOri*
@@ -87,7 +87,7 @@ stc = W @ (whitener @ proj @ evoked.data)
 
 **Parameters:**
 
-- **evoked** : *const FIFFLIB::FiffEvoked &*
+- **evoked** : *const [FiffEvoked](/docs/api/fiff/fiff-evoked) &*
   Evoked data (averaged, channel x time).
 
 - **filters** : *const InvBeamformer &*
@@ -95,7 +95,7 @@ stc = W @ (whitener @ proj @ evoked.data)
 
 **Returns:**
 
-- *InvSourceEstimate* — Source estimate with time courses at each source point.
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Source estimate with time courses at each source point.
 
 ---
 
@@ -119,7 +119,7 @@ Apply LCMV beamformer to raw data matrix.
 
 **Returns:**
 
-- *InvSourceEstimate* — Source estimate with time courses.
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Source estimate with time courses.
 
 ---
 
@@ -131,7 +131,7 @@ power_i = trace(W_i @ Cm @ W_i^T)
 
 **Parameters:**
 
-- **dataCov** : *const FIFFLIB::FiffCov &*
+- **dataCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   Data covariance matrix.
 
 - **filters** : *const InvBeamformer &*
@@ -139,7 +139,7 @@ power_i = trace(W_i @ Cm @ W_i^T)
 
 **Returns:**
 
-- *InvSourceEstimate* — Source estimate where data column 0 contains power at each source.
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Source estimate where data column 0 contains power at each source.
 
 ---
 
@@ -163,7 +163,7 @@ Apply LCMV beamformer to a list of epochs.
 
 **Returns:**
 
-- *QList&lt; InvSourceEstimate &gt;* — List of source estimates, one per epoch.
+- *QList&lt; [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &gt;* — List of source estimates, one per epoch.
 
 ---
 
@@ -175,19 +175,19 @@ The resolution matrix describes the point-spread function of the beamformer. Eac
 
 **Parameters:**
 
-- **forward** : *const MNELIB::MNEForwardSolution &*
+- **forward** : *const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) &*
   Forward solution with leadfield.
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info.
 
-- **dataCov** : *const FIFFLIB::FiffCov &*
+- **dataCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   Data covariance.
 
 - **reg** : *double*
   Regularization (default 0.05).
 
-- **noiseCov** : *const FIFFLIB::FiffCov &*
+- **noiseCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   Noise covariance for whitening (optional).
 
 **Returns:**

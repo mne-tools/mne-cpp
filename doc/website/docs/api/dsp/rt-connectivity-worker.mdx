@@ -19,6 +19,13 @@ Real-time connectivity worker.
 
 Background worker thread that computes functional connectivity metrics in real time.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- RtConnectivityWorker
+```
+
 ---
 
 ## Public Methods
@@ -29,7 +36,7 @@ Perform actual connectivity estimation.
 
 **Parameters:**
 
-- **connectivitySettings** : *const CONNECTIVITYLIB::ConnectivitySettings &*
+- **connectivitySettings** : *const [ConnectivitySettings](/docs/api/connectivity/connectivity-settings) &*
   The connectivity settings to be used during connectivity estimation.
 
 ---

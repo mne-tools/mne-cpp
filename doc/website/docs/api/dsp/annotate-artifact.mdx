@@ -23,7 +23,7 @@ class; the functions live directly in the library namespace.
 
 SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
-The detectors in this header scan continuous MEG / EEG data and emit `FIFFLIB::FiffAnnotation` intervals marking time segments that should be excluded from downstream averaging, ICA fitting or PSD estimation. annotateMuscleZscore band-pass filters the signal in the 110–140 Hz range (typical EMG band), takes the smoothed envelope across channels and z-scores it against the global median absolute deviation; samples whose z-score exceeds a user threshold are merged into BAD_muscle annotations. annotateAmplitude flags two boundary conditions instead: per-channel peak-to-peak amplitude exceeding an upper limit ("high-amplitude" artefact) and amplitude falling below a lower limit for longer than a minimum duration ("flat" / dead channel).
+The detectors in this header scan continuous MEG / EEG data and emit `FIFFLIB::FiffAnnotation` intervals marking time segments that should be excluded from downstream averaging, [ICA](/docs/api/dsp/ica) fitting or PSD estimation. annotateMuscleZscore band-pass filters the signal in the 110–140 Hz range (typical EMG band), takes the smoothed envelope across channels and z-scores it against the global median absolute deviation; samples whose z-score exceeds a user threshold are merged into BAD_muscle annotations. annotateAmplitude flags two boundary conditions instead: per-channel peak-to-peak amplitude exceeding an upper limit ("high-amplitude" artefact) and amplitude falling below a lower limit for longer than a minimum duration ("flat" / dead channel).
 
 Both routines mirror the semantics of their MNE-Python counterparts `mne.preprocessing.annotate_muscle_zscore` and `mne.preprocessing.annotate_amplitude` so cross-toolchain pipelines produce identical bad-segment lists.
 
@@ -34,7 +34,7 @@ Both routines mirror the semantics of their MNE-Python counterparts `mne.preproc
 ### annotateMusclZscore(data, info, sfreq, params)
 
 ```cpp
-FIFFLIB::FiffAnnotations annotateMusclZscore(const Eigen::MatrixXd & data, const FIFFLIB::FiffInfo & info, double sfreq, const AnnotateMusclParams & params);
+[FiffAnnotations](/docs/api/fiff/fiff-annotations) annotateMusclZscore(const Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, double sfreq, const AnnotateMusclParams & params);
 ```
 
 Detect muscle artifacts via high-frequency z-score and annotate bad segments.
@@ -62,7 +62,7 @@ Merge adjacent annotations and apply minimum duration.
 - **data** : *const Eigen::MatrixXd &*
   Raw data matrix (n_channels × n_times).
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info.
 
 - **sfreq** : *double*
@@ -73,14 +73,14 @@ Merge adjacent annotations and apply minimum duration.
 
 **Returns:**
 
-- *FIFFLIB::FiffAnnotations* — FiffAnnotations with "BAD_muscle" entries.
+- *[FiffAnnotations](/docs/api/fiff/fiff-annotations)* — FiffAnnotations with "BAD_muscle" entries.
 
 ---
 
 ### annotateAmplitude(data, info, sfreq, params)
 
 ```cpp
-FIFFLIB::FiffAnnotations annotateAmplitude(const Eigen::MatrixXd & data, const FIFFLIB::FiffInfo & info, double sfreq, const AnnotateAmplitudeParams & params);
+[FiffAnnotations](/docs/api/fiff/fiff-annotations) annotateAmplitude(const Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, double sfreq, const AnnotateAmplitudeParams & params);
 ```
 
 Annotate segments where amplitude exceeds thresholds or is too flat.
@@ -96,7 +96,7 @@ If peak-to-peak amplitude in a sliding window &lt; dFlatMin, the window is annot
 - **data** : *const Eigen::MatrixXd &*
   Raw data matrix (n_channels × n_times).
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info (for channel names).
 
 - **sfreq** : *double*
@@ -107,7 +107,7 @@ If peak-to-peak amplitude in a sliding window &lt; dFlatMin, the window is annot
 
 **Returns:**
 
-- *FIFFLIB::FiffAnnotations* — FiffAnnotations with bad entries.
+- *[FiffAnnotations](/docs/api/fiff/fiff-annotations)* — FiffAnnotations with bad entries.
 
 ---
 

@@ -171,7 +171,7 @@ Returns a new inverted copy of this transformation (swaps from/to and trans/invt
 
 **Returns:**
 
-- *FiffCoordTrans* — The inverted transformation.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The inverted transformation.
 
 ---
 
@@ -198,7 +198,7 @@ Writes the transformation to a FIFF stream.
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   Pointer to the FIFF stream to write to.
 
 ---
@@ -244,7 +244,7 @@ Reads a coordinate transform from a fif file.
 - **p_IODevice** : *QIODevice &*
   A fiff IO device like a fiff QFile or QTCPSocket.
 
-- **p_Trans** : *FiffCoordTrans &*
+- **p_Trans** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   A coordinate transform from a fif file.
 
 **Returns:**
@@ -270,7 +270,7 @@ Reads a specified coordinate transform from a FIFF file.
 
 **Returns:**
 
-- *FiffCoordTrans* — The coordinate transform, or an empty transform if not found.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The coordinate transform, or an empty transform if not found.
 
 ---
 
@@ -285,7 +285,7 @@ Reads the MRI → head coordinate transform from a FIFF file.
 
 **Returns:**
 
-- *FiffCoordTrans* — The MRI→head transform, or an empty transform if not found.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The MRI→head transform, or an empty transform if not found.
 
 ---
 
@@ -300,7 +300,7 @@ Reads the MEG device → head coordinate transform from a FIFF file.
 
 **Returns:**
 
-- *FiffCoordTrans* — The device→head transform, or an empty transform if not found.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The device→head transform, or an empty transform if not found.
 
 ---
 
@@ -321,7 +321,7 @@ Reads a coordinate transform from an ASCII 4×3 matrix file (mm-to-m conversion 
 
 **Returns:**
 
-- *FiffCoordTrans* — The coordinate transform, or an empty transform on failure.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The coordinate transform, or an empty transform on failure.
 
 ---
 
@@ -336,7 +336,7 @@ Reads the FreeSurfer head → MRI transform from an ASCII file.
 
 **Returns:**
 
-- *FiffCoordTrans* — The head→MRI transform, or an empty transform on failure.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The head→MRI transform, or an empty transform on failure.
 
 ---
 
@@ -349,7 +349,7 @@ Applies the coordinate transform to a single 3D point in place.
 - **r** : *float*
   3-element float array to transform in place.
 
-- **t** : *const FiffCoordTrans &*
+- **t** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The coordinate transformation to apply.
 
 - **do_move** : *bool*
@@ -366,7 +366,7 @@ Applies the inverse coordinate transform to a single 3D point in place.
 - **r** : *float*
   3-element float array to transform in place.
 
-- **t** : *const FiffCoordTrans &*
+- **t** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The coordinate transformation whose inverse to apply.
 
 - **do_move** : *bool*
@@ -403,7 +403,7 @@ Creates an identity transformation between two coordinate systems.
 
 **Returns:**
 
-- *FiffCoordTrans* — An identity coordinate transformation.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — An identity coordinate transformation.
 
 ---
 
@@ -421,15 +421,15 @@ Automatically handles inversion and ordering of the input transforms.
 - **to** : *int*
   Desired destination coordinate system.
 
-- **t1** : *const FiffCoordTrans &*
+- **t1** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   First transformation.
 
-- **t2** : *const FiffCoordTrans &*
+- **t2** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   Second transformation.
 
 **Returns:**
 
-- *FiffCoordTrans* — The combined transformation, or an empty transform on failure.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The combined transformation, or an empty transform on failure.
 
 ---
 
@@ -456,7 +456,7 @@ Constructs a coordinate transformation from cardinal points (LPA, Nasion, RPA).
 
 **Returns:**
 
-- *FiffCoordTrans* — The coordinate transformation.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The coordinate transformation.
 
 ---
 
@@ -464,8 +464,8 @@ Constructs a coordinate transformation from cardinal points (LPA, Nasion, RPA).
 
 **Parameters:**
 
-- **t** : *FiffCoordTrans &*
-  `Fiff` coordinate transform to which the inverse should be added.
+- **t** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
+  [`Fiff`](/docs/api/fiff/fiff-class) coordinate transform to which the inverse should be added.
 
 **Returns:**
 
@@ -489,12 +489,12 @@ Reads a coordinate transform from a FIFF tag.
 
 **Parameters:**
 
-- **tag** : *const std::unique_ptr&lt; FiffTag &gt; &*
+- **tag** : *const std::unique_ptr&lt; [FiffTag](/docs/api/fiff/fiff-tag) &gt; &*
   The FIFF tag to read from.
 
 **Returns:**
 
-- *FiffCoordTrans* — The coordinate transform, or an empty transform if the tag is invalid.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The coordinate transform, or an empty transform if the tag is invalid.
 
 ---
 
@@ -504,10 +504,10 @@ Reads a coordinate transform from a FIFF stream node.
 
 **Parameters:**
 
-- **stream** : *FiffStream::SPtr &*
+- **stream** : *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   The FIFF stream.
 
-- **node** : *const FiffDirNode::SPtr &*
+- **node** : *const [FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
   The directory node to search.
 
 - **from** : *int*
@@ -518,7 +518,7 @@ Reads a coordinate transform from a FIFF stream node.
 
 **Returns:**
 
-- *FiffCoordTrans* — The coordinate transform, or an empty transform if not found.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The coordinate transform, or an empty transform if not found.
 
 ---
 
@@ -548,7 +548,7 @@ Performs a Procrustes alignment between two sets of corresponding 3D points.
 
 **Returns:**
 
-- *FiffCoordTrans* — The alignment transform, or an empty transform on failure.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — The alignment transform, or an empty transform on failure.
 
 ---
 

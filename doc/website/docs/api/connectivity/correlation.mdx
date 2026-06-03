@@ -21,13 +21,21 @@ Per-trial correlation matrices are computed in parallel via `QtConcurrent::mappe
 
 Pearson correlation estimator; broadband, zero-lag time-domain baseline.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractMetric <|-- Correlation
+    click AbstractMetric "/docs/api/connectivity/abstract-metric"
+```
+
 ---
 
 ## Public Methods
 
 ### Correlation()
 
-Constructs a `Correlation` object.
+Constructs a [`Correlation`](/docs/api/connectivity/correlation) object.
 
 ---
 
@@ -39,12 +47,12 @@ Calculates the correlation coefficient between the rows of the data matrix.
 
 **Parameters:**
 
-- **connectivitySettings** : *ConnectivitySettings &*
+- **connectivitySettings** : *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings) &*
   The input data and parameters.
 
 **Returns:**
 
-- *Network* — The connectivity information in form of a network structure.
+- *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
 

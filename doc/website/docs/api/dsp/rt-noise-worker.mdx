@@ -17,6 +17,13 @@ class RTPROCESSINGLIB::RtNoiseWorker
 
 Background worker that computes a noise power spectral density estimate from accumulated data blocks.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- RtNoiseWorker
+```
+
 ---
 
 ## Public Methods
@@ -30,7 +37,7 @@ Creates the worker.
 - **iFftLength** : *qint32*
   FFT length (number of samples per window).
 
-- **pFiffInfo** : *FIFFLIB::FiffInfo::SPtr*
+- **pFiffInfo** : *[FIFFLIB::FiffInfo](/docs/api/fiff/fiff-info)::SPtr*
   Associated Fiff Information.
 
 - **iDataLength** : *qint32*

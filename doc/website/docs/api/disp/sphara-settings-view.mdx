@@ -19,13 +19,21 @@ SPHARA spatial-filter configuration panel (per-modality basis order spinboxes).
 
 An activation `QCheckBox` plus per-modality basis-order spinboxes (MAG, GRAD, EEG) forwarded to the `rtprocessing` SPHARA decomposition.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- SpharaSettingsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
 
 ### SpharaSettingsView(sSettingsPath, parent, f)
 
-Constructs a `SpharaSettingsView` which is a child of parent.
+Constructs a [`SpharaSettingsView`](/docs/api/disp/sphara-settings-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `SpharaSettingsView` which is a child of parent.
 
 ### ~SpharaSettingsView()
 
-Destroys the `SpharaSettingsView`.
+Destroys the [`SpharaSettingsView`](/docs/api/disp/sphara-settings-view).
 
 ---
 

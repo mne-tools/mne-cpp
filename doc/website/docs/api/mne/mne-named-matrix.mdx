@@ -17,7 +17,7 @@ class MNELIB::MNENamedMatrix
 
 A dense matrix with named rows and columns.
 
-`MNENamedMatrix` associates a dense float matrix (Eigen::MatrixXf) with optional row and column name lists (QStringList). It is the C++ equivalent of the MNE-C `mneNamedMatrixRec` struct, and is used throughout the library to represent projection vectors, CTF compensation matrices, and forward-solution gain matrices.
+[`MNENamedMatrix`](/docs/api/mne/mne-named-matrix) associates a dense float matrix (Eigen::MatrixXf) with optional row and column name lists (QStringList). It is the C++ equivalent of the MNE-C `mneNamedMatrixRec` struct, and is used throughout the library to represent projection vectors, CTF compensation matrices, and forward-solution gain matrices.
 
 The class provides factory methods to:
 `build()` a matrix from its constituent parts,
@@ -85,7 +85,7 @@ Selects a subset of this matrix's rows and columns by matching their names again
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNENamedMatrix &gt;* — A unique pointer to the picked sub-matrix, or `nullptr` if a requested name was not found.
+- *std::unique_ptr&lt; [MNENamedMatrix](/docs/api/mne/mne-named-matrix) &gt;* — A unique pointer to the picked sub-matrix, or `nullptr` if a requested name was not found.
 
 ---
 
@@ -95,7 +95,7 @@ Selects a subset of this matrix's rows and columns by matching their names again
 
 Factory: build a named matrix from its constituent parts.
 
-Assembles an `MNENamedMatrix` from dimension counts, optional row/column name lists, and a dense data matrix.
+Assembles an [`MNENamedMatrix`](/docs/api/mne/mne-named-matrix) from dimension counts, optional row/column name lists, and a dense data matrix.
 
 **Parameters:**
 
@@ -116,7 +116,7 @@ Assembles an `MNENamedMatrix` from dimension counts, optional row/column name li
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNENamedMatrix &gt;* — A unique pointer to the newly created named matrix.
+- *std::unique_ptr&lt; [MNENamedMatrix](/docs/api/mne/mne-named-matrix) &gt;* — A unique pointer to the newly created named matrix.
 
 ---
 
@@ -128,10 +128,10 @@ Reads a two-dimensional tagged matrix of the given `kind` from `node` (or its fi
 
 **Parameters:**
 
-- **stream** : *QSharedPointer&lt;FIFFLIB::FiffStream&gt; &*
+- **stream** : *QSharedPointer&lt;[FiffStream](/docs/api/fiff/fiff-stream)&gt; &*
   Open FIFF stream to read from.
 
-- **node** : *const QSharedPointer&lt;FIFFLIB::FiffDirNode&gt; &*
+- **node** : *const QSharedPointer&lt;[FiffDirNode](/docs/api/fiff/fiff-dir-node)&gt; &*
   Directory node that contains (or is) the named-matrix block.
 
 - **kind** : *int*
@@ -139,7 +139,7 @@ Reads a two-dimensional tagged matrix of the given `kind` from `node` (or its fi
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNENamedMatrix &gt;* — A unique pointer to the read matrix, or `nullptr` on failure.
+- *std::unique_ptr&lt; [MNENamedMatrix](/docs/api/mne/mne-named-matrix) &gt;* — A unique pointer to the read matrix, or `nullptr` on failure.
 
 ---
 

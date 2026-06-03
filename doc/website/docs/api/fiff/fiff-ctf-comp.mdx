@@ -17,7 +17,7 @@ class FIFFLIB::FiffCtfComp
 
 One CTF software-gradient compensation matrix: grade kind, calibration flag and the gradiometer × reference named matrix.
 
-A list of `FiffCtfComp` lives inside `FiffInfo` and lets raw / evoked data be moved between compensation grades by chaining the appropriate matrices. The `save_calibrated` flag controls whether the matrix was stored already-calibrated (and therefore must not be re-multiplied by the channel cals on apply).
+A list of [`FiffCtfComp`](/docs/api/fiff/fiff-ctf-comp) lives inside [`FiffInfo`](/docs/api/fiff/fiff-info) and lets raw / evoked data be moved between compensation grades by chaining the appropriate matrices. The `save_calibrated` flag controls whether the matrix was stored already-calibrated (and therefore must not be re-multiplied by the channel cals on apply).
 
 ---
 

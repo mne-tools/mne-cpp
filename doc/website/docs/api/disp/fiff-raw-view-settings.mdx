@@ -17,7 +17,15 @@ class DISPLIB::FiffRawViewSettings
 
 Display-style settings panel for the FIFF raw browser (zoom, colours, distance, scope).
 
-Bundles the visible time window, signal / background / trigger colours and the distance-to-axis spinbox with an embedded `ApplyToView` so the user controls whether changes affect selected / visible / all channels.
+Bundles the visible time window, signal / background / trigger colours and the distance-to-axis spinbox with an embedded [`ApplyToView`](/docs/api/disp/apply-to-view) so the user controls whether changes affect selected / visible / all channels.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- FiffRawViewSettings
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Bundles the visible time window, signal / background / trigger colours and the d
 
 ### FiffRawViewSettings(sSettingsPath, parent, f)
 
-Constructs a `FiffRawViewSettings` which is a child of parent.
+Constructs a [`FiffRawViewSettings`](/docs/api/disp/fiff-raw-view-settings) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `FiffRawViewSettings` which is a child of parent.
 
 ### ~FiffRawViewSettings()
 
-Destroys the `FiffRawViewSettings`.
+Destroys the [`FiffRawViewSettings`](/docs/api/disp/fiff-raw-view-settings).
 
 ---
 

@@ -17,9 +17,17 @@ class MNELIB::MNEBemSurface
 
 BEM surface geometry information.
 
-Inherits core geometry (vertices, normals, triangles, neighbors) from MNESurface/MNESurfaceOrVolume. Adds BEM-specific computed triangle metadata (centers, normals, areas) and I/O.
+Inherits core geometry (vertices, normals, triangles, neighbors) from [MNESurface](/docs/api/mne/mne-surface)/[MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume). Adds BEM-specific computed triangle metadata (centers, normals, areas) and I/O.
 
 BEM surface provides geometry information
+
+### Inheritance
+
+```mermaid
+classDiagram
+    MNESurface <|-- MNEBemSurface
+    click MNESurface "/docs/api/mne/mne-surface"
+```
 
 ---
 
@@ -94,7 +102,7 @@ Writes the bem surface to a FIFF stream.
 
 **Parameters:**
 
-- **p_pStream** : *FIFFLIB::FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   The stream to write to.
 
 ---
@@ -122,7 +130,7 @@ Decimate the outer skin surface to the target vertex counts using iterative edge
 
 **Parameters:**
 
-- **outerSkin** : *const MNEBemSurface &*
+- **outerSkin** : *const [MNEBemSurface](/docs/api/mne/mne-bem-surface) &*
   The outer skin BEM surface to decimate.
 
 - **targetVertices** : *const QList&lt; int &gt; &*
@@ -130,7 +138,7 @@ Decimate the outer skin surface to the target vertex counts using iterative edge
 
 **Returns:**
 
-- *QList&lt; MNEBemSurface &gt;* — A list of decimated BEM surfaces, one per target resolution.
+- *QList&lt; [MNEBemSurface](/docs/api/mne/mne-bem-surface) &gt;* — A list of decimated BEM surfaces, one per target resolution.
 
 ---
 

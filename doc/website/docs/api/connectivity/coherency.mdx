@@ -21,13 +21,21 @@ compute fills the per-trial DPSS spectra and accumulates the cross- and auto-spe
 
 Complex coherency core; produces magnitude-squared and imaginary-part reductions for downstream metrics.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractMetric <|-- Coherency
+    click AbstractMetric "/docs/api/connectivity/abstract-metric"
+```
+
 ---
 
 ## Public Methods
 
 ### Coherency()
 
-Constructs a `Coherency` object.
+Constructs a [`Coherency`](/docs/api/connectivity/coherency) object.
 
 ---
 
@@ -39,10 +47,10 @@ Calculates the absolute value of coherency of the rows of the data matrix.
 
 **Parameters:**
 
-- **finalNetwork** : *Network &*
+- **finalNetwork** : *[Network](/docs/api/connectivity/network) &*
   The resulting network.
 
-- **connectivitySettings** : *ConnectivitySettings &*
+- **connectivitySettings** : *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings) &*
   The input data and parameters.
 
 ---
@@ -53,10 +61,10 @@ Calculates the imaginary part of coherency of the rows of the data matrix.
 
 **Parameters:**
 
-- **finalNetwork** : *Network &*
+- **finalNetwork** : *[Network](/docs/api/connectivity/network) &*
   The resulting network.
 
-- **connectivitySettings** : *ConnectivitySettings &*
+- **connectivitySettings** : *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings) &*
   The input data and parameters.
 
 ---

@@ -17,7 +17,14 @@ class DISPLIB::Spline
 
 Histogram QWidget with cubic-spline overlay and interactive threshold markers.
 
-Click-drag drops left / middle / right threshold lines that are emitted as data-space coordinates; otherwise the API mirrors `Bar` (`setData` / `updatePlot` templates).
+Click-drag drops left / middle / right threshold lines that are emitted as data-space coordinates; otherwise the API mirrors [`Bar`](/docs/api/disp/bar) (`setData` / `updatePlot` templates).
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- Spline
+```
 
 ---
 
@@ -25,12 +32,12 @@ Click-drag drops left / middle / right threshold lines that are emitted as data-
 
 ### Spline(parent, title)
 
-The constructor for `Spline`.
+The constructor for [`Spline`](/docs/api/disp/spline).
 
 **Parameters:**
 
 - **parent** : *QWidget **
-  sets the behaviour of `Spline` as an object, defaults to no parent QWidget.
+  sets the behaviour of [`Spline`](/docs/api/disp/spline) as an object, defaults to no parent QWidget.
 
 - **title** : *const QString &*
   string to specify the title displayed on the histogram, defaults to "Spline Histogram".

@@ -25,13 +25,45 @@ m_iNumberBinStart and m_iNumberBinAmount define the frequency-bin window over wh
 
 Static control knobs (storage mode, frequency band) shared by all `CONNECTIVITYLIB` metrics.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractMetric <|-- Coherence
+    click Coherence "/docs/api/connectivity/coherence"
+    AbstractMetric <|-- Coherency
+    click Coherency "/docs/api/connectivity/coherency"
+    AbstractMetric <|-- Correlation
+    click Correlation "/docs/api/connectivity/correlation"
+    AbstractMetric <|-- CrossCorrelation
+    click CrossCorrelation "/docs/api/connectivity/cross-correlation"
+    AbstractMetric <|-- DebiasedSquaredWeightedPhaseLagIndex
+    click DebiasedSquaredWeightedPhaseLagIndex "/docs/api/connectivity/debiased-squared-weighted-phase-lag-index"
+    AbstractMetric <|-- DirectedTransferFunction
+    click DirectedTransferFunction "/docs/api/connectivity/directed-transfer-function"
+    AbstractMetric <|-- GrangerCausality
+    click GrangerCausality "/docs/api/connectivity/granger-causality"
+    AbstractMetric <|-- ImagCoherence
+    click ImagCoherence "/docs/api/connectivity/imag-coherence"
+    AbstractMetric <|-- PartialDirectedCoherence
+    click PartialDirectedCoherence "/docs/api/connectivity/partial-directed-coherence"
+    AbstractMetric <|-- PhaseLagIndex
+    click PhaseLagIndex "/docs/api/connectivity/phase-lag-index"
+    AbstractMetric <|-- PhaseLockingValue
+    click PhaseLockingValue "/docs/api/connectivity/phase-locking-value"
+    AbstractMetric <|-- UnbiasedSquaredPhaseLagIndex
+    click UnbiasedSquaredPhaseLagIndex "/docs/api/connectivity/unbiased-squared-phase-lag-index"
+    AbstractMetric <|-- WeightedPhaseLagIndex
+    click WeightedPhaseLagIndex "/docs/api/connectivity/weighted-phase-lag-index"
+```
+
 ---
 
 ## Public Methods
 
 ### AbstractMetric()
 
-Constructs a `AbstractMetric` object.
+Constructs a [`AbstractMetric`](/docs/api/connectivity/abstract-metric) object.
 
 ---
 

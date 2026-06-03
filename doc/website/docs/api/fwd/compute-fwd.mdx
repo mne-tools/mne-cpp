@@ -21,7 +21,7 @@ class FWDLIB::ComputeFwd
 
 Implements the forward-solution computation driver.
 
-`ComputeFwd` is the worker/factory that takes a `ComputeFwdSettings`, initialises all required data structures (coil definitions, BEM or sphere model, source spaces, compensation data, coordinate transforms) and assembles the MEG/EEG lead-field matrix `G` one dipole column at a time. The computed MNEForwardSolution is returned by `calculateFwd`; `updateHeadPos` rebuilds only the MEG block after a new device-to-head transform.
+[`ComputeFwd`](/docs/api/fwd/compute-fwd) is the worker/factory that takes a [`ComputeFwdSettings`](/docs/api/fwd/compute-fwd-settings), initialises all required data structures (coil definitions, BEM or sphere model, source spaces, compensation data, coordinate transforms) and assembles the MEG/EEG lead-field matrix `G` one dipole column at a time. The computed [MNEForwardSolution](/docs/api/mne/mne-forward-solution) is returned by `calculateFwd`; `updateHeadPos` rebuilds only the MEG block after a new device-to-head transform.
 
 Top-level driver for MEG/EEG forward-solution computation.
 
@@ -31,11 +31,11 @@ Top-level driver for MEG/EEG forward-solution computation.
 
 ### ComputeFwd(pSettings)
 
-Constructs a `ComputeFwd` and initialises all data structures needed for the forward computation according to *pSettings*.
+Constructs a [`ComputeFwd`](/docs/api/fwd/compute-fwd) and initialises all data structures needed for the forward computation according to *pSettings*.
 
 **Parameters:**
 
-- **pSettings** : *std::shared_ptr&lt; ComputeFwdSettings &gt;*
+- **pSettings** : *std::shared_ptr&lt; [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) &gt;*
   Shared pointer to the forward computation settings.
 
 ---
@@ -52,7 +52,7 @@ Perform the forward calculation.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNELIB::MNEForwardSolution &gt;* — The computed forward solution, or nullptr on error.
+- *std::unique_ptr&lt; [MNEForwardSolution](/docs/api/mne/mne-forward-solution) &gt;* — The computed forward solution, or nullptr on error.
 
 ---
 
@@ -62,10 +62,10 @@ Update the head position with a new device-to-head transform and recompute the M
 
 **Parameters:**
 
-- **transDevHead** : *const FIFFLIB::FiffCoordTrans &*
+- **transDevHead** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The updated device-to-head coordinate transform.
 
-- **fwd** : *MNELIB::MNEForwardSolution &*
+- **fwd** : *[MNEForwardSolution](/docs/api/mne/mne-forward-solution) &*
   The forward solution to update in place.
 
 **Returns:**

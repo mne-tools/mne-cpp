@@ -17,7 +17,16 @@ class DISPLIB::DraggableFramelessWidget
 
 Frameless QWidget that can be dragged anywhere on its body.
 
-Base class of `QuickControlView` and any other floating popup that wants to look like an in-app palette rather than a system window.
+Base class of [`QuickControlView`](/docs/api/disp/quick-control-view) and any other floating popup that wants to look like an in-app palette rather than a system window.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- DraggableFramelessWidget
+    DraggableFramelessWidget <|-- QuickControlView
+    click QuickControlView "/docs/api/disp/quick-control-view"
+```
 
 ---
 
@@ -25,7 +34,7 @@ Base class of `QuickControlView` and any other floating popup that wants to look
 
 ### DraggableFramelessWidget(parent, flags, bRoundEdges, bDraggable, bFrameless)
 
-Constructs a `DraggableFramelessWidget` which is a child of parent.
+Constructs a [`DraggableFramelessWidget`](/docs/api/disp/draggable-frameless-widget) which is a child of parent.
 
 **Parameters:**
 
@@ -48,7 +57,7 @@ Constructs a `DraggableFramelessWidget` which is a child of parent.
 
 ### ~DraggableFramelessWidget()
 
-Destructs a `DraggableFramelessWidget`.
+Destructs a [`DraggableFramelessWidget`](/docs/api/disp/draggable-frameless-widget).
 
 ---
 

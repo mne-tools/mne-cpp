@@ -66,7 +66,7 @@ Copy constructor.
 **Parameters:**
 
 - **p_MNEForwardSolution** : *const MNEForwardSolution &*
-  `MNE` forward solution.
+  [`MNE`](/docs/api/mne/mne-class) forward solution.
 
 ---
 
@@ -78,18 +78,18 @@ Copies public data fields only (not computation state).
 
 **Parameters:**
 
-- **other** : *const MNEForwardSolution &*
-  `MNE` forward solution to copy from.
+- **other** : *const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) &*
+  [`MNE`](/docs/api/mne/mne-class) forward solution to copy from.
 
 **Returns:**
 
-- *MNEForwardSolution &* — Reference to this.
+- *[MNEForwardSolution](/docs/api/mne/mne-forward-solution) &* — Reference to this.
 
 ---
 
 ### MNEForwardSolution(other)
 
-Move constructs an `MNEForwardSolution`.
+Move constructs an [`MNEForwardSolution`](/docs/api/mne/mne-forward-solution).
 
 ---
 
@@ -101,13 +101,13 @@ Move assignment operator.
 
 ### ~MNEForwardSolution()
 
-Destroys the `MNEForwardSolution`.
+Destroys the [`MNEForwardSolution`](/docs/api/mne/mne-forward-solution).
 
 ---
 
 ### clear()
 
-Initializes the `MNE` forward solution.
+Initializes the [`MNE`](/docs/api/mne/mne-class) forward solution.
 
 ---
 
@@ -119,7 +119,7 @@ The clustering is done by using the provided annotations
 
 **Parameters:**
 
-- **p_AnnotationSet** : *const FSLIB::FsAnnotationSet &*
+- **p_AnnotationSet** : *const [FsAnnotationSet](/docs/api/fs/fs-annotation-set) &*
   FsAnnotation set containing the annotation of left & right hemisphere.
 
 - **p_iClusterSize** : *qint32*
@@ -137,7 +137,7 @@ The clustering is done by using the provided annotations
 
 **Returns:**
 
-- *MNEForwardSolution* — clustered `MNE` forward solution.
+- *[MNEForwardSolution](/docs/api/mne/mne-forward-solution)* — clustered [`MNE`](/docs/api/mne/mne-class) forward solution.
 
 ---
 
@@ -152,7 +152,7 @@ Compute orientation prior.
 
 **Returns:**
 
-- *FIFFLIB::FiffCov* — Orientation priors.
+- *[FiffCov](/docs/api/fiff/fiff-cov)* — Orientation priors.
 
 ---
 
@@ -202,7 +202,7 @@ Pick channels from forward operator
 
 **Returns:**
 
-- *MNEForwardSolution* — Forward solution restricted to selected channel types.
+- *[MNEForwardSolution](/docs/api/mne/mne-forward-solution)* — Forward solution restricted to selected channel types.
 
 ---
 
@@ -212,12 +212,12 @@ Reduces a forward solution to selected regions.
 
 **Parameters:**
 
-- **p_qListLabels** : *const QList&lt; FSLIB::FsLabel &gt; &*
+- **p_qListLabels** : *const QList&lt; [FsLabel](/docs/api/fs/fs-label) &gt; &*
   ROIs.
 
 **Returns:**
 
-- *MNEForwardSolution* — the reduced forward solution.
+- *[MNEForwardSolution](/docs/api/mne/mne-forward-solution)* — the reduced forward solution.
 
 ---
 
@@ -243,7 +243,7 @@ Pick by channel type and names from a forward operator
 
 **Returns:**
 
-- *MNEForwardSolution* — Forward solution restricted to selected channel types.
+- *[MNEForwardSolution](/docs/api/mne/mne-forward-solution)* — Forward solution restricted to selected channel types.
 
 ---
 
@@ -253,10 +253,10 @@ Prepare forward for assembling the inverse operator.
 
 **Parameters:**
 
-- **p_info** : *const FIFFLIB::FiffInfo &*
+- **p_info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
 
-- **p_noise_cov** : *const FIFFLIB::FiffCov &*
+- **p_noise_cov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   The noise covariance matrix.
 
 - **p_pca** : *bool*
@@ -268,7 +268,7 @@ Prepare forward for assembling the inverse operator.
 - **gain** : *Eigen::MatrixXd &*
   Gain matrix.
 
-- **p_outNoiseCov** : *FIFFLIB::FiffCov &*
+- **p_outNoiseCov** : *[FiffCov](/docs/api/fiff/fiff-cov) &*
   noise covariance matrix.
 
 - **p_outWhitener** : *Eigen::MatrixXd &*
@@ -287,7 +287,7 @@ Prepare forward for assembling the inverse operator.
 
 Write the forward solution to a FIFF file.
 
-Formerly write_solution (SVN `MNE`).
+Formerly write_solution (SVN [`MNE`](/docs/api/mne/mne-class)).
 
 Splits the combined MEG/EEG forward matrix back into separate blocks for FIFF storage, writes source spaces, coordinate transforms, and parent file provenance.
 
@@ -316,7 +316,7 @@ reduces the forward solution and stores the result to p_fwdOut.
 
 **Returns:**
 
-- *MNEForwardSolution* — reduced `MNE` forward solution.
+- *[MNEForwardSolution](/docs/api/mne/mne-forward-solution)* — reduced [`MNE`](/docs/api/mne/mne-class) forward solution.
 
 ---
 
@@ -332,10 +332,10 @@ Returns the positions of the specified sources based on their beloning labels.
 
 **Parameters:**
 
-- **lPickedLabels** : *const QList&lt; FSLIB::FsLabel &gt; &*
-  The stream to which the `MNE` forward solution should be assigned to.
+- **lPickedLabels** : *const QList&lt; [FsLabel](/docs/api/fs/fs-label) &gt; &*
+  The stream to which the [`MNE`](/docs/api/mne/mne-class) forward solution should be assigned to.
 
-- **tSurfSetInflated** : *const FSLIB::FsSurfaceSet &*
+- **tSurfSetInflated** : *const [FsSurfaceSet](/docs/api/fs/fs-surface-set) &*
   The surface used to pick the source from, based on their index specified bzy this forward solution.
 
 **Returns:**
@@ -350,14 +350,14 @@ Returns the positions of the specified sources based on their beloning labels.
 
 Compute weighting for depth prior.
 
-ToDo move this to FiffCov
+ToDo move this to [FiffCov](/docs/api/fiff/fiff-cov)
 
 **Parameters:**
 
 - **Gain** : *const Eigen::MatrixXd &*
   gain matrix.
 
-- **gain_info** : *const FIFFLIB::FiffInfo &*
+- **gain_info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   The measurement info to specify the channels to include.
 
 - **is_fixed_ori** : *bool*
@@ -373,11 +373,11 @@ ToDo move this to FiffCov
   (optional).
 
 - **limit_depth_chs** : *bool*
-  If True, use only grad channels in depth weighting (equivalent to `MNE` C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels. (optional).
+  If True, use only grad channels in depth weighting (equivalent to [`MNE`](/docs/api/mne/mne-class) C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels. (optional).
 
 **Returns:**
 
-- *FIFFLIB::FiffCov* — the depth prior.
+- *[FiffCov](/docs/api/fiff/fiff-cov)* — the depth prior.
 
 ---
 
@@ -388,7 +388,7 @@ ToDo move this to FiffCov
 - **p_IODevice** : *QIODevice &*
   A fiff IO device like a fiff QFile or QTCPSocket.
 
-- **fwd** : *MNEForwardSolution &*
+- **fwd** : *[MNEForwardSolution](/docs/api/mne/mne-forward-solution) &*
   A forward solution from a fif file.
 
 - **force_fixed** : *bool*
@@ -421,7 +421,7 @@ Restrict gain matrix entries for optimal depth weighting.
 - **G** : *Eigen::MatrixXd &*
   Gain matrix to be restricted; result is stored in place.
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Fiff information.
 
 ---

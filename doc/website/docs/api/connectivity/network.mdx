@@ -15,11 +15,11 @@ sidebar_position: 16
 class CONNECTIVITYLIB::Network
 ```
 
-Graph container for one functional-connectivity result.
+[Graph](/docs/api/disp/graph) container for one functional-connectivity result.
 
-Holds the `NetworkNode` list (channel / source positions) and the `NetworkEdge` list (per-frequency weight matrices + scalar band- averaged weights). Provides full and thresholded views of both edges and the corresponding adjacency matrix, the metric name ("COH", "PLI", "GC", ...) and threshold currently in effect, and the `VisualizationInfo` block read by the disp3D rendering layer.
+Holds the [`NetworkNode`](/docs/api/connectivity/network-node) list (channel / source positions) and the [`NetworkEdge`](/docs/api/connectivity/network-edge) list (per-frequency weight matrices + scalar band- averaged weights). Provides full and thresholded views of both edges and the corresponding adjacency matrix, the metric name ("COH", "PLI", "GC", ...) and threshold currently in effect, and the `VisualizationInfo` block read by the disp3D rendering layer.
 
-Graph container for one connectivity metric; nodes + weighted edges + threshold/visualisation state.
+[Graph](/docs/api/disp/graph) container for one connectivity metric; nodes + weighted edges + threshold/visualisation state.
 
 ---
 
@@ -27,7 +27,7 @@ Graph container for one connectivity metric; nodes + weighted edges + threshold/
 
 ### Network(sConnectivityMethod, dThreshold)
 
-Constructs a `Network` object.
+Constructs a [`Network`](/docs/api/connectivity/network) object.
 
 **Parameters:**
 
@@ -75,7 +75,7 @@ Returns the full and non thresholded edges.
 
 **Returns:**
 
-- *const QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt; &* — Returns the network edges.
+- *const QList&lt; QSharedPointer&lt;[NetworkEdge](/docs/api/connectivity/network-edge)&gt; &gt; &* — Returns the network edges.
 
 ---
 
@@ -85,7 +85,7 @@ Returns the thresholded edges.
 
 **Returns:**
 
-- *const QList&lt; QSharedPointer&lt;NetworkEdge&gt; &gt; &* — Returns the network edges.
+- *const QList&lt; QSharedPointer&lt;[NetworkEdge](/docs/api/connectivity/network-edge)&gt; &gt; &* — Returns the network edges.
 
 ---
 
@@ -95,7 +95,7 @@ Returns the nodes.
 
 **Returns:**
 
-- *const QList&lt; QSharedPointer&lt;NetworkNode&gt; &gt; &* — Returns the network nodes.
+- *const QList&lt; QSharedPointer&lt;[NetworkNode](/docs/api/connectivity/network-node)&gt; &gt; &* — Returns the network nodes.
 
 ---
 
@@ -110,7 +110,7 @@ Returns the edge at a specific position.
 
 **Returns:**
 
-- *QSharedPointer&lt;NetworkEdge&gt;* — Returns the network edge.
+- *QSharedPointer&lt;[NetworkEdge](/docs/api/connectivity/network-edge)&gt;* — Returns the network edge.
 
 ---
 
@@ -125,7 +125,7 @@ Returns the node at a specific position.
 
 **Returns:**
 
-- *QSharedPointer&lt;NetworkNode&gt;* — Returns the network node.
+- *QSharedPointer&lt;[NetworkNode](/docs/api/connectivity/network-node)&gt;* — Returns the network node.
 
 ---
 
@@ -301,7 +301,7 @@ Appends a network edge to this network node.
 
 **Parameters:**
 
-- **newEdge** : *QSharedPointer&lt;NetworkEdge&gt;*
+- **newEdge** : *QSharedPointer&lt;[NetworkEdge](/docs/api/connectivity/network-edge)&gt;*
   The new edge item.
 
 ---
@@ -312,18 +312,18 @@ Appends a network edge to this network node.
 
 **Parameters:**
 
-- **newNode** : *QSharedPointer&lt;NetworkNode&gt;*
+- **newNode** : *QSharedPointer&lt;[NetworkNode](/docs/api/connectivity/network-node)&gt;*
   The new node item as a reference.
 
 ---
 
 ### isEmpty()
 
-Returns whether the `Network` is empty by checking the number of nodes and edges.
+Returns whether the [`Network`](/docs/api/connectivity/network) is empty by checking the number of nodes and edges.
 
 **Returns:**
 
-- *bool* — The flag identifying whether the `Network` is empty.
+- *bool* — The flag identifying whether the [`Network`](/docs/api/connectivity/network) is empty.
 
 ---
 

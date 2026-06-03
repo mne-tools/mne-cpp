@@ -17,7 +17,15 @@ class DISPLIB::AverageLayoutView
 
 Sensor-layout viewer drawing per-channel evoked traces at their physical 2-D positions.
 
-Wraps a `QGraphicsView` around an `AverageScene` fed by an `EvokedSetModel` and a `ChannelInfoModel`; selection groups are pushed in as `SelectionItem` to show only a subset of channels.
+Wraps a `QGraphicsView` around an [`AverageScene`](/docs/api/disp/average-scene) fed by an [`EvokedSetModel`](/docs/api/disp/evoked-set-model) and a [`ChannelInfoModel`](/docs/api/disp/channel-info-model); selection groups are pushed in as [`SelectionItem`](/docs/api/disp/selection-item) to show only a subset of channels.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- AverageLayoutView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Wraps a `QGraphicsView` around an `AverageScene` fed by an `EvokedSetModel` and 
 
 ### AverageLayoutView(sSettingsPath, parent, f)
 
-Constructs a `AverageLayoutView` which is a child of parent.
+Constructs a [`AverageLayoutView`](/docs/api/disp/average-layout-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `AverageLayoutView` which is a child of parent.
 
 ### ~AverageLayoutView()
 
-Destroys the `AverageLayoutView`.
+Destroys the [`AverageLayoutView`](/docs/api/disp/average-layout-view).
 
 ---
 
@@ -54,7 +62,7 @@ Sets the channel info model.
 
 **Parameters:**
 
-- **pChannelInfoModel** : *QSharedPointer&lt;ChannelInfoModel&gt; &*
+- **pChannelInfoModel** : *QSharedPointer&lt;[ChannelInfoModel](/docs/api/disp/channel-info-model)&gt; &*
   The new channel info model.
 
 ---
@@ -65,18 +73,18 @@ Sets the evoked set model.
 
 **Parameters:**
 
-- **pEvokedSetModel** : *QSharedPointer&lt;EvokedSetModel&gt;*
+- **pEvokedSetModel** : *QSharedPointer&lt;[EvokedSetModel](/docs/api/disp/evoked-set-model)&gt;*
   The new evoked set model.
 
 ---
 
 ### getEvokedSetModel()
 
-Returns the currently set `EvokedSetModel`.
+Returns the currently set [`EvokedSetModel`](/docs/api/disp/evoked-set-model).
 
 **Returns:**
 
-- *QSharedPointer&lt;EvokedSetModel&gt;* — the currently set `EvokedSetModel`.
+- *QSharedPointer&lt;[EvokedSetModel](/docs/api/disp/evoked-set-model)&gt;* — the currently set [`EvokedSetModel`](/docs/api/disp/evoked-set-model).
 
 ---
 
@@ -180,11 +188,11 @@ Set the average activations.
 
 ### setFiffInfo(pFiffInfo)
 
-Stores FiffInfo to local variable to be used for getting channel info.
+Stores [FiffInfo](/docs/api/fiff/fiff-info) to local variable to be used for getting channel info.
 
 **Parameters:**
 
-- **pFiffInfo** : *const QSharedPointer&lt;FIFFLIB::FiffInfo&gt;*
+- **pFiffInfo** : *const QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt;*
   shared pointer to Fiff Info of currently loaded data.
 
 ---
@@ -207,7 +215,7 @@ Sets the currently viewable channels using the corrent name and location paramet
 **Parameters:**
 
 - **data** : *const QVariant &*
-  QVariant containing a `SelectionItem` object with selected channel information.
+  QVariant containing a [`SelectionItem`](/docs/api/disp/selection-item) object with selected channel information.
 
 ---
 

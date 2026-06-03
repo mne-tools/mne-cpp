@@ -15,7 +15,7 @@ sidebar_position: 18
 class FIFFLIB::FiffDigPointSet
 ```
 
-Collection of `FiffDigPoint` records as parsed from a FIFFB_ISOTRAK block.
+Collection of [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) records as parsed from a FIFFB_ISOTRAK block.
 
 Indexed access plus convenience filters (cardinals only, HPI only, EEG only, extras only) so registration code can pick out the subset it needs without re-walking the underlying QList of dig points.
 
@@ -25,7 +25,7 @@ Indexed access plus convenience filters (cardinals only, HPI only, EEG only, ext
 
 ### FiffDigPointSet()
 
-Constructs a `FiffDigPointSet` object.
+Constructs a [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) object.
 
 ---
 
@@ -36,24 +36,24 @@ Copy constructor.
 **Parameters:**
 
 - **p_FiffDigPointSet** : *const FiffDigPointSet &*
-  `FiffDigPointSet` which should be copied.
+  [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) which should be copied.
 
 ---
 
 ### FiffDigPointSet(pointList)
 
-Construct `FiffDigPointSet` based on input pointList.
+Construct [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) based on input pointList.
 
 **Parameters:**
 
-- **pointList** : *QList&lt; FIFFLIB::FiffDigPoint &gt;*
+- **pointList** : *QList&lt; [FiffDigPoint](/docs/api/fiff/fiff-dig-point) &gt;*
   list of digitizer points
 
 ---
 
 ### FiffDigPointSet(p_IODevice)
 
-Constructs a `FiffDigPointSet` by reading from a IO device.
+Constructs a [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) by reading from a IO device.
 
 **Parameters:**
 
@@ -64,23 +64,23 @@ Constructs a `FiffDigPointSet` by reading from a IO device.
 
 ### ~FiffDigPointSet()
 
-Destroys the `FiffDigPointSet`.
+Destroys the [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set).
 
 ---
 
 ### clear()
 
-Initializes `FiffDigPointSet`.
+Initializes [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set).
 
 ---
 
 ### isEmpty()
 
-True if `FiffDigPointSet` is empty.
+True if [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) is empty.
 
 **Returns:**
 
-- *bool* — true if `FiffDigPointSet` is empty.
+- *bool* — true if [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) is empty.
 
 ---
 
@@ -96,7 +96,7 @@ Returns the number of stored FiffDigPoints.
 
 ### write(p_IODevice)
 
-Writes the `FiffDigPointSet` to a FIFF file.
+Writes the [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) to a FIFF file.
 
 **Parameters:**
 
@@ -127,42 +127,42 @@ Verifies that the destination directory exists and that the file was actually pr
 
 ### writeToStream(p_pStream)
 
-Writes the `FiffDigPointSet` to a FIFF stream.
+Writes the [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) to a FIFF stream.
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   Pointer to the FIFF stream to write to.
 
 ---
 
 ### operator[](idx)
 
-Subscript operator [] to access `FiffDigPoint` by index.
+Subscript operator [] to access [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) by index.
 
 **Parameters:**
 
 - **idx** : *qint32*
-  the `FiffDigPoint` index.
+  the [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) index.
 
 **Returns:**
 
-- *const FiffDigPoint &* — `FiffDigPoint` related to the parameter index.
+- *const [FiffDigPoint](/docs/api/fiff/fiff-dig-point) &* — [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) related to the parameter index.
 
 ---
 
 ### operator[](idx)
 
-Subscript operator [] to access `FiffDigPoint` by index.
+Subscript operator [] to access [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) by index.
 
 **Parameters:**
 
 - **idx** : *qint32*
-  the `FiffDigPoint` index.
+  the [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) index.
 
 **Returns:**
 
-- *FiffDigPoint &* — `FiffDigPoint` related to the parameter index.
+- *[FiffDigPoint](/docs/api/fiff/fiff-dig-point) &* — [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) related to the parameter index.
 
 ---
 
@@ -177,37 +177,37 @@ Pick the wanted types from this set and returns them.
 
 **Returns:**
 
-- *FiffDigPointSet* — `FiffDigPointSet`.
+- *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set)* — [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set).
 
 ---
 
 ### operator&lt;&lt;(dig)
 
-Subscript operator &lt;&lt; to add a new `FiffDigPoint`.
+Subscript operator &lt;&lt; to add a new [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point).
 
 **Parameters:**
 
-- **dig** : *const FiffDigPoint &*
-  `FiffDigPoint` to be added.
+- **dig** : *const [FiffDigPoint](/docs/api/fiff/fiff-dig-point) &*
+  [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) to be added.
 
 **Returns:**
 
-- *FiffDigPointSet &* — `FiffDigPointSet`.
+- *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) &* — [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set).
 
 ---
 
 ### operator&lt;&lt;(dig)
 
-Subscript operator &lt;&lt; to add a new `FiffDigPoint`.
+Subscript operator &lt;&lt; to add a new [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point).
 
 **Parameters:**
 
-- **dig** : *const FiffDigPoint **
-  `FiffDigPoint` to be added.
+- **dig** : *const [FiffDigPoint](/docs/api/fiff/fiff-dig-point) **
+  [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) to be added.
 
 **Returns:**
 
-- *FiffDigPointSet &* — `FiffDigPointSet`.
+- *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) &* — [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set).
 
 ---
 
@@ -217,8 +217,8 @@ Apply a transformation matrix on the 3D position of the digitized points.
 
 **Parameters:**
 
-- **coordTrans** : *const FiffCoordTrans &*
-  `FiffCoordTrans` which is to be applied.
+- **coordTrans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
+  [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans) which is to be applied.
 
 - **bApplyInverse** : *bool*
   Whether to apply the inverse. False by default.
@@ -231,7 +231,7 @@ Returns list of digitizer point the set contains.
 
 **Returns:**
 
-- *QList&lt; FiffDigPoint &gt;* — list of digitizer points
+- *QList&lt; [FiffDigPoint](/docs/api/fiff/fiff-dig-point) &gt;* — list of digitizer points
 
 ---
 
@@ -239,14 +239,14 @@ Returns list of digitizer point the set contains.
 
 ### readFromStream(p_Stream, p_Dig)
 
-Reads `FiffDigPointSet` from a fif file.
+Reads [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) from a fif file.
 
 **Parameters:**
 
-- **p_Stream** : *FiffStream::SPtr &*
+- **p_Stream** : *[FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
   The opened fif file.
 
-- **p_Dig** : *FiffDigPointSet &*
+- **p_Dig** : *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) &*
   The read digitizer point set.
 
 **Returns:**

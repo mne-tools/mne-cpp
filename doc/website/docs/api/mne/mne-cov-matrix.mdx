@@ -17,7 +17,7 @@ class MNELIB::MNECovMatrix
 
 Covariance matrix storage.
 
-Stores a noise or source covariance matrix in dense (packed lower-triangle), diagonal, or sparse form together with its eigendecomposition and associated metadata (projection operator, SSS info, channel classification, bad channels).
+Stores a noise or source covariance matrix in dense (packed lower-triangle), diagonal, or sparse form together with its eigendecomposition and associated metadata (projection operator, [SSS](/docs/api/dsp/sss) info, channel classification, bad channels).
 
 ---
 
@@ -44,7 +44,7 @@ Construct a covariance matrix.
 - **p_cov_diag** : *const Eigen::VectorXd &*
   Diagonal data (may be empty).
 
-- **p_cov_sparse** : *FIFFLIB::FiffSparseMatrix **
+- **p_cov_sparse** : *[FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) **
   Sparse covariance data (may be nullptr).
 
 ---
@@ -57,11 +57,11 @@ Destructor.
 
 ### dup()
 
-Create a deep copy of this covariance matrix including data, channel classes, bad channel list, projection, and SSS info.
+Create a deep copy of this covariance matrix including data, channel classes, bad channel list, projection, and [SSS](/docs/api/dsp/sss) info.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNECovMatrix &gt;* — A newly allocated copy.
+- *std::unique_ptr&lt; [MNECovMatrix](/docs/api/mne/mne-cov-matrix) &gt;* — A newly allocated copy.
 
 ---
 
@@ -137,7 +137,7 @@ Assign channel-type classifications (MEG mag, MEG grad, EEG) to channels in this
 
 **Parameters:**
 
-- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+- **chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   Channel information list.
 
 - **nchan** : *int*
@@ -202,12 +202,12 @@ Pick designated channels from this covariance matrix, optionally omitting MEG-EE
 - **omit_meg_eeg** : *int*
   If non-zero, zero out MEG-EEG cross entries.
 
-- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+- **chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   Channel information list (for MEG/EEG classification).
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNECovMatrix &gt;* — A new covariance matrix with only the selected channels, or nullptr on error.
+- *std::unique_ptr&lt; [MNECovMatrix](/docs/api/mne/mne-cov-matrix) &gt;* — A new covariance matrix with only the selected channels, or nullptr on error.
 
 ---
 
@@ -233,7 +233,7 @@ Create a dense (full lower-triangle packed) covariance matrix.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNECovMatrix &gt;* — A new covariance matrix.
+- *std::unique_ptr&lt; [MNECovMatrix](/docs/api/mne/mne-cov-matrix) &gt;* — A new covariance matrix.
 
 ---
 
@@ -257,7 +257,7 @@ Create a diagonal covariance matrix.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNECovMatrix &gt;* — A new covariance matrix.
+- *std::unique_ptr&lt; [MNECovMatrix](/docs/api/mne/mne-cov-matrix) &gt;* — A new covariance matrix.
 
 ---
 
@@ -276,12 +276,12 @@ Create a sparse covariance matrix.
 - **names** : *const QStringList &*
   Channel names.
 
-- **cov_sparse** : *FIFFLIB::FiffSparseMatrix **
+- **cov_sparse** : *[FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) **
   Sparse covariance data (note: data are floats).
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNECovMatrix &gt;* — A new covariance matrix.
+- *std::unique_ptr&lt; [MNECovMatrix](/docs/api/mne/mne-cov-matrix) &gt;* — A new covariance matrix.
 
 ---
 
@@ -308,7 +308,7 @@ Create a covariance matrix from either dense or diagonal data.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNECovMatrix &gt;* — A new covariance matrix.
+- *std::unique_ptr&lt; [MNECovMatrix](/docs/api/mne/mne-cov-matrix) &gt;* — A new covariance matrix.
 
 ---
 
@@ -326,7 +326,7 @@ Read a covariance matrix of the specified kind from a FIFF file.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNECovMatrix &gt;* — The covariance matrix, or nullptr on failure.
+- *std::unique_ptr&lt; [MNECovMatrix](/docs/api/mne/mne-cov-matrix) &gt;* — The covariance matrix, or nullptr on failure.
 
 ---
 

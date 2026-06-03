@@ -17,7 +17,15 @@ class DISPLIB::RtFiffRawView
 
 QTableView-based real-time FIFF raw-data browser host.
 
-Owns the scrollbars, the marker / annotation machinery and the trigger-channel overlay; delegates per-row painting to `RtFiffRawViewDelegate` and data access to `RtFiffRawViewModel`.
+Owns the scrollbars, the marker / annotation machinery and the trigger-channel overlay; delegates per-row painting to [`RtFiffRawViewDelegate`](/docs/api/disp/rt-fiff-raw-view-delegate) and data access to [`RtFiffRawViewModel`](/docs/api/disp/rt-fiff-raw-view-model).
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- RtFiffRawView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Owns the scrollbars, the marker / annotation machinery and the trigger-channel o
 
 ### RtFiffRawView(sSettingsPath, parent, f)
 
-Constructs a `RtFiffRawView` which is a child of parent.
+Constructs a [`RtFiffRawView`](/docs/api/disp/rt-fiff-raw-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `RtFiffRawView` which is a child of parent.
 
 ### ~RtFiffRawView()
 
-Destroys the `RtFiffRawView`.
+Destroys the [`RtFiffRawView`](/docs/api/disp/rt-fiff-raw-view).
 
 ---
 
@@ -63,11 +71,11 @@ Note that this will also trigger a reload of the stored settings.
 
 ### init(info)
 
-Initilaizes the `RtFiffRawView` based on a FiffInfo.
+Initilaizes the [`RtFiffRawView`](/docs/api/disp/rt-fiff-raw-view) based on a [FiffInfo](/docs/api/fiff/fiff-info).
 
 **Parameters:**
 
-- **info** : *QSharedPointer&lt;FIFFLIB::FiffInfo&gt; &*
+- **info** : *QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt; &*
   The FiffInfo.
 
 ---
@@ -258,7 +266,7 @@ Update the SSP projection.
 
 **Parameters:**
 
-- **projs** : *const QList&lt; FIFFLIB::FiffProj &gt; &*
+- **projs** : *const QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt; &*
   The new projectors.
 
 ---
@@ -308,7 +316,7 @@ Filter parameters changed.
 
 **Parameters:**
 
-- **filterData** : *const UTILSLIB::FilterKernel &*
+- **filterData** : *const [FilterKernel](/docs/api/dsp/filter-kernel) &*
   the currently active filter.
 
 ---

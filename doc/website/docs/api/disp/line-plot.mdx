@@ -19,6 +19,13 @@ Simple x / y line-series QWidget rendered with QPainter (no Qt Charts dependency
 
 Supports multiple series, a settable title and x / y labels and auto-ranging axes. Series are stored as `QVector<double>` pairs and re-drawn during `paintEvent`.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QWidget <|-- LinePlot
+```
+
 ---
 
 ## Public Methods
@@ -44,7 +51,7 @@ Constructs a line series plot.
   The double data vector.
 
 - **title** : *const QString &*
-  `Plot` title.
+  [`Plot`](/docs/api/disp/plot) title.
 
 - **parent** : *QWidget **
   If parent is nullptr, the new widget becomes a window.
@@ -64,7 +71,7 @@ Constructs a line series plot.
   Y-Axis data to plot.
 
 - **title** : *const QString &*
-  `Plot` title.
+  [`Plot`](/docs/api/disp/plot) title.
 
 - **parent** : *QWidget **
   If parent is nullptr, the new widget becomes a window.

@@ -15,9 +15,16 @@ sidebar_position: 33
 class DISPLIB::FrequencySpectrumModel
 ```
 
-QAbstractTableModel storing per-channel FFT magnitudes for `SpectrumView`.
+QAbstractTableModel storing per-channel FFT magnitudes for [`SpectrumView`](/docs/api/disp/spectrum-view).
 
 Maintains an `Eigen::MatrixXd` of channels × frequency bins; ``addData()`` appends or averages new FFT frames and emits `dataChanged` so the view repaints the affected rows.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QAbstractTableModel <|-- FrequencySpectrumModel
+```
 
 ---
 
@@ -144,7 +151,7 @@ Returns the fiff info.
 
 **Returns:**
 
-- *QSharedPointer&lt;FIFFLIB::FiffInfo&gt;* — the fiff info.
+- *QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt;* — the fiff info.
 
 ---
 

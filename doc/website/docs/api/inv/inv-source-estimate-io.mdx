@@ -19,7 +19,7 @@ sidebar_position: 15
 class INVLIB::InvSourceEstimateIO
 ```
 
-Extended I/O methods for `InvSourceEstimate`.
+Extended I/O methods for [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate).
 
 ---
 
@@ -33,7 +33,7 @@ Writes a header line with vertex indices, then one row per time point. First col
 
 **Parameters:**
 
-- **stc** : *const InvSourceEstimate &*
+- **stc** : *const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &*
   Source estimate to export.
 
 - **sPath** : *const QString &*
@@ -62,7 +62,7 @@ Read source estimate from CSV format.
 
 **Returns:**
 
-- *InvSourceEstimate* — Source estimate (empty if failed).
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Source estimate (empty if failed).
 
 ---
 
@@ -74,7 +74,7 @@ No header; pure numeric matrix (n_vertices × n_times).
 
 **Parameters:**
 
-- **stc** : *const InvSourceEstimate &*
+- **stc** : *const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &*
   Source estimate to export.
 
 - **sPath** : *const QString &*

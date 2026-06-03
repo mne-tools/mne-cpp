@@ -41,7 +41,7 @@ All Eigen containers are left at size zero; scalar members are set to safe defau
 
 Destroys the BEM model.
 
-FsSurface ownership is released automatically via std::unique_ptr. The solution matrix is freed by `fwd_bem_free_solution()`.
+[FsSurface](/docs/api/fs/fs-surface) ownership is released automatically via std::unique_ptr. The solution matrix is freed by `fwd_bem_free_solution()`.
 
 ---
 
@@ -64,7 +64,7 @@ Find a surface of the given kind in this BEM model.
 
 **Returns:**
 
-- *MNELIB::MNESurface ** — Non-owning pointer to the surface, or nullptr if not found.
+- *[MNESurface](/docs/api/mne/mne-surface) ** — Non-owning pointer to the surface, or nullptr if not found.
 
 ---
 
@@ -94,7 +94,7 @@ Set the Head-to-MRI coordinate transform for this BEM model.
 
 **Parameters:**
 
-- **t** : *const FIFFLIB::FiffCoordTrans &*
+- **t** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The head-to-MRI coordinate transformation.
 
 **Returns:**
@@ -169,7 +169,7 @@ Builds the coil-specific solution matrix for EEG electrodes by multiplying the B
 
 **Parameters:**
 
-- **els** : *FwdCoilSet **
+- **els** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   Electrode (coil) set to prepare.
 
 **Returns:**
@@ -190,7 +190,7 @@ Compute the gradient of BEM potentials with respect to dipole position (constant
 - **Q** : *const Eigen::Vector3f &*
   Dipole orientation.
 
-- **els** : *FwdCoilSet **
+- **els** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   Electrode set.
 
 - **all_surfs** : *int*
@@ -219,7 +219,7 @@ Compute BEM potentials at electrodes using linear collocation.
 - **Q** : *const Eigen::Vector3f &*
   Dipole orientation.
 
-- **els** : *FwdCoilSet **
+- **els** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   Electrode set.
 
 - **all_surfs** : *int*
@@ -242,7 +242,7 @@ Compute the gradient of BEM potentials with respect to dipole position (linear c
 - **Q** : *const Eigen::Vector3f &*
   Dipole orientation.
 
-- **els** : *FwdCoilSet **
+- **els** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   Electrode set.
 
 - **all_surfs** : *int*
@@ -271,7 +271,7 @@ Compute BEM potentials at electrodes using constant collocation.
 - **Q** : *const Eigen::Vector3f &*
   Dipole orientation.
 
-- **els** : *FwdCoilSet **
+- **els** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   Electrode set.
 
 - **all_surfs** : *int*
@@ -288,7 +288,7 @@ Assemble the constant-collocation magnetic field coefficient matrix.
 
 **Parameters:**
 
-- **coils** : *FwdCoilSet **
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   MEG coil set.
 
 **Returns:**
@@ -303,7 +303,7 @@ Assemble the linear-collocation magnetic field coefficient matrix.
 
 **Parameters:**
 
-- **coils** : *FwdCoilSet **
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   MEG coil set.
 
 - **method** : *int*
@@ -323,7 +323,7 @@ Builds the coil-specific solution matrix by multiplying the BEM solution with th
 
 **Parameters:**
 
-- **coils** : *FwdCoilSet **
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   MEG coil set to prepare.
 
 **Returns:**
@@ -344,7 +344,7 @@ Compute BEM magnetic fields at coils using linear collocation.
 - **Q** : *const Eigen::Vector3f &*
   Dipole orientation.
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coil set.
 
 - **B** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
@@ -364,7 +364,7 @@ Compute BEM magnetic fields at coils using constant collocation.
 - **Q** : *const Eigen::Vector3f &*
   Dipole orientation.
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coil set.
 
 - **B** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
@@ -384,7 +384,7 @@ Compute the gradient of BEM magnetic fields with respect to dipole position (con
 - **Q** : *const Eigen::Vector3f &*
   Dipole orientation.
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coil set.
 
 - **xgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
@@ -410,7 +410,7 @@ Compute the gradient of BEM magnetic fields with respect to dipole position (lin
 - **Q** : *const Eigen::Vector3f &*
   Dipole orientation.
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coil set.
 
 - **xgrad** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
@@ -430,16 +430,16 @@ Compute the MEG forward solution for one or more source spaces.
 
 **Parameters:**
 
-- **spaces** : *std::vector&lt; std::unique_ptr&lt; MNELIB::MNESourceSpace &gt; &gt; &*
+- **spaces** : *std::vector&lt; std::unique_ptr&lt; [MNESourceSpace](/docs/api/mne/mne-source-space) &gt; &gt; &*
   Source spaces.
 
-- **coils** : *FwdCoilSet **
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   MEG coil set.
 
-- **comp_coils** : *FwdCoilSet **
+- **comp_coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   Compensator coil set (may be nullptr).
 
-- **comp_data** : *MNELIB::MNECTFCompDataSet **
+- **comp_data** : *[MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) **
   CTF compensation data (may be nullptr).
 
 - **fixed_ori** : *bool*
@@ -451,10 +451,10 @@ Compute the MEG forward solution for one or more source spaces.
 - **use_threads** : *bool*
   If true, parallelize across source spaces.
 
-- **resp** : *FIFFLIB::FiffNamedMatrix &*
+- **resp** : *[FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) &*
   Forward solution matrix.
 
-- **resp_grad** : *FIFFLIB::FiffNamedMatrix &*
+- **resp_grad** : *[FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) &*
   Gradient forward solution matrix.
 
 - **bDoGRad** : *bool*
@@ -472,25 +472,25 @@ Compute the EEG forward solution for one or more source spaces.
 
 **Parameters:**
 
-- **spaces** : *std::vector&lt; std::unique_ptr&lt; MNELIB::MNESourceSpace &gt; &gt; &*
+- **spaces** : *std::vector&lt; std::unique_ptr&lt; [MNESourceSpace](/docs/api/mne/mne-source-space) &gt; &gt; &*
   Source spaces.
 
-- **els** : *FwdCoilSet **
+- **els** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   Electrode locations.
 
 - **fixed_ori** : *bool*
   If true, use fixed-orientation dipoles.
 
-- **eeg_model** : *FwdEegSphereModel **
+- **eeg_model** : *[FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) **
   Sphere model definition.
 
 - **use_threads** : *bool*
   If true, parallelize across source spaces.
 
-- **resp** : *FIFFLIB::FiffNamedMatrix &*
+- **resp** : *[FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) &*
   Forward solution matrix.
 
-- **resp_grad** : *FIFFLIB::FiffNamedMatrix &*
+- **resp_grad** : *[FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) &*
   Gradient forward solution matrix.
 
 - **bDoGrad** : *bool*
@@ -613,7 +613,7 @@ Creates an evenly-spaced grid of candidate source locations, optionally excludin
 
 **Parameters:**
 
-- **guess_surf** : *MNELIB::MNESurface **
+- **guess_surf** : *[MNESurface](/docs/api/mne/mne-surface) **
   Predefined boundary surface for the guesses (may be nullptr).
 
 - **guessrad** : *float*
@@ -633,7 +633,7 @@ Creates an evenly-spaced grid of candidate source locations, optionally excludin
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNELIB::MNESurface &gt;* — FsSurface containing the guess locations, or nullptr on failure.
+- *std::unique_ptr&lt; [MNESurface](/docs/api/mne/mne-surface) &gt;* — FsSurface containing the guess locations, or nullptr on failure.
 
 ---
 
@@ -664,7 +664,7 @@ Compute the linear potential coefficients for one source-destination pair.
 - **from** : *const Eigen::Vector3f &*
   Source point.
 
-- **to** : *MNELIB::MNETriangle &*
+- **to** : *[MNETriangle](/docs/api/mne/mne-triangle) &*
   Destination triangle.
 
 - **omega** : *Eigen::Vector3d &*
@@ -678,7 +678,7 @@ Correct the auto (self-coupling) elements of the linear collocation matrix.
 
 **Parameters:**
 
-- **surf** : *MNELIB::MNESurface &*
+- **surf** : *[MNESurface](/docs/api/mne/mne-surface) &*
   The BEM surface.
 
 - **mat** : *Eigen::MatrixXf &*
@@ -692,7 +692,7 @@ Assemble the full linear-collocation potential coefficient matrix.
 
 **Parameters:**
 
-- **surfs** : *const std::vector&lt; MNELIB::MNESurface * &gt; &*
+- **surfs** : *const std::vector&lt; [MNESurface](/docs/api/mne/mne-surface) * &gt; &*
   Vector of BEM surfaces.
 
 **Returns:**
@@ -800,7 +800,7 @@ Compute the solid-angle matrix for all BEM surfaces.
 
 **Parameters:**
 
-- **surfs** : *const std::vector&lt; MNELIB::MNESurface * &gt; &*
+- **surfs** : *const std::vector&lt; [MNESurface](/docs/api/mne/mne-surface) * &gt; &*
   Vector of BEM surfaces.
 
 **Returns:**
@@ -872,14 +872,14 @@ Matches the fwdFieldFunc signature for use in forward computation threads.
 - **Q** : *const Eigen::Vector3f &*
   Dipole orientation (3-element array).
 
-- **els** : *FwdCoilSet &*
+- **els** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   Electrode descriptors.
 
 - **pot** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
   Output potentials.
 
 - **client** : *void **
-  Opaque pointer to the `FwdBemModel` instance.
+  Opaque pointer to the [`FwdBemModel`](/docs/api/fwd/fwd-bem-model) instance.
 
 **Returns:**
 
@@ -901,7 +901,7 @@ Matches the fwdFieldGradFunc signature for use in forward computation threads.
 - **Q** : *const Eigen::Vector3f &*
   Dipole orientation (3-element array).
 
-- **els** : *FwdCoilSet &*
+- **els** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   Electrode descriptors.
 
 - **pot** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
@@ -917,7 +917,7 @@ Matches the fwdFieldGradFunc signature for use in forward computation threads.
   Gradient with respect to z.
 
 - **client** : *void **
-  Opaque pointer to the `FwdBemModel` instance.
+  Opaque pointer to the [`FwdBemModel`](/docs/api/fwd/fwd-bem-model) instance.
 
 **Returns:**
 
@@ -983,7 +983,7 @@ Compute the geometry integrals for the magnetic field from a triangle.
 - **from** : *const Eigen::Vector3f &*
   Source point.
 
-- **to** : *MNELIB::MNETriangle &*
+- **to** : *[MNETriangle](/docs/api/mne/mne-triangle) &*
   Destination triangle.
 
 - **I1p** : *double &*
@@ -1021,7 +1021,7 @@ Compute the constant-collocation magnetic field coefficient for one triangle.
 - **normal** : *const Eigen::Vector3f &*
   Field direction of interest (unit vector).
 
-- **tri** : *MNELIB::MNETriangle &*
+- **tri** : *[MNETriangle](/docs/api/mne/mne-triangle) &*
   Source triangle.
 
 **Returns:**
@@ -1060,7 +1060,7 @@ Compute linear field coefficients using the Ferguson method.
 - **dir** : *const Eigen::Vector3f &*
   Field direction of interest (unit vector).
 
-- **tri** : *MNELIB::MNETriangle &*
+- **tri** : *[MNETriangle](/docs/api/mne/mne-triangle) &*
   Destination triangle.
 
 - **res** : *Eigen::Vector3d &*
@@ -1080,7 +1080,7 @@ Compute linear field coefficients using the Urankar method.
 - **dir** : *const Eigen::Vector3f &*
   Field direction of interest (unit vector).
 
-- **tri** : *MNELIB::MNETriangle &*
+- **tri** : *[MNETriangle](/docs/api/mne/mne-triangle) &*
   Destination triangle.
 
 - **res** : *Eigen::Vector3d &*
@@ -1100,7 +1100,7 @@ Compute linear field coefficients using the simple (direct) method.
 - **normal** : *const Eigen::Vector3f &*
   Field direction of interest (unit vector).
 
-- **source** : *MNELIB::MNETriangle &*
+- **source** : *[MNETriangle](/docs/api/mne/mne-triangle) &*
   Source triangle.
 
 - **res** : *Eigen::Vector3d &*
@@ -1175,14 +1175,14 @@ Dispatches to fwd_bem_field_calc or fwd_bem_lin_field_calc based on the current 
 - **Q** : *const Eigen::Vector3f &*
   Dipole orientation (3-element array).
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coil descriptors.
 
 - **B** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
   Output magnetic fields.
 
 - **client** : *void **
-  Opaque pointer to the `FwdBemModel` instance.
+  Opaque pointer to the [`FwdBemModel`](/docs/api/fwd/fwd-bem-model) instance.
 
 **Returns:**
 
@@ -1204,7 +1204,7 @@ Matches the fwdFieldGradFunc signature for use in forward computation threads.
 - **Q** : *const Eigen::Vector3f &*
   Dipole orientation (3-element array).
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coil definitions.
 
 - **Bval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
@@ -1220,7 +1220,7 @@ Matches the fwdFieldGradFunc signature for use in forward computation threads.
   Gradient with respect to z.
 
 - **client** : *void **
-  Opaque pointer to the `FwdBemModel` instance.
+  Opaque pointer to the [`FwdBemModel`](/docs/api/fwd/fwd-bem-model) instance.
 
 **Returns:**
 
@@ -1236,7 +1236,7 @@ Used as a thread entry point; the argument is cast to the appropriate worker str
 
 **Parameters:**
 
-- **arg** : *FwdThreadArg **
+- **arg** : *[FwdThreadArg](/docs/api/fwd/fwd-thread-arg) **
   Per-thread work descriptor.
 
 ---
@@ -1255,7 +1255,7 @@ Matches the fwdFieldFunc signature.
 - **Q** : *const Eigen::Vector3f &*
   Dipole components (xyz).
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coil definitions.
 
 - **Bval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
@@ -1281,7 +1281,7 @@ Returns one row per cardinal dipole direction (x, y, z). Matches the fwdVecField
 - **rd** : *const Eigen::Vector3f &*
   Dipole position (3-element array).
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coil definitions.
 
 - **Bval** : *Eigen::Ref&lt; Eigen::MatrixXf &gt;*
@@ -1310,7 +1310,7 @@ Matches the fwdFieldGradFunc signature.
 - **Q** : *const Eigen::Vector3f &*
   Dipole components (xyz).
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coil definitions.
 
 - **Bval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
@@ -1346,7 +1346,7 @@ Callback: compute the magnetic field of a magnetic dipole at coils.
 - **M** : *const Eigen::Vector3f &*
   Dipole moment components (xyz).
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coil definitions.
 
 - **Bval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
@@ -1372,7 +1372,7 @@ Returns one row per cardinal dipole direction (x, y, z).
 - **rm** : *const Eigen::Vector3f &*
   Dipole position (3-element array).
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   MEG coil definitions.
 
 - **Bval** : *Eigen::Ref&lt; Eigen::MatrixXf &gt;*

@@ -23,7 +23,7 @@ class; the functions live directly in the library namespace.
 
 SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
-MNELIB::MNEIcp wraps the classical point-to-surface ICP used by mne-cpp's coregistration tools to refine an initial `head` &lt;-&gt; `MRI` transformation. It projects each digitiser point onto the nearest triangle of an MNEBemSurface (via MNEProjectToSurface), solves a rigid-body least squares with SVD and iterates until convergence.
+MNELIB::MNEIcp wraps the classical point-to-surface ICP used by mne-cpp's coregistration tools to refine an initial `head` &lt;-&gt; `MRI` transformation. It projects each digitiser point onto the nearest triangle of an [MNEBemSurface](/docs/api/mne/mne-bem-surface) (via [MNEProjectToSurface](/docs/api/mne/mne-project-to-surface)), solves a rigid-body least squares with SVD and iterates until convergence.
 
 ---
 
@@ -32,20 +32,20 @@ MNELIB::MNEIcp wraps the classical point-to-surface ICP used by mne-cpp's coregi
 ### performIcp(mneSurfacePoints, matPointCloud, transFromTo, fRMSE, bScale, iMaxIter, fTol, vecWeights)
 
 ```cpp
-bool performIcp(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints, const Eigen::MatrixXf & matPointCloud, FIFFLIB::FiffCoordTrans & transFromTo, float & fRMSE, bool bScale, int iMaxIter, float fTol, const Eigen::VectorXf & vecWeights);
+bool performIcp(const QSharedPointer<[MNEProjectToSurface](/docs/api/mne/mne-project-to-surface)> mneSurfacePoints, const Eigen::MatrixXf & matPointCloud, [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) & transFromTo, float & fRMSE, bool bScale, int iMaxIter, float fTol, const Eigen::VectorXf & vecWeights);
 ```
 
 The ICP algorithm to register a point cloud with a surface.
 
 **Parameters:**
 
-- **mneSurfacePoints** : *const QSharedPointer&lt;MNELIB::MNEProjectToSurface&gt;*
-  The `MNEProjectToSurface` object that contains the surface triangles etc. (To).
+- **mneSurfacePoints** : *const QSharedPointer&lt;[MNEProjectToSurface](/docs/api/mne/mne-project-to-surface)&gt;*
+  The [`MNEProjectToSurface`](/docs/api/mne/mne-project-to-surface) object that contains the surface triangles etc. (To).
 
 - **matPointCloud** : *const Eigen::MatrixXf &*
   The point cloud to be registered (From).
 
-- **transFromTo** : *FIFFLIB::FiffCoordTrans &*
+- **transFromTo** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The forward transformation matrix. It can contain an initial transformation (e.g. from fiducial alignment).
 
 - **fRMSE** : *float &*
@@ -106,20 +106,20 @@ Corresponding point set registration using quaternions.
 ### discard3DPointOutliers(mneSurfacePoints, matPointCloud, transFromTo, vecTake, matTakePoint, fMaxDist)
 
 ```cpp
-bool discard3DPointOutliers(const QSharedPointer<MNELIB::MNEProjectToSurface> mneSurfacePoints, const Eigen::MatrixXf & matPointCloud, const FIFFLIB::FiffCoordTrans & transFromTo, Eigen::VectorXi & vecTake, Eigen::MatrixXf & matTakePoint, float fMaxDist);
+bool discard3DPointOutliers(const QSharedPointer<[MNEProjectToSurface](/docs/api/mne/mne-project-to-surface)> mneSurfacePoints, const Eigen::MatrixXf & matPointCloud, const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) & transFromTo, Eigen::VectorXi & vecTake, Eigen::MatrixXf & matTakePoint, float fMaxDist);
 ```
 
 Discard outliers compared to a given 3D surface.
 
 **Parameters:**
 
-- **mneSurfacePoints** : *const QSharedPointer&lt;MNELIB::MNEProjectToSurface&gt;*
-  The `MNEProjectToSurface` object that contains the surface triangles etc. (To).
+- **mneSurfacePoints** : *const QSharedPointer&lt;[MNEProjectToSurface](/docs/api/mne/mne-project-to-surface)&gt;*
+  The [`MNEProjectToSurface`](/docs/api/mne/mne-project-to-surface) object that contains the surface triangles etc. (To).
 
 - **matPointCloud** : *const Eigen::MatrixXf &*
   The point cloud to be registered (From).
 
-- **transFromTo** : *const FIFFLIB::FiffCoordTrans &*
+- **transFromTo** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The forward transformation matrix.
 
 - **vecTake** : *Eigen::VectorXi &*

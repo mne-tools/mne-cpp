@@ -15,7 +15,7 @@ sidebar_position: 28
 class FIFFLIB::FiffSparseMatrix
 ```
 
-Sparse FIFF matrix: CCS or RCS storage with the value / index / pointer triple as written by FiffStream::write_float_sparse_*.
+Sparse FIFF matrix: CCS or RCS storage with the value / index / pointer triple as written by [FiffStream](/docs/api/fiff/fiff-stream)::write_float_sparse_*.
 
 Holds the three arrays the FIFF sparse-matrix tag stores on disk (values, inner indices, outer pointers) and the (nrow, ncol, nnz) shape, so it can be streamed in and out without conversion. Convert to an `Eigen::SparseMatrix` for arithmetic and back for serialization.
 
@@ -25,13 +25,13 @@ Holds the three arrays the FIFF sparse-matrix tag stores on disk (values, inner 
 
 ### FiffSparseMatrix()
 
-Constructs an empty `FiffSparseMatrix`.
+Constructs an empty [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix).
 
 ---
 
 ### FiffSparseMatrix(mat, coding)
 
-Constructs a `FiffSparseMatrix` wrapping an existing Eigen sparse matrix.
+Constructs a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) wrapping an existing Eigen sparse matrix.
 
 **Parameters:**
 
@@ -123,7 +123,7 @@ Add the upper triangle to a lower-triangular sparse RCS matrix.
 
 **Returns:**
 
-- *FiffSparseMatrix::UPtr* — A unique pointer to the newly constructed `FiffSparseMatrix` with both triangles.
+- *FiffSparseMatrix::UPtr* — A unique pointer to the newly constructed [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) with both triangles.
 
 ---
 
@@ -133,7 +133,7 @@ Extract only the lower triangle (including diagonal) from a square RCS matrix.
 
 **Returns:**
 
-- *FiffSparseMatrix::UPtr* — A unique pointer to the newly constructed `FiffSparseMatrix` with lower-triangle elements.
+- *FiffSparseMatrix::UPtr* — A unique pointer to the newly constructed [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) with lower-triangle elements.
 
 ---
 
@@ -165,7 +165,7 @@ Interpret dimensions and nz from matrix data.
 
 **Parameters:**
 
-- **tag** : *const FIFFLIB::FiffTag::UPtr &*
+- **tag** : *const [FIFFLIB::FiffTag](/docs/api/fiff/fiff-tag)::UPtr &*
   The tag containing sparse matrix data.
 
 **Returns:**
@@ -180,12 +180,12 @@ Conversion of tag data into the standard sparse representation.
 
 **Parameters:**
 
-- **tag** : *const FIFFLIB::FiffTag::UPtr &*
+- **tag** : *const [FIFFLIB::FiffTag](/docs/api/fiff/fiff-tag)::UPtr &*
   The tag containing sparse matrix data.
 
 **Returns:**
 
-- *FiffSparseMatrix::UPtr* — A unique pointer to the newly constructed `FiffSparseMatrix`, or nullptr on error.
+- *FiffSparseMatrix::UPtr* — A unique pointer to the newly constructed [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix), or nullptr on error.
 
 ---
 
@@ -212,13 +212,13 @@ Create a sparse RCS matrix from row-based data.
 
 **Returns:**
 
-- *FiffSparseMatrix::UPtr* — A unique pointer to the newly constructed `FiffSparseMatrix`, or nullptr on error.
+- *FiffSparseMatrix::UPtr* — A unique pointer to the newly constructed [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix), or nullptr on error.
 
 ---
 
 ### fromEigenSparse(mat)
 
-Create a `FiffSparseMatrix` from an Eigen::SparseMatrix&lt;double&gt;.
+Create a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) from an Eigen::SparseMatrix&lt;double&gt;.
 
 The data is cast to float for internal storage.
 
@@ -229,13 +229,13 @@ The data is cast to float for internal storage.
 
 **Returns:**
 
-- *FiffSparseMatrix* — The equivalent `FiffSparseMatrix`.
+- *[FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix)* — The equivalent [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix).
 
 ---
 
 ### fromEigenSparse(mat)
 
-Create a `FiffSparseMatrix` from an Eigen::SparseMatrix&lt;float&gt;.
+Create a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) from an Eigen::SparseMatrix&lt;float&gt;.
 
 **Parameters:**
 
@@ -244,7 +244,7 @@ Create a `FiffSparseMatrix` from an Eigen::SparseMatrix&lt;float&gt;.
 
 **Returns:**
 
-- *FiffSparseMatrix* — The equivalent `FiffSparseMatrix`.
+- *[FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix)* — The equivalent [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix).
 
 ---
 

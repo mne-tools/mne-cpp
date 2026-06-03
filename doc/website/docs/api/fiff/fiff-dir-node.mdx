@@ -17,7 +17,7 @@ class FIFFLIB::FiffDirNode
 
 Recursive FIFF block-tree node: block kind, block ID, directly contained directory entries and child sub-blocks.
 
-Each node corresponds to one `FIFFB_BLOCK_START` ... `FIFFB_BLOCK_END` pair in the on-disk tag stream. The full tree is built once by FiffStream::make_dir_tree after the directory tag is parsed, and is then traversed by every higher-level reader (`FiffInfo`, FiffRawData, `FiffEvoked`, `FiffCov`, ...) via `dir_tree_find`. The static `copy_tree` helper streams an entire sub-tree from one `FiffStream` to another preserving block IDs, which is how MNE-CPP writes derived files that keep provenance back to the source recording.
+Each node corresponds to one `FIFFB_BLOCK_START` ... `FIFFB_BLOCK_END` pair in the on-disk tag stream. The full tree is built once by [FiffStream](/docs/api/fiff/fiff-stream)::make_dir_tree after the directory tag is parsed, and is then traversed by every higher-level reader ([`FiffInfo`](/docs/api/fiff/fiff-info), [FiffRawData](/docs/api/fiff/fiff-raw-data), [`FiffEvoked`](/docs/api/fiff/fiff-evoked), [`FiffCov`](/docs/api/fiff/fiff-cov), ...) via `dir_tree_find`. The static `copy_tree` helper streams an entire sub-tree from one [`FiffStream`](/docs/api/fiff/fiff-stream) to another preserving block IDs, which is how MNE-CPP writes derived files that keep provenance back to the source recording.
 
 ---
 
@@ -77,17 +77,17 @@ Definition of the find_tag function in various files e.g.
 
 fiff_read_named_matrix.m,
 
-Founds a tag of a given kind within a tree, and reeds it from file. Note: In difference to mne-matlab this is not a static function. This is a method of the `FiffDirNode` class, that's why a tree object doesn't need to be handed to the function.
+Founds a tag of a given kind within a tree, and reeds it from file. Note: In difference to mne-matlab this is not a static function. This is a method of the [`FiffDirNode`](/docs/api/fiff/fiff-dir-node) class, that's why a tree object doesn't need to be handed to the function.
 
 **Parameters:**
 
-- **p_pStream** : *QSharedPointer&lt;FiffStream&gt; &*
+- **p_pStream** : *QSharedPointer&lt;[FiffStream](/docs/api/fiff/fiff-stream)&gt; &*
   the opened fif file.
 
 - **findkind** : *fiff_int_t*
   the kind which should be found.
 
-- **p_pTag** : *std::unique_ptr&lt; FiffTag &gt; &*
+- **p_pTag** : *std::unique_ptr&lt; [FiffTag](/docs/api/fiff/fiff-tag) &gt; &*
   the found tag.
 
 **Returns:**
@@ -102,17 +102,17 @@ Definition of the find_tag function in various files e.g.
 
 fiff_read_named_matrix.m,
 
-Founds a tag of a given kind within a tree, and reeds it from file. Note: In difference to mne-matlab this is not a static function. This is a method of the `FiffDirNode` class, that's why a tree object doesn't need to be handed to the function.
+Founds a tag of a given kind within a tree, and reeds it from file. Note: In difference to mne-matlab this is not a static function. This is a method of the [`FiffDirNode`](/docs/api/fiff/fiff-dir-node) class, that's why a tree object doesn't need to be handed to the function.
 
 **Parameters:**
 
-- **p_pStream** : *FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   the opened fif file.
 
 - **findkind** : *fiff_int_t*
   the kind which should be found.
 
-- **p_pTag** : *std::unique_ptr&lt; FiffTag &gt; &*
+- **p_pTag** : *std::unique_ptr&lt; [FiffTag](/docs/api/fiff/fiff-tag) &gt; &*
   the found tag.
 
 **Returns:**
@@ -138,7 +138,7 @@ Definition of the has_tag function in fiff_read_named_matrix.m.
 
 ### has_kind(p_kind)
 
-Checks whether a `FiffDirNode` has a specific kind.
+Checks whether a [`FiffDirNode`](/docs/api/fiff/fiff-dir-node) has a specific kind.
 
 **Parameters:**
 
@@ -190,16 +190,16 @@ Copies directory subtrees from fidin to fidout.
 
 **Parameters:**
 
-- **p_pStreamIn** : *QSharedPointer&lt;FiffStream&gt; &*
+- **p_pStreamIn** : *QSharedPointer&lt;[FiffStream](/docs/api/fiff/fiff-stream)&gt; &*
   fiff file to copy from.
 
-- **in_id** : *const FiffId &*
+- **in_id** : *const [FiffId](/docs/api/fiff/fiff-id) &*
   file id description.
 
-- **p_Nodes** : *const QList&lt; QSharedPointer&lt;FiffDirNode&gt; &gt; &*
+- **p_Nodes** : *const QList&lt; QSharedPointer&lt;[FiffDirNode](/docs/api/fiff/fiff-dir-node)&gt; &gt; &*
   subtree directories to be copied.
 
-- **p_pStreamOut** : *QSharedPointer&lt;FiffStream&gt; &*
+- **p_pStreamOut** : *QSharedPointer&lt;[FiffStream](/docs/api/fiff/fiff-stream)&gt; &*
   fiff file to write to.
 
 **Returns:**

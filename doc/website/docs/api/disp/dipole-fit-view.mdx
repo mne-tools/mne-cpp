@@ -19,6 +19,14 @@ Single-equivalent-current-dipole-fit input / result panel.
 
 Collects measurement / BEM / covariance / trans inputs and a time window, launches the underlying `INVERSELIB::DipoleFit` job, then renders the fitted position, orientation, magnitude and goodness-of-fit in a result table.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- DipoleFitView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods

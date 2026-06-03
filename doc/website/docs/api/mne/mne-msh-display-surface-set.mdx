@@ -19,7 +19,7 @@ Replaces *mshDisplaySurfaceSet, mshDisplaySurfaceSetRec struct (analyze_types.c)
 
 Note that another implementation can be found in movie_types.h
 
-The `MNE` Msh Display FsSurface Set class holds information about a set of surfaces to be rendered.
+The [`MNE`](/docs/api/mne/mne-class) Msh Display [FsSurface](/docs/api/fs/fs-surface) Set class holds information about a set of surfaces to be rendered.
 
 ---
 
@@ -27,13 +27,13 @@ The `MNE` Msh Display FsSurface Set class holds information about a set of surfa
 
 ### MNEMshDisplaySurfaceSet(nsurf)
 
-Constructs the `MNEMshDisplaySurfaceSet`.
+Constructs the [`MNEMshDisplaySurfaceSet`](/docs/api/mne/mne-msh-display-surface-set).
 
 ---
 
 ### ~MNEMshDisplaySurfaceSet()
 
-Destroys the `MNEMshDisplaySurfaceSet`.
+Destroys the [`MNEMshDisplaySurfaceSet`](/docs/api/mne/mne-msh-display-surface-set).
 
 ---
 
@@ -70,7 +70,7 @@ Add a new surface to the set, or replace an existing surface with the same ID if
 
 **Parameters:**
 
-- **newSurf** : *std::unique_ptr&lt; MNEMshDisplaySurface &gt;*
+- **newSurf** : *std::unique_ptr&lt; [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) &gt;*
   The surface to add or use as replacement.
 
 - **replace** : *bool*
@@ -105,7 +105,7 @@ Replace the current active lighting with a deep copy of the provided light set.
 
 **Parameters:**
 
-- **set** : *const MNEMshLightSet &*
+- **set** : *const [MNEMshLightSet](/docs/api/mne/mne-msh-light-set) &*
   The light set to apply.
 
 ---
@@ -129,7 +129,7 @@ Load left and right hemisphere FreeSurfer surfaces (with curvature) from the sub
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNEMshDisplaySurfaceSet &gt;* — A new display surface set, or NULL on failure. Caller takes ownership.
+- *std::unique_ptr&lt; [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) &gt;* — A new display surface set, or NULL on failure. Caller takes ownership.
 
 ---
 
@@ -145,12 +145,12 @@ Deep-copy a light set including all individual light entries.
 
 **Parameters:**
 
-- **s** : *const MNEMshLightSet &*
+- **s** : *const [MNEMshLightSet](/docs/api/mne/mne-msh-light-set) &*
   The light set to duplicate.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNEMshLightSet &gt;* — A new deep copy. Caller takes ownership.
+- *std::unique_ptr&lt; [MNEMshLightSet](/docs/api/mne/mne-msh-light-set) &gt;* — A new deep copy. Caller takes ownership.
 
 ---
 

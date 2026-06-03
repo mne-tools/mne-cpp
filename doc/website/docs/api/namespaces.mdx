@@ -1,0 +1,547 @@
+---
+id: namespaces
+title: "Namespace List"
+sidebar_label: Namespaces
+sidebar_position: 1
+---
+
+# Namespace List
+
+All public namespaces in the MNE-CPP library tree.
+
+| Namespace | Classes | Description |
+|-----------|---------|-------------|
+| [`BIDSLIB`](/docs/api/bids/) | 14 | BIDS dataset reading, writing, path construction, and sidecar metadata handling for iEEG/EEG/MEG. |
+| `COMLIB` | 8 | Real-time client/server communication primitives for talking to `mne_rt_server`. |
+| [`CONNECTIVITYLIB`](/docs/api/connectivity/) | 21 | Functional connectivity metrics (coherence, PLV, cross-correlation, etc.). |
+| [`DECODINGLIB`](/docs/api/decoding/) | 5 | Supervised and unsupervised spatial-filter decompositions for M/EEG decoding. |
+| [`DISP3DLIB`](/docs/api/disp3-d/) | 14 | 3-D brain visualisation using the Qt RHI rendering backend. |
+| [`DISPLIB`](/docs/api/disp/) | 69 | 2-D display widgets and visualisation helpers (charts, topography, colour maps). |
+| `DSPLIB` | 0 | Digital signal processing (filtering, spectrograms, real-time averaging, HPI, noise reduction). |
+| [`FIFFLIB`](/docs/api/fiff/) | 29 | FIFF file I/O, in-memory data structures and high-level readers/writers. |
+| [`FSLIB`](/docs/api/fs/) | 8 | FreeSurfer surface, annotation and parcellation I/O for mne-cpp. |
+| [`FWDLIB`](/docs/api/fwd/) | 14 | Forward modelling — BEM solver, spherical models, sensor/coil definitions and the lead-field assembly that links current dipoles to MEG/EEG sensor readings. |
+| `INVLIB` | 54 | Inverse source estimation (MNE, dSPM, sLORETA, dipole fitting). |
+| [`LSLLIB`](/docs/api/lsl/) | 3 | Lab Streaming Layer (LSL) integration for real-time data exchange. |
+| [`MATHLIB`](/docs/api/math/) | 0 | Mathematical algorithms and geometry (linear algebra, optimization, spectral estimation). |
+| [`MLLIB`](/docs/api/ml/) | 4 | Tensors, model abstraction, ONNX Runtime inference and Python training drivers used across mne-cpp. |
+| [`MNALIB`](/docs/api/mna/) | 22 | MNE Analysis Container Format (mna/mnx). |
+| [`MNELIB`](/docs/api/mne/) | 65 | Core [`MNE`](/docs/api/mne/mne-class) data structures (source spaces, source estimates, hemispheres). |
+| [`MRILIB`](/docs/api/mri/) | 8 | Volume I/O, voxel geometry and slice resampling for structural MRI data inside mne-cpp. |
+| [`RTPROCESSINGLIB`](/docs/api/dsp/) | 15 |  |
+| `STSLIB` | 10 | Statistical testing (t-tests, F-tests, cluster permutation, multiple comparison correction). |
+| `SURFACEKEYS` | 0 | Centralised string constants for surface map keys. |
+| [`UTILSLIB`](/docs/api/utils/) | 93 | Shared utilities (I/O helpers, spectral analysis, layout management, warp algorithms). |
+| `Ui` | 0 |  |
+
+## Class inventory by namespace
+
+### BIDSLIB
+
+- [AbstractFormatReader](/docs/api/bids/abstract-format-reader)
+- [BIDSPath](/docs/api/bids/bids-path)
+- `BidsChannel`
+- `BidsCoordinateSystem`
+- `BidsDatasetDescription`
+- `BidsElectrode`
+- `BidsEvent`
+- [BidsRawData](/docs/api/bids/bids-raw-data)
+- [BidsTsv](/docs/api/bids/bids-tsv)
+- `BrainVisionChannelInfo`
+- `BrainVisionMarker`
+- [BrainVisionReader](/docs/api/bids/brain-vision-reader)
+- `EDFChannelInfo`
+- [EDFReader](/docs/api/bids/edf-reader)
+
+### COMLIB
+
+- `Command`
+- `CommandManager`
+- `CommandParser`
+- `MetaData`
+- `RawCommand`
+- `RtClient`
+- `RtCmdClient`
+- `RtDataClient`
+
+### CONNECTIVITYLIB
+
+- [AbstractMetric](/docs/api/connectivity/abstract-metric)
+- [Coherence](/docs/api/connectivity/coherence)
+- [Coherency](/docs/api/connectivity/coherency)
+- [Connectivity](/docs/api/connectivity/connectivity-class)
+- [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
+- [Correlation](/docs/api/connectivity/correlation)
+- [CrossCorrelation](/docs/api/connectivity/cross-correlation)
+- [DebiasedSquaredWeightedPhaseLagIndex](/docs/api/connectivity/debiased-squared-weighted-phase-lag-index)
+- [DirectedTransferFunction](/docs/api/connectivity/directed-transfer-function)
+- [GrangerCausality](/docs/api/connectivity/granger-causality)
+- [ImagCoherence](/docs/api/connectivity/imag-coherence)
+- [MvarModel](/docs/api/connectivity/mvar-model)
+- [Network](/docs/api/connectivity/network)
+- [NetworkEdge](/docs/api/connectivity/network-edge)
+- [NetworkNode](/docs/api/connectivity/network-node)
+- [PartialDirectedCoherence](/docs/api/connectivity/partial-directed-coherence)
+- [PhaseLagIndex](/docs/api/connectivity/phase-lag-index)
+- [PhaseLockingValue](/docs/api/connectivity/phase-locking-value)
+- [UnbiasedSquaredPhaseLagIndex](/docs/api/connectivity/unbiased-squared-phase-lag-index)
+- `VisualizationInfo`
+- [WeightedPhaseLagIndex](/docs/api/connectivity/weighted-phase-lag-index)
+
+### DECODINGLIB
+
+- [DecodingCsp](/docs/api/decoding/decoding-csp)
+- [DecodingSpoc](/docs/api/decoding/decoding-spoc)
+- [DecodingSsd](/docs/api/decoding/decoding-ssd)
+- `IcaLabelResult`
+- [MlIcaLabel](/docs/api/decoding/ml-ica-label)
+
+### DISP3DLIB
+
+- `ElectrodeArray`
+- `ElectrodeContact`
+- [ElectrodeObject](/docs/api/disp3-d/electrode-object)
+- [GeometryInfo](/docs/api/disp3-d/geometry-info)
+- [Interpolation](/docs/api/disp3-d/interpolation)
+- [MultimodalScene](/docs/api/disp3-d/multimodal-scene)
+- `PickResult`
+- [RtSensorDataWorker](/docs/api/disp3-d/rt-sensor-data-worker)
+- [RtSensorInterpolationMatWorker](/docs/api/disp3-d/rt-sensor-interpolation-mat-worker)
+- [RtSourceDataWorker](/docs/api/disp3-d/rt-source-data-worker)
+- [RtSourceInterpolationMatWorker](/docs/api/disp3-d/rt-source-interpolation-mat-worker)
+- `SceneLayer`
+- [SliceObject](/docs/api/disp3-d/slice-object)
+- [VideoOverlay](/docs/api/disp3-d/video-overlay)
+
+### DISPLIB
+
+- [AbstractView](/docs/api/disp/abstract-view)
+- [ApplyToView](/docs/api/disp/apply-to-view)
+- [ArtifactSettingsView](/docs/api/disp/artifact-settings-view)
+- [AverageLayoutView](/docs/api/disp/average-layout-view)
+- [AverageScene](/docs/api/disp/average-scene)
+- [AverageSceneItem](/docs/api/disp/average-scene-item)
+- [AverageSelectionView](/docs/api/disp/average-selection-view)
+- [AveragingSettingsView](/docs/api/disp/averaging-settings-view)
+- [Bar](/docs/api/disp/bar)
+- [BidsView](/docs/api/disp/bids-view)
+- [BidsViewModel](/docs/api/disp/bids-view-model)
+- [ButterflyView](/docs/api/disp/butterfly-view)
+- [ChannelDataModel](/docs/api/disp/channel-data-model)
+- [ChannelDataView](/docs/api/disp/channel-data-view)
+- `ChannelDisplayInfo`
+- [ChannelInfoModel](/docs/api/disp/channel-info-model)
+- [ChannelLabelPanel](/docs/api/disp/channel-label-panel)
+- [ChannelRhiView](/docs/api/disp/channel-rhi-view)
+- [ChannelSelectionView](/docs/api/disp/channel-selection-view)
+- [ColorMap](/docs/api/disp/color-map)
+- [CompensatorView](/docs/api/disp/compensator-view)
+- [ConnectivitySettingsView](/docs/api/disp/connectivity-settings-view)
+- [Control3DView](/docs/api/disp/control3-d-view)
+- [CoregSettingsView](/docs/api/disp/coreg-settings-view)
+- [CovarianceSettingsView](/docs/api/disp/covariance-settings-view)
+- [DipoleFitView](/docs/api/disp/dipole-fit-view)
+- [DraggableFramelessWidget](/docs/api/disp/draggable-frameless-widget)
+- [EvokedSetModel](/docs/api/disp/evoked-set-model)
+- [FiffRawViewSettings](/docs/api/disp/fiff-raw-view-settings)
+- [FilterDesignView](/docs/api/disp/filter-design-view)
+- [FilterPlotScene](/docs/api/disp/filter-plot-scene)
+- [FilterSettingsView](/docs/api/disp/filter-settings-view)
+- [FrequencySpectrumDelegate](/docs/api/disp/frequency-spectrum-delegate)
+- [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model)
+- [FwdSettingsView](/docs/api/disp/fwd-settings-view)
+- [Graph](/docs/api/disp/graph)
+- [HpiSettingsView](/docs/api/disp/hpi-settings-view)
+- [ImageSc](/docs/api/disp/image-sc)
+- [LayoutScene](/docs/api/disp/layout-scene)
+- [LinePlot](/docs/api/disp/line-plot)
+- [MNEOperator](/docs/api/disp/mne-operator)
+- [MinimumNormSettingsView](/docs/api/disp/minimum-norm-settings-view)
+- [ModalitySelectionView](/docs/api/disp/modality-selection-view)
+- [MultiView](/docs/api/disp/multi-view)
+- [MultiViewWindow](/docs/api/disp/multi-view-window)
+- [OverviewBarWidget](/docs/api/disp/overview-bar-widget)
+- [Plot](/docs/api/disp/plot)
+- [ProgressView](/docs/api/disp/progress-view)
+- [ProjectSettingsView](/docs/api/disp/project-settings-view)
+- [ProjectorsView](/docs/api/disp/projectors-view)
+- [QuickControlView](/docs/api/disp/quick-control-view)
+- [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view)
+- [RtFiffRawViewDelegate](/docs/api/disp/rt-fiff-raw-view-delegate)
+- [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model)
+- [ScaleControl](/docs/api/disp/scale-control)
+- [ScalingView](/docs/api/disp/scaling-view)
+- [SelectionItem](/docs/api/disp/selection-item)
+- [SelectionScene](/docs/api/disp/selection-scene)
+- [SelectionSceneItem](/docs/api/disp/selection-scene-item)
+- [SpectrumSettingsView](/docs/api/disp/spectrum-settings-view)
+- [SpectrumView](/docs/api/disp/spectrum-view)
+- [SpharaSettingsView](/docs/api/disp/sphara-settings-view)
+- [Spline](/docs/api/disp/spline)
+- [TFplot](/docs/api/disp/t-fplot)
+- [TfSettingsView](/docs/api/disp/tf-settings-view)
+- `TimeRulerEventMark`
+- `TimeRulerReferenceMark`
+- [TimeRulerWidget](/docs/api/disp/time-ruler-widget)
+- [TriggerDetectionView](/docs/api/disp/trigger-detection-view)
+
+### FIFFLIB
+
+- [Fiff](/docs/api/fiff/fiff-class)
+- `FiffAnnotation`
+- [FiffAnnotations](/docs/api/fiff/fiff-annotations)
+- [FiffChInfo](/docs/api/fiff/fiff-ch-info)
+- [FiffChPos](/docs/api/fiff/fiff-ch-pos)
+- [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)
+- [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set)
+- [FiffCov](/docs/api/fiff/fiff-cov)
+- [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp)
+- [FiffDataRef](/docs/api/fiff/fiff-data-ref)
+- [FiffDigPoint](/docs/api/fiff/fiff-dig-point)
+- [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set)
+- [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data)
+- [FiffDirEntry](/docs/api/fiff/fiff-dir-entry)
+- [FiffDirNode](/docs/api/fiff/fiff-dir-node)
+- [FiffEvents](/docs/api/fiff/fiff-events)
+- [FiffEvoked](/docs/api/fiff/fiff-evoked)
+- `FiffExplainEntry`
+- [FiffFileSharer](/docs/api/fiff/fiff-file-sharer)
+- [FiffId](/docs/api/fiff/fiff-id)
+- [FiffInfo](/docs/api/fiff/fiff-info)
+- [FiffInfoBase](/docs/api/fiff/fiff-info-base)
+- [FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix)
+- [FiffProj](/docs/api/fiff/fiff-proj)
+- [FiffRawDir](/docs/api/fiff/fiff-raw-dir)
+- [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix)
+- [FiffStream](/docs/api/fiff/fiff-stream)
+- [FiffTag](/docs/api/fiff/fiff-tag)
+- [FiffTime](/docs/api/fiff/fiff-time)
+
+### FSLIB
+
+- [FsAnnotation](/docs/api/fs/fs-annotation)
+- [FsAnnotationSet](/docs/api/fs/fs-annotation-set)
+- [FsAtlasLookup](/docs/api/fs/fs-atlas-lookup)
+- [FsColortable](/docs/api/fs/fs-colortable)
+- [FsLabel](/docs/api/fs/fs-label)
+- [FsLabelUtils](/docs/api/fs/fs-label-utils)
+- [FsSurface](/docs/api/fs/fs-surface)
+- [FsSurfaceSet](/docs/api/fs/fs-surface-set)
+
+### FWDLIB
+
+- [ComputeFwd](/docs/api/fwd/compute-fwd)
+- [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings)
+- [Fwd](/docs/api/fwd/fwd-class)
+- [FwdBemModel](/docs/api/fwd/fwd-bem-model)
+- [FwdBemSolution](/docs/api/fwd/fwd-bem-solution)
+- [FwdCoil](/docs/api/fwd/fwd-coil)
+- [FwdCoilSet](/docs/api/fwd/fwd-coil-set)
+- [FwdCompData](/docs/api/fwd/fwd-comp-data)
+- [FwdEegSphereLayer](/docs/api/fwd/fwd-eeg-sphere-layer)
+- [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model)
+- [FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set)
+- [FwdFieldMap](/docs/api/fwd/fwd-field-map)
+- [FwdThreadArg](/docs/api/fwd/fwd-thread-arg)
+- `fitUserRec`
+
+### INVLIB
+
+- `CoilParam`
+- `DipFitError`
+- `FitDipUserRec`
+- `HPISortStruct`
+- `HpiFitResult`
+- `InvBeamformer`
+- `InvBeamformerCompute`
+- [InvCMNE](/docs/api/inv/inv-cmne)
+- `InvCMNEResult`
+- `InvCMNESettings`
+- `InvConnectivity`
+- [InvDICS](/docs/api/inv/inv-dics)
+- `InvDipole`
+- [InvDipoleFit](/docs/api/inv/inv-dipole-fit)
+- `InvDipoleFitData`
+- `InvDipoleFitSettings`
+- `InvDipoleForward`
+- `InvDipolePair`
+- `InvEcd`
+- `InvEcdSet`
+- `InvFocalDipole`
+- [InvGammaMap](/docs/api/inv/inv-gamma-map)
+- `InvGammaMapResult`
+- `InvGuessData`
+- `InvHpiDataUpdater`
+- [InvHpiFit](/docs/api/inv/inv-hpi-fit)
+- `InvHpiFitData`
+- `InvHpiModelParameters`
+- [InvLCMV](/docs/api/inv/inv-lcmv)
+- [InvLabelTimeCourse](/docs/api/inv/inv-label-time-course)
+- [InvMinimumNorm](/docs/api/inv/inv-minimum-norm)
+- [InvMxne](/docs/api/inv/inv-mxne)
+- `InvMxneResult`
+- `InvPwlRapMusic`
+- [InvRapMusic](/docs/api/inv/inv-rap-music)
+- [InvResolutionMatrix](/docs/api/inv/inv-resolution-matrix)
+- `InvSensorSet`
+- `InvSensorSetCreator`
+- `InvSignalModel`
+- `InvSourceCoupling`
+- [InvSourceEstimate](/docs/api/inv/inv-source-estimate)
+- [InvSourceEstimateIO](/docs/api/inv/inv-source-estimate-io)
+- [InvTfMxne](/docs/api/inv/inv-tf-mxne)
+- `InvTfMxneParams`
+- `InvTfMxneResult`
+- `InvToken`
+- `InvTokenizeOptions`
+- [InvTrapMusic](/docs/api/inv/inv-trap-music)
+- [InvVectorSourceEstimate](/docs/api/inv/inv-vector-source-estimate)
+- [InvVolumeSourceEstimate](/docs/api/inv/inv-volume-source-estimate)
+- `Pair`
+- [SourceMorph](/docs/api/inv/source-morph)
+- `TrapMusicDipole`
+- `dipoleFitFuncsRec`
+
+### LSLLIB
+
+- [stream_info](/docs/api/lsl/stream_info)
+- [stream_inlet](/docs/api/lsl/stream_inlet)
+- [stream_outlet](/docs/api/lsl/stream_outlet)
+
+### MLLIB
+
+- [MLTrainer](/docs/api/ml/ml-trainer)
+- [MlModel](/docs/api/ml/ml-model)
+- [MlOnnxModel](/docs/api/ml/ml-onnx-model)
+- [MlTensor](/docs/api/ml/ml-tensor)
+
+### MNALIB
+
+- `MnaFileRef`
+- [MnaGraph](/docs/api/mna/mna-graph)
+- [MnaGraphExecutor](/docs/api/mna/mna-graph-executor)
+- [MnaIO](/docs/api/mna/mna-io)
+- `MnaNode`
+- [MnaOpRegistry](/docs/api/mna/mna-op-registry)
+- [MnaOpSchema](/docs/api/mna/mna-op-schema)
+- `MnaOpSchemaAttr`
+- `MnaOpSchemaPort`
+- `MnaParamBinding`
+- [MnaParamTree](/docs/api/mna/mna-param-tree)
+- `MnaPort`
+- [MnaProject](/docs/api/mna/mna-project)
+- `MnaProvenance`
+- `MnaRecording`
+- [MnaRegistryLoader](/docs/api/mna/mna-registry-loader)
+- `MnaScript`
+- `MnaSession`
+- `MnaSubject`
+- `MnaVerification`
+- `MnaVerificationCheck`
+- `MnaVerificationResult`
+
+### MNELIB
+
+- `ArtifactRejectionData`
+- `CovDefinition`
+- `CovDescription`
+- `FilterSettings`
+- [FilterThreadArg](/docs/api/mne/filter-thread-arg)
+- [MNE](/docs/api/mne/mne-class)
+- [MNEBem](/docs/api/mne/mne-bem)
+- [MNEBemSurface](/docs/api/mne/mne-bem-surface)
+- [MNECTFCompData](/docs/api/mne/mnectf-comp-data)
+- [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set)
+- [MNEChSelection](/docs/api/mne/mne-ch-selection)
+- [MNEClusterInfo](/docs/api/mne/mne-cluster-info)
+- [MNECorticalMap](/docs/api/mne/mne-cortical-map)
+- [MNECovMatrix](/docs/api/mne/mne-cov-matrix)
+- [MNEDeriv](/docs/api/mne/mne-deriv)
+- [MNEDerivSet](/docs/api/mne/mne-deriv-set)
+- [MNEDescriptionParser](/docs/api/mne/mne-description-parser)
+- [MNEEpochData](/docs/api/mne/mne-epoch-data)
+- [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list)
+- [MNEEvent](/docs/api/mne/mne-event)
+- [MNEEventList](/docs/api/mne/mne-event-list)
+- [MNEFilterDef](/docs/api/mne/mne-filter-def)
+- [MNEForwardSolution](/docs/api/mne/mne-forward-solution)
+- [MNEHemisphere](/docs/api/mne/mne-hemisphere)
+- [MNEInverseOperator](/docs/api/mne/mne-inverse-operator)
+- [MNELayout](/docs/api/mne/mne-layout)
+- [MNELayoutPort](/docs/api/mne/mne-layout-port)
+- [MNEMeasData](/docs/api/mne/mne-meas-data)
+- [MNEMeasDataSet](/docs/api/mne/mne-meas-data-set)
+- [MNEMghTag](/docs/api/mne/mne-mgh-tag)
+- [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group)
+- [MNEMneData](/docs/api/mne/mne-mne-data)
+- [MNEMorphMap](/docs/api/mne/mne-morph-map)
+- [MNEMshColorScaleDef](/docs/api/mne/mne-msh-color-scale-def)
+- [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface)
+- [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set)
+- [MNEMshEyes](/docs/api/mne/mne-msh-eyes)
+- [MNEMshLight](/docs/api/mne/mne-msh-light)
+- [MNEMshLightSet](/docs/api/mne/mne-msh-light-set)
+- [MNEMshPicked](/docs/api/mne/mne-msh-picked)
+- [MNENamedMatrix](/docs/api/mne/mne-named-matrix)
+- [MNENamedVector](/docs/api/mne/mne-named-vector)
+- [MNENearest](/docs/api/mne/mne-nearest)
+- [MNEPatchInfo](/docs/api/mne/mne-patch-info)
+- [MNEProjData](/docs/api/mne/mne-proj-data)
+- [MNEProjItem](/docs/api/mne/mne-proj-item)
+- [MNEProjOp](/docs/api/mne/mne-proj-op)
+- [MNEProjectToSurface](/docs/api/mne/mne-project-to-surface)
+- [MNERawBufDef](/docs/api/mne/mne-raw-buf-def)
+- [MNERawData](/docs/api/mne/mne-raw-data)
+- [MNERawInfo](/docs/api/mne/mne-raw-info)
+- [MNESourceSpace](/docs/api/mne/mne-source-space)
+- [MNESourceSpaces](/docs/api/mne/mne-source-spaces)
+- [MNESparseNamedMatrix](/docs/api/mne/mne-sparse-named-matrix)
+- [MNESssData](/docs/api/mne/mne-sss-data)
+- [MNESurface](/docs/api/mne/mne-surface)
+- [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume)
+- [MNESurfacePatch](/docs/api/mne/mne-surface-patch)
+- [MNETriangle](/docs/api/mne/mne-triangle)
+- [MNEVolGeom](/docs/api/mne/mne-vol-geom)
+- `ProcessingSettings`
+- `RegionData`
+- `RegionDataOut`
+- `RegionMT`
+- `RegionMTOut`
+
+### MRILIB
+
+- [MriCorFifIO](/docs/api/mri/mri-cor-fif-io)
+- [MriCorIO](/docs/api/mri/mri-cor-io)
+- [MriMghIO](/docs/api/mri/mri-mgh-io)
+- [MriNiftiIO](/docs/api/mri/mri-nifti-io)
+- `MriSlice`
+- `MriSliceImage`
+- [MriSlicer](/docs/api/mri/mri-slicer)
+- [MriVolData](/docs/api/mri/mri-vol-data)
+
+### RTPROCESSINGLIB
+
+- `FilterObject`
+- [FilterOverlapAdd](/docs/api/dsp/filter-overlap-add)
+- [RtAveraging](/docs/api/dsp/rt-averaging)
+- [RtAveragingWorker](/docs/api/dsp/rt-averaging-worker)
+- [RtConnectivity](/docs/api/dsp/rt-connectivity)
+- [RtConnectivityWorker](/docs/api/dsp/rt-connectivity-worker)
+- [RtCov](/docs/api/dsp/rt-cov)
+- `RtCovComputeResult`
+- [RtHpi](/docs/api/dsp/rt-hpi)
+- [RtHpiWorker](/docs/api/dsp/rt-hpi-worker)
+- [RtInvOp](/docs/api/dsp/rt-inv-op)
+- `RtInvOpInput`
+- [RtInvOpWorker](/docs/api/dsp/rt-inv-op-worker)
+- [RtNoise](/docs/api/dsp/rt-noise)
+- [RtNoiseWorker](/docs/api/dsp/rt-noise-worker)
+
+### STSLIB
+
+- [StatsAdjacency](/docs/api/sts/stats-adjacency)
+- [StatsCluster](/docs/api/sts/stats-cluster)
+- `StatsClusterResult`
+- [StatsFtest](/docs/api/sts/stats-ftest)
+- `StatsFtestResult`
+- [StatsMcCorrection](/docs/api/sts/stats-mc-correction)
+- [StatsSourceMetrics](/docs/api/sts/stats-source-metrics)
+- [StatsTtest](/docs/api/sts/stats-ttest)
+- `StatsTtestResult`
+- [StsCovEstimators](/docs/api/sts/sts-cov-estimators)
+
+### UTILSLIB
+
+- [AcquiredPoints](/docs/api/utils/acquired-points)
+- `AnnotateAmplitudeParams`
+- `AnnotateMusclParams`
+- [ArtifactDetect](/docs/api/utils/artifact-detect)
+- `ArtifactDetectEcgParams`
+- `ArtifactDetectEogParams`
+- [BadChannelDetect](/docs/api/utils/bad-channel-detect)
+- `BadChannelDetectParams`
+- `BadChannelsMaxwellParams`
+- `BadChannelsMaxwellResult`
+- `BridgedElectrodeParams`
+- [ChannelDerivation](/docs/api/utils/channel-derivation)
+- [CircularBuffer](/docs/api/utils/circular-buffer)
+- [ConnectivityAec](/docs/api/dsp/connectivity-aec)
+- [CosineFilter](/docs/api/utils/cosine-filter)
+- [Csd](/docs/api/utils/csd)
+- `CsdResult`
+- `DerivationRule`
+- `DigitizedPoint`
+- [Dpss](/docs/api/utils/dpss)
+- `DpssResult`
+- `ElectrodePosition`
+- [EogRegression](/docs/api/dsp/eog-regression)
+- [EpochExtractor](/docs/api/utils/epoch-extractor)
+- `EpochExtractorParams`
+- [ExtendedInfomax](/docs/api/dsp/extended-infomax)
+- [FastrakParser](/docs/api/utils/fastrak-parser)
+- `FastrakSample`
+- `FilterChpiParams`
+- [FilterIO](/docs/api/utils/filter-io)
+- [FilterKernel](/docs/api/dsp/filter-kernel)
+- [FilterParameter](/docs/api/utils/filter-parameter)
+- `FineCalEntry`
+- [FineCalibration](/docs/api/dsp/fine-calibration)
+- [FirFilter](/docs/api/dsp/fir-filter)
+- `FitUser`
+- `HeadPosEntry`
+- [ICA](/docs/api/dsp/ica)
+- [ICommand](/docs/api/utils/i-command)
+- [IOUtils](/docs/api/utils/io-utils)
+- [IObserver](/docs/api/utils/i-observer)
+- `IcaResult`
+- `IirBiquad`
+- [IirFilter](/docs/api/dsp/iir-filter)
+- `InfomaxResult`
+- [KMeans](/docs/api/math/k-means)
+- [LayoutLoader](/docs/api/utils/layout-loader)
+- [LayoutMaker](/docs/api/utils/layout-maker)
+- [Linalg](/docs/api/math/linalg)
+- `LofBadChannelParams`
+- [MNELogger](/docs/api/utils/mne-logger)
+- `MaxwellMoveCompParams`
+- [MaxwellMovementComp](/docs/api/dsp/maxwell-movement-comp)
+- [MorletTfr](/docs/api/dsp/morlet-tfr)
+- `MorletTfrResult`
+- [MultitaperPsd](/docs/api/dsp/multitaper-psd)
+- `MultitaperPsdResult`
+- [MultitaperTfr](/docs/api/dsp/multitaper-tfr)
+- `MultitaperTfrResult`
+- [Numerics](/docs/api/utils/numerics)
+- [ParksMcClellan](/docs/api/utils/parks-mc-clellan)
+- `PeakFinderParams`
+- [PicardIca](/docs/api/dsp/picard-ica)
+- [PolhemusConnection](/docs/api/utils/polhemus-connection)
+- [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
+- `PolhemusSerialConfig`
+- [PythonRunner](/docs/api/utils/python-runner)
+- `PythonRunnerConfig`
+- `PythonRunnerResult`
+- [PythonTestHelper](/docs/api/utils/python-test-helper)
+- [Report](/docs/api/utils/report)
+- `ReportSection`
+- [Resample](/docs/api/dsp/resample)
+- [SSS](/docs/api/dsp/sss)
+- `SSSParams`
+- [SelectionIO](/docs/api/utils/selection-io)
+- [SimplexAlgorithm](/docs/api/math/simplex-algorithm)
+- `SimulateStcParams`
+- `SpectogramInputData`
+- [Spectral](/docs/api/utils/spectral)
+- [Spectrogram](/docs/api/utils/spectrogram)
+- [Sphere](/docs/api/math/sphere)
+- [StandardMontage](/docs/api/utils/standard-montage)
+- [Subject](/docs/api/utils/subject)
+- [SurfaceLaplacian](/docs/api/dsp/surface-laplacian)
+- `SurfaceLaplacianResult`
+- `TaperedSpectraInputData`
+- [Warp](/docs/api/math/warp)
+- [WelchPsd](/docs/api/dsp/welch-psd)
+- `WelchPsdResult`
+- [Xdawn](/docs/api/dsp/xdawn)
+- `XdawnResult`
+- `fitUserRec`

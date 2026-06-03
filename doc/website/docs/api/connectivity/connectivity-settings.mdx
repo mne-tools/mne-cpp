@@ -17,7 +17,7 @@ class CONNECTIVITYLIB::ConnectivitySettings
 
 Mutable container that aggregates the inputs and intermediate spectral results required by every metric implementation in ``CONNECTIVITYLIB``.
 
-Each call to append adds one trial; the trial matrices live in `m_trialData`, while DPSS tapered spectra, cross-spectral densities and their imaginary-part derivatives are filled in lazily by whichever metric runs first. Cross-trial sums accumulate in `m_intermediateSumData` so that a second metric run on the same data set reuses those sums and skips the FFT pass entirely. Node positions can be derived from a `FiffInfo` (sensor space) or from a forward solution + `FsSurfaceSet` (source space) and are propagated into the resulting `Network` nodes.
+Each call to append adds one trial; the trial matrices live in `m_trialData`, while DPSS tapered spectra, cross-spectral densities and their imaginary-part derivatives are filled in lazily by whichever metric runs first. Cross-trial sums accumulate in `m_intermediateSumData` so that a second metric run on the same data set reuses those sums and skips the FFT pass entirely. Node positions can be derived from a `FiffInfo` (sensor space) or from a forward solution + `FsSurfaceSet` (source space) and are propagated into the resulting [`Network`](/docs/api/connectivity/network) nodes.
 
 Aggregates trial data, spectral cache and node geometry shared by all ``CONNECTIVITYLIB`` metrics.
 
@@ -27,7 +27,7 @@ Aggregates trial data, spectral cache and node geometry shared by all ``CONNECTI
 
 ### ConnectivitySettings()
 
-Constructs a `ConnectivitySettings` object.
+Constructs a [`ConnectivitySettings`](/docs/api/connectivity/connectivity-settings) object.
 
 ---
 

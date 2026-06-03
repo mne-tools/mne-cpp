@@ -36,11 +36,11 @@ Eigen::MatrixXd den  = Xdawn::denoise(epoch.epoch, xd, 2); // n_channels x n_sam
 
 Fit xDAWN spatial filters for a target event code.
 
-Uses non-rejected epochs only. The target signal covariance is estimated from the average of epochs whose MNEEpochData::event equals `iTargetEvent`. The noise covariance is estimated from residuals around the class-wise average for each event type.
+Uses non-rejected epochs only. The target signal covariance is estimated from the average of epochs whose [MNEEpochData](/docs/api/mne/mne-epoch-data)::event equals `iTargetEvent`. The noise covariance is estimated from residuals around the class-wise average for each event type.
 
 **Parameters:**
 
-- **epochs** : *const QVector&lt; MNELIB::MNEEpochData &gt; &*
+- **epochs** : *const QVector&lt; [MNEEpochData](/docs/api/mne/mne-epoch-data) &gt; &*
   Input epochs.
 
 - **iTargetEvent** : *int*
@@ -105,7 +105,7 @@ Apply `denoise()` to all epochs in the vector, preserving metadata.
 
 **Parameters:**
 
-- **epochs** : *const QVector&lt; MNELIB::MNEEpochData &gt; &*
+- **epochs** : *const QVector&lt; [MNEEpochData](/docs/api/mne/mne-epoch-data) &gt; &*
   Input epochs.
 
 - **result** : *const XdawnResult &*
@@ -116,7 +116,7 @@ Apply `denoise()` to all epochs in the vector, preserving metadata.
 
 **Returns:**
 
-- *QVector&lt; MNELIB::MNEEpochData &gt;* — Copy of the input epochs with denoised epoch matrices.
+- *QVector&lt; [MNEEpochData](/docs/api/mne/mne-epoch-data) &gt;* — Copy of the input epochs with denoised epoch matrices.
 
 ---
 

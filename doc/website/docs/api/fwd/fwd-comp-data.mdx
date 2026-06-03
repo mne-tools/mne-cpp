@@ -49,14 +49,14 @@ Calculate the compensated field for one dipole component.
 - **Q** : *const Eigen::Vector3f &*
   Dipole moment direction.
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   Coil definitions.
 
 - **res** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
   Result vector.
 
 - **client** : *void **
-  Pointer to `FwdCompData`.
+  Pointer to [`FwdCompData`](/docs/api/fwd/fwd-comp-data).
 
 **Returns:**
 
@@ -70,13 +70,13 @@ Set up CTF compensation coils for field computations.
 
 **Parameters:**
 
-- **set** : *MNELIB::MNECTFCompDataSet **
+- **set** : *[MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) **
   Available compensation data.
 
-- **coils** : *FwdCoilSet **
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   Main coil set.
 
-- **comp_coils** : *FwdCoilSet **
+- **comp_coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   Compensation coils.
 
 **Returns:**
@@ -91,13 +91,13 @@ Compose a compensation data set.
 
 **Parameters:**
 
-- **set** : *MNELIB::MNECTFCompDataSet **
+- **set** : *[MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) **
   CTF compensation data read from file.
 
-- **coils** : *FwdCoilSet **
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   Principal coil set.
 
-- **comp_coils** : *FwdCoilSet **
+- **comp_coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) **
   Compensation coils.
 
 - **field** : *fwdFieldFunc*
@@ -114,7 +114,7 @@ Compose a compensation data set.
 
 **Returns:**
 
-- *FwdCompData ** — Pointer to the created `FwdCompData`, or nullptr on error. Caller owns the pointer.
+- *[FwdCompData](/docs/api/fwd/fwd-comp-data) ** — Pointer to the created [`FwdCompData`](/docs/api/fwd/fwd-comp-data), or nullptr on error. Caller owns the pointer.
 
 ---
 
@@ -127,14 +127,14 @@ Calculate the compensated field for all three dipole components.
 - **rd** : *const Eigen::Vector3f &*
   Dipole position.
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   Coil definitions.
 
 - **res** : *Eigen::Ref&lt; Eigen::MatrixXf &gt;*
   Result matrix (3 x ncoil).
 
 - **client** : *void **
-  Pointer to `FwdCompData`.
+  Pointer to [`FwdCompData`](/docs/api/fwd/fwd-comp-data).
 
 **Returns:**
 
@@ -154,7 +154,7 @@ Calculate the compensated field and gradient for one dipole component.
 - **Q** : *const Eigen::Vector3f &*
   Dipole moment direction.
 
-- **coils** : *FwdCoilSet &*
+- **coils** : *[FwdCoilSet](/docs/api/fwd/fwd-coil-set) &*
   Coil definitions.
 
 - **res** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
@@ -170,7 +170,7 @@ Calculate the compensated field and gradient for one dipole component.
   Z-gradient result.
 
 - **client** : *void **
-  Pointer to `FwdCompData`.
+  Pointer to [`FwdCompData`](/docs/api/fwd/fwd-comp-data).
 
 **Returns:**
 

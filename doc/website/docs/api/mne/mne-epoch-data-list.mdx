@@ -17,7 +17,14 @@ class MNELIB::MNEEpochDataList
 
 Epoch data list, which corresponds to a set of events.
 
-Ordered list of `MNEEpochData` objects sharing a common measurement info.
+Ordered list of [`MNEEpochData`](/docs/api/mne/mne-epoch-data) objects sharing a common measurement info.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    SPtr__ <|-- MNEEpochDataList
+```
 
 ---
 
@@ -31,7 +38,7 @@ Default constructor.
 
 ### ~MNEEpochDataList()
 
-Destroys the `MNEEpochDataList`.
+Destroys the [`MNEEpochDataList`](/docs/api/mne/mne-epoch-data-list).
 
 ---
 
@@ -96,7 +103,7 @@ Read the epochs from a raw file based on provided events.
 
 **Parameters:**
 
-- **raw** : *const FIFFLIB::FiffRawData &*
+- **raw** : *const FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data.
 
 - **events** : *const Eigen::MatrixXi &*
@@ -128,7 +135,7 @@ Checks the givven matrix for artifacts beyond a threshold value.
 - **data** : *const Eigen::MatrixXd &*
   The data matrix.
 
-- **pFiffInfo** : *const FIFFLIB::FiffInfo &*
+- **pFiffInfo** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   The fiff info.
 
 - **mapReject** : *const QMap&lt; QString, double &gt; &*
@@ -151,11 +158,11 @@ Checks the givven matrix for artifacts beyond a threshold value.
 
 averageCategories
 
-Multi-category offline averaging. Reads epochs from raw data for multiple event types and returns an `FiffEvokedSet` with one FiffEvoked per category. Ported from average.c (MNE-C).
+Multi-category offline averaging. Reads epochs from raw data for multiple event types and returns an `FiffEvokedSet` with one [FiffEvoked](/docs/api/fiff/fiff-evoked) per category. Ported from average.c (MNE-C).
 
 **Parameters:**
 
-- **raw** : *const FIFFLIB::FiffRawData &*
+- **raw** : *const FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data.
 
 - **events** : *const Eigen::MatrixXi &*
@@ -194,7 +201,7 @@ Convenience function: reads epochs, optionally applies baseline correction and a
 
 **Parameters:**
 
-- **raw** : *const FIFFLIB::FiffRawData &*
+- **raw** : *const FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data.
 
 - **matEvents** : *const Eigen::MatrixXi &*
@@ -229,7 +236,7 @@ Convenience function: reads epochs, optionally applies baseline correction and a
 
 **Returns:**
 
-- *FIFFLIB::FiffEvoked* — The averaged evoked data.
+- *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — The averaged evoked data.
 
 ---
 

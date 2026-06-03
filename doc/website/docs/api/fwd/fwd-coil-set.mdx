@@ -15,9 +15,9 @@ sidebar_position: 8
 class FWDLIB::FwdCoilSet
 ```
 
-Implements `FwdCoilSet` (replaces `fwdCoilSet` / `fwdCoilSetRec` from MNE-C ``fwd_types.h``).
+Implements [`FwdCoilSet`](/docs/api/fwd/fwd-coil-set) (replaces `fwdCoilSet` / `fwdCoilSetRec` from MNE-C ``fwd_types.h``).
 
-Container of `FwdCoil` instances acting both as the in-memory image of the `coil_def.dat` template database and as a per-channel sensor array in a chosen coordinate frame (device / head / MRI).
+Container of [`FwdCoil`](/docs/api/fwd/fwd-coil) instances acting both as the in-memory image of the `coil_def.dat` template database and as a per-channel sensor array in a chosen coordinate frame (device / head / MRI).
 
 ---
 
@@ -41,18 +41,18 @@ Create a MEG coil definition using a database of templates Change the coordinate
 
 **Parameters:**
 
-- **ch** : *const FIFFLIB::FiffChInfo &*
+- **ch** : *const [FiffChInfo](/docs/api/fiff/fiff-ch-info) &*
   Channel information to use.
 
 - **acc** : *int*
   Required accuracy.
 
-- **t** : *const FIFFLIB::FiffCoordTrans &*
+- **t** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   Transform the points using this.
 
 **Returns:**
 
-- *FwdCoil::UPtr* — The created meg coil.
+- *[FwdCoil](/docs/api/fwd/fwd-coil)::UPtr* — The created meg coil.
 
 ---
 
@@ -71,7 +71,7 @@ Create a MEG coil set definition using a database of templates Change the coordi
 - **acc** : *int*
   Required accuracy.
 
-- **t** : *const FIFFLIB::FiffCoordTrans &*
+- **t** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   Transform the points using this.
 
 **Returns:**
@@ -86,7 +86,7 @@ Make a coil set duplicate.
 
 **Parameters:**
 
-- **t** : *const FIFFLIB::FiffCoordTrans &*
+- **t** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   Transformation which should be applied to the duplicate.
 
 **Returns:**
@@ -175,7 +175,7 @@ Create a EEG coil set definition using a channel information Change the coordina
 - **nch** : *int*
   Number of channels.
 
-- **t** : *const FIFFLIB::FiffCoordTrans &*
+- **t** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   Transform the points using this.
 
 **Returns:**

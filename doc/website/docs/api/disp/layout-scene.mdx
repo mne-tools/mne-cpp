@@ -19,13 +19,26 @@ Base QGraphicsScene providing pan, pinch-zoom and swipe gesture handling for sen
 
 Installs gesture recognisers on the active view and translates pan / pinch / swipe events into view-zoom / view-pan operations regardless of input device.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QGraphicsScene <|-- LayoutScene
+    LayoutScene <|-- AverageScene
+    click AverageScene "/docs/api/disp/average-scene"
+    LayoutScene <|-- FilterPlotScene
+    click FilterPlotScene "/docs/api/disp/filter-plot-scene"
+    LayoutScene <|-- SelectionScene
+    click SelectionScene "/docs/api/disp/selection-scene"
+```
+
 ---
 
 ## Public Methods
 
 ### LayoutScene(view, parent)
 
-Constructs a `LayoutScene`.
+Constructs a [`LayoutScene`](/docs/api/disp/layout-scene).
 
 ---
 

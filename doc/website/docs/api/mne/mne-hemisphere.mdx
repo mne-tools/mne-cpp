@@ -19,6 +19,14 @@ Hemisphere source space geometry information.
 
 Hemisphere provides geometry information
 
+### Inheritance
+
+```mermaid
+classDiagram
+    MNESourceSpace <|-- MNEHemisphere
+    click MNESourceSpace "/docs/api/mne/mne-source-space"
+```
+
 ---
 
 ## Public Methods
@@ -48,11 +56,11 @@ Destroys the hemisphere source space.
 
 ### clone()
 
-Creates a deep copy of this hemisphere, preserving the `MNEHemisphere` type.
+Creates a deep copy of this hemisphere, preserving the [`MNEHemisphere`](/docs/api/mne/mne-hemisphere) type.
 
 **Returns:**
 
-- *MNESourceSpace::SPtr* — a shared_ptr&lt;MNESourceSpace&gt; pointing to a cloned `MNEHemisphere`.
+- *[MNESourceSpace](/docs/api/mne/mne-source-space)::SPtr* — a shared_ptr&lt;MNESourceSpace&gt; pointing to a cloned [`MNEHemisphere`](/docs/api/mne/mne-hemisphere).
 
 ---
 
@@ -135,7 +143,7 @@ mne_transform_source_space_to
 - **dest** : *FIFFLIB::fiff_int_t*
   The id of the destination coordinate system (FIFFV_COORD_...).
 
-- **p_Trans** : *const FIFFLIB::FiffCoordTrans &*
+- **p_Trans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
   The coordinate transformation structure to use.
 
 **Returns:**
@@ -150,7 +158,7 @@ mne_python _write_one_source_space
 
 **Parameters:**
 
-- **p_pStream** : *FIFFLIB::FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   The stream to write to.
 
 ---
@@ -161,12 +169,12 @@ Copy assignment operator.
 
 **Parameters:**
 
-- **other** : *const MNEHemisphere &*
-  The `MNEHemisphere` to assign from.
+- **other** : *const [MNEHemisphere](/docs/api/mne/mne-hemisphere) &*
+  The [`MNEHemisphere`](/docs/api/mne/mne-hemisphere) to assign from.
 
 **Returns:**
 
-- *MNEHemisphere &* — Reference to this object.
+- *[MNEHemisphere](/docs/api/mne/mne-hemisphere) &* — Reference to this object.
 
 ---
 

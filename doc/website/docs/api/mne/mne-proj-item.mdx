@@ -17,9 +17,9 @@ class MNELIB::MNEProjItem
 
 A single SSP (Signal-Space Projection) item.
 
-`MNEProjItem` holds one linear projection operator consisting of a set of projection vectors (stored as an `MNENamedMatrix`), together with metadata such as the projection kind, a human-readable description, and flags indicating whether the item is currently active and which channel types (MEG / EEG) it covers.
+[`MNEProjItem`](/docs/api/mne/mne-proj-item) holds one linear projection operator consisting of a set of projection vectors (stored as an [`MNENamedMatrix`](/docs/api/mne/mne-named-matrix)), together with metadata such as the projection kind, a human-readable description, and flags indicating whether the item is currently active and which channel types (MEG / EEG) it covers.
 
-Projection items are aggregated by `MNEProjOp` to form the complete SSP operator that is applied during inverse computations and dipole fitting.
+Projection items are aggregated by [`MNEProjOp`](/docs/api/mne/mne-proj-op) to form the complete SSP operator that is applied during inverse computations and dipole fitting.
 
 ---
 

@@ -17,7 +17,15 @@ class MNELIB::MNEMshDisplaySurface
 
 Replaces *mshDisplaySurface, mshDisplaySurfaceRec struct (analyze_types.c).
 
-The `MNE` Msh Display FsSurface class holds information about a surface to be rendered.
+The [`MNE`](/docs/api/mne/mne-class) Msh Display [FsSurface](/docs/api/fs/fs-surface) class holds information about a surface to be rendered.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    MNESurface <|-- MNEMshDisplaySurface
+    click MNESurface "/docs/api/mne/mne-surface"
+```
 
 ---
 
@@ -25,13 +33,13 @@ The `MNE` Msh Display FsSurface class holds information about a surface to be re
 
 ### MNEMshDisplaySurface()
 
-Constructs the `MNEMshDisplaySurface`.
+Constructs the [`MNEMshDisplaySurface`](/docs/api/mne/mne-msh-display-surface).
 
 ---
 
 ### ~MNEMshDisplaySurface()
 
-Destroys the `MNEMshDisplaySurface`.
+Destroys the [`MNEMshDisplaySurface`](/docs/api/mne/mne-msh-display-surface).
 
 ---
 
@@ -41,10 +49,10 @@ Align MEG and MRI coordinate systems using fiducial points and ICP.
 
 **Parameters:**
 
-- **head_dig** : *FIFFLIB::FiffDigitizerData &*
+- **head_dig** : *[FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) &*
   MEG digitizer data (transformed in-place).
 
-- **mri_dig** : *const FIFFLIB::FiffDigitizerData &*
+- **mri_dig** : *const [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) &*
   MRI digitizer data with fiducial locations.
 
 - **head_surf**

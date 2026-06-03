@@ -17,7 +17,7 @@ class FIFFLIB::FiffEvents
 
 FIFF event list: (sample, prev, new) integer triples with read / write / detect / filter helpers.
 
-On-disk representation matches `mne.io.write.write_events` output and the `-eve.fif` files consumed by `mne.read_events`; the detection path mirrors `mne.find_events`. Used by `FiffEpochs` and the batch-averaging path in `FiffEvokedSet` to drive epoch extraction.
+On-disk representation matches `mne.io.write.write_events` output and the `-eve.fif` files consumed by `mne.read_events`; the detection path mirrors `mne.find_events`. Used by [`FiffEpochs`](/docs/api/fiff/fiff-epochs) and the batch-averaging path in `FiffEvokedSet` to drive epoch extraction.
 
 ---
 
@@ -33,7 +33,7 @@ Creates an empty event set.
 
 ### FiffEvents(p_IODevice)
 
-Constructs `FiffEvents` by reading from an I/O device.
+Constructs [`FiffEvents`](/docs/api/fiff/fiff-events) by reading from an I/O device.
 
 Attempts to read as FIFF first; if that fails, tries ASCII format.
 
@@ -113,7 +113,7 @@ If t_sEventName is empty, the event file name is derived from the raw file name 
 - **t_fileRawName** : *const QString &*
   Path to the raw data file (used to derive event file name if needed).
 
-- **p_Events** : *FiffEvents &*
+- **p_Events** : *[FiffEvents](/docs/api/fiff/fiff-events) &*
   The loaded events.
 
 **Returns:**
@@ -131,7 +131,7 @@ Read an event list from a FIFF file.
 - **p_IODevice** : *QIODevice &*
   The I/O device to read from.
 
-- **p_Events** : *FiffEvents &*
+- **p_Events** : *[FiffEvents](/docs/api/fiff/fiff-events) &*
   The loaded events.
 
 **Returns:**
@@ -149,7 +149,7 @@ Read a list of events from an ASCII event file.
 - **p_IODevice** : *QIODevice &*
   The I/O device to read from.
 
-- **p_Events** : *FiffEvents &*
+- **p_Events** : *[FiffEvents](/docs/api/fiff/fiff-events) &*
   The loaded events.
 
 **Returns:**
@@ -166,10 +166,10 @@ Ported from detect_events (MNE-C).
 
 **Parameters:**
 
-- **raw** : *const FiffRawData &*
+- **raw** : *const [FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data.
 
-- **p_Events** : *FiffEvents &*
+- **p_Events** : *[FiffEvents](/docs/api/fiff/fiff-events) &*
   The detected events.
 
 - **triggerCh** : *const QString &*

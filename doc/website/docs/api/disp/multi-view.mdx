@@ -15,9 +15,16 @@ sidebar_position: 43
 class DISPLIB::MultiView
 ```
 
-QMainWindow container hosting an arbitrary number of `MultiViewWindow` dock widgets.
+QMainWindow container hosting an arbitrary number of [`MultiViewWindow`](/docs/api/disp/multi-view-window) dock widgets.
 
 Inherits `QMainWindow` purely for the dock infrastructure; named views are added with `addWidgetTop` / `addWidgetBottom` and geometry is persisted via `QSettings`.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QMainWindow <|-- MultiView
+```
 
 ---
 
@@ -25,13 +32,13 @@ Inherits `QMainWindow` purely for the dock infrastructure; named views are added
 
 ### MultiView(sSettingsPath, parent, flags)
 
-Constructs an `MultiView`.
+Constructs an [`MultiView`](/docs/api/disp/multi-view).
 
 ---
 
 ### ~MultiView()
 
-Destructs an `MultiView`.
+Destructs an [`MultiView`](/docs/api/disp/multi-view).
 
 ---
 
@@ -49,7 +56,7 @@ Adds a QWidget to the top docking area.
 
 **Returns:**
 
-- *MultiViewWindow ** — Returns a pointer to the added widget in form of a `MultiViewWindow`.
+- *[MultiViewWindow](/docs/api/disp/multi-view-window) ** — Returns a pointer to the added widget in form of a [`MultiViewWindow`](/docs/api/disp/multi-view-window).
 
 ---
 
@@ -69,7 +76,7 @@ Please note that all bottom dock widgets are tabbified by default.
 
 **Returns:**
 
-- *MultiViewWindow ** — Returns a pointer to the added widget in form of a `MultiViewWindow`.
+- *[MultiViewWindow](/docs/api/disp/multi-view-window) ** — Returns a pointer to the added widget in form of a [`MultiViewWindow`](/docs/api/disp/multi-view-window).
 
 ---
 

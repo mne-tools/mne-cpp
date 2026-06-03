@@ -17,7 +17,15 @@ class DISPLIB::FilterDesignView
 
 Interactive FIR / IIR filter design GUI with a live magnitude / phase preview.
 
-Lets the user pick filter type, design family (cosine, Hamming, Blackman, …), cutoff frequencies, transition bandwidth and tap count, then renders the resulting frequency response in an embedded `FilterPlotScene` and emits the `FilterKernel` as a `filterChanged` signal consumed by the `rtprocessing` chain.
+Lets the user pick filter type, design family (cosine, Hamming, Blackman, …), cutoff frequencies, transition bandwidth and tap count, then renders the resulting frequency response in an embedded [`FilterPlotScene`](/docs/api/disp/filter-plot-scene) and emits the `FilterKernel` as a `filterChanged` signal consumed by the `rtprocessing` chain.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- FilterDesignView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,20 +33,20 @@ Lets the user pick filter type, design family (cosine, Hamming, Blackman, …), 
 
 ### FilterDesignView(sSettingsPath, parent, f)
 
-Constructs a `FilterDesignView` dialog which is a child of parent.
+Constructs a [`FilterDesignView`](/docs/api/disp/filter-design-view) dialog which is a child of parent.
 
 **Parameters:**
 
 - **parent** : *QWidget **
-  pointer to parent widget; If parent is 0, the new `FilterDesignView` becomes a window. If parent is another widget, `FilterDesignView` becomes a child window inside parent. `FilterDesignView` is deleted when its parent is deleted.
+  pointer to parent widget; If parent is 0, the new [`FilterDesignView`](/docs/api/disp/filter-design-view) becomes a window. If parent is another widget, [`FilterDesignView`](/docs/api/disp/filter-design-view) becomes a child window inside parent. [`FilterDesignView`](/docs/api/disp/filter-design-view) is deleted when its parent is deleted.
 
 ---
 
 ### ~FilterDesignView()
 
-Destroys the `FilterDesignView`.
+Destroys the [`FilterDesignView`](/docs/api/disp/filter-design-view).
 
-All `FilterDesignView`'s children are deleted first. The application exits if `FilterDesignView` is the main widget.
+All [`FilterDesignView`](/docs/api/disp/filter-design-view)'s children are deleted first. The application exits if [`FilterDesignView`](/docs/api/disp/filter-design-view) is the main widget.
 
 ---
 
@@ -122,7 +130,7 @@ Returns the current filter.
 
 **Returns:**
 
-- *UTILSLIB::FilterKernel* — returns the current filter.
+- *[FilterKernel](/docs/api/dsp/filter-kernel)* — returns the current filter.
 
 ---
 

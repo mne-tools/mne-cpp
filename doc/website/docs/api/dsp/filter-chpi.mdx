@@ -32,7 +32,7 @@ Removes continuous head-position indicator (cHPI) excitation signals from MEG da
 ### filterChpi(data, info, sfreq, hpiFreqs, params)
 
 ```cpp
-void filterChpi(Eigen::MatrixXd & data, const FIFFLIB::FiffInfo & info, double sfreq, const QVector< double > & hpiFreqs, const FilterChpiParams & params);
+void filterChpi(Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, double sfreq, const QVector< double > & hpiFreqs, const FilterChpiParams & params);
 ```
 
 Remove cHPI excitation signals from MEG data by notch filtering.
@@ -44,7 +44,7 @@ Applies a zero-phase Butterworth band-stop (notch) filter at each specified cHPI
 - **data** : *Eigen::MatrixXd &*
   Data matrix (n_channels x n_times). Modified in-place.
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info (used to identify MEG channels if bMegOnly is true).
 
 - **sfreq** : *double*
@@ -61,19 +61,19 @@ Applies a zero-phase Butterworth band-stop (notch) filter at each specified cHPI
 ### filterChpi(data, info, sfreq, params)
 
 ```cpp
-void filterChpi(Eigen::MatrixXd & data, const FIFFLIB::FiffInfo & info, double sfreq, const FilterChpiParams & params);
+void filterChpi(Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, double sfreq, const FilterChpiParams & params);
 ```
 
-Overload that attempts to extract cHPI frequencies from FiffInfo.
+Overload that attempts to extract cHPI frequencies from [FiffInfo](/docs/api/fiff/fiff-info).
 
-Tries to read HPI coil frequencies from the FiffInfo metadata. Because the FiffInfo HPI frequency storage varies across file versions, this overload may not always succeed. If frequencies cannot be determined, a warning is logged and no filtering is applied. In that case, use the explicit-frequency overload instead.
+Tries to read HPI coil frequencies from the [FiffInfo](/docs/api/fiff/fiff-info) metadata. Because the [FiffInfo](/docs/api/fiff/fiff-info) HPI frequency storage varies across file versions, this overload may not always succeed. If frequencies cannot be determined, a warning is logged and no filtering is applied. In that case, use the explicit-frequency overload instead.
 
 **Parameters:**
 
 - **data** : *Eigen::MatrixXd &*
   Data matrix (n_channels x n_times). Modified in-place.
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info.
 
 - **sfreq** : *double*

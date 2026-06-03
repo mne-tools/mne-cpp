@@ -15,9 +15,21 @@ sidebar_position: 53
 class MNELIB::MNESurface
 ```
 
-Implements the `MNE` FsSurface (Replaces typedef mneSurfaceOrVolume mneSurface; struct of MNE-C `mne_types.h`).
+Implements the [`MNE`](/docs/api/mne/mne-class) [FsSurface](/docs/api/fs/fs-surface) (Replaces typedef mneSurfaceOrVolume mneSurface; struct of MNE-C `mne_types.h`).
 
 Lightweight triangulated surface (vertices, triangles, normals).
+
+### Inheritance
+
+```mermaid
+classDiagram
+    MNESurfaceOrVolume <|-- MNESurface
+    click MNESurfaceOrVolume "/docs/api/mne/mne-surface-or-volume"
+    MNESurface <|-- MNEBemSurface
+    click MNEBemSurface "/docs/api/mne/mne-bem-surface"
+    MNESurface <|-- MNEMshDisplaySurface
+    click MNEMshDisplaySurface "/docs/api/mne/mne-msh-display-surface"
+```
 
 ---
 
@@ -25,13 +37,13 @@ Lightweight triangulated surface (vertices, triangles, normals).
 
 ### MNESurface()
 
-Constructs the `MNE` FsSurface.
+Constructs the [`MNE`](/docs/api/mne/mne-class) [FsSurface](/docs/api/fs/fs-surface).
 
 ---
 
 ### ~MNESurface()
 
-Destroys the `MNE` FsSurface.
+Destroys the [`MNE`](/docs/api/mne/mne-class) [FsSurface](/docs/api/fs/fs-surface).
 
 ---
 
@@ -84,8 +96,8 @@ Find the nearest point on a triangle to a given point.
 - **r** : *const Eigen::Vector3f &*
   The point.
 
-- **user** : *const MNEProjData **
-  Optional `MNEProjData` restricting active triangles (may be NULL).
+- **user** : *const [MNEProjData](/docs/api/mne/mne-proj-data) **
+  Optional [`MNEProjData`](/docs/api/mne/mne-proj-data) restricting active triangles (may be NULL).
 
 - **tri** : *int*
   Triangle index.
@@ -177,8 +189,8 @@ Project a point onto the nearest triangle of the surface.
 
 **Parameters:**
 
-- **proj_data** : *const MNEProjData **
-  Optional `MNEProjData` restricting active triangles (may be NULL).
+- **proj_data** : *const [MNEProjData](/docs/api/mne/mne-proj-data) **
+  Optional [`MNEProjData`](/docs/api/mne/mne-proj-data) restricting active triangles (may be NULL).
 
 - **r** : *const Eigen::Vector3f &*
   The 3D point to project.
@@ -221,7 +233,7 @@ Set up the triangle activation mask for a restricted surface search.
 
 **Parameters:**
 
-- **p** : *MNEProjData &*
+- **p** : *[MNEProjData](/docs/api/mne/mne-proj-data) &*
   The projection data whose mask is set.
 
 - **approx_best** : *int*
@@ -271,7 +283,7 @@ Read a BEM surface from a FIFF file (excess-neighbor checking enabled).
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNESurface &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
+- *std::unique_ptr&lt; [MNESurface](/docs/api/mne/mne-surface) &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
 
 ---
 
@@ -295,7 +307,7 @@ Read a BEM surface from a FIFF file (excess-neighbor checking enabled).
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNESurface &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
+- *std::unique_ptr&lt; [MNESurface](/docs/api/mne/mne-surface) &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
 
 ---
 
@@ -316,7 +328,7 @@ Read a BEM surface from a FIFF file (excess-neighbor checking disabled).
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNESurface &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
+- *std::unique_ptr&lt; [MNESurface](/docs/api/mne/mne-surface) &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
 
 ---
 
@@ -343,7 +355,7 @@ Read a BEM surface from a FIFF file.
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNESurface &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
+- *std::unique_ptr&lt; [MNESurface](/docs/api/mne/mne-surface) &gt;* — The loaded surface, or nullptr on failure. Caller takes ownership.
 
 ---
 

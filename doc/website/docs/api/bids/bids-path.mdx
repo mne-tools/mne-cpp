@@ -21,7 +21,7 @@ class BIDSLIB::BIDSPath
 
 Manages BIDS-compliant file paths.
 
-A `BIDSPath` encodes the BIDS entities (subject, session, task, acquisition, run, etc.) together with a datatype, suffix, extension, and root directory to produce fully qualified file paths that conform to the BIDS specification.
+A [`BIDSPath`](/docs/api/bids/bids-path) encodes the BIDS entities (subject, session, task, acquisition, run, etc.) together with a datatype, suffix, extension, and root directory to produce fully qualified file paths that conform to the BIDS specification.
 
 Example usage: 
 ```cpp
@@ -52,13 +52,13 @@ BIDS-compliant path and filename construction.
 
 ### BIDSPath()
 
-Constructs an empty `BIDSPath`.
+Constructs an empty [`BIDSPath`](/docs/api/bids/bids-path).
 
 ---
 
 ### BIDSPath(sRoot, sSubject, sSession, sTask, sDatatype, sSuffix, sExtension)
 
-Constructs a `BIDSPath` with the most common entities.
+Constructs a [`BIDSPath`](/docs/api/bids/bids-path) with the most common entities.
 
 **Parameters:**
 
@@ -195,7 +195,7 @@ BIDS dataset root path.
 
 ### subject()
 
-Subject label (without "sub-").
+[Subject](/docs/api/utils/subject) label (without "sub-").
 
 ---
 
@@ -307,7 +307,7 @@ Constructs the full file path: `directory()` + `basename()`.
 
 ### withSuffix(sSuffix, sExtension)
 
-Returns a copy of this `BIDSPath` with updated suffix and extension.
+Returns a copy of this [`BIDSPath`](/docs/api/bids/bids-path) with updated suffix and extension.
 
 Useful for deriving sidecar paths from a data path.
 
@@ -321,7 +321,7 @@ Useful for deriving sidecar paths from a data path.
 
 **Returns:**
 
-- *BIDSPath* — A new `BIDSPath` with the updated suffix and extension.
+- *[BIDSPath](/docs/api/bids/bids-path)* — A new [`BIDSPath`](/docs/api/bids/bids-path) with the updated suffix and extension.
 
 ---
 
@@ -331,7 +331,7 @@ Returns the path for the channels.tsv sidecar.
 
 **Returns:**
 
-- *BIDSPath* — `BIDSPath` pointing to the *_channels.tsv file.
+- *[BIDSPath](/docs/api/bids/bids-path)* — [`BIDSPath`](/docs/api/bids/bids-path) pointing to the *_channels.tsv file.
 
 ---
 
@@ -341,7 +341,7 @@ Returns the path for the electrodes.tsv sidecar.
 
 **Returns:**
 
-- *BIDSPath* — `BIDSPath` pointing to the *_electrodes.tsv file.
+- *[BIDSPath](/docs/api/bids/bids-path)* — [`BIDSPath`](/docs/api/bids/bids-path) pointing to the *_electrodes.tsv file.
 
 ---
 
@@ -351,7 +351,7 @@ Returns the path for the coordsystem.json sidecar.
 
 **Returns:**
 
-- *BIDSPath* — `BIDSPath` pointing to the *_coordsystem.json file.
+- *[BIDSPath](/docs/api/bids/bids-path)* — [`BIDSPath`](/docs/api/bids/bids-path) pointing to the *_coordsystem.json file.
 
 ---
 
@@ -361,7 +361,7 @@ Returns the path for the events.tsv sidecar.
 
 **Returns:**
 
-- *BIDSPath* — `BIDSPath` pointing to the *_events.tsv file.
+- *[BIDSPath](/docs/api/bids/bids-path)* — [`BIDSPath`](/docs/api/bids/bids-path) pointing to the *_events.tsv file.
 
 ---
 
@@ -373,7 +373,7 @@ Returns the path for the sidecar JSON metadata file (e.g.
 
 **Returns:**
 
-- *BIDSPath* — `BIDSPath` pointing to the sidecar JSON file.
+- *[BIDSPath](/docs/api/bids/bids-path)* — [`BIDSPath`](/docs/api/bids/bids-path) pointing to the sidecar JSON file.
 
 ---
 
@@ -405,7 +405,7 @@ Wildcards are used for unset entities.
 
 **Returns:**
 
-- *QList&lt; BIDSPath &gt;* — List of matching `BIDSPath` objects.
+- *QList&lt; [BIDSPath](/docs/api/bids/bids-path) &gt;* — List of matching [`BIDSPath`](/docs/api/bids/bids-path) objects.
 
 ---
 

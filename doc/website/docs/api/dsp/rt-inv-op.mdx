@@ -17,7 +17,14 @@ class RTPROCESSINGLIB::RtInvOp
 
 Real-time inverse dSPM, sLoreta inverse operator estimation.
 
-Controller that manages `RtInvOpWorker` for online inverse operator updates.
+Controller that manages [`RtInvOpWorker`](/docs/api/dsp/rt-inv-op-worker) for online inverse operator updates.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- RtInvOp
+```
 
 ---
 
@@ -29,10 +36,10 @@ Creates the real-time inverse operator estimation object.
 
 **Parameters:**
 
-- **p_pFiffInfo** : *QSharedPointer&lt;FIFFLIB::FiffInfo&gt; &*
+- **p_pFiffInfo** : *QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt; &*
   Fiff measurement info.
 
-- **p_pFwd** : *QSharedPointer&lt;MNELIB::MNEForwardSolution&gt; &*
+- **p_pFwd** : *QSharedPointer&lt;[MNEForwardSolution](/docs/api/mne/mne-forward-solution)&gt; &*
   Forward solution.
 
 - **parent** : *QObject **
@@ -52,7 +59,7 @@ Slot to receive incoming noise covariance estimations.
 
 **Parameters:**
 
-- **noiseCov** : *const FIFFLIB::FiffCov &*
+- **noiseCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   Noise covariance estimation.
 
 ---
@@ -63,7 +70,7 @@ Slot to receive incoming forward solution.
 
 **Parameters:**
 
-- **pFwd** : *QSharedPointer&lt;MNELIB::MNEForwardSolution&gt;*
+- **pFwd** : *QSharedPointer&lt;[MNEForwardSolution](/docs/api/mne/mne-forward-solution)&gt;*
   Forward solution.
 
 ---

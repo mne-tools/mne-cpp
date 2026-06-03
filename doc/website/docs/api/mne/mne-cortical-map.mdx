@@ -39,13 +39,13 @@ where inv_kernel is the inverse operator kernel and fwd_gain is the forward solu
 
 **Parameters:**
 
-- **fwd** : *const MNEForwardSolution &*
+- **fwd** : *const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) &*
   The forward solution containing the gain matrix.
 
-- **inv** : *const MNEInverseOperator &*
+- **inv** : *const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*
   The inverse operator (must have been prepared / have a kernel).
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   The measurement info for channel selection.
 
 **Returns:**

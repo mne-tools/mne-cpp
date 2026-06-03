@@ -15,11 +15,11 @@ sidebar_position: 1
 class MRILIB::MriCorFifIO
 ```
 
-Stateless serialiser that turns an `MriVolData` into a FIFF MRI set (COR.fif).
+Stateless serialiser that turns an [`MriVolData`](/docs/api/mri/mri-vol-data) into a FIFF MRI set (COR.fif).
 
-Writes MRI slice data  whether originally loaded from a FreeSurfer COR tree, an MGH/MGZ volume, or a NIfTI file  into the FIFF block hierarchy (`FIFFB_MRI` / `FIFFB_MRI_SET` / `FIFFB_MRI_SLICE`) understood by every downstream MNE C / MNE-Python step that needs an MRI volume in source-space coordinates. The class exposes only `static` methods so callers can use it without owning any state; the input `MriVolData` is consumed verbatim.
+Writes MRI slice data  whether originally loaded from a FreeSurfer COR tree, an MGH/MGZ volume, or a NIfTI file  into the FIFF block hierarchy (`FIFFB_MRI` / `FIFFB_MRI_SET` / `FIFFB_MRI_SLICE`) understood by every downstream [MNE](/docs/api/mne/mne-class) C / MNE-Python step that needs an MRI volume in source-space coordinates. The class exposes only `static` methods so callers can use it without owning any state; the input [`MriVolData`](/docs/api/mri/mri-vol-data) is consumed verbatim.
 
-Ported from `save_slices()` / `write_slice()` in MNE C `write_mri_set.c` by Matti Hamalainen.
+Ported from `save_slices()` / `write_slice()` in [MNE](/docs/api/mne/mne-class) C `write_mri_set.c` by Matti Hamalainen.
 
 ---
 
@@ -37,7 +37,7 @@ Writes COR.fif file from slice data.
 - **slices** : *const QVector&lt; MriSlice &gt; &*
   Vector of `MriSlice` structures to write.
 
-- **additionalTrans** : *const QVector&lt; FIFFLIB::FiffCoordTrans &gt; &*
+- **additionalTrans** : *const QVector&lt; [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &gt; &*
   Additional coordinate transforms (Talairach etc.).
 
 **Returns:**

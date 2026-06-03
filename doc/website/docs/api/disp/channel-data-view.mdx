@@ -17,7 +17,15 @@ class DISPLIB::ChannelDataView
 
 Composite real-time multi-channel raw scroller assembling label panel, table view, time ruler and scrollbars.
 
-Acts as the user-facing host of the `ChannelDataModel` and `RtFiffRawViewDelegate` pair, exposing playback / zoom / channel-selection signals consumed by the surrounding plugin GUI.
+Acts as the user-facing host of the [`ChannelDataModel`](/docs/api/disp/channel-data-model) and [`RtFiffRawViewDelegate`](/docs/api/disp/rt-fiff-raw-view-delegate) pair, exposing playback / zoom / channel-selection signals consumed by the surrounding plugin GUI.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- ChannelDataView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Acts as the user-facing host of the `ChannelDataModel` and `RtFiffRawViewDelegat
 
 ### ChannelDataView(sSettingsPath, parent, f)
 
-Constructs a `ChannelDataView`.
+Constructs a [`ChannelDataView`](/docs/api/disp/channel-data-view).
 
 **Parameters:**
 
@@ -46,11 +54,11 @@ Constructs a `ChannelDataView`.
 
 ### init(pInfo)
 
-Initialise the view from a FiffInfo (channel names, types, sampling rate).
+Initialise the view from a [FiffInfo](/docs/api/fiff/fiff-info) (channel names, types, sampling rate).
 
 **Parameters:**
 
-- **pInfo** : *QSharedPointer&lt;FIFFLIB::FiffInfo&gt;*
+- **pInfo** : *QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt;*
   Shared pointer to FiffInfo.
 
 ---
@@ -259,7 +267,7 @@ Pass an empty vector to clear all markers.
 
 **Parameters:**
 
-- **events** : *const QVector&lt; ChannelRhiView::EventMarker &gt; &*
+- **events** : *const QVector&lt; [ChannelRhiView](/docs/api/disp/channel-rhi-view)::EventMarker &gt; &*
   List of EventMarker objects.
 
 ---
@@ -309,7 +317,7 @@ Set the list of annotation spans to display as translucent overlays.
 
 **Parameters:**
 
-- **annotations** : *const QVector&lt; ChannelRhiView::AnnotationSpan &gt; &*
+- **annotations** : *const QVector&lt; [ChannelRhiView](/docs/api/disp/channel-rhi-view)::AnnotationSpan &gt; &*
   List of AnnotationSpan objects.
 
 ---

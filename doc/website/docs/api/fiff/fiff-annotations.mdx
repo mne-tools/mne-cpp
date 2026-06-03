@@ -29,7 +29,7 @@ Read and written under `FIFFB_MNE_ANNOTATIONS` so the annotation list travels wi
 
 ### FiffAnnotations()
 
-Constructs an empty `FiffAnnotations` object.
+Constructs an empty [`FiffAnnotations`](/docs/api/fiff/fiff-annotations) object.
 
 ---
 
@@ -197,7 +197,7 @@ Selects annotations whose description starts with the filter string.
 
 **Returns:**
 
-- *FiffAnnotations* — Filtered annotations.
+- *[FiffAnnotations](/docs/api/fiff/fiff-annotations)* — Filtered annotations.
 
 ---
 
@@ -212,7 +212,7 @@ Selects annotations that reference the given channel name.
 
 **Returns:**
 
-- *FiffAnnotations* — Filtered annotations.
+- *[FiffAnnotations](/docs/api/fiff/fiff-annotations)* — Filtered annotations.
 
 ---
 
@@ -230,7 +230,7 @@ Returns annotations overlapping [tmin, tmax], clipping partially overlapping one
 
 **Returns:**
 
-- *FiffAnnotations* — Cropped annotations.
+- *[FiffAnnotations](/docs/api/fiff/fiff-annotations)* — Cropped annotations.
 
 ---
 
@@ -247,7 +247,7 @@ Reads annotations from a JSON file.
 
 **Returns:**
 
-- *FiffAnnotations* — Parsed annotations.
+- *[FiffAnnotations](/docs/api/fiff/fiff-annotations)* — Parsed annotations.
 
 ---
 
@@ -260,7 +260,7 @@ Writes annotations to a JSON file.
 - **path** : *const QString &*
   File path.
 
-- **annot** : *const FiffAnnotations &*
+- **annot** : *const [FiffAnnotations](/docs/api/fiff/fiff-annotations) &*
   Annotations to write.
 
 **Returns:**
@@ -280,7 +280,7 @@ Reads annotations from a CSV file.
 
 **Returns:**
 
-- *FiffAnnotations* — Parsed annotations.
+- *[FiffAnnotations](/docs/api/fiff/fiff-annotations)* — Parsed annotations.
 
 ---
 
@@ -293,7 +293,7 @@ Writes annotations to a CSV file.
 - **path** : *const QString &*
   File path.
 
-- **annot** : *const FiffAnnotations &*
+- **annot** : *const [FiffAnnotations](/docs/api/fiff/fiff-annotations) &*
   Annotations to write.
 
 **Returns:**
@@ -313,7 +313,7 @@ Auto-detects format and reads annotations.
 
 **Returns:**
 
-- *FiffAnnotations* — Parsed annotations.
+- *[FiffAnnotations](/docs/api/fiff/fiff-annotations)* — Parsed annotations.
 
 ---
 
@@ -326,7 +326,7 @@ Auto-detects format and writes annotations.
 - **path** : *const QString &*
   File path (.json or .csv).
 
-- **annot** : *const FiffAnnotations &*
+- **annot** : *const [FiffAnnotations](/docs/api/fiff/fiff-annotations) &*
   Annotations to write.
 
 **Returns:**

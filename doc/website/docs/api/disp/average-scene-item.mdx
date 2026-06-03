@@ -15,9 +15,16 @@ sidebar_position: 6
 class DISPLIB::AverageSceneItem
 ```
 
-QGraphicsObject painting one channel's averaged evoked traces inside `AverageScene`.
+QGraphicsObject painting one channel's averaged evoked traces inside [`AverageScene`](/docs/api/disp/average-scene).
 
 Stores per-condition data vectors and colours and paints overlaid traces, the t = 0 marker and the baseline inside its bounding rect during `paint()`.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    QGraphicsObject <|-- AverageSceneItem
+```
 
 ---
 
@@ -25,7 +32,7 @@ Stores per-condition data vectors and colours and paints overlaid traces, the t 
 
 ### AverageSceneItem(channelName, channelNumber, channelPosition, channelKind, channelUnit, color)
 
-Constructs a `AverageSceneItem`.
+Constructs a [`AverageSceneItem`](/docs/api/disp/average-scene-item).
 
 ---
 

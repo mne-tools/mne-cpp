@@ -54,13 +54,13 @@ Build the current compensation operator for the given channel set by locating th
 
 **Parameters:**
 
-- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+- **chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   Channels to compensate (may include non-MEG channels).
 
 - **nch** : *int*
   Number of channels.
 
-- **compchs** : *QList&lt; FIFFLIB::FiffChInfo &gt;*
+- **compchs** : *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt;*
   Compensation input channels (may include non-reference channels).
 
 - **ncomp** : *int*
@@ -138,13 +138,13 @@ Configure the full compensation pipeline: determine current compensation, build 
 - **compensate_to** : *int*
   Desired compensation grade.
 
-- **chs** : *QList&lt; FIFFLIB::FiffChInfo &gt; &*
+- **chs** : *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   Channels to compensate (coil_type is updated).
 
 - **nchan** : *int*
   Number of channels.
 
-- **comp_chs** : *QList&lt; FIFFLIB::FiffChInfo &gt;*
+- **comp_chs** : *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt;*
   Compensation input channels.
 
 - **ncomp_chan** : *int*
@@ -169,7 +169,7 @@ Read all CTF compensation data sets (matrices and channel info) from a FIFF file
 
 **Returns:**
 
-- *std::unique_ptr&lt; MNECTFCompDataSet &gt;* — A new compensation data set, or nullptr on failure.
+- *std::unique_ptr&lt; [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) &gt;* — A new compensation data set, or nullptr on failure.
 
 ---
 
@@ -179,7 +179,7 @@ Write the compensation grade into the upper 16 bits of coil_type for all MEG cha
 
 **Parameters:**
 
-- **chs** : *QList&lt; FIFFLIB::FiffChInfo &gt; &*
+- **chs** : *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   Channel information list.
 
 - **nch** : *int*
@@ -200,7 +200,7 @@ Extract the compensation grade from MEG channel coil types.
 
 **Parameters:**
 
-- **chs** : *const QList&lt; FIFFLIB::FiffChInfo &gt; &*
+- **chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   Channel information list.
 
 - **nch** : *int*

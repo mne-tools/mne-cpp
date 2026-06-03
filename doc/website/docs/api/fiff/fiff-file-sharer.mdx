@@ -19,19 +19,26 @@ Refcounted memory-mapped view of a FIFF file shared between cooperating consumer
 
 Each consumer gets a zero-copy `QByteArray` view of the same backing pages. When the last reference goes away the mapping is unmapped. Used to let the GUI, the realtime pipeline and the recording dumper share one open FIFF file without duplicate I/O.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    QObject <|-- FiffFileSharer
+```
+
 ---
 
 ## Public Methods
 
 ### FiffFileSharer()
 
-Constructs a `FiffFileSharer` with default paramaters (based on m_sDefaultDirectory and m_sDefaultFileName).
+Constructs a [`FiffFileSharer`](/docs/api/fiff/fiff-file-sharer) with default paramaters (based on m_sDefaultDirectory and m_sDefaultFileName).
 
 ---
 
 ### FiffFileSharer(sDirName)
 
-Constructs a `FiffFileSharer` to watch/save to sDirName.
+Constructs a [`FiffFileSharer`](/docs/api/fiff/fiff-file-sharer) to watch/save to sDirName.
 
 **Parameters:**
 

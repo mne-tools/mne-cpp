@@ -19,9 +19,9 @@ sidebar_position: 5
 class FiffEpochs
 ```
 
-Free / static helpers that turn a FiffRawData plus an event list into fixed-length epochs.
+Free / static helpers that turn a [FiffRawData](/docs/api/fiff/fiff-raw-data) plus an event list into fixed-length epochs.
 
-Stateless — operates on the FiffRawData and event arguments directly. Used by the source-reconstruction pipeline and by the offline averaging tooling when building epochs for an `FiffEvokedSet`.
+Stateless — operates on the [FiffRawData](/docs/api/fiff/fiff-raw-data) and event arguments directly. Used by the source-reconstruction pipeline and by the offline averaging tooling when building epochs for an `FiffEvokedSet`.
 
 ---
 
@@ -75,7 +75,7 @@ Concatenate multiple epoch sets into a single list.
 
 Compute the average (evoked response) across epochs.
 
-All epochs must have the same dimensions. Returns a FiffEvoked with data, nave, times, and aspect_kind populated.
+All epochs must have the same dimensions. Returns a [FiffEvoked](/docs/api/fiff/fiff-evoked) with data, nave, times, and aspect_kind populated.
 
 **Parameters:**
 
@@ -90,7 +90,7 @@ All epochs must have the same dimensions. Returns a FiffEvoked with data, nave, 
 
 **Returns:**
 
-- *FiffEvoked* — FiffEvoked with averaged data and metadata.
+- *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — FiffEvoked with averaged data and metadata.
 
 ---
 

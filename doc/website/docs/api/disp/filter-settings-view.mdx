@@ -15,9 +15,17 @@ sidebar_position: 31
 class DISPLIB::FilterSettingsView
 ```
 
-Compact filter on / off + bandwidth panel that opens the full `FilterDesignView` on demand.
+Compact filter on / off + bandwidth panel that opens the full [`FilterDesignView`](/docs/api/disp/filter-design-view) on demand.
 
 Houses an activation `QCheckBox`, from / to frequency labels and an `Edit` button; the two widgets stay in sync via `filterChannelTypeChanged` and `filterChanged` signals.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- FilterSettingsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
 
 ---
 
@@ -25,7 +33,7 @@ Houses an activation `QCheckBox`, from / to frequency labels and an `Edit` butto
 
 ### FilterSettingsView(sSettingsPath, parent, f)
 
-Constructs a `FilterSettingsView` which is a child of parent.
+Constructs a [`FilterSettingsView`](/docs/api/disp/filter-settings-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `FilterSettingsView` which is a child of parent.
 
 ### ~FilterSettingsView()
 
-Destroys the `FilterSettingsView`.
+Destroys the [`FilterSettingsView`](/docs/api/disp/filter-settings-view).
 
 ---
 

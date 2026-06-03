@@ -19,13 +19,21 @@ Three-way radio selector for scope = Selected / Visible / All channels.
 
 Emits `selectionChanged(int)` when the active radio flips; the integer matches the `QButtonGroup` id of the chosen scope.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- ApplyToView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
 
 ### ApplyToView(sSettingsPath, parent, f)
 
-`ApplyToView`.
+[`ApplyToView`](/docs/api/disp/apply-to-view).
 
 **Parameters:**
 

@@ -17,7 +17,7 @@ class MNALIB::MnaGraphExecutor
 
 Executes a computational graph by traversing nodes in topological order and invoking registered operation functions.
 
-Stateless batch and stream-mode runner for an `MnaGraph`.
+Stateless batch and stream-mode runner for an [`MnaGraph`](/docs/api/mna/mna-graph).
 
 ---
 
@@ -29,7 +29,7 @@ Execute the full graph (all nodes in topological order).
 
 **Parameters:**
 
-- **graph** : *MnaGraph &*
+- **graph** : *[MnaGraph](/docs/api/mna/mna-graph) &*
   The graph to execute.
 
 - **graphInputs** : *const QVariantMap &*
@@ -47,7 +47,7 @@ Execute only dirty nodes and their downstream dependents.
 
 **Parameters:**
 
-- **graph** : *MnaGraph &*
+- **graph** : *[MnaGraph](/docs/api/mna/mna-graph) &*
   The graph to execute.
 
 - **existing** : *Context &*
@@ -96,16 +96,16 @@ Performs topological sort
 For each node, calls `factory` to instantiate a live plugin
 
 
-Applies `MnaParamTree` values to node attributes
+Applies [`MnaParamTree`](/docs/api/mna/mna-param-tree) values to node attributes
 
 
 Wires connections based on port dataKind matching
 
-The mna library does NOT depend on MNE Scan — the host app provides the factory and is responsible for wiring Qt signal/slot connections between the returned QObject* instances.
+The mna library does NOT depend on [MNE](/docs/api/mne/mne-class) Scan — the host app provides the factory and is responsible for wiring Qt signal/slot connections between the returned QObject* instances.
 
 **Parameters:**
 
-- **graph** : *MnaGraph &*
+- **graph** : *[MnaGraph](/docs/api/mna/mna-graph) &*
   The pipeline graph.
 
 - **factory** : *PluginFactory*

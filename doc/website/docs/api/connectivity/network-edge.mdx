@@ -15,11 +15,11 @@ sidebar_position: 17
 class CONNECTIVITYLIB::NetworkEdge
 ```
 
-Directed weighted edge connecting two `NetworkNode` instances.
+Directed weighted edge connecting two [`NetworkNode`](/docs/api/connectivity/network-node) instances.
 
-Holds the start- and end-node IDs, the full per-frequency weight matrix delivered by the metric, an active/inactive flag honoured by the thresholded views on `Network`, and the ``[iStartWeightBin, iEndWeightBin) window that reduces the matrix to the scalar weight used for thresholding and rendering. For symmetric metrics the directionality is purely a storage convention.
+Holds the start- and end-node IDs, the full per-frequency weight matrix delivered by the metric, an active/inactive flag honoured by the thresholded views on [`Network`](/docs/api/connectivity/network), and the ``[iStartWeightBin, iEndWeightBin) window that reduces the matrix to the scalar weight used for thresholding and rendering. For symmetric metrics the directionality is purely a storage convention.
 
-Weighted, directional edge in a `Network`; carries per-frequency weights plus a band-averaged scalar.
+Weighted, directional edge in a [`[Network](/docs/api/connectivity/network)`](/docs/api/connectivity/network); carries per-frequency weights plus a band-averaged scalar.
 
 ---
 
@@ -27,7 +27,7 @@ Weighted, directional edge in a `Network`; carries per-frequency weights plus a 
 
 ### NetworkEdge(iStartNodeID, iEndNodeID, matWeight, bIsActive, iStartWeightBin, iEndWeightBin)
 
-Constructs a `NetworkEdge` object.
+Constructs a [`NetworkEdge`](/docs/api/connectivity/network-edge) object.
 
 **Parameters:**
 

@@ -19,13 +19,21 @@ Tabular picker for active / colour of each averaged condition in the current evo
 
 Emits `newAverageActivationMap` and `newAverageColorMap` whenever the user toggles a row or changes a colour; consumers refresh their evoked plots accordingly.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- AverageSelectionView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
 
 ### AverageSelectionView(sSettingsPath, parent, f)
 
-Constructs a `AverageSelectionView` which is a child of parent.
+Constructs a [`AverageSelectionView`](/docs/api/disp/average-selection-view) which is a child of parent.
 
 **Parameters:**
 
@@ -36,7 +44,7 @@ Constructs a `AverageSelectionView` which is a child of parent.
 
 ### ~AverageSelectionView()
 
-Destroys the `AverageSelectionView`.
+Destroys the [`AverageSelectionView`](/docs/api/disp/average-selection-view).
 
 ---
 

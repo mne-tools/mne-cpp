@@ -15,9 +15,17 @@ sidebar_position: 46
 class DISPLIB::Plot
 ```
 
-MATLAB-style line plot for an Eigen vector, derived from `Graph`.
+MATLAB-style line plot for an Eigen vector, derived from [`Graph`](/docs/api/disp/graph).
 
 Owns a list of `QVector<QPointF>` trace paths and supports a `m_bHoldOn` flag for overlaying multiple curves. ``updateData()`` replaces the visible curve in place.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    Graph <|-- Plot
+    click Graph "/docs/api/disp/graph"
+```
 
 ---
 
@@ -50,13 +58,13 @@ Creates the plot using a given double vector.
 
 ### ~Plot()
 
-Destructs the `Plot` object.
+Destructs the [`Plot`](/docs/api/disp/plot) object.
 
 ---
 
 ### init()
 
-Initializes the `Plot` object.
+Initializes the [`Plot`](/docs/api/disp/plot) object.
 
 ---
 

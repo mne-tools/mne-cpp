@@ -19,13 +19,21 @@ MRI ↔ head co-registration configuration / refinement panel.
 
 Exposes the inputs of the ICP-based co-registration step (fiducial files, trans-file load / save paths, ICP iteration cap, outlier threshold) plus manual scale / rotation / translation tweak spinboxes.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- CoregSettingsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
 
 ### CoregSettingsView(sSettingsPath, parent, f)
 
-Constructs a `CoregSettingsView` object.
+Constructs a [`CoregSettingsView`](/docs/api/disp/coreg-settings-view) object.
 
 ---
 
@@ -170,7 +178,7 @@ Set the the number of omitted points.
 
 ### setRMSE(fRMSE)
 
-Set the the Root-Mean-Square-Error (Digitizer-FsSurface) after icp.
+Set the the Root-Mean-Square-Error (Digitizer-[FsSurface](/docs/api/fs/fs-surface)) after icp.
 
 **Parameters:**
 

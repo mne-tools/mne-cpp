@@ -19,13 +19,21 @@ Forward-solution computation control panel (BEM / source-space / EEG sphere mode
 
 Exposes the parameters required by the ``FWDLIB`` recomputation job and provides a `Recompute` trigger plus live status labels showing the currently loaded BEM and dipole / sensor counts.
 
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractView <|-- FwdSettingsView
+    click AbstractView "/docs/api/disp/abstract-view"
+```
+
 ---
 
 ## Public Methods
 
 ### FwdSettingsView(sSettingsPath, parent, f)
 
-Constructs a `FwdSettingsView` object.
+Constructs a [`FwdSettingsView`](/docs/api/disp/fwd-settings-view) object.
 
 ---
 

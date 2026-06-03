@@ -17,7 +17,14 @@ class UTILSLIB::IObserver
 
 DECLARE INTERFACE OBSERVER.
 
-The `IObserver` interface provides the base class of every observer of the observer design pattern.
+The [`IObserver`](/docs/api/utils/i-observer) interface provides the base class of every observer of the observer design pattern.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    IObserver <|-- CommandManager
+```
 
 ---
 
@@ -25,17 +32,17 @@ The `IObserver` interface provides the base class of every observer of the obser
 
 ### ~IObserver()
 
-Destroys the `IObserver`.
+Destroys the [`IObserver`](/docs/api/utils/i-observer).
 
 ---
 
 ### update(pSubject)
 
-Updates the `IObserver`.
+Updates the [`IObserver`](/docs/api/utils/i-observer).
 
 **Parameters:**
 
-- **pSubject** : *Subject **
+- **pSubject** : *[Subject](/docs/api/utils/subject) **
   pointer to the subject where observer is attached to.
 
 ---

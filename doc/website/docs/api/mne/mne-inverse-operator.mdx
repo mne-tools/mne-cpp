@@ -50,13 +50,13 @@ Constructs an inverse operator from measurement info, forward solution, and nois
 
 **Parameters:**
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info specifying channels; bad channels in info.bads are excluded.
 
-- **forward** : *const MNEForwardSolution &*
+- **forward** : *const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) &*
   Forward operator.
 
-- **noiseCov** : *const FIFFLIB::FiffCov &*
+- **noiseCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   Noise covariance matrix.
 
 - **loose** : *float*
@@ -98,7 +98,7 @@ Applies eigenfield/eigenlead decomposition, regularisation, whitening, projectio
 
 **Parameters:**
 
-- **label** : *const FSLIB::FsLabel &*
+- **label** : *const [FsLabel](/docs/api/fs/fs-label) &*
   Cortical label restricting the source space (empty for all sources).
 
 - **method** : *const QString &*
@@ -111,7 +111,7 @@ Applies eigenfield/eigenlead decomposition, regularisation, whitening, projectio
   Assembled kernel matrix (nSources x nChannels).
 
 - **noise_norm** : *Eigen::SparseMatrix&lt; double &gt; &*
-  Diagonal noise-normalisation matrix (empty for `MNE`).
+  Diagonal noise-normalisation matrix (empty for [`MNE`](/docs/api/mne/mne-class)).
 
 - **vertno** : *QList&lt; Eigen::VectorXi &gt; &*
   Vertex numbers per hemisphere.
@@ -128,7 +128,7 @@ Verify that inverse-operator channels are present in the measurement info.
 
 **Parameters:**
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info whose channel names are checked.
 
 **Returns:**
@@ -141,11 +141,11 @@ Verify that inverse-operator channels are present in the measurement info.
 
 Cluster the inverse kernel by cortical parcellation.
 
-Groups source-space points within each parcellation label using KMeans and returns a reduced kernel together with the cluster operator.
+Groups source-space points within each parcellation label using [KMeans](/docs/api/math/k-means) and returns a reduced kernel together with the cluster operator.
 
 **Parameters:**
 
-- **annotationSet** : *const FSLIB::FsAnnotationSet &*
+- **annotationSet** : *const [FsAnnotationSet](/docs/api/fs/fs-annotation-set) &*
   Annotation set for left and right hemisphere.
 
 - **clusterSize** : *qint32*
@@ -215,7 +215,7 @@ Scales covariances by the number of averages, builds the regularised pseudo-inve
 
 **Returns:**
 
-- *MNEInverseOperator* — A prepared copy of the inverse operator ready for apply_inverse.
+- *[MNEInverseOperator](/docs/api/mne/mne-inverse-operator)* — A prepared copy of the inverse operator ready for apply_inverse.
 
 ---
 
@@ -236,7 +236,7 @@ Write the inverse operator into an already-open FIFF stream.
 
 **Parameters:**
 
-- **p_pStream** : *FIFFLIB::FiffStream **
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
   Open FIFF stream.
 
 ---
@@ -251,13 +251,13 @@ Performs depth weighting, source-covariance construction, whitening, and SVD dec
 
 **Parameters:**
 
-- **info** : *const FIFFLIB::FiffInfo &*
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info; bad channels in info.bads are excluded.
 
-- **forward** : *MNEForwardSolution*
+- **forward** : *[MNEForwardSolution](/docs/api/mne/mne-forward-solution)*
   Forward operator (modified internally for fixed orientation if needed).
 
-- **noiseCov** : *const FIFFLIB::FiffCov &*
+- **noiseCov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
   Noise covariance matrix.
 
 - **loose** : *float*
@@ -274,7 +274,7 @@ Performs depth weighting, source-covariance construction, whitening, and SVD dec
 
 **Returns:**
 
-- *MNEInverseOperator* — Assembled inverse operator.
+- *[MNEInverseOperator](/docs/api/mne/mne-inverse-operator)* — Assembled inverse operator.
 
 ---
 
@@ -287,7 +287,7 @@ Read an inverse operator from a FIFF file.
 - **p_IODevice** : *QIODevice &*
   FIFF IO device (e.g. QFile or QTcpSocket).
 
-- **inv** : *MNEInverseOperator &*
+- **inv** : *[MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*
   Receives the loaded inverse operator.
 
 **Returns:**

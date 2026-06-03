@@ -17,9 +17,9 @@ class MRILIB::MriCorIO
 
 Stateless reader for the FreeSurfer COR-NNN directory layout.
 
-Walks a `mri/T1` (or `mri/orig`, `mri/brain`, …) directory, loads the 256 `COR-001` … `COR-256` flat 256×256 unsigned-char coronal slice files, and assembles them into an `MriVolData` with the per-slice coordinate transform (slice→surface RAS) the rest of `MRILIB` expects. The class exposes only `static` methods  there is no per-instance state, the caller supplies the directory path and an output volume.
+Walks a `mri/T1` (or `mri/orig`, `mri/brain`, …) directory, loads the 256 `COR-001` … `COR-256` flat 256×256 unsigned-char coronal slice files, and assembles them into an [`MriVolData`](/docs/api/mri/mri-vol-data) with the per-slice coordinate transform (slice→surface RAS) the rest of `MRILIB` expects. The class exposes only `static` methods  there is no per-instance state, the caller supplies the directory path and an output volume.
 
-Ported from `make_cor_set()` in MNE C `mne_make_cor_set` by Matti Hamalainen.
+Ported from `make_cor_set()` in [MNE](/docs/api/mne/mne-class) C `mne_make_cor_set` by Matti Hamalainen.
 
 ---
 

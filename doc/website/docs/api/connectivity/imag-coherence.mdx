@@ -17,9 +17,17 @@ class CONNECTIVITYLIB::ImagCoherence
 
 Computes the imaginary part of complex coherency for every channel pair.
 
-The estimator inherits the volume-conduction rejection property derived by Nolte et al. (NeuroImage, 2004): zero-lag mixing of independent sources contributes only to the real axis and is removed, so the returned edge weights reflect interactions with non-zero conduction delay only. The cross-spectral accumulation is delegated to `Coherency::calculateImag`; this class is the public entry point used by the dispatcher in `Connectivity`.
+The estimator inherits the volume-conduction rejection property derived by Nolte et al. (NeuroImage, 2004): zero-lag mixing of independent sources contributes only to the real axis and is removed, so the returned edge weights reflect interactions with non-zero conduction delay only. The cross-spectral accumulation is delegated to `Coherency::calculateImag`; this class is the public entry point used by the dispatcher in [`Connectivity`](/docs/api/connectivity/connectivity-class).
 
 Imaginary-coherence estimator (Nolte et al. 2004); rejects zero-lag volume-conduction mixing.
+
+### Inheritance
+
+```mermaid
+classDiagram
+    AbstractMetric <|-- ImagCoherence
+    click AbstractMetric "/docs/api/connectivity/abstract-metric"
+```
 
 ---
 
@@ -27,7 +35,7 @@ Imaginary-coherence estimator (Nolte et al. 2004); rejects zero-lag volume-condu
 
 ### ImagCoherence()
 
-Constructs a `ImagCoherence` object.
+Constructs a [`ImagCoherence`](/docs/api/connectivity/imag-coherence) object.
 
 ---
 
@@ -39,12 +47,12 @@ Calculates the imaginary coherence between the rows of the data matrix.
 
 **Parameters:**
 
-- **connectivitySettings** : *ConnectivitySettings &*
+- **connectivitySettings** : *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings) &*
   The input data and parameters.
 
 **Returns:**
 
-- *Network* — The connectivity information in form of a network structure.
+- *[Network](/docs/api/connectivity/network)* — The connectivity information in form of a network structure.
 
 ---
 
