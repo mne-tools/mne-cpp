@@ -43,7 +43,7 @@ jobs:
       run: |
         sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
-        sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build
+        sudo apt-get install -q build-essential libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libvulkan-dev ninja-build
     - name: Compile dynamic Qt version
       run: |
         cd ..
@@ -549,7 +549,7 @@ jobs:
       run: |
         sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
-        sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build
+        sudo apt-get install -q build-essential libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libvulkan-dev ninja-build
     - name: Compile static Qt version
       run: |
         # Clone Qt6 repo
@@ -685,7 +685,7 @@ jobs:
       run: |
         sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
-        sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build
+        sudo apt-get install -q build-essential libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libvulkan-dev ninja-build
     - name: Build host Qt (needed for cross-compilation)
       run: |
         cd ..
