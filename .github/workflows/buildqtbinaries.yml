@@ -43,7 +43,11 @@ jobs:
       run: |
         sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
-        sudo apt-get install -q build-essential libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libvulkan-dev ninja-build
+        sudo apt-get install -q build-essential libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libvulkan-dev ninja-build \
+          libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev \
+          libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev \
+          libxcb-randr0-dev libxcb-render-util0-dev libxcb-cursor-dev \
+          libxkbcommon-dev libxkbcommon-x11-dev libfontconfig1-dev
     - name: Compile dynamic Qt version
       run: |
         cd ..
