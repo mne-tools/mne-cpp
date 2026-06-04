@@ -58,6 +58,10 @@ jobs:
     - name: Clone mne-cpp test data
       run: git clone https://github.com/mne-tools/mne-cpp-test-data.git resources/data/mne-cpp-test-data
 
+    - name: Clear stale pip cache
+      if: runner.os == 'macOS'
+      run: rm -rf ~/Library/Caches/pip
+
     - name: Install Python 3.10
       uses: actions/setup-python@v6
       with:

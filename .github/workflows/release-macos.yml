@@ -35,6 +35,8 @@ jobs:
           echo "prefix=mne-cpp-local" >> "$GITHUB_OUTPUT"
           echo "should_upload=false" >> "$GITHUB_OUTPUT"
         fi
+    - name: Clear stale pip cache
+      run: rm -rf ~/Library/Caches/pip
     - name: Install Python 3.10 version
       uses: actions/setup-python@v6
       with:
@@ -155,6 +157,8 @@ jobs:
           echo "prefix=mne-cpp-local" >> "$GITHUB_OUTPUT"
           echo "should_upload=false" >> "$GITHUB_OUTPUT"
         fi
+    - name: Clear stale pip cache
+      run: rm -rf ~/Library/Caches/pip
     - name: Install Python 3.10 version
       uses: actions/setup-python@v6
       with:
