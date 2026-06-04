@@ -108,7 +108,10 @@ jobs:
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2025-vs2026'
       run: |
-        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        $vsInstallPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+        if (-not $vsInstallPath) { throw 'Could not locate a Visual Studio installation with VC tools.' }
+        $vcvarsPath = Join-Path $vsInstallPath 'VC\Auxiliary\Build\vcvars64.bat'
+        cmd.exe /c "call `"$vcvarsPath`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DUSE_ONNXRUNTIME=ON
         cmake --build build --config Release

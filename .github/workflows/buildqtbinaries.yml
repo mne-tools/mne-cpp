@@ -641,8 +641,11 @@ jobs:
         # Create shadow build folder
         mkdir qt6_shadow
         cd qt6_shadow
-        # Setup the compiler 
-        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        # Setup the compiler
+        $vsInstallPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+        if (-not $vsInstallPath) { throw 'Could not locate a Visual Studio installation with VC tools.' }
+        $vcvarsPath = Join-Path $vsInstallPath 'VC\Auxiliary\Build\vcvars64.bat'
+        cmd.exe /c "call `"$vcvarsPath`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         # Configure Qt6 (use -init-submodules instead of init-repository which requires /bin/sh)
         ..\qt5\configure.bat -init-submodules -submodules qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport -release -static -no-openssl -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt6_binaries" -skip webengine -nomake tests -nomake examples -opensource -confirm-license
