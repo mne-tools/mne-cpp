@@ -88,6 +88,8 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v5
+    - name: Clear stale pip cache
+      run: rm -rf ~/Library/Caches/pip
     - name: Install Python 3.10 version
       uses: actions/setup-python@v6
       with:
@@ -133,7 +135,7 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz" --clobber
 
   GenerateWinDynamicBinaries:
-    runs-on: windows-2025
+    runs-on: windows-2025-vs2026
 
     strategy:
       fail-fast: false
@@ -407,7 +409,7 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt_ifw_${{ env.QIF_VERSION_TOKEN }}_macos.tar.gz" --clobber
 
   GenerateWinInstallerFramework:
-    runs-on: windows-2025
+    runs-on: windows-2025-vs2026
 
     steps:
     - name: Clone repository
@@ -620,7 +622,7 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6111_static_binaries_macos.tar.gz --clobber
 
   GenerateWinStaticBinaries:
-    runs-on: windows-2025
+    runs-on: windows-2025-vs2026
 
     steps:
     - name: Clone repository

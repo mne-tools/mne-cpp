@@ -146,7 +146,7 @@ jobs:
         path: ${{ runner.temp }}/mne-cpp-sdk-${{ env.MNE_CPP_VERSION }}-macos-arm64.tar.gz
 
   WindowsSDK:
-    runs-on: windows-2025
+    runs-on: windows-2025-vs2026
     steps:
     - name: Clone repository
       uses: actions/checkout@v5

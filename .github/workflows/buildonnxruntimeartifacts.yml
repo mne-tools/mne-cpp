@@ -101,7 +101,7 @@ jobs:
         gh release upload "${{ env.ONNXRUNTIME_ARTIFACT_RELEASE_TAG }}" "onnxruntime_${{ env.ONNXRUNTIME_VERSION_TOKEN }}_macos_${{ matrix.arch }}.tar.gz" --clobber
 
   RepackageWindows:
-    runs-on: windows-2025
+    runs-on: windows-2025-vs2026
 
     steps:
     - name: Clone repository
