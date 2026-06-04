@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        os: [ubuntu-24.04, macos-26, windows-2025]
+        os: [ubuntu-24.04, macos-26, windows-2025-vs2026]
 
     steps:
     - name: Clone repository
@@ -72,7 +72,7 @@ jobs:
       run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
 
     - name: Download Qt toolchain (Windows)
-      if: matrix.os == 'windows-2025'
+      if: matrix.os == 'windows-2025-vs2026'
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -80,7 +80,7 @@ jobs:
         call scripts\ci\download_toolchain.bat --kind qt --version "${{ inputs.qt_version }}" --linkage dynamic --output-dir "%RUNNER_TEMP%\qt"
 
     - name: Download Eigen package (Windows)
-      if: matrix.os == 'windows-2025'
+      if: matrix.os == 'windows-2025-vs2026'
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -88,7 +88,7 @@ jobs:
         call scripts\ci\download_toolchain.bat --kind eigen --version "5.0.1" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
 
     - name: Download ONNX Runtime (Windows)
-      if: matrix.os == 'windows-2025'
+      if: matrix.os == 'windows-2025-vs2026'
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -96,7 +96,7 @@ jobs:
         call scripts\ci\download_toolchain.bat --kind onnxruntime --version "1.21.0" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
 
     - name: Clone Skigen (Windows)
-      if: matrix.os == 'windows-2025'
+      if: matrix.os == 'windows-2025-vs2026'
       run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
 
     - name: Configure and compile MNE-CPP (Linux|MacOS)
@@ -106,7 +106,7 @@ jobs:
         cmake --build build
 
     - name: Configure and compile MNE-CPP (Windows)
-      if: matrix.os == 'windows-2025'
+      if: matrix.os == 'windows-2025-vs2026'
       run: |
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }

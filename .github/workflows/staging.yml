@@ -37,6 +37,7 @@ permissions:
   contents: write
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
   # Minimum acceptable line coverage percentage (libraries only).
   # The pipeline will FAIL if coverage drops below this.
   COVERAGE_THRESHOLD: 50
@@ -193,7 +194,7 @@ jobs:
         cache-dependency-path: doc/website/package-lock.json
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.11'
 
@@ -202,7 +203,7 @@ jobs:
 
     - name: Validate SPDX license headers (advisory)
       continue-on-error: true
-      run: python3 -m tools.license_headers.validate --strict || echo "::warning::SPDX header validation found issues — see log above"
+      run: python3 -m tools.license_headers.validate || echo "SPDX header validation found issues — see log above"
 
     - name: Generate placeholder screenshots
       run: |

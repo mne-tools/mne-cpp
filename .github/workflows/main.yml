@@ -37,6 +37,9 @@ concurrency:
   group: main-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 # ═══════════════════════════════════════════════════════════════════════════
 # Jobs that run ONLY on branch pushes to main (skipped on tag pushes to
 # avoid duplicate runs when both main push and tag push trigger together)
@@ -135,7 +138,7 @@ jobs:
         cache-dependency-path: doc/website/package-lock.json
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.11'
 

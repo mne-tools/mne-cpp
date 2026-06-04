@@ -186,7 +186,7 @@ jobs:
       uses: actions/cache@v5
       with:
         path: Qt6_static
-        key: qt-6.11.1-static-macos-arm64-v2
+        key: qt-6.11.1-static-macos-arm64-v3
     - name: Download pre-built static Qt
       id: download-qt-static
       if: steps.cache-qt-static.outputs.cache-hit != 'true'

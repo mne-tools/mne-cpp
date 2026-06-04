@@ -71,6 +71,8 @@ jobs:
       uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
+        # We run our own cmake build below, so tell CodeQL this is a manual build.
+        build-mode: manual
         # Disable CodeQL TRAP caching: each cache entry is ~3.7 GB and two of
         # them (~7.4 GB) dominate the repo's 10 GB Actions cache budget, evicting
         # the Qt/sample-data caches via LRU and forcing unnecessary re-downloads.

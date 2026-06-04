@@ -42,7 +42,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        os: [ubuntu-24.04, macos-26, windows-2025]
+        os: [ubuntu-24.04, macos-26, windows-2025-vs2026]
 
     steps:
     - name: Clone repository
@@ -100,7 +100,7 @@ jobs:
       run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
 
     - name: Download Qt toolchain (Windows)
-      if: matrix.os == 'windows-2025'
+      if: matrix.os == 'windows-2025-vs2026'
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -108,7 +108,7 @@ jobs:
         call scripts\ci\download_toolchain.bat --kind qt --version "6.11.1" --linkage dynamic --output-dir "%RUNNER_TEMP%\qt"
 
     - name: Download Eigen package (Windows)
-      if: matrix.os == 'windows-2025'
+      if: matrix.os == 'windows-2025-vs2026'
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -116,7 +116,7 @@ jobs:
         call scripts\ci\download_toolchain.bat --kind eigen --version "5.0.1" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
 
     - name: Download ONNX Runtime (Windows)
-      if: matrix.os == 'windows-2025'
+      if: matrix.os == 'windows-2025-vs2026'
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -124,7 +124,7 @@ jobs:
         call scripts\ci\download_toolchain.bat --kind onnxruntime --version "1.21.0" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
 
     - name: Clone Skigen (Windows)
-      if: matrix.os == 'windows-2025'
+      if: matrix.os == 'windows-2025-vs2026'
       run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
 
     - name: Install MNE-Python
@@ -137,7 +137,7 @@ jobs:
       uses: actions/cache@v5
       with:
         path: ~/mne_data/MNE-sample-data
-        key: mne-sample-data-v2
+        key: mne-sample-data-v3
 
     - name: Download MNE sample data
       if: steps.cache-mne-data.outputs.cache-hit != 'true'
@@ -162,7 +162,7 @@ jobs:
         cmake --build build -j $(sysctl -n hw.logicalcpu)
 
     - name: Configure and compile MNE-CPP (Windows)
-      if: matrix.os == 'windows-2025'
+      if: matrix.os == 'windows-2025-vs2026'
       run: |
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
@@ -195,7 +195,7 @@ jobs:
         ./scripts/test/test_all.bat Release verbose
 
     - name: Run tests (Windows)
-      if: matrix.os == 'windows-2025'
+      if: matrix.os == 'windows-2025-vs2026'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
         MNE_DATA: ~/mne_data
