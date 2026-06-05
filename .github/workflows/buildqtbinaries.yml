@@ -46,7 +46,7 @@ jobs:
         sudo apt-get install -q build-essential libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libvulkan-dev ninja-build \
           libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev \
           libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev \
-          libxcb-randr0-dev libxcb-render-util0-dev libxcb-cursor-dev \
+          libxcb-randr0-dev libxcb-render-util0-dev libxcb-cursor-dev libxcb-util-dev libxcb-xkb-dev \
           libxkbcommon-dev libxkbcommon-x11-dev libfontconfig1-dev
     - name: Compile dynamic Qt version
       run: |
@@ -58,7 +58,8 @@ jobs:
         mkdir qt6_shadow
         cd qt6_shadow
         # Add -opengl desktop to ensure OpenGL/WrapOpenGL CMake config is generated
-        ../qt5/configure -release -prefix "../Qt6_binaries" -skip webengine -nomake tests -nomake examples -no-dbus -no-openssl -no-pch -opengl desktop -opensource -confirm-license -qt-libpng -qt-pcre -- -DCMAKE_BUILD_TYPE=Release
+        # Add -xcb to explicitly enable the xcb QPA platform plugin
+        ../qt5/configure -release -prefix "../Qt6_binaries" -skip webengine -nomake tests -nomake examples -no-dbus -no-openssl -no-pch -opengl desktop -xcb -opensource -confirm-license -qt-libpng -qt-pcre -- -DCMAKE_BUILD_TYPE=Release
         cmake --build . --parallel $(nproc)
         cmake --install .
     - name: Package binaries
