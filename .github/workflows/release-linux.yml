@@ -40,7 +40,10 @@ jobs:
         # Remove third-party repos that can cause transient 403/signing errors
         sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
-        sudo apt-get install -q libgl1-mesa-dev
+        # libxkbcommon-dev: the dynamic Qt toolchain is built with -xcb, so
+        # Qt6::GuiPrivate now declares a third-party dependency on XKB::XKB.
+        # find_package(Qt6 COMPONENTS GuiPrivate) and linking require xkbcommon.
+        sudo apt-get install -q libgl1-mesa-dev libxkbcommon-dev
     - name: Install Python 3.10 version
       uses: actions/setup-python@v6
       with:
@@ -135,7 +138,10 @@ jobs:
         # Remove third-party repos that can cause transient 403/signing errors
         sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
-        sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build
+        # libxkbcommon-dev: the dynamic Qt toolchain is built with -xcb, so
+        # Qt6::GuiPrivate now declares a third-party dependency on XKB::XKB.
+        # find_package(Qt6 COMPONENTS GuiPrivate) and linking require xkbcommon.
+        sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build libxkbcommon-dev
     - name: Download Eigen package
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}

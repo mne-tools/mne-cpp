@@ -53,7 +53,10 @@ jobs:
       run: |
         sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -q
-        sudo apt-get install -q libgl1-mesa-dev
+        # libxkbcommon-dev: the dynamic Qt toolchain is built with -xcb, so
+        # Qt6::GuiPrivate now declares a third-party dependency on XKB::XKB.
+        # find_package(Qt6 COMPONENTS GuiPrivate) and linking require xkbcommon.
+        sudo apt-get install -q libgl1-mesa-dev libxkbcommon-dev
 
     - name: Clone mne-cpp test data
       run: git clone https://github.com/mne-tools/mne-cpp-test-data.git resources/data/mne-cpp-test-data

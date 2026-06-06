@@ -33,11 +33,14 @@ jobs:
           sudo apt-get update -q
           # libgl1-mesa-dev is required for Qt6's Gui module to be detected
           # by find_package; libvulkan-dev mirrors the regular Linux build.
+          # libxkbcommon-dev: the dynamic Qt toolchain is built with -xcb, so
+          # Qt6::GuiPrivate now declares a third-party dependency on XKB::XKB.
           sudo apt-get install -q -y \
             build-essential \
             ninja-build \
             libgl1-mesa-dev \
-            libvulkan-dev
+            libvulkan-dev \
+            libxkbcommon-dev
       - name: Download Qt toolchain
         env:
           GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
