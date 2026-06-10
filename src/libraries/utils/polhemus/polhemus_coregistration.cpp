@@ -1073,11 +1073,23 @@ void PolhemusCoregistration::saveSessionState(QSettings &settings, const QString
 
     // Optical calibration
     settings.setValue("opticalCalibValid", m_opticalCalibValid);
+    settings.setValue("knownTrackerToObjectiveDist", static_cast<double>(m_knownTrackerToObjectiveDist));
     if (m_opticalCalibValid) {
         saveVec3(settings, "opticalAxisLocal", m_opticalAxisLocal);
         saveVec3(settings, "opticalCenterLocal", m_opticalCenterLocal);
         settings.setValue("opticalCalibResidualMm", static_cast<double>(m_opticalCalibResidualMm));
         settings.setValue("opticalCalibDepthSpreadMm", static_cast<double>(m_opticalCalibDepthSpreadMm));
+    }
+
+    // Optical calibration samples (so calibration can be re-solved after restart)
+    const int nOptSamples = static_cast<int>(m_opticalCalibSamples.size());
+    settings.setValue("opticalCalibSampleCount", nOptSamples);
+    for (int i = 0; i < nOptSamples; ++i) {
+        const auto& s = m_opticalCalibSamples[static_cast<size_t>(i)];
+        const QString key = QString("opticalCalibSample/%1").arg(i);
+        saveVec3(settings, key + "/trackerPos", s.trackerPos);
+        saveQuat(settings, key + "/trackerOri", s.trackerOri);
+        saveVec3(settings, key + "/focusPoint", s.focusPoint);
     }
 
     // Registration transforms
@@ -1137,12 +1149,26 @@ bool PolhemusCoregistration::restoreSessionState(QSettings &settings, const QStr
     m_tipOffsetEnabled  = settings.value("tipOffsetEnabled", false).toBool();
 
     // Optical calibration
+    m_knownTrackerToObjectiveDist = static_cast<float>(settings.value("knownTrackerToObjectiveDist", 0.200).toDouble());
     m_opticalCalibValid = settings.value("opticalCalibValid", false).toBool();
     if (m_opticalCalibValid) {
         m_opticalAxisLocal         = loadVec3(settings, "opticalAxisLocal");
         m_opticalCenterLocal       = loadVec3(settings, "opticalCenterLocal");
         m_opticalCalibResidualMm   = static_cast<float>(settings.value("opticalCalibResidualMm", 0.0).toDouble());
         m_opticalCalibDepthSpreadMm = static_cast<float>(settings.value("opticalCalibDepthSpreadMm", 0.0).toDouble());
+    }
+
+    // Optical calibration samples
+    const int nOptSamples = settings.value("opticalCalibSampleCount", 0).toInt();
+    m_opticalCalibSamples.clear();
+    m_opticalCalibSamples.reserve(static_cast<size_t>(nOptSamples));
+    for (int i = 0; i < nOptSamples; ++i) {
+        const QString key = QString("opticalCalibSample/%1").arg(i);
+        OpticalCalibSample s;
+        s.trackerPos = loadVec3(settings, key + "/trackerPos");
+        s.trackerOri = loadQuat(settings, key + "/trackerOri");
+        s.focusPoint = loadVec3(settings, key + "/focusPoint");
+        m_opticalCalibSamples.push_back(s);
     }
 
     // Registration transforms
