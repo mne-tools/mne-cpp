@@ -56,6 +56,7 @@
 #include <QMatrix4x4>
 #include <QObject>
 #include <QQuaternion>
+#include <QSettings>
 #include <QVector3D>
 
 #include <vector>
@@ -277,6 +278,13 @@ public:
      *        Call this when the user clears all fiducials.
      */
     void resetRegistration();
+
+    //=========================================================================================================
+    // Session persistence — save/restore registration state across app restarts
+    //=========================================================================================================
+
+    void saveSessionState(QSettings &settings, const QString &prefix = QStringLiteral("polhemus")) const;
+    bool restoreSessionState(QSettings &settings, const QString &prefix = QStringLiteral("polhemus"));
 
     bool registrationValid() const { return m_registrationValid; }
 

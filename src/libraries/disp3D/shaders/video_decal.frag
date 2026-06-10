@@ -45,11 +45,13 @@ void main() {
     vec3 d = v_worldPos - focusAndSize.xyz;
 
     float side = max(focusAndSize.w, 0.0001);
+    float aspect = max(cameraPosAndFacing.w, 0.0001); // width / height
     float depth = dot(d, axisNAndDepth.xyz);
     if (abs(depth) > axisNAndDepth.w)
         discard;
 
-    vec2 local = vec2(dot(d, axisUAndOpacity.xyz), dot(d, axisVAndOffset.xyz)) / side;
+    vec2 local = vec2(dot(d, axisUAndOpacity.xyz) / side,
+                      dot(d, axisVAndOffset.xyz) / (side / aspect));
 
     // Soft rounded aperture. Keep the projection square enough to read as a
     // microscope viewport, but remove the hard decal edge so the video feels

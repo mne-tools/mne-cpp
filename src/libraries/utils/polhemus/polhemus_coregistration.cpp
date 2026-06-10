@@ -22,6 +22,7 @@
 #include "polhemus_coregistration.h"
 
 #include <Eigen/Dense>
+#include <QSettings>
 #include <cmath>
 
 using namespace UTILSLIB;
@@ -896,4 +897,189 @@ bool PolhemusCoregistration::opticalRayInWorld(QVector3D& origin, QVector3D& dir
     origin    = trackerPos + trackerOri.rotatedVector(m_opticalCenterLocal);
     direction = trackerOri.rotatedVector(m_opticalAxisLocal).normalized();
     return true;
+}
+
+//=============================================================================================================
+// Session persistence helpers
+//=============================================================================================================
+
+namespace {
+
+void saveVec3(QSettings &s, const QString &key, const QVector3D &v)
+{
+    s.setValue(key + "/x", static_cast<double>(v.x()));
+    s.setValue(key + "/y", static_cast<double>(v.y()));
+    s.setValue(key + "/z", static_cast<double>(v.z()));
+}
+
+QVector3D loadVec3(const QSettings &s, const QString &key)
+{
+    return QVector3D(
+        static_cast<float>(s.value(key + "/x", 0.0).toDouble()),
+        static_cast<float>(s.value(key + "/y", 0.0).toDouble()),
+        static_cast<float>(s.value(key + "/z", 0.0).toDouble()));
+}
+
+void saveMat4(QSettings &s, const QString &key, const QMatrix4x4 &m)
+{
+    QByteArray data(reinterpret_cast<const char*>(m.constData()), 16 * sizeof(float));
+    s.setValue(key, data);
+}
+
+QMatrix4x4 loadMat4(const QSettings &s, const QString &key)
+{
+    QByteArray data = s.value(key).toByteArray();
+    QMatrix4x4 m;
+    if (data.size() == 16 * static_cast<int>(sizeof(float)))
+        memcpy(m.data(), data.constData(), 16 * sizeof(float));
+    return m;
+}
+
+void saveQuat(QSettings &s, const QString &key, const QQuaternion &q)
+{
+    s.setValue(key + "/w", static_cast<double>(q.scalar()));
+    s.setValue(key + "/x", static_cast<double>(q.x()));
+    s.setValue(key + "/y", static_cast<double>(q.y()));
+    s.setValue(key + "/z", static_cast<double>(q.z()));
+}
+
+QQuaternion loadQuat(const QSettings &s, const QString &key)
+{
+    return QQuaternion(
+        static_cast<float>(s.value(key + "/w", 1.0).toDouble()),
+        static_cast<float>(s.value(key + "/x", 0.0).toDouble()),
+        static_cast<float>(s.value(key + "/y", 0.0).toDouble()),
+        static_cast<float>(s.value(key + "/z", 0.0).toDouble()));
+}
+
+} // anonymous namespace
+
+//=============================================================================================================
+
+void PolhemusCoregistration::saveSessionState(QSettings &settings, const QString &prefix) const
+{
+    settings.beginGroup(prefix);
+
+    // Stations & axis mirror
+    settings.setValue("trackerStation", m_trackerStation);
+    settings.setValue("penStation", m_penStation);
+    settings.setValue("mirrorX", m_mirrorX);
+    settings.setValue("mirrorY", m_mirrorY);
+
+    // Pen fiducials
+    const char* fidNames[] = {"LPA", "NAS", "RPA", "CZ"};
+    for (int i = 0; i < 4; ++i) {
+        settings.setValue(QString("hasPenFid/%1").arg(fidNames[i]), m_hasPenFid[i]);
+        if (m_hasPenFid[i])
+            saveVec3(settings, QString("penFid/%1").arg(fidNames[i]), m_penFid[i]);
+    }
+
+    // Model fiducials
+    for (int i = 0; i < 4; ++i) {
+        settings.setValue(QString("hasModelFid/%1").arg(fidNames[i]), m_hasModelFid[i]);
+        if (m_hasModelFid[i])
+            saveVec3(settings, QString("modelFid/%1").arg(fidNames[i]), m_modelFid[i]);
+    }
+
+    // Vertex
+    settings.setValue("hasPenVertex", m_hasPenVertex);
+    if (m_hasPenVertex) saveVec3(settings, "penVertex", m_penVertex);
+    settings.setValue("hasModelVertex", m_hasModelVertex);
+    if (m_hasModelVertex) saveVec3(settings, "modelVertex", m_modelVertex);
+
+    // Calibration offset
+    saveVec3(settings, "offsetTranslation", m_offsetTranslation);
+    saveQuat(settings, "offsetRotation", m_offsetRotation);
+
+    // Pen tip offset
+    saveVec3(settings, "penTipOffset", m_penTipOffset);
+    settings.setValue("tipOffsetEnabled", m_tipOffsetEnabled);
+
+    // Optical calibration
+    settings.setValue("opticalCalibValid", m_opticalCalibValid);
+    if (m_opticalCalibValid) {
+        saveVec3(settings, "opticalAxisLocal", m_opticalAxisLocal);
+        saveVec3(settings, "opticalCenterLocal", m_opticalCenterLocal);
+        settings.setValue("opticalCalibResidualMm", static_cast<double>(m_opticalCalibResidualMm));
+        settings.setValue("opticalCalibDepthSpreadMm", static_cast<double>(m_opticalCalibDepthSpreadMm));
+    }
+
+    // Registration transforms
+    settings.setValue("registrationValid", m_registrationValid);
+    if (m_registrationValid) {
+        saveMat4(settings, "headToDevice", m_headToDevice);
+        saveMat4(settings, "headToWorld", m_headToWorld);
+        saveMat4(settings, "worldToModel", m_worldToModel);
+    }
+
+    settings.endGroup();
+}
+
+//=============================================================================================================
+
+bool PolhemusCoregistration::restoreSessionState(QSettings &settings, const QString &prefix)
+{
+    if (!settings.childGroups().contains(prefix))
+        return false;
+
+    settings.beginGroup(prefix);
+
+    // Stations & axis mirror
+    m_trackerStation = settings.value("trackerStation", 1).toInt();
+    m_penStation     = settings.value("penStation", 2).toInt();
+    m_mirrorX        = settings.value("mirrorX", false).toBool();
+    m_mirrorY        = settings.value("mirrorY", false).toBool();
+
+    // Pen fiducials
+    const char* fidNames[] = {"LPA", "NAS", "RPA", "CZ"};
+    for (int i = 0; i < 4; ++i) {
+        m_hasPenFid[i] = settings.value(QString("hasPenFid/%1").arg(fidNames[i]), false).toBool();
+        if (m_hasPenFid[i])
+            m_penFid[i] = loadVec3(settings, QString("penFid/%1").arg(fidNames[i]));
+    }
+
+    // Model fiducials
+    for (int i = 0; i < 4; ++i) {
+        m_hasModelFid[i] = settings.value(QString("hasModelFid/%1").arg(fidNames[i]), false).toBool();
+        if (m_hasModelFid[i])
+            m_modelFid[i] = loadVec3(settings, QString("modelFid/%1").arg(fidNames[i]));
+    }
+
+    // Vertex
+    m_hasPenVertex = settings.value("hasPenVertex", false).toBool();
+    if (m_hasPenVertex) m_penVertex = loadVec3(settings, "penVertex");
+    m_hasModelVertex = settings.value("hasModelVertex", false).toBool();
+    if (m_hasModelVertex) m_modelVertex = loadVec3(settings, "modelVertex");
+
+    // Calibration offset
+    m_offsetTranslation = loadVec3(settings, "offsetTranslation");
+    m_offsetRotation    = loadQuat(settings, "offsetRotation");
+
+    // Pen tip offset
+    m_penTipOffset      = loadVec3(settings, "penTipOffset");
+    m_tipOffsetEnabled  = settings.value("tipOffsetEnabled", false).toBool();
+
+    // Optical calibration
+    m_opticalCalibValid = settings.value("opticalCalibValid", false).toBool();
+    if (m_opticalCalibValid) {
+        m_opticalAxisLocal         = loadVec3(settings, "opticalAxisLocal");
+        m_opticalCenterLocal       = loadVec3(settings, "opticalCenterLocal");
+        m_opticalCalibResidualMm   = static_cast<float>(settings.value("opticalCalibResidualMm", 0.0).toDouble());
+        m_opticalCalibDepthSpreadMm = static_cast<float>(settings.value("opticalCalibDepthSpreadMm", 0.0).toDouble());
+    }
+
+    // Registration transforms
+    m_registrationValid = settings.value("registrationValid", false).toBool();
+    if (m_registrationValid) {
+        m_headToDevice = loadMat4(settings, "headToDevice");
+        m_headToWorld  = loadMat4(settings, "headToWorld");
+        m_worldToModel = loadMat4(settings, "worldToModel");
+    }
+
+    settings.endGroup();
+
+    if (m_registrationValid)
+        emit registrationChanged();
+
+    return m_registrationValid;
 }

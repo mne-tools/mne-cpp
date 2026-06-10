@@ -631,7 +631,16 @@ void BrainRenderer::renderVideoOverlay(QRhiCommandBuffer *cb, QRhi *rhi,
 
     // ── Billboard the quad to face the camera ──────────────────────
     const QVector3D centre = overlay->focusPosition();
-    const float halfSize = 0.5f * overlay->sizeMeters();
+    const float sizeM = overlay->sizeMeters();
+
+    // Preserve the video frame's aspect ratio: sizeMeters controls the
+    // width, and the height is derived from the frame dimensions.
+    const QImage &frm = overlay->frame();
+    const float aspect = (frm.height() > 0)
+                             ? static_cast<float>(frm.width()) / frm.height()
+                             : 1.0f;
+    const float halfW = 0.5f * sizeM;
+    const float halfH = (aspect > 0.0f) ? halfW / aspect : halfW;
 
     QVector3D viewDir = centre - data.cameraPos;
     if (viewDir.lengthSquared() < 1e-12f) viewDir = QVector3D(0, 0, -1);
@@ -644,10 +653,10 @@ void BrainRenderer::renderVideoOverlay(QRhiCommandBuffer *cb, QRhi *rhi,
     QVector3D right = QVector3D::crossProduct(viewDir, worldUp).normalized();
     QVector3D up = QVector3D::crossProduct(right, viewDir).normalized();
 
-    const QVector3D c00 = centre - right * halfSize - up * halfSize;
-    const QVector3D c10 = centre + right * halfSize - up * halfSize;
-    const QVector3D c01 = centre - right * halfSize + up * halfSize;
-    const QVector3D c11 = centre + right * halfSize + up * halfSize;
+    const QVector3D c00 = centre - right * halfW - up * halfH;
+    const QVector3D c10 = centre + right * halfW - up * halfH;
+    const QVector3D c01 = centre - right * halfW + up * halfH;
+    const QVector3D c11 = centre + right * halfW + up * halfH;
 
     const float verts[4 * 5] = {
         c00.x(), c00.y(), c00.z(),  0.0f, 1.0f,   // image y is flipped vs uv
@@ -749,7 +758,12 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi
     ub.cameraPosAndFacing[0] = data.cameraPos.x();
     ub.cameraPosAndFacing[1] = data.cameraPos.y();
     ub.cameraPosAndFacing[2] = data.cameraPos.z();
-    ub.cameraPosAndFacing[3] = 0.0f;
+    // Pack video aspect ratio (width/height) so the decal shader can
+    // scale the V axis to preserve the frame's proportions.
+    const QImage &decalFrame = overlay->frame();
+    ub.cameraPosAndFacing[3] = (decalFrame.height() > 0)
+        ? static_cast<float>(decalFrame.width()) / decalFrame.height()
+        : 1.0f;
     ub.borderColor[0] = 0.0f;
     ub.borderColor[1] = 0.85f;
     ub.borderColor[2] = 1.0f;
