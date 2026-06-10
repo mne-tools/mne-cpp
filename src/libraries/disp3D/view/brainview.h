@@ -909,6 +909,9 @@ public slots:
     /** Set the world-space focus position (metres) of the overlay quad. */
     void setVideoOverlayFocusPosition(const QVector3D &position);
 
+    /** Set the orientation hint for the overlay quad (world-space direction). */
+    void setVideoOverlayUpHint(const QVector3D &dir);
+
     /** Set the side length of the overlay quad (metres). Default ≈ 0.06 m. */
     void setVideoOverlaySize(float meters);
 

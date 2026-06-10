@@ -646,12 +646,23 @@ void BrainRenderer::renderVideoOverlay(QRhiCommandBuffer *cb, QRhi *rhi,
     if (viewDir.lengthSquared() < 1e-12f) viewDir = QVector3D(0, 0, -1);
     viewDir.normalize();
 
-    QVector3D worldUp(0.0f, 0.0f, 1.0f);
-    if (std::abs(QVector3D::dotProduct(viewDir, worldUp)) > 0.95f) {
-        worldUp = QVector3D(0.0f, 1.0f, 0.0f);
+    // Use the upHint (tracker→objective axis) when available so that
+    // the quad's long edge is perpendicular to the optical axis.
+    const QVector3D hint = overlay->upHint();
+    QVector3D up;
+    if (hint.lengthSquared() > 1e-8f) {
+        // Project the hint onto the plane perpendicular to viewDir
+        up = (hint - QVector3D::dotProduct(hint, viewDir) * viewDir).normalized();
+        if (up.lengthSquared() < 1e-8f)
+            up = QVector3D(0.0f, 0.0f, 1.0f);
+    } else {
+        QVector3D worldUp(0.0f, 0.0f, 1.0f);
+        if (std::abs(QVector3D::dotProduct(viewDir, worldUp)) > 0.95f)
+            worldUp = QVector3D(0.0f, 1.0f, 0.0f);
+        up = QVector3D::crossProduct(
+                 QVector3D::crossProduct(viewDir, worldUp), viewDir).normalized();
     }
-    QVector3D right = QVector3D::crossProduct(viewDir, worldUp).normalized();
-    QVector3D up = QVector3D::crossProduct(right, viewDir).normalized();
+    QVector3D right = QVector3D::crossProduct(viewDir, up).normalized();
 
     const QVector3D c00 = centre - right * halfW - up * halfH;
     const QVector3D c10 = centre + right * halfW - up * halfH;

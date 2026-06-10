@@ -85,9 +85,18 @@ public:
     float opacity() const { return m_opacity; }
     void setOpacity(float opacity) { m_opacity = opacity; }
 
+    /**
+     * @brief Hint direction used as the quad's "up" axis.
+     * When set (non-zero), the quad's long edge is perpendicular to this
+     * direction instead of using the default world-up billboard.
+     */
+    QVector3D upHint() const { return m_upHint; }
+    void setUpHint(const QVector3D &dir) { m_upHint = dir; }
+
 private:
     bool m_enabled = false;
     QVector3D m_focusPosition = QVector3D(0.0f, 0.05f, 0.08f); // arbitrary default near the top of the head
+    QVector3D m_upHint;          //!< Optional orientation hint (zero = default billboard)
     float m_size = 0.06f;        //!< 6 cm wide by default
     float m_opacity = 1.0f;
     QImage m_frame;

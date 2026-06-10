@@ -3314,6 +3314,13 @@ void BrainView::setVideoOverlayFocusPosition(const QVector3D &position)
     if (m_videoOverlay->isEnabled()) { m_sceneDirty = true; update(); }
 }
 
+void BrainView::setVideoOverlayUpHint(const QVector3D &dir)
+{
+    if (!m_videoOverlay) return;
+    m_videoOverlay->setUpHint(dir);
+    if (m_videoOverlay->isEnabled()) { m_sceneDirty = true; update(); }
+}
+
 void BrainView::setVideoOverlaySize(float meters)
 {
     if (!m_videoOverlay) return;
