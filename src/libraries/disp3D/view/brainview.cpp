@@ -1827,21 +1827,20 @@ void BrainView::render(QRhiCommandBuffer *cb)
 
     bool videoOverlayDrawn = false;
     auto drawVideoOverlay = [&]() {
-        if (!videoOverlayDrawn && videoOverlayTargetSurface) {
+        if (videoOverlayDrawn) return;
+        if (videoOverlayTargetSurface) {
             m_renderer->renderVideoOverlayOnSurface(cb, rhi(), sceneData,
                                                     m_videoOverlay.get(), videoOverlayTargetSurface);
-            videoOverlayDrawn = true;
+        } else if (hasVideoOverlay) {
+            // No skin/BEM surface in this view — fall back to billboard quad
+            m_renderer->renderVideoOverlay(cb, rhi(), sceneData, m_videoOverlay.get());
         }
+        videoOverlayDrawn = true;
     };
 
     for (const auto &item : transparentDraws) {
         m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
         if (item.surface == videoOverlayTargetSurface) {
-            // The decal belongs to the target anatomy, so draw it immediately
-            // after that surface. Drawing it before the transparent pass hides
-            // it behind the anatomical head; drawing it at frame end makes it
-            // float above the helmet. This placement keeps it attached to the
-            // head while preserving later transparent context.
             drawVideoOverlay();
         }
     }
@@ -3344,15 +3343,21 @@ void BrainView::pushVideoOverlayFrame(const QImage &frame)
 
 bool BrainView::intersectWorldRay(const QVector3D& origin, const QVector3D& direction, QVector3D& hitPoint) const
 {
-    // Use the single-view SubView for surface visibility filtering
-    const SubView& sv = (m_viewMode == MultiView && !m_subViews.isEmpty())
-        ? m_subViews.first() : m_singleView;
-
-    PickResult result = RayPicker::pick(origin, direction, sv, m_surfaces,
-                                        m_itemSurfaceMap, m_itemDipoleMap);
-    if (result.hit) {
-        hitPoint = result.hitPoint;
-        return true;
+    // Test against ALL surfaces (no SubView visibility filter) so
+    // the optical ray always finds the head even if it's hidden in
+    // the first SubView of a multi-view layout.
+    float closestDist = std::numeric_limits<float>::max();
+    bool found = false;
+    for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
+        const auto &surf = it.value();
+        if (!surf || !surf->isVisible()) continue;
+        float dist = 0.0f;
+        int vertexIdx = -1;
+        if (surf->intersects(origin, direction, dist, vertexIdx) && dist < closestDist) {
+            closestDist = dist;
+            hitPoint = origin + dist * direction;
+            found = true;
+        }
     }
-    return false;
+    return found;
 }
