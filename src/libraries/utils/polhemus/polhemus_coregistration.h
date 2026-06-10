@@ -249,6 +249,17 @@ public:
      */
     bool opticalRayInWorld(QVector3D& origin, QVector3D& direction) const;
 
+    /**
+     * Returns the "up" direction of the optical path in world coordinates.
+     * This is the tracker's local Y axis rotated into the world frame,
+     * orthogonalised against the optical axis so it can be used directly
+     * as an orientation hint for projected overlays.
+     *
+     * @param[out] up  Unit vector pointing "up" in the microscope view.
+     * @return @c true if tracker data and calibration are available.
+     */
+    bool opticalUpInWorld(QVector3D& up) const;
+
     //=========================================================================================================
     // Digitizer connection
     //=========================================================================================================

@@ -713,7 +713,7 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi
 {
     Q_UNUSED(rhi);
     if (!overlay || !overlay->isEnabled() || !overlay->hasFrame()) return;
-    if (!surface || !surface->isVisible()) return;
+    if (!surface) return;
 
     auto &k = d->videoOverlay;
     if (!k.initialized || !k.surfacePipeline) return;
@@ -724,21 +724,33 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi
     k.currentUniformOffset += k.uniformBufferOffsetAlignment;
     if (uniformOffset + kUniformBlockSize > k.uniformBuffer->size()) return;
 
-    // Keep the decal attached to the same head-space location and orientation
-    // in every viewport. Approximate the local scalp normal from the current
-    // focus vector; later this can be replaced by a microscope/fiducial normal.
+    // Approximate the local scalp normal from the focus position vector.
     QVector3D localNormal = overlay->focusPosition();
     if (localNormal.lengthSquared() < 1e-12f) {
         localNormal = QVector3D(0.0f, 0.0f, 1.0f);
     }
     localNormal.normalize();
 
-    QVector3D referenceUp(0.0f, 0.0f, 1.0f);
-    if (std::abs(QVector3D::dotProduct(localNormal, referenceUp)) > 0.95f) {
-        referenceUp = QVector3D(1.0f, 0.0f, 0.0f);
+    // Use the tracker-derived up hint when available — this keeps the
+    // decal orientation locked to the physical microscope and avoids
+    // the 180° flip singularity that occurs with a fixed reference axis.
+    QVector3D referenceUp = overlay->upHint();
+    if (referenceUp.lengthSquared() < 1e-6f) {
+        // Fallback when no tracker up is available.
+        referenceUp = QVector3D(0.0f, 0.0f, 1.0f);
+        if (std::abs(QVector3D::dotProduct(localNormal, referenceUp)) > 0.95f) {
+            referenceUp = QVector3D(1.0f, 0.0f, 0.0f);
+        }
     }
-    const QVector3D axisU = QVector3D::crossProduct(referenceUp, localNormal).normalized();
-    const QVector3D axisV = QVector3D::crossProduct(localNormal, axisU).normalized();
+    // Orthogonalise against the surface normal so the frame is tangent.
+    referenceUp = (referenceUp - QVector3D::dotProduct(referenceUp, localNormal) * localNormal);
+    if (referenceUp.lengthSquared() < 1e-12f) {
+        referenceUp = QVector3D(0.0f, 0.0f, 1.0f);
+    }
+    referenceUp.normalize();
+
+    const QVector3D axisV = referenceUp;
+    const QVector3D axisU = QVector3D::crossProduct(axisV, localNormal).normalized();
 
     struct {
         float mvp[16];

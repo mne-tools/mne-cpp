@@ -1044,6 +1044,31 @@ bool PolhemusCoregistration::opticalRayInWorld(QVector3D& origin, QVector3D& dir
 }
 
 //=============================================================================================================
+
+bool PolhemusCoregistration::opticalUpInWorld(QVector3D& up) const
+{
+    if (!m_opticalCalibValid) return false;
+
+    const QMatrix4x4& dev = m_deviceToWorld;
+    if (dev.isIdentity()) return false;
+
+    QMatrix4x4 offsetMat;
+    offsetMat.setToIdentity();
+    offsetMat.translate(m_offsetTranslation);
+    offsetMat.rotate(m_offsetRotation);
+
+    const QMatrix4x4 trackerToWorld = dev * offsetMat.inverted();
+    const QQuaternion trackerOri = QQuaternion::fromRotationMatrix(trackerToWorld.toGenericMatrix<3, 3>());
+
+    // Tracker local Z axis = "up" in the microscope view.
+    // Orthogonalise against the optical axis to remove any tilt component.
+    const QVector3D rawUp = trackerOri.rotatedVector(QVector3D(0.0f, 0.0f, 1.0f));
+    const QVector3D axis  = trackerOri.rotatedVector(m_opticalAxisLocal).normalized();
+    up = (rawUp - QVector3D::dotProduct(rawUp, axis) * axis).normalized();
+    return up.lengthSquared() > 0.5f; // degenerate if Y ≈ optical axis
+}
+
+//=============================================================================================================
 // Session persistence helpers
 //=============================================================================================================
 

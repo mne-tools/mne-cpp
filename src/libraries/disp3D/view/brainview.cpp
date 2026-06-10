@@ -1813,6 +1813,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
                                  && m_videoOverlay->isEnabled()
                                  && m_videoOverlay->hasFrame();
     if (hasVideoOverlay) {
+        // Target is always the head surface (BEM head or TissueSkin).
         if (m_surfaces.contains(QStringLiteral("bem_head"))) {
             videoOverlayTargetSurface = m_surfaces[QStringLiteral("bem_head")].get();
         } else {
@@ -1832,7 +1833,6 @@ void BrainView::render(QRhiCommandBuffer *cb)
             m_renderer->renderVideoOverlayOnSurface(cb, rhi(), sceneData,
                                                     m_videoOverlay.get(), videoOverlayTargetSurface);
         } else if (hasVideoOverlay) {
-            // No skin/BEM surface in this view — fall back to billboard quad
             m_renderer->renderVideoOverlay(cb, rhi(), sceneData, m_videoOverlay.get());
         }
         videoOverlayDrawn = true;
@@ -3348,15 +3348,32 @@ bool BrainView::intersectWorldRay(const QVector3D& origin, const QVector3D& dire
     // the first SubView of a multi-view layout.
     float closestDist = std::numeric_limits<float>::max();
     bool found = false;
-    for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
-        const auto &surf = it.value();
-        if (!surf || !surf->isVisible()) continue;
+
+    // Always test the BEM head surface first (even when hidden) — the
+    // optical projection cares about the outermost physical shell.
+    auto headIt = m_surfaces.constFind(QStringLiteral("bem_head"));
+    if (headIt != m_surfaces.cend() && headIt.value()) {
         float dist = 0.0f;
         int vertexIdx = -1;
-        if (surf->intersects(origin, direction, dist, vertexIdx) && dist < closestDist) {
+        if (headIt.value()->intersects(origin, direction, dist, vertexIdx) && dist < closestDist) {
             closestDist = dist;
             hitPoint = origin + dist * direction;
             found = true;
+        }
+    }
+
+    // Fall back to any other visible surface if the head wasn't hit.
+    if (!found) {
+        for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
+            const auto &surf = it.value();
+            if (!surf || !surf->isVisible()) continue;
+            float dist = 0.0f;
+            int vertexIdx = -1;
+            if (surf->intersects(origin, direction, dist, vertexIdx) && dist < closestDist) {
+                closestDist = dist;
+                hitPoint = origin + dist * direction;
+                found = true;
+            }
         }
     }
     return found;
