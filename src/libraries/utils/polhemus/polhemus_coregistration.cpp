@@ -1020,10 +1020,11 @@ void PolhemusCoregistration::saveSessionState(QSettings &settings, const QString
 
 bool PolhemusCoregistration::restoreSessionState(QSettings &settings, const QString &prefix)
 {
-    if (!settings.childGroups().contains(prefix))
-        return false;
-
     settings.beginGroup(prefix);
+    if (settings.allKeys().isEmpty()) {
+        settings.endGroup();
+        return false;
+    }
 
     // Stations & axis mirror
     m_trackerStation = settings.value("trackerStation", 1).toInt();
