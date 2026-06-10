@@ -20,6 +20,7 @@
  */
 
 #include "polhemus_coregistration.h"
+#include "acquired_points.h"
 
 #include <Eigen/Dense>
 #include <QSettings>
@@ -1077,6 +1078,22 @@ bool PolhemusCoregistration::restoreSessionState(QSettings &settings, const QStr
     }
 
     settings.endGroup();
+
+    // Re-populate the AcquiredPoints list so that countOf() / UI status
+    // reflect the restored fiducials.
+    if (m_pPoints) {
+        const char* fidLabels[] = { "", "LPA", "NAS", "RPA" };
+        for (int i = 1; i <= 3; ++i) {
+            if (m_hasPenFid[i]) {
+                DigitizedPoint dp;
+                dp.kind        = PointKind::Fiducial;
+                dp.label       = QString::fromLatin1(fidLabels[i]);
+                dp.identNumber = i;
+                dp.position    = m_penFid[i];
+                m_pPoints->append(dp);
+            }
+        }
+    }
 
     if (m_registrationValid)
         emit registrationChanged();
