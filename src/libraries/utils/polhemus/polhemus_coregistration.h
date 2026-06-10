@@ -193,6 +193,17 @@ public:
      */
     bool solveOpticalCalibration();
 
+    /**
+     * @brief Set the known perpendicular distance from tracker sensor to
+     *        the objective center (metres).
+     *
+     * When nonzero, the solver constrains the optical center to lie at this
+     * distance from the tracker origin, vastly improving accuracy.
+     * Default: 0.200 m (~200 mm for ZEISS Kinevo).  Set to 0 to disable.
+     */
+    void setKnownTrackerToObjectiveDistance(float metres) { m_knownTrackerToObjectiveDist = metres; }
+    float knownTrackerToObjectiveDistance() const { return m_knownTrackerToObjectiveDist; }
+
     /** @return Whether a valid optical calibration has been computed. */
     bool opticalCalibrationValid() const { return m_opticalCalibValid; }
 
@@ -369,6 +380,13 @@ private:
     float     m_opticalCalibResidualMm = 0.0f;
     float     m_opticalCalibDepthSpreadMm = 0.0f;
     bool      m_opticalCalibValid = false;
+
+    // Known tracker-to-objective distance (metres) — used as a constraint in the
+    // optical calibration solver.  Default is 0.200 m (~200 mm) for the ZEISS
+    // Kinevo surgical microscope.  When nonzero, the solver constrains the optical
+    // center to lie at this distance from the tracker origin, dramatically
+    // improving calibration accuracy with few samples.
+    float     m_knownTrackerToObjectiveDist = 0.200f;  // metres
 
     bool solvePivotCalibration();
 };

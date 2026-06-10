@@ -752,55 +752,131 @@ bool PolhemusCoregistration::solveOpticalCalibration()
         localPoints[static_cast<size_t>(i)] = Eigen::Vector3d(local.x(), local.y(), local.z());
     }
 
-    // Step 2: Compute centroid
+    // Step 2: PCA initial estimate — centroid + SVD for starting axis & center
     Eigen::Vector3d centroid = Eigen::Vector3d::Zero();
     for (const auto& p : localPoints) centroid += p;
     centroid /= static_cast<double>(N);
 
-    // Step 3: PCA — fit line via SVD of the centered point matrix
     Eigen::MatrixXd centered(3, N);
     for (int i = 0; i < N; ++i) {
         centered.col(i) = localPoints[static_cast<size_t>(i)] - centroid;
     }
 
     Eigen::JacobiSVD<Eigen::MatrixXd> svd(centered, Eigen::ComputeThinU);
-    const Eigen::Vector3d axis = svd.matrixU().col(0); // principal direction
+    Eigen::Vector3d axisDir = svd.matrixU().col(0);
+    if (centroid.dot(axisDir) < 0.0) axisDir = -axisDir;
 
-    // Ensure the axis points away from the tracker origin (toward the focus points)
-    Eigen::Vector3d axisDir = axis;
-    if (centroid.dot(axisDir) < 0.0) {
-        axisDir = -axisDir;
+    const double t0 = -centroid.dot(axisDir);
+    Eigen::Vector3d opticalCenter = centroid + t0 * axisDir;
+
+    // Step 3: Constrained refinement — if the known tracker-to-objective
+    // distance is set, iteratively refine the optical center position so
+    // that |opticalCenter| = knownDist while minimising the sum of squared
+    // perpendicular distances from each focus point to the ray from O.
+    //
+    // The cost for a candidate center O and axis d is:
+    //   E = sum_i | (F_i - O) - ((F_i - O).d) d |^2
+    // We parameterise O on the sphere |O| = R using spherical coordinates
+    // (theta, phi) and optimise with Gauss-Newton.
+    const double knownDist = static_cast<double>(m_knownTrackerToObjectiveDist);
+    if (knownDist > 0.0 && N >= 2) {
+        // Project PCA center onto sphere of radius knownDist
+        double R = knownDist;
+        Eigen::Vector3d O = opticalCenter;
+        double Onorm = O.norm();
+        if (Onorm > 1e-9) {
+            O = O * (R / Onorm);
+        } else {
+            O = centroid.normalized() * R;
+        }
+
+        // Gauss-Newton iterations: optimise O on the sphere, recompute axis each step
+        for (int iter = 0; iter < 30; ++iter) {
+            // Recompute axis direction from O: SVD of (F_i - O)
+            Eigen::MatrixXd rays(3, N);
+            for (int i = 0; i < N; ++i)
+                rays.col(i) = localPoints[static_cast<size_t>(i)] - O;
+
+            Eigen::JacobiSVD<Eigen::MatrixXd> raySvd(rays, Eigen::ComputeThinU);
+            Eigen::Vector3d d = raySvd.matrixU().col(0);
+            if (O.dot(d) < 0.0) d = -d;  // axis points away from tracker
+
+            // Compute gradient of cost w.r.t. O (on the tangent plane of the sphere)
+            // Cost: E = sum_i |(F_i-O) - ((F_i-O).d)d|^2
+            // dE/dO = sum_i -2 * perp_i  where perp_i = (F_i-O) - ((F_i-O).d)d
+            // but we project gradient onto tangent plane of sphere at O
+            Eigen::Vector3d grad = Eigen::Vector3d::Zero();
+            double cost = 0.0;
+            for (int i = 0; i < N; ++i) {
+                Eigen::Vector3d v = localPoints[static_cast<size_t>(i)] - O;
+                Eigen::Vector3d perp = v - v.dot(d) * d;
+                cost += perp.squaredNorm();
+                grad -= 2.0 * perp;
+            }
+
+            // Project gradient onto tangent plane of sphere at O
+            Eigen::Vector3d normal = O.normalized();
+            Eigen::Vector3d tangentGrad = grad - grad.dot(normal) * normal;
+
+            double gradNorm = tangentGrad.norm();
+            if (gradNorm < 1e-12) break;
+
+            // Line search with backtracking
+            double step = 0.01 * R / gradNorm;  // conservative initial step
+            for (int ls = 0; ls < 10; ++ls) {
+                Eigen::Vector3d candidate = O - step * tangentGrad;
+                // Project back onto sphere
+                candidate = candidate.normalized() * R;
+
+                // Recompute cost at candidate
+                Eigen::MatrixXd cRays(3, N);
+                for (int i = 0; i < N; ++i)
+                    cRays.col(i) = localPoints[static_cast<size_t>(i)] - candidate;
+                Eigen::JacobiSVD<Eigen::MatrixXd> cSvd(cRays, Eigen::ComputeThinU);
+                Eigen::Vector3d cd = cSvd.matrixU().col(0);
+
+                double cCost = 0.0;
+                for (int i = 0; i < N; ++i) {
+                    Eigen::Vector3d v = localPoints[static_cast<size_t>(i)] - candidate;
+                    Eigen::Vector3d perp = v - v.dot(cd) * cd;
+                    cCost += perp.squaredNorm();
+                }
+
+                if (cCost < cost) {
+                    O = candidate;
+                    break;
+                }
+                step *= 0.5;
+            }
+        }
+
+        opticalCenter = O;
+
+        // Final axis from refined center
+        Eigen::MatrixXd finalRays(3, N);
+        for (int i = 0; i < N; ++i)
+            finalRays.col(i) = localPoints[static_cast<size_t>(i)] - opticalCenter;
+        Eigen::JacobiSVD<Eigen::MatrixXd> finalSvd(finalRays, Eigen::ComputeThinU);
+        axisDir = finalSvd.matrixU().col(0);
+        if (opticalCenter.dot(axisDir) < 0.0) axisDir = -axisDir;
+
+        qInfo().nospace()
+            << "Optical calibration: constrained refinement (R="
+            << knownDist * 1000.0 << " mm) converged, |O|="
+            << opticalCenter.norm() * 1000.0 << " mm";
     }
 
-    // Step 4: Find the point on the fitted line closest to the tracker origin (0,0,0)
-    // Line: P = centroid + t * axisDir
-    // Closest point to origin: t = -dot(centroid, axisDir)
-    const double t0 = -centroid.dot(axisDir);
-    const Eigen::Vector3d opticalCenter = centroid + t0 * axisDir;
-
-    // Step 5: Compute RMS residual (perpendicular distance from each point to the line)
+    // Step 4: Compute RMS residual (perpendicular distance from each point to the ray from O)
     double sumSq = 0.0;
     for (const auto& p : localPoints) {
-        const Eigen::Vector3d diff = p - centroid;
+        const Eigen::Vector3d diff = p - opticalCenter;
         const double along = diff.dot(axisDir);
         const double perpSq = (diff - along * axisDir).squaredNorm();
         sumSq += perpSq;
     }
     const double rms = std::sqrt(sumSq / static_cast<double>(N)) * 1000.0; // mm
 
-    // Step 6: Check collinearity — with only 2 points the line is exact.
-    // With 3+ points, warn if residual is large.
-    const auto& sv = svd.singularValues();
-    const double linearityRatio = (sv.size() > 1 && sv(0) > 1e-12) ? sv(1) / sv(0) : 0.0;
-
-    // Compute depth spread: range of focal distances along the fitted axis.
-    // The tracker→focus line and the optical axis converge at the focus point
-    // but diverge at the tracker end due to the ~20 cm offset.  At large
-    // focal distances the lines are nearly parallel and the angular difference
-    // between them is small; at close range the angle is large (approaching
-    // 90° when focus point is at the optical center).  Good calibration
-    // requires samples at varied focal distances so the PCA can reliably
-    // separate the axis direction from noise.
+    // Step 5: Depth spread along the optical axis from the refined center
     double minDepth =  1e30, maxDepth = -1e30;
     for (const auto& p : localPoints) {
         const double depth = (p - opticalCenter).dot(axisDir);
@@ -822,12 +898,12 @@ bool PolhemusCoregistration::solveOpticalCalibration()
     const float distMm = m_opticalCenterLocal.length() * 1000.0f;
 
     qInfo().nospace()
-        << "Optical calibration solved (" << N << " samples):"
+        << "Optical calibration solved (" << N << " samples"
+        << (knownDist > 0.0 ? ", constrained R=" + QString::number(knownDist * 1000.0, 'f', 1) + " mm" : QString()) << "):"
         << "\n    axis (local):   (" << m_opticalAxisLocal.x() << ", " << m_opticalAxisLocal.y() << ", " << m_opticalAxisLocal.z() << ")"
         << "\n    center (local): (" << m_opticalCenterLocal.x()*1000.f << ", " << m_opticalCenterLocal.y()*1000.f << ", " << m_opticalCenterLocal.z()*1000.f << ") mm"
         << "\n    tracker\u2194center: " << distMm << " mm"
         << "\n    RMS residual:   " << rms << " mm"
-        << "\n    linearity:      " << (1.0 - linearityRatio) * 100.0 << "% (sv ratio " << linearityRatio << ")"
         << "\n    depth spread:   " << depthSpreadMm << " mm (range " << minDepth*1000.0 << " .. " << maxDepth*1000.0 << " mm)";
 
     // Per-sample: report convergence angle between tracker→focus direction
@@ -841,7 +917,8 @@ bool PolhemusCoregistration::solveOpticalCalibration()
         const double cosAngle = std::clamp(trkToFocus.dot(axisDir), -1.0, 1.0);
         const double angleDeg = std::acos(cosAngle) * (180.0 / 3.14159265358979);
         const double depth = (p - opticalCenter).dot(axisDir);
-        const double perpDist = (p - centroid - (p - centroid).dot(axisDir) * axisDir).norm() * 1000.0;
+        const Eigen::Vector3d diff = p - opticalCenter;
+        const double perpDist = (diff - diff.dot(axisDir) * axisDir).norm() * 1000.0;
         qInfo().nospace()
             << "      sample " << (i + 1) << ": depth=" << depth*1000.0
             << " mm, convergence angle=" << angleDeg << "\u00b0"
@@ -859,19 +936,17 @@ bool PolhemusCoregistration::solveOpticalCalibration()
                    << "mm is large. Check that the stylus accurately marks the microscope focus point.";
     }
 
-    // Plausibility check: the perpendicular distance from the tracker sensor
-    // to the optical axis should be approximately 270 mm for the Kinevo.
-    // The tracker is mounted on the microscope body, offset from the objective
-    // by a roughly fixed distance.  Flag anything clearly outside [100, 500] mm.
-    constexpr float kExpectedOffsetMm = 270.0f;
-    constexpr float kMinPlausibleMm   = 100.0f;
-    constexpr float kMaxPlausibleMm   = 500.0f;
-    if (distMm < kMinPlausibleMm || distMm > kMaxPlausibleMm) {
-        qWarning().nospace()
-            << "Optical calibration: tracker\u2194axis distance " << distMm
-            << " mm is outside the plausible range [" << kMinPlausibleMm
-            << ", " << kMaxPlausibleMm << "] mm (expected ~" << kExpectedOffsetMm
-            << " mm for Kinevo).  Calibration data may be unreliable.";
+    // Plausibility check: when not using constrained mode, verify the
+    // tracker-to-optical-center distance is in a plausible range.
+    if (knownDist <= 0.0) {
+        constexpr float kMinPlausibleMm   = 100.0f;
+        constexpr float kMaxPlausibleMm   = 500.0f;
+        if (distMm < kMinPlausibleMm || distMm > kMaxPlausibleMm) {
+            qWarning().nospace()
+                << "Optical calibration: tracker\u2194axis distance " << distMm
+                << " mm is outside the plausible range [" << kMinPlausibleMm
+                << ", " << kMaxPlausibleMm << "] mm.  Calibration data may be unreliable.";
+        }
     }
 
     emit opticalCalibrationChanged();
