@@ -736,6 +736,53 @@ void PolhemusCoregistration::clearOpticalCalibSamples()
     emit opticalCalibrationChanged();
 }
 
+//=============================================================================================================
+
+bool PolhemusCoregistration::captureObjectiveCenter()
+{
+    if (!m_havePenPos) {
+        qWarning() << "Objective center capture: no pen position available";
+        return false;
+    }
+
+    const QMatrix4x4& dev = m_deviceToWorld;
+    if (dev.isIdentity()) {
+        qWarning() << "Objective center capture: no tracker data available";
+        return false;
+    }
+
+    // Recover raw tracker pose (remove device offset)
+    QMatrix4x4 offsetInv;
+    offsetInv.setToIdentity();
+    offsetInv.translate(m_offsetTranslation);
+    offsetInv.rotate(m_offsetRotation);
+    offsetInv = offsetInv.inverted();
+
+    const QMatrix4x4 trackerToWorld = dev * offsetInv;
+    const QVector3D trackerPos(trackerToWorld(0, 3), trackerToWorld(1, 3), trackerToWorld(2, 3));
+    const QQuaternion trackerOri = QQuaternion::fromRotationMatrix(trackerToWorld.toGenericMatrix<3, 3>());
+
+    // Transform pen position into tracker-local frame
+    m_objectiveCenterLocal = trackerOri.inverted().rotatedVector(m_penPosition - trackerPos);
+    m_hasObjectiveCenter = true;
+
+    const float distMm = m_objectiveCenterLocal.length() * 1000.0f;
+    qInfo().nospace()
+        << "Objective center captured (tracker-local): ("
+        << m_objectiveCenterLocal.x() * 1000.f << ", "
+        << m_objectiveCenterLocal.y() * 1000.f << ", "
+        << m_objectiveCenterLocal.z() * 1000.f << ") mm"
+        << ", distance from tracker: " << distMm << " mm";
+
+    return true;
+}
+
+void PolhemusCoregistration::clearObjectiveCenter()
+{
+    m_objectiveCenterLocal = QVector3D();
+    m_hasObjectiveCenter = false;
+}
+
 bool PolhemusCoregistration::solveOpticalCalibration()
 {
     const int N = static_cast<int>(m_opticalCalibSamples.size());
@@ -769,17 +816,38 @@ bool PolhemusCoregistration::solveOpticalCalibration()
     const double t0 = -centroid.dot(axisDir);
     Eigen::Vector3d opticalCenter = centroid + t0 * axisDir;
 
-    // Step 3: Constrained refinement — if the known tracker-to-objective
-    // distance is set, iteratively refine the optical center position so
-    // that |opticalCenter| = knownDist while minimising the sum of squared
-    // perpendicular distances from each focus point to the ray from O.
+    // Step 3: Constrained refinement.
     //
-    // The cost for a candidate center O and axis d is:
-    //   E = sum_i | (F_i - O) - ((F_i - O).d) d |^2
-    // We parameterise O on the sphere |O| = R using spherical coordinates
-    // (theta, phi) and optimise with Gauss-Newton.
+    // Priority: (a) directly captured objective center, (b) known distance
+    // constraint, (c) unconstrained PCA fallback.
+    //
+    // (a) If the user touched the pen to the objective lens, we know the
+    //     optical center exactly in tracker-local frame.  Only the axis
+    //     direction needs to be determined from the focus samples.
+    // (b) If only the distance is known, optimise O on the sphere |O| = R.
+    // (c) Otherwise fall back to unconstrained PCA.
     const double knownDist = static_cast<double>(m_knownTrackerToObjectiveDist);
-    if (knownDist > 0.0 && N >= 2) {
+    if (m_hasObjectiveCenter) {
+        // Direct objective center — use it as-is, recompute axis from it
+        opticalCenter = Eigen::Vector3d(m_objectiveCenterLocal.x(),
+                                        m_objectiveCenterLocal.y(),
+                                        m_objectiveCenterLocal.z());
+
+        Eigen::MatrixXd rays(3, N);
+        for (int i = 0; i < N; ++i)
+            rays.col(i) = localPoints[static_cast<size_t>(i)] - opticalCenter;
+
+        Eigen::JacobiSVD<Eigen::MatrixXd> raySvd(rays, Eigen::ComputeThinU);
+        axisDir = raySvd.matrixU().col(0);
+        // Axis must point from objective toward focus points
+        Eigen::Vector3d meanRay = Eigen::Vector3d::Zero();
+        for (int i = 0; i < N; ++i) meanRay += rays.col(i);
+        if (meanRay.dot(axisDir) < 0.0) axisDir = -axisDir;
+
+        qInfo().nospace()
+            << "Optical calibration: using directly captured objective center, |O|="
+            << opticalCenter.norm() * 1000.0 << " mm";
+    } else if (knownDist > 0.0 && N >= 2) {
         // Project PCA center onto sphere of radius knownDist
         double R = knownDist;
         Eigen::Vector3d O = opticalCenter;
@@ -1074,6 +1142,9 @@ void PolhemusCoregistration::saveSessionState(QSettings &settings, const QString
     // Optical calibration
     settings.setValue("opticalCalibValid", m_opticalCalibValid);
     settings.setValue("knownTrackerToObjectiveDist", static_cast<double>(m_knownTrackerToObjectiveDist));
+    settings.setValue("hasObjectiveCenter", m_hasObjectiveCenter);
+    if (m_hasObjectiveCenter)
+        saveVec3(settings, "objectiveCenterLocal", m_objectiveCenterLocal);
     if (m_opticalCalibValid) {
         saveVec3(settings, "opticalAxisLocal", m_opticalAxisLocal);
         saveVec3(settings, "opticalCenterLocal", m_opticalCenterLocal);
@@ -1150,6 +1221,9 @@ bool PolhemusCoregistration::restoreSessionState(QSettings &settings, const QStr
 
     // Optical calibration
     m_knownTrackerToObjectiveDist = static_cast<float>(settings.value("knownTrackerToObjectiveDist", 0.200).toDouble());
+    m_hasObjectiveCenter = settings.value("hasObjectiveCenter", false).toBool();
+    if (m_hasObjectiveCenter)
+        m_objectiveCenterLocal = loadVec3(settings, "objectiveCenterLocal");
     m_opticalCalibValid = settings.value("opticalCalibValid", false).toBool();
     if (m_opticalCalibValid) {
         m_opticalAxisLocal         = loadVec3(settings, "opticalAxisLocal");

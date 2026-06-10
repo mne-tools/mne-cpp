@@ -184,6 +184,27 @@ public:
     void clearOpticalCalibSamples();
 
     /**
+     * @brief Capture the current pen position as the objective lens center.
+     *
+     * Touch the pen stylus to the center of the OPMI objective lens while
+     * the tracker is live.  The point is stored in the tracker's local frame
+     * and used by the solver as a direct measurement of the optical center,
+     * replacing the sphere-distance constraint.
+     *
+     * @return @c true on success, @c false if pen or tracker data unavailable.
+     */
+    bool captureObjectiveCenter();
+
+    /** @return Whether an objective center has been captured. */
+    bool hasObjectiveCenter() const { return m_hasObjectiveCenter; }
+
+    /** Clear the captured objective center. */
+    void clearObjectiveCenter();
+
+    /** Captured objective center in tracker body frame (metres). */
+    QVector3D objectiveCenterLocal() const { return m_objectiveCenterLocal; }
+
+    /**
      * @brief Fit a 3D line through the focus points in tracker-local frame.
      *
      * Requires at least 2 samples. Computes the optical axis direction
@@ -381,11 +402,13 @@ private:
     float     m_opticalCalibDepthSpreadMm = 0.0f;
     bool      m_opticalCalibValid = false;
 
-    // Known tracker-to-objective distance (metres) — used as a constraint in the
-    // optical calibration solver.  Default is 0.200 m (~200 mm) for the ZEISS
-    // Kinevo surgical microscope.  When nonzero, the solver constrains the optical
-    // center to lie at this distance from the tracker origin, dramatically
-    // improving calibration accuracy with few samples.
+    // Directly captured objective center (in tracker-local frame, metres).
+    // When available, the solver uses this instead of the distance constraint.
+    QVector3D m_objectiveCenterLocal;       // objective center in tracker body frame
+    bool      m_hasObjectiveCenter = false;
+
+    // Known tracker-to-objective distance (metres) — fallback constraint when
+    // no direct objective center capture is available.
     float     m_knownTrackerToObjectiveDist = 0.200f;  // metres
 
     bool solvePivotCalibration();
