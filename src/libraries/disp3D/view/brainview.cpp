@@ -3170,10 +3170,10 @@ void BrainView::setProbeVisualization(const QVector3D& tip, const QVector3D& dir
     tipSurf->setVisible(true);
     m_surfaces[QStringLiteral("dig_probe_tip")] = tipSurf;
 
-    // Glow aura: tight halo around the tip for a clean medical aesthetic.
-    // The shaft gets no glow — it stays as a subtle directional hint.
+    // Glow aura: visible halo around the tip that pulses with the
+    // incoming glowColor alpha — large enough to clearly surround the core.
     if (glowColor.alpha() > 0) {
-        constexpr float kGlowTipRadius = 0.0028f; // 2.8 mm — tight precision halo
+        constexpr float kGlowTipRadius = 0.004f; // 4 mm — clearly visible pulse ring
         auto tipGlow = MeshFactory::createBatchedSpheres({tip}, kGlowTipRadius, glowColor);
         tipGlow->setVisible(true);
         m_surfaces[QStringLiteral("dig_probe_tipglow")] = tipGlow;
