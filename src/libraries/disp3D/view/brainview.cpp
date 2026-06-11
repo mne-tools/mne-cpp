@@ -3164,8 +3164,8 @@ void BrainView::setProbeVisualization(const QVector3D& tip, const QVector3D& dir
     shaft->setVisible(true);
     m_surfaces[QStringLiteral("dig_probe_shaft")] = shaft;
 
-    // Tip: precise small sphere — the focal point of the probe
-    constexpr float kTipRadius = 0.0012f; // 1.2 mm — surgical precision
+    // Tip: pinpoint sphere — the focal point of the probe
+    constexpr float kTipRadius = 0.0007f; // 0.7 mm — needle-point precision
     auto tipSurf = MeshFactory::createBatchedSpheres({tip}, kTipRadius, color);
     tipSurf->setVisible(true);
     m_surfaces[QStringLiteral("dig_probe_tip")] = tipSurf;
