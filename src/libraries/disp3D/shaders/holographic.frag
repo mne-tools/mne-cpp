@@ -60,6 +60,31 @@ void main() {
     
     // === EDGE GLOW ===
     float rim = pow(1.0 - N_dot_V, 3.0);
+
+    // === INSTRUMENT PATH (surfaceId >= 100) ===
+    // Probe and ray surfaces: ethereal additive glow driven by vertex alpha.
+    // v_curvature carries the QColor alpha (0..1) for these surfaces.
+    float vertAlpha = v_curvature; // repurposed: actual alpha for instruments
+    bool isInstrument = (v_surfaceId >= 99.5);
+
+    if (isInstrument) {
+        // Pure additive glow — no solid fill, just edge bloom + colour wash.
+        float glow = fresnel * 1.8 + rim * 0.6;
+        vec3 base_rgb = effectiveColor * (0.5 + glow);
+        float final_alpha = vertAlpha * (0.15 + 0.85 * fresnel);
+
+        // --- Selection Highlight (Silver Rim) ---
+        bool highlighted = (isSelected > 0.5)
+                        || (selectedSurfaceId >= 0.0 && abs(v_surfaceId - selectedSurfaceId) < 0.5);
+        if (highlighted) {
+            float selectionRim = pow(1.0 - N_dot_V, 3.0);
+            base_rgb += vec3(1.0, 1.1, 1.2) * selectionRim * 0.5;
+            final_alpha = clamp(final_alpha + selectionRim * 0.3, 0.0, 1.0);
+        }
+
+        fragColor = vec4(base_rgb * final_alpha, final_alpha);
+        return;
+    }
     
     // === FINAL COLOR CALCULATION ===
     // Shell: Only glow at edges
