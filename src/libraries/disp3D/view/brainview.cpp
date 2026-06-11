@@ -3129,11 +3129,11 @@ void BrainView::setLiveRay(const QVector3D& from, const QVector3D& to,
                             const QColor& color, float radius)
 {
     // Remove previous ray surface
-    m_surfaces.remove(QLatin1String("dig_liveray_0"));
+    m_surfaces.remove(QLatin1String("dig_ray_0"));
 
     auto surf = MeshFactory::createCylinder(from, to, radius, color);
     surf->setVisible(true);
-    m_surfaces[QStringLiteral("dig_liveray_0")] = surf;
+    m_surfaces[QStringLiteral("dig_ray_0")] = surf;
 
     m_sceneDirty = true;
     update();
@@ -3141,7 +3141,7 @@ void BrainView::setLiveRay(const QVector3D& from, const QVector3D& to,
 
 void BrainView::clearLiveRay()
 {
-    if (m_surfaces.remove(QLatin1String("dig_liveray_0"))) {
+    if (m_surfaces.remove(QLatin1String("dig_ray_0"))) {
         m_sceneDirty = true;
         update();
     }
