@@ -3149,24 +3149,41 @@ void BrainView::clearLiveRay()
 }
 
 void BrainView::setProbeVisualization(const QVector3D& tip, const QVector3D& direction,
-                                       float length, const QColor& color)
+                                       float length, const QColor& color,
+                                       const QColor& glowColor)
 {
     // Remove previous probe surfaces
     m_surfaces.remove(QLatin1String("dig_probe_shaft"));
     m_surfaces.remove(QLatin1String("dig_probe_tip"));
+    m_surfaces.remove(QLatin1String("dig_probe_glow"));
+    m_surfaces.remove(QLatin1String("dig_probe_tipglow"));
 
-    // Shaft: cylinder from tip backwards along direction
+    // Shaft: thin core cylinder
     const QVector3D shaftEnd = tip - direction * length;
-    constexpr float kShaftRadius = 0.0012f; // 1.2 mm
+    constexpr float kShaftRadius = 0.0008f; // 0.8 mm core
     auto shaft = MeshFactory::createCylinder(tip, shaftEnd, kShaftRadius, color);
     shaft->setVisible(true);
     m_surfaces[QStringLiteral("dig_probe_shaft")] = shaft;
 
-    // Tip: small sphere at the probe tip
-    constexpr float kTipRadius = 0.0025f; // 2.5 mm
+    // Tip: bright sphere at the probe tip
+    constexpr float kTipRadius = 0.002f; // 2 mm
     auto tipSurf = MeshFactory::createBatchedSpheres({tip}, kTipRadius, color);
     tipSurf->setVisible(true);
     m_surfaces[QStringLiteral("dig_probe_tip")] = tipSurf;
+
+    // Glow aura: larger translucent cylinder and tip sphere for
+    // a futuristic glowing effect (only when glowColor has alpha > 0).
+    if (glowColor.alpha() > 0) {
+        constexpr float kGlowShaftRadius = 0.003f; // 3 mm — soft outer glow
+        auto glow = MeshFactory::createCylinder(tip, shaftEnd, kGlowShaftRadius, glowColor);
+        glow->setVisible(true);
+        m_surfaces[QStringLiteral("dig_probe_glow")] = glow;
+
+        constexpr float kGlowTipRadius = 0.005f; // 5 mm — prominent tip glow
+        auto tipGlow = MeshFactory::createBatchedSpheres({tip}, kGlowTipRadius, glowColor);
+        tipGlow->setVisible(true);
+        m_surfaces[QStringLiteral("dig_probe_tipglow")] = tipGlow;
+    }
 
     m_sceneDirty = true;
     update();
@@ -3177,6 +3194,8 @@ void BrainView::clearProbeVisualization()
     bool removed = false;
     removed |= m_surfaces.remove(QLatin1String("dig_probe_shaft"));
     removed |= m_surfaces.remove(QLatin1String("dig_probe_tip"));
+    removed |= m_surfaces.remove(QLatin1String("dig_probe_glow"));
+    removed |= m_surfaces.remove(QLatin1String("dig_probe_tipglow"));
     if (removed) {
         m_sceneDirty = true;
         update();
