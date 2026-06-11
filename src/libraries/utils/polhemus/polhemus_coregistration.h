@@ -93,9 +93,11 @@ public:
 
     void setTrackerStation(int station);
     void setPenStation(int station);
+    void setProbeStation(int station);
 
     int trackerStation() const { return m_trackerStation; }
     int penStation()     const { return m_penStation; }
+    int probeStation()   const { return m_probeStation; }
 
     //=========================================================================================================
     // Pen tip offset (sensor body frame → tip)
@@ -343,9 +345,14 @@ public:
     QQuaternion penOrientation()   const { return m_penOrientation; }
     bool        haveLivePenPosition() const { return m_havePenPos; }
 
+    QVector3D   probePosition()    const { return m_probePosition; }
+    QQuaternion probeOrientation() const { return m_probeOrientation; }
+    bool        haveLiveProbePosition() const { return m_haveProbePos; }
+
 signals:
     void devicePoseChanged(const QMatrix4x4& deviceToWorld);
     void penPoseChanged(const QVector3D& position, const QQuaternion& orientation);
+    void probePoseChanged(const QVector3D& position, const QQuaternion& orientation);
     void penButtonPressed(const QVector3D& position, const QQuaternion& orientation);
     void registrationChanged();
     void pivotStateChanged(PolhemusCoregistration::PivotState state);
@@ -364,6 +371,7 @@ private:
 
     int m_trackerStation = 2;
     int m_penStation     = 1;
+    int m_probeStation   = 3;
 
     QVector3D   m_offsetTranslation;
     QQuaternion m_offsetRotation;
@@ -378,6 +386,10 @@ private:
     QVector3D   m_penPosition;
     QQuaternion m_penOrientation;
     bool        m_havePenPos = false;
+
+    QVector3D   m_probePosition;
+    QQuaternion m_probeOrientation;
+    bool        m_haveProbePos = false;
 
     QMatrix4x4  m_deviceToWorld;
     QMatrix4x4  m_headToWorld;

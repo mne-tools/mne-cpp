@@ -51,6 +51,11 @@ void PolhemusCoregistration::setPenStation(int station)
     m_penStation = station;
 }
 
+void PolhemusCoregistration::setProbeStation(int station)
+{
+    m_probeStation = station;
+}
+
 //=============================================================================================================
 
 void PolhemusCoregistration::setTrackerToDeviceOffset(const QVector3D& translation,
@@ -480,6 +485,11 @@ void PolhemusCoregistration::onPointReceived(int station,
         }
 
         emit penPoseChanged(m_penPosition, m_penOrientation);
+    } else if (station == m_probeStation) {
+        m_probePosition    = pos;
+        m_probeOrientation = orientation;
+        m_haveProbePos     = true;
+        emit probePoseChanged(m_probePosition, m_probeOrientation);
     }
 }
 

@@ -3147,6 +3147,41 @@ void BrainView::clearLiveRay()
     }
 }
 
+void BrainView::setProbeVisualization(const QVector3D& tip, const QVector3D& direction,
+                                       float length, const QColor& color)
+{
+    // Remove previous probe surfaces
+    m_surfaces.remove(QLatin1String("dig_probe_shaft"));
+    m_surfaces.remove(QLatin1String("dig_probe_tip"));
+
+    // Shaft: cylinder from tip backwards along direction
+    const QVector3D shaftEnd = tip - direction * length;
+    constexpr float kShaftRadius = 0.0012f; // 1.2 mm
+    auto shaft = MeshFactory::createCylinder(tip, shaftEnd, kShaftRadius, color);
+    shaft->setVisible(true);
+    m_surfaces[QStringLiteral("dig_probe_shaft")] = shaft;
+
+    // Tip: small sphere at the probe tip
+    constexpr float kTipRadius = 0.0025f; // 2.5 mm
+    auto tipSurf = MeshFactory::createBatchedSpheres({tip}, kTipRadius, color);
+    tipSurf->setVisible(true);
+    m_surfaces[QStringLiteral("dig_probe_tip")] = tipSurf;
+
+    m_sceneDirty = true;
+    update();
+}
+
+void BrainView::clearProbeVisualization()
+{
+    bool removed = false;
+    removed |= m_surfaces.remove(QLatin1String("dig_probe_shaft"));
+    removed |= m_surfaces.remove(QLatin1String("dig_probe_tip"));
+    if (removed) {
+        m_sceneDirty = true;
+        update();
+    }
+}
+
 void BrainView::setStaticMarkers(const QVector<LiveMarker>& markers)
 {
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ) {
