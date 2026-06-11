@@ -180,8 +180,10 @@ bool SubView::shouldRenderSurface(const QString &key) const
     if (key.startsWith("sens_meg_"))        return visibility.sensMeg;
     if (key.startsWith("sens_eeg_"))        return visibility.sensEeg;
 
-    if (key.startsWith("dig_live_"))  return true;  // always show live tracker
+    if (key.startsWith("dig_live_"))   return true;  // always show live tracker
     if (key.startsWith("dig_static_")) return true;  // always show static markers
+    if (key.startsWith("dig_ray_"))    return true;  // always show optical ray
+    if (key.startsWith("dig_probe_"))  return true;  // always show catheter probe
     if (key.startsWith("dig_cardinal")) return visibility.dig && visibility.digCardinal;
     if (key.startsWith("dig_hpi"))      return visibility.dig && visibility.digHpi;
     if (key.startsWith("dig_eeg"))      return visibility.dig && visibility.digEeg;
