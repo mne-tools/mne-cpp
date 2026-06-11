@@ -1745,7 +1745,8 @@ void BrainView::render(QRhiCommandBuffer *cb)
             if (!sv.shouldRenderSurface(key)) continue;
             if (!surf->isVisible()) continue;
             if (key.startsWith(QLatin1String("dig_live_t_"))
-                || key.startsWith(QLatin1String("dig_liveray_"))) {
+                || key.startsWith(QLatin1String("dig_ray_"))
+                || key.startsWith(QLatin1String("dig_probe_"))) {
                 QVector3D bmin, bmax;
                 surf->boundingBox(bmin, bmax);
                 QVector3D ctr = (bmin + bmax) * 0.5f;
