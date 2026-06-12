@@ -294,6 +294,24 @@ public slots:
 
     //=========================================================================================================
     /**
+     * Render the scene offscreen and save to a PNG file.
+     *
+     * Uses Qt::WA_DontShowOnScreen so no window manager surface is
+     * created — works on headless CI runners without Xvfb. The widget
+     * is temporarily shown to trigger QRhi initialization, then
+     * grabFramebuffer() reads pixels back from the GPU.
+     *
+     * @param[in] path        Output PNG file path.
+     * @param[in] width       Render width in pixels (default 1200).
+     * @param[in] height      Render height in pixels (default 800).
+     * @param[in] surfaceType Surface type to match (default "pial").
+     * @return true on success, false on failure.
+     */
+    bool savePng(const QString &path, int width = 1200, int height = 800,
+                 const QString &surfaceType = QStringLiteral("pial"));
+
+    //=========================================================================================================
+    /**
      * Switch to single-view mode (one viewport, interactive camera).
      */
     void showSingleView();

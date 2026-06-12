@@ -126,6 +126,9 @@ option(BUILD_MNE_RT_SERVER "Build MNE Rt Server" ON)
 # Simulation
 option(BUILD_MNE_SIMU "Build MNE Simu" ON)
 
+# Visualization / testing
+option(BUILD_MNE_SCREENSHOT_REGRESSION "Build MNE Screenshot Regression" ON)
+
 ##==============================================================================
 ## Preset: build only realtime tools
 
@@ -402,6 +405,11 @@ if(NOT WASM)
   # Simulation
   if(BUILD_MNE_SIMU)
     add_subdirectory(simulation/mne_simu)
+  endif()
+
+  # Visualization / testing
+  if(BUILD_MNE_SCREENSHOT_REGRESSION AND TARGET mne_disp3D)
+    add_subdirectory(visualization/mne_screenshot_regression)
   endif()
 
 endif()

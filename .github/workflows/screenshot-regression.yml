@@ -1,0 +1,119 @@
+# ---------------------------------------------------------------------------
+# Screenshot Regression CI
+#
+# Renders FreeSurfer sample surfaces offscreen via BrainView::savePng()
+# and optionally compares against golden reference images.
+#
+# Uses Qt::WA_DontShowOnScreen — no Xvfb or display server needed.
+# ---------------------------------------------------------------------------
+name: Screenshot Regression
+
+on:
+  push:
+    branches: [staging, main]
+    paths:
+      - 'src/libraries/disp3D/**'
+      - 'src/tools/visualization/**'
+      - '.github/workflows/screenshot-regression.yml'
+  pull_request:
+    branches: [staging, main]
+    paths:
+      - 'src/libraries/disp3D/**'
+      - 'src/tools/visualization/**'
+      - '.github/workflows/screenshot-regression.yml'
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+concurrency:
+  group: screenshot-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshot:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-26]
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    - name: Clone mne-cpp test data
+      run: git clone --depth 1 https://github.com/mne-tools/mne-cpp-test-data.git resources/data/mne-cpp-test-data
+
+    - name: Install system dependencies (Linux)
+      if: matrix.os == 'ubuntu-24.04'
+      run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
+        sudo apt-get update -q
+        sudo apt-get install -q libgl1-mesa-dev libxkbcommon-dev
+
+    - name: Download Qt toolchain (Linux)
+      if: matrix.os == 'ubuntu-24.04'
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind qt \
+          --version "6.11.1" \
+          --linkage dynamic \
+          --output-dir "$RUNNER_TEMP/qt"
+
+    - name: Download Qt toolchain (macOS)
+      if: matrix.os == 'macos-26'
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind qt \
+          --version "6.11.1" \
+          --linkage dynamic \
+          --output-dir "$RUNNER_TEMP/qt"
+
+    - name: Download Eigen
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind eigen \
+          --version "5.0.1" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+
+    - name: Download ONNX Runtime
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind onnxruntime \
+          --version "1.21.0" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
+
+    - name: Clone Skigen
+      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
+
+    - name: Configure and build
+      run: |
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_MNE_SCREENSHOT_REGRESSION=ON
+        cmake --build build --target mne_screenshot_regression -j $(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
+
+    - name: Run screenshot regression
+      env:
+        QT_QPA_PLATFORM: offscreen
+      run: |
+        ./build/bin/mne_screenshot_regression \
+          --subjects-dir resources/data/mne-cpp-test-data/subjects \
+          --subject sample \
+          --out screenshot_${{ matrix.os }}.png \
+          --width 1200 --height 800
+
+    - name: Upload screenshot artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: screenshot-${{ matrix.os }}
+        path: screenshot_*.png
+        retention-days: 30

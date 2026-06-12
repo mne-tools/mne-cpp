@@ -48,6 +48,8 @@
 #include <QTimer>
 #include <QMenu>
 #include <QStandardItem>
+#include <QCoreApplication>
+#include <QElapsedTimer>
 #include <algorithm>
 #include <cmath>
 
@@ -860,6 +862,61 @@ void BrainView::saveSnapshot()
     QString fileName = QString("snapshot_refactor_%1.png").arg(m_snapshotCounter++, 4, 10, QChar('0'));
     img.save(fileName);
 
+}
+
+//=============================================================================================================
+
+bool BrainView::savePng(const QString &path, int width, int height,
+                        const QString &surfaceType)
+{
+    // Realise the widget off-screen — QRhi init still runs because
+    // the widget is technically "shown", but no window-manager surface
+    // is created.  Same pattern as skigen-plot Figure::save().
+    setAttribute(Qt::WA_DontShowOnScreen, true);
+    resize(width, height);
+
+    // Set the surface type filter so the render loop matches the
+    // loaded surface names (e.g. "white" vs default "pial").
+    m_singleView.surfaceType = surfaceType;
+
+    show();
+
+    // Spin the event loop until QRhi is initialised, at least one
+    // frame has been rendered (m_renderer becomes non-null), and the
+    // surface map is populated.
+    QElapsedTimer timer;
+    timer.start();
+    while (timer.elapsed() < 5000) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 16);
+        if (m_renderer && !m_surfaces.isEmpty())
+            break;
+    }
+
+    if (!m_renderer) {
+        hide();
+        setAttribute(Qt::WA_DontShowOnScreen, false);
+        return false;
+    }
+
+    // Force a dirty scene so the next grab renders everything.
+    m_sceneDirty = true;
+    updateSceneBounds();
+
+    // Pump a few more frames so pipeline resources are fully created.
+    for (int i = 0; i < 5; ++i)
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 16);
+
+    // QRhiWidget::grabFramebuffer() internally creates an offscreen
+    // frame, calls render(), and reads back the texture.
+    QImage img = grabFramebuffer();
+
+    hide();
+    setAttribute(Qt::WA_DontShowOnScreen, false);
+
+    if (img.isNull())
+        return false;
+
+    return img.save(path, "PNG");
 }
 
 //=============================================================================================================
