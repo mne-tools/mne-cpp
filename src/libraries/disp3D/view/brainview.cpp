@@ -3487,6 +3487,36 @@ void BrainView::pushVideoOverlayFrame(const QImage &frame)
     if (m_videoOverlay->isEnabled()) { m_sceneDirty = true; update(); }
 }
 
+void BrainView::setVideoDepthEnabled(bool enabled)
+{
+    if (!m_videoOverlay) return;
+    m_videoOverlay->setDepthEnabled(enabled);
+    if (m_videoOverlay->isEnabled()) { m_sceneDirty = true; update(); }
+}
+
+void BrainView::setVideoDepthScale(float scale)
+{
+    if (!m_videoOverlay) return;
+    m_videoOverlay->setDepthScale(std::clamp(scale, 0.0f, 1.0f));
+    if (m_videoOverlay->isEnabled()) { m_sceneDirty = true; update(); }
+}
+
+void BrainView::setVideoDepthSteps(int steps)
+{
+    if (!m_videoOverlay) return;
+    m_videoOverlay->setDepthSteps(std::clamp(steps, 8, 64));
+    if (m_videoOverlay->isEnabled()) { m_sceneDirty = true; update(); }
+}
+
+void BrainView::pushVideoDepthFrame(const QImage &depthFrame)
+{
+    if (!m_videoOverlay) return;
+    m_videoOverlay->setDepthFrame(depthFrame);
+    if (m_videoOverlay->isEnabled() && m_videoOverlay->isDepthEnabled()) {
+        m_sceneDirty = true; update();
+    }
+}
+
 bool BrainView::intersectWorldRay(const QVector3D& origin, const QVector3D& direction, QVector3D& hitPoint) const
 {
     // Test against ALL surfaces (no SubView visibility filter) so

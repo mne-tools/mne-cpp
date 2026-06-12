@@ -942,6 +942,18 @@ public slots:
     /** Push a new video frame to the overlay (e.g. from QVideoSink). */
     void pushVideoOverlayFrame(const QImage &frame);
 
+    /** Enable or disable depth-based parallax relief on the video overlay. */
+    void setVideoDepthEnabled(bool enabled);
+
+    /** Set the parallax occlusion displacement scale [0..1]. */
+    void setVideoDepthScale(float scale);
+
+    /** Set the number of POM ray-march steps (quality vs. performance). */
+    void setVideoDepthSteps(int steps);
+
+    /** Push a monocular depth map corresponding to the current video frame. */
+    void pushVideoDepthFrame(const QImage &depthFrame);
+
     /**
      * @brief Intersect a world-space ray with loaded scene geometry.
      *

@@ -143,6 +143,8 @@ qt_add_shaders(${PROJECT_NAME} "disp3d_shaders"
         "shaders/video_overlay.frag"
         "shaders/video_decal.vert"
         "shaders/video_decal.frag"
+        "shaders/video_decal_depth.vert"
+        "shaders/video_decal_depth.frag"
 )
 
 target_include_directories(${PROJECT_NAME}

@@ -95,18 +95,25 @@ struct BrainRenderer::Impl
     struct VideoOverlayResources {
         std::unique_ptr<QRhiGraphicsPipeline> pipeline;
         std::unique_ptr<QRhiGraphicsPipeline> surfacePipeline;
+        std::unique_ptr<QRhiGraphicsPipeline> surfaceDepthPipeline; // POM-enhanced decal
         std::unique_ptr<QRhiShaderResourceBindings> srb;
+        std::unique_ptr<QRhiShaderResourceBindings> srbDepth;       // SRB with depth texture at binding 2
         std::unique_ptr<QRhiBuffer> uniformBuffer;
         std::unique_ptr<QRhiBuffer> vertexBuffer;
         std::unique_ptr<QRhiBuffer> indexBuffer;
         std::unique_ptr<QRhiTexture> texture;
+        std::unique_ptr<QRhiTexture> depthTexture;
         std::unique_ptr<QRhiSampler> sampler;
+        std::unique_ptr<QRhiSampler> depthSampler;  // mipmap-enabled for vertex displacement
         QSize textureSize;
+        QSize depthTextureSize;
         int uniformBufferOffsetAlignment = 0;
         int currentUniformOffset = 0;
         quint64 uploadedFrameGen = std::numeric_limits<quint64>::max();
+        quint64 uploadedDepthFrameGen = std::numeric_limits<quint64>::max();
         bool indexUploaded = false;
         bool initialized = false;
+        bool depthInitialized = false;
     };
     VideoOverlayResources videoOverlay;
 };
@@ -580,6 +587,82 @@ void BrainRenderer::prepareVideoOverlay(QRhi *rhi,
         k.initialized = true;
     }
 
+    // ── Lazy depth-enhanced pipeline creation ───────────────────────
+    if (overlay->isDepthEnabled() && !k.depthInitialized && k.initialized) {
+        QFile ddvFile(QStringLiteral(":/video_decal_depth.vert.qsb"));
+        QFile ddfFile(QStringLiteral(":/video_decal_depth.frag.qsb"));
+        if (ddvFile.open(QIODevice::ReadOnly) && ddfFile.open(QIODevice::ReadOnly)) {
+            QShader ddvShader = QShader::fromSerialized(ddvFile.readAll());
+            QShader ddfShader = QShader::fromSerialized(ddfFile.readAll());
+            if (ddvShader.isValid() && ddfShader.isValid()) {
+                // Mipmap-enabled sampler for depth texture (vertex shader
+                // samples a high LOD for smooth displacement on sparse meshes)
+                k.depthSampler.reset(rhi->newSampler(
+                    QRhiSampler::Linear, QRhiSampler::Linear,
+                    QRhiSampler::Linear,       // mip filtering
+                    QRhiSampler::ClampToEdge,
+                    QRhiSampler::ClampToEdge));
+                k.depthSampler->create();
+
+                // 1x1 placeholder depth texture with mipmaps
+                k.depthTexture.reset(rhi->newTexture(
+                    QRhiTexture::RGBA8, QSize(1, 1), 1, QRhiTexture::MipMapped));
+                k.depthTexture->create();
+                k.depthTextureSize = QSize(1, 1);
+
+                // SRB with depth texture at binding 2 (vertex + fragment)
+                k.srbDepth.reset(rhi->newShaderResourceBindings());
+                k.srbDepth->setBindings({
+                    QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(0,
+                        QRhiShaderResourceBinding::VertexStage |
+                        QRhiShaderResourceBinding::FragmentStage,
+                        k.uniformBuffer.get(), kUniformBlockSize),
+                    QRhiShaderResourceBinding::sampledTexture(1,
+                        QRhiShaderResourceBinding::FragmentStage,
+                        k.texture.get(), k.sampler.get()),
+                    QRhiShaderResourceBinding::sampledTexture(2,
+                        QRhiShaderResourceBinding::VertexStage |
+                        QRhiShaderResourceBinding::FragmentStage,
+                        k.depthTexture.get(), k.depthSampler.get())
+                });
+                k.srbDepth->create();
+
+                QRhiGraphicsPipeline::TargetBlend depthDecalBlend;
+                depthDecalBlend.enable = true;
+                depthDecalBlend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
+                depthDecalBlend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+                depthDecalBlend.srcAlpha = QRhiGraphicsPipeline::One;
+                depthDecalBlend.dstAlpha = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+
+                k.surfaceDepthPipeline.reset(rhi->newGraphicsPipeline());
+                k.surfaceDepthPipeline->setShaderStages({
+                    { QRhiShaderStage::Vertex, ddvShader },
+                    { QRhiShaderStage::Fragment, ddfShader }
+                });
+                QRhiVertexInputLayout ddil;
+                ddil.setBindings({{ 36 }});
+                ddil.setAttributes({
+                    { 0, 0, QRhiVertexInputAttribute::Float3, 0 },
+                    { 0, 1, QRhiVertexInputAttribute::Float3, 12 },
+                    { 0, 2, QRhiVertexInputAttribute::UNormByte4, 24 },
+                    { 0, 3, QRhiVertexInputAttribute::UNormByte4, 28 },
+                    { 0, 4, QRhiVertexInputAttribute::Float, 32 }
+                });
+                k.surfaceDepthPipeline->setVertexInputLayout(ddil);
+                k.surfaceDepthPipeline->setShaderResourceBindings(k.srbDepth.get());
+                k.surfaceDepthPipeline->setRenderPassDescriptor(d->rtClear->renderPassDescriptor());
+                k.surfaceDepthPipeline->setSampleCount(d->rtClear->sampleCount());
+                k.surfaceDepthPipeline->setCullMode(QRhiGraphicsPipeline::None);
+                k.surfaceDepthPipeline->setTargetBlends({depthDecalBlend});
+                k.surfaceDepthPipeline->setDepthTest(false);   // inward-displaced vertices must not be culled by brain surface z
+                k.surfaceDepthPipeline->setDepthWrite(false);
+                k.surfaceDepthPipeline->setFlags(QRhiGraphicsPipeline::UsesScissor);
+                k.surfaceDepthPipeline->create();
+                k.depthInitialized = true;
+            }
+        }
+    }
+
     // ── Index buffer (one-shot upload) ──────────────────────────────
     if (!k.indexUploaded) {
         const quint32 idx[6] = { 0, 1, 2,  2, 1, 3 };
@@ -603,6 +686,23 @@ void BrainRenderer::prepareVideoOverlay(QRhi *rhi,
                 k.texture.get(), k.sampler.get())
         });
         k.srb->create();
+        // Also rebuild depth SRB if it exists
+        if (k.srbDepth && k.depthTexture) {
+            k.srbDepth->setBindings({
+                QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(0,
+                    QRhiShaderResourceBinding::VertexStage |
+                    QRhiShaderResourceBinding::FragmentStage,
+                    k.uniformBuffer.get(), kUniformBlockSize),
+                QRhiShaderResourceBinding::sampledTexture(1,
+                    QRhiShaderResourceBinding::FragmentStage,
+                    k.texture.get(), k.sampler.get()),
+                QRhiShaderResourceBinding::sampledTexture(2,
+                    QRhiShaderResourceBinding::VertexStage |
+                    QRhiShaderResourceBinding::FragmentStage,
+                    k.depthTexture.get(), k.depthSampler.get())
+            });
+            k.srbDepth->create();
+        }
         k.uploadedFrameGen = std::numeric_limits<quint64>::max();
     }
     if (overlay->frameGeneration() != k.uploadedFrameGen) {
@@ -610,6 +710,42 @@ void BrainRenderer::prepareVideoOverlay(QRhi *rhi,
         QRhiTextureUploadDescription desc({ 0, 0, sub });
         u->uploadTexture(k.texture.get(), desc);
         k.uploadedFrameGen = overlay->frameGeneration();
+    }
+
+    // ── Depth texture upload ────────────────────────────────────────
+    if (overlay->isDepthEnabled() && overlay->hasDepthFrame() && k.depthInitialized) {
+        QImage depthFrame = tightlyPackedRgba(overlay->depthFrame());
+        if (!depthFrame.isNull()) {
+            if (depthFrame.size() != k.depthTextureSize) {
+                k.depthTexture.reset(rhi->newTexture(
+                    QRhiTexture::RGBA8, depthFrame.size(), 1, QRhiTexture::MipMapped));
+                k.depthTexture->create();
+                k.depthTextureSize = depthFrame.size();
+                // Rebuild depth SRB with new depth texture
+                k.srbDepth->setBindings({
+                    QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(0,
+                        QRhiShaderResourceBinding::VertexStage |
+                        QRhiShaderResourceBinding::FragmentStage,
+                        k.uniformBuffer.get(), kUniformBlockSize),
+                    QRhiShaderResourceBinding::sampledTexture(1,
+                        QRhiShaderResourceBinding::FragmentStage,
+                        k.texture.get(), k.sampler.get()),
+                    QRhiShaderResourceBinding::sampledTexture(2,
+                        QRhiShaderResourceBinding::VertexStage |
+                        QRhiShaderResourceBinding::FragmentStage,
+                        k.depthTexture.get(), k.depthSampler.get())
+                });
+                k.srbDepth->create();
+                k.uploadedDepthFrameGen = std::numeric_limits<quint64>::max();
+            }
+            if (overlay->depthFrameGeneration() != k.uploadedDepthFrameGen) {
+                QRhiTextureSubresourceUploadDescription depthSub(depthFrame);
+                QRhiTextureUploadDescription depthDesc({ 0, 0, depthSub });
+                u->uploadTexture(k.depthTexture.get(), depthDesc);
+                u->generateMips(k.depthTexture.get());
+                k.uploadedDepthFrameGen = overlay->depthFrameGeneration();
+            }
+        }
     }
 }
 
@@ -752,6 +888,14 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi
     const QVector3D axisV = referenceUp;
     const QVector3D axisU = QVector3D::crossProduct(axisV, localNormal).normalized();
 
+    const bool useDepth = overlay->isDepthEnabled()
+                          && overlay->hasDepthFrame()
+                          && k.depthInitialized
+                          && k.surfaceDepthPipeline;
+
+    // Uniform block — the depth-enhanced shader has an extra vec4 depthParams
+    // but the base 7×vec4 layout (112 bytes) still fits within kUniformBlockSize
+    // (256 bytes) even with the extra vec4 (128 bytes total).
     struct {
         float mvp[16];
         float focusAndSize[4];
@@ -760,6 +904,7 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi
         float axisNAndDepth[4];
         float cameraPosAndFacing[4];
         float borderColor[4];
+        float depthParams[4];
     } ub;
     memcpy(ub.mvp, data.mvp.constData(), 64);
     ub.focusAndSize[0] = overlay->focusPosition().x();
@@ -781,8 +926,6 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi
     ub.cameraPosAndFacing[0] = data.cameraPos.x();
     ub.cameraPosAndFacing[1] = data.cameraPos.y();
     ub.cameraPosAndFacing[2] = data.cameraPos.z();
-    // Pack video aspect ratio (width/height) so the decal shader can
-    // scale the V axis to preserve the frame's proportions.
     const QImage &decalFrame = overlay->frame();
     ub.cameraPosAndFacing[3] = (decalFrame.height() > 0)
         ? static_cast<float>(decalFrame.width()) / decalFrame.height()
@@ -791,14 +934,24 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi
     ub.borderColor[1] = 0.85f;
     ub.borderColor[2] = 1.0f;
     ub.borderColor[3] = 1.0f;
+    ub.depthParams[0] = useDepth ? overlay->depthScale() : 0.0f;
+    ub.depthParams[1] = useDepth ? static_cast<float>(overlay->depthSteps()) : 0.0f;
+    ub.depthParams[2] = useDepth ? 1.0f : 0.0f;
+    ub.depthParams[3] = 0.0f;
     u->updateDynamicBuffer(k.uniformBuffer.get(), uniformOffset, sizeof(ub), &ub);
     cb->resourceUpdate(u);
 
     cb->setViewport(toViewport(data));
     cb->setScissor(toScissor(data));
-    cb->setGraphicsPipeline(k.surfacePipeline.get());
-    const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(uniformOffset) };
-    cb->setShaderResources(k.srb.get(), 1, &srbOffset);
+    if (useDepth) {
+        cb->setGraphicsPipeline(k.surfaceDepthPipeline.get());
+        const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(uniformOffset) };
+        cb->setShaderResources(k.srbDepth.get(), 1, &srbOffset);
+    } else {
+        cb->setGraphicsPipeline(k.surfacePipeline.get());
+        const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(uniformOffset) };
+        cb->setShaderResources(k.srb.get(), 1, &srbOffset);
+    }
     const QRhiCommandBuffer::VertexInput vbuf(surface->vertexBuffer(), 0);
     cb->setVertexInput(0, 1, &vbuf, surface->indexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
     cb->drawIndexed(surface->indexCount());

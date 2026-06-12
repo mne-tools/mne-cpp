@@ -93,6 +93,33 @@ public:
     QVector3D upHint() const { return m_upHint; }
     void setUpHint(const QVector3D &dir) { m_upHint = dir; }
 
+    // ── Depth / topographic relief ──────────────────────────────────
+
+    /** @return Whether depth-based parallax relief is enabled. */
+    bool isDepthEnabled() const { return m_depthEnabled; }
+    void setDepthEnabled(bool enabled) { m_depthEnabled = enabled; }
+
+    /** Push a new monocular depth map (single-channel or RGBA grayscale). */
+    void setDepthFrame(const QImage &image)
+    {
+        if (image.isNull())
+            return;
+        m_depthFrame = image;
+        ++m_depthFrameGeneration;
+    }
+
+    const QImage &depthFrame() const { return m_depthFrame; }
+    bool hasDepthFrame() const { return !m_depthFrame.isNull(); }
+    quint64 depthFrameGeneration() const { return m_depthFrameGeneration; }
+
+    /** @return POM displacement scale in UV space [0..1]. */
+    float depthScale() const { return m_depthScale; }
+    void setDepthScale(float scale) { m_depthScale = scale; }
+
+    /** @return Number of POM ray-march steps (quality vs. performance). */
+    int depthSteps() const { return m_depthSteps; }
+    void setDepthSteps(int steps) { m_depthSteps = steps; }
+
 private:
     bool m_enabled = false;
     QVector3D m_focusPosition = QVector3D(0.0f, 0.05f, 0.08f); // arbitrary default near the top of the head
@@ -101,6 +128,13 @@ private:
     float m_opacity = 1.0f;
     QImage m_frame;
     quint64 m_frameGeneration = 0;
+
+    // Depth / topographic relief
+    bool m_depthEnabled = false;
+    QImage m_depthFrame;
+    quint64 m_depthFrameGeneration = 0;
+    float m_depthScale = 0.25f;  //!< POM height scale (UV space units)
+    int m_depthSteps = 32;       //!< POM ray-march steps
 };
 
 } // namespace DISP3DLIB
