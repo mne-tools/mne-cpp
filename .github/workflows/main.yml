@@ -94,13 +94,13 @@ jobs:
 
     - name: Deploy Doxygen to GitHub Pages (production)
       env:
-        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         cd doc/doxygen
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
         # Deploy to the root (stable) of doxygen-api
-        git clone -b gh-pages "https://${GIT_CREDENTIALS}@github.com/mne-cpp/doxygen-api" gh-pages
+        git clone -b gh-pages "https://x-access-token:${GH_TOKEN}@github.com/mne-cpp/doxygen-api" gh-pages
         cd gh-pages
         # Preserve /dev directory if it exists (staging docs)
         if [ -d "dev" ]; then
@@ -167,11 +167,11 @@ jobs:
 
     - name: Deploy to mne-cpp.github.io
       env:
-        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
-        git clone -b main --single-branch "https://${GIT_CREDENTIALS}@github.com/mne-cpp/mne-cpp.github.io.git"
+        git clone -b main --single-branch "https://x-access-token:${GH_TOKEN}@github.com/mne-cpp/mne-cpp.github.io.git"
         cd mne-cpp.github.io
 
         # Preserve /dev directory (staging website) and online installer repos.
@@ -375,11 +375,11 @@ jobs:
 
     - name: Deploy WASM to mne-cpp/wasm repository
       env:
-        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
-        git clone "https://${GIT_CREDENTIALS}@github.com/mne-cpp/wasm.git" wasm-repo
+        git clone "https://x-access-token:${GH_TOKEN}@github.com/mne-cpp/wasm.git" wasm-repo
         cd wasm-repo
 
         # --- gh-pages branch ---
