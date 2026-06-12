@@ -858,15 +858,19 @@ public slots:
      * Show a catheter-style probe visualization (cylinder shaft + sphere tip
      * with an optional pulsing glow aura).
      *
-     * @param[in] tip       Probe tip position (metres, model space).
-     * @param[in] direction Probe forward axis (unit vector, model space).
-     * @param[in] length    Visible shaft length behind the tip (metres).
-     * @param[in] color     Probe core color.
-     * @param[in] glowColor Outer glow aura color (default: transparent = no glow).
+     * @param[in] tip         Probe tip position (metres, model space).
+     * @param[in] direction   Probe forward axis (unit vector, model space).
+     * @param[in] length      Visible shaft length behind the tip (metres).
+     * @param[in] color       Probe core color.
+     * @param[in] glowColor   Outer glow aura color (default: transparent = no glow).
+     * @param[in] orientation Full probe orientation for drawing a debug
+     *                        coordinate frame (X=red, Y=green, Z=blue).
+     *                        Pass a null quaternion to skip axes.
      */
     void setProbeVisualization(const QVector3D& tip, const QVector3D& direction,
                                float length, const QColor& color,
-                               const QColor& glowColor = QColor(0, 0, 0, 0));
+                               const QColor& glowColor = QColor(0, 0, 0, 0),
+                               const QQuaternion& orientation = QQuaternion(0, 0, 0, 0));
 
     /** Remove the probe visualization from the scene. */
     void clearProbeVisualization();

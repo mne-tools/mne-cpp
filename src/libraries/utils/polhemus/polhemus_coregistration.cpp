@@ -1079,6 +1079,90 @@ bool PolhemusCoregistration::opticalUpInWorld(QVector3D& up) const
 }
 
 //=============================================================================================================
+
+bool PolhemusCoregistration::applyOpticalAxisFineAdjust(const QVector3D& targetWorldPos,
+                                                        float& correctionDeg)
+{
+    correctionDeg = 0.0f;
+    if (!m_opticalCalibValid) return false;
+
+    // Get tracker-to-world transform (same as opticalRayInWorld)
+    const QMatrix4x4& dev = m_deviceToWorld;
+    if (dev.isIdentity()) return false;
+
+    QMatrix4x4 offsetMat;
+    offsetMat.setToIdentity();
+    offsetMat.translate(m_offsetTranslation);
+    offsetMat.rotate(m_offsetRotation);
+
+    const QMatrix4x4 trackerToWorld = dev * offsetMat.inverted();
+    const QVector3D trackerPos(trackerToWorld(0, 3), trackerToWorld(1, 3), trackerToWorld(2, 3));
+    const QQuaternion trackerOri = QQuaternion::fromRotationMatrix(trackerToWorld.toGenericMatrix<3, 3>());
+
+    // Current optical center in world frame
+    const QVector3D optCenterWorld = trackerPos + trackerOri.rotatedVector(m_opticalCenterLocal);
+
+    // Desired axis direction: from optical center to the target point
+    const QVector3D toTarget = (targetWorldPos - optCenterWorld);
+    if (toTarget.length() < 0.001f) return false; // target too close to optical center
+
+    const QVector3D desiredDirWorld = toTarget.normalized();
+
+    // Current axis direction in world frame
+    const QVector3D currentDirWorld = trackerOri.rotatedVector(m_opticalAxisLocal).normalized();
+
+    // Compute correction angle
+    const float cosAngle = std::clamp(QVector3D::dotProduct(currentDirWorld, desiredDirWorld), -1.0f, 1.0f);
+    correctionDeg = std::acos(cosAngle) * (180.0f / 3.14159265358979f);
+
+    // Sanity: reject corrections > 10° — likely a user error
+    if (correctionDeg > 10.0f) {
+        qWarning().nospace() << "Optical fine adjust: correction " << correctionDeg
+            << "° exceeds 10° limit — rejected.";
+        return false;
+    }
+
+    // Save pre-adjustment axis for undo
+    if (!m_opticalFineAdjustApplied)
+        m_opticalAxisPreFineAdjust = m_opticalAxisLocal;
+
+    // Compute the rotation from current to desired direction, in world frame
+    const QQuaternion worldCorrection = QQuaternion::rotationTo(currentDirWorld, desiredDirWorld);
+
+    // Transform the correction into tracker-local frame:
+    // localCorrection = trackerOri⁻¹ * worldCorrection * trackerOri
+    const QQuaternion trackerOriInv = trackerOri.inverted();
+    const QQuaternion localCorrection = trackerOriInv * worldCorrection * trackerOri;
+
+    // Apply to the local axis
+    m_opticalAxisLocal = localCorrection.rotatedVector(m_opticalAxisLocal).normalized();
+    m_opticalFineAdjustDeg = correctionDeg;
+    m_opticalFineAdjustApplied = true;
+
+    qInfo().nospace()
+        << "Optical fine adjust applied: " << correctionDeg << "°"
+        << "\n    axis (local):   (" << m_opticalAxisLocal.x() << ", "
+        << m_opticalAxisLocal.y() << ", " << m_opticalAxisLocal.z() << ")";
+
+    emit opticalCalibrationChanged();
+    return true;
+}
+
+//=============================================================================================================
+
+void PolhemusCoregistration::clearOpticalFineAdjust()
+{
+    if (!m_opticalFineAdjustApplied) return;
+
+    m_opticalAxisLocal = m_opticalAxisPreFineAdjust;
+    m_opticalFineAdjustApplied = false;
+    m_opticalFineAdjustDeg = 0.0f;
+
+    qInfo() << "Optical fine adjust cleared — axis restored to original calibration.";
+    emit opticalCalibrationChanged();
+}
+
+//=============================================================================================================
 // Session persistence helpers
 //=============================================================================================================
 
@@ -1185,6 +1269,13 @@ void PolhemusCoregistration::saveSessionState(QSettings &settings, const QString
         saveVec3(settings, "opticalCenterLocal", m_opticalCenterLocal);
         settings.setValue("opticalCalibResidualMm", static_cast<double>(m_opticalCalibResidualMm));
         settings.setValue("opticalCalibDepthSpreadMm", static_cast<double>(m_opticalCalibDepthSpreadMm));
+
+        // Fine adjustment
+        settings.setValue("opticalFineAdjustApplied", m_opticalFineAdjustApplied);
+        if (m_opticalFineAdjustApplied) {
+            saveVec3(settings, "opticalAxisPreFineAdjust", m_opticalAxisPreFineAdjust);
+            settings.setValue("opticalFineAdjustDeg", static_cast<double>(m_opticalFineAdjustDeg));
+        }
     }
 
     // Optical calibration samples (so calibration can be re-solved after restart)
@@ -1265,6 +1356,13 @@ bool PolhemusCoregistration::restoreSessionState(QSettings &settings, const QStr
         m_opticalCenterLocal       = loadVec3(settings, "opticalCenterLocal");
         m_opticalCalibResidualMm   = static_cast<float>(settings.value("opticalCalibResidualMm", 0.0).toDouble());
         m_opticalCalibDepthSpreadMm = static_cast<float>(settings.value("opticalCalibDepthSpreadMm", 0.0).toDouble());
+
+        // Fine adjustment
+        m_opticalFineAdjustApplied = settings.value("opticalFineAdjustApplied", false).toBool();
+        if (m_opticalFineAdjustApplied) {
+            m_opticalAxisPreFineAdjust = loadVec3(settings, "opticalAxisPreFineAdjust");
+            m_opticalFineAdjustDeg = static_cast<float>(settings.value("opticalFineAdjustDeg", 0.0).toDouble());
+        }
     }
 
     // Optical calibration samples

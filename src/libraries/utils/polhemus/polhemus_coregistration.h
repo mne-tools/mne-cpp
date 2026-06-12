@@ -243,6 +243,31 @@ public:
     float opticalCalibDepthSpreadMm() const { return m_opticalCalibDepthSpreadMm; }
 
     /**
+     * @brief Fine-adjust the optical axis so it passes through a known
+     *        world-frame point (e.g. the probe tip touched with the stylus).
+     *
+     * The correction rotates @c m_opticalAxisLocal in the tracker body
+     * frame so that a ray from the optical center would pass through
+     * @a targetWorldPos at the current tracker pose.
+     *
+     * @param targetWorldPos  Desired focus point in Polhemus world frame.
+     * @param[out] correctionDeg  Angle of the applied correction (degrees).
+     * @return @c true on success; @c false if calibration or tracker data
+     *         is unavailable, or the correction would exceed 10°.
+     */
+    bool applyOpticalAxisFineAdjust(const QVector3D& targetWorldPos,
+                                    float& correctionDeg);
+
+    /** @return Whether a fine adjustment has been applied. */
+    bool opticalFineAdjustApplied() const { return m_opticalFineAdjustApplied; }
+
+    /** @return The angle of the last fine adjustment (degrees). */
+    float opticalFineAdjustDeg() const { return m_opticalFineAdjustDeg; }
+
+    /** Undo the last fine adjustment, restoring the original solved axis. */
+    void clearOpticalFineAdjust();
+
+    /**
      * @brief Compute the current optical axis ray in Polhemus world frame.
      *
      * @param[out] origin     Ray origin (optical center in world frame).
@@ -429,6 +454,13 @@ private:
     // When available, the solver uses this instead of the distance constraint.
     QVector3D m_objectiveCenterLocal;       // objective center in tracker body frame
     bool      m_hasObjectiveCenter = false;
+
+    // Fine adjustment — small correction rotation applied on top of the
+    // solved optical axis to compensate for residual misalignment between
+    // the tracked probe position and its appearance in the video.
+    QVector3D m_opticalAxisPreFineAdjust;   // axis before fine-adjust (for undo)
+    float     m_opticalFineAdjustDeg = 0.0f;
+    bool      m_opticalFineAdjustApplied = false;
 
     // Known tracker-to-objective distance (metres) — fallback constraint when
     // no direct objective center capture is available.
