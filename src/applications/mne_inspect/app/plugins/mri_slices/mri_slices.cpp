@@ -45,12 +45,15 @@ namespace {
 
 QImage sliceImageToQImage(const MriSliceImage& slice)
 {
+    // pixels is stored as pixels(col, row) — Eigen column-major.
+    // extractSlice fills pixels(ix, iy) where ix indexes across width, iy across height.
+    // QImage scanLine(y) walks rows (height), scanLine[x] walks columns (width).
+    // So QImage(x, y) = pixels(x, y).
     QImage img(slice.width, slice.height, QImage::Format_Grayscale8);
     for (int y = 0; y < slice.height; ++y) {
         uchar* row = img.scanLine(y);
         for (int x = 0; x < slice.width; ++x) {
-            // pixels is row-major (y, x) and normalised to [0, 1].
-            float v = slice.pixels(y, x);
+            float v = slice.pixels(x, y);
             if (v < 0.0f) v = 0.0f;
             if (v > 1.0f) v = 1.0f;
             row[x] = static_cast<uchar>(v * 255.0f + 0.5f);
@@ -176,7 +179,7 @@ Eigen::Vector3f MriSlicesPlugin::voxelFromWorld(const QVector3D& worldPosition) 
         const float nan = std::numeric_limits<float>::quiet_NaN();
         return Eigen::Vector3f(nan, nan, nan);
     }
-    const Eigen::Matrix4f ras2vox = m_volume->computeVox2Ras().inverse();
+    const Eigen::Matrix4f ras2vox = m_volume->computeVox2RasTkr().inverse();
     const Eigen::Vector4f w(worldPosition.x(), worldPosition.y(), worldPosition.z(), 1.0f);
     const Eigen::Vector4f v = ras2vox * w;
     return Eigen::Vector3f(v.x(), v.y(), v.z());
@@ -251,7 +254,7 @@ Eigen::Vector3f MriSlicesPlugin::volumeCenter() const
     if (!m_volume) {
         return Eigen::Vector3f::Zero();
     }
-    const Eigen::Matrix4f vox2ras = m_volume->computeVox2Ras();
+    const Eigen::Matrix4f vox2ras = m_volume->computeVox2RasTkr();
     const Eigen::Vector4f vc(m_volume->dimX() * 0.5f,
                               m_volume->dimY() * 0.5f,
                               m_volume->dimZ() * 0.5f,
@@ -283,7 +286,7 @@ void MriSlicesPlugin::rebuildSlices()
         return;
     }
 
-    const Eigen::Matrix4f vox2rasF = m_volume->computeVox2Ras();
+    const Eigen::Matrix4f vox2rasF = m_volume->computeVox2RasTkr();
     const Eigen::Matrix4d vox2rasD = vox2rasF.cast<double>();
 
     for (int i = 0; i < 3; ++i) {

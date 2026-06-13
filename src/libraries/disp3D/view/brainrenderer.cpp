@@ -21,6 +21,7 @@
 #include "renderable/dipoleobject.h"
 #include "renderable/networkobject.h"
 #include "renderable/videooverlay.h"
+#include "renderable/sliceobject.h"
 
 using DISP3DLIB::VideoOverlay;
 
@@ -116,6 +117,35 @@ struct BrainRenderer::Impl
         bool depthInitialized = false;
     };
     VideoOverlayResources videoOverlay;
+
+    // ── MRI slice rendering ─────────────────────────────────────────
+    // Up to 3 ortho slices (axial, coronal, sagittal) rendered as
+    // textured quads with depth test and alpha blending.
+    static constexpr int kMaxSliceSlots = 3;
+    struct SliceSlot {
+        std::unique_ptr<QRhiTexture> texture;
+        QSize textureSize;
+        bool dirty = true;        // needs texture re-upload
+        bool visible = false;     // whether this slot has valid data
+        QVector<float> vertices;  // 4 verts × (3 pos + 2 uv) = 20 floats
+        float opacity = 0.8f;
+        float windowCenter = 0.5f;
+        float windowWidth  = 1.0f;
+    };
+    struct SliceResources {
+        std::unique_ptr<QRhiGraphicsPipeline> pipeline;
+        std::unique_ptr<QRhiShaderResourceBindings> srb[kMaxSliceSlots];
+        std::unique_ptr<QRhiBuffer> uniformBuffer;
+        std::unique_ptr<QRhiBuffer> vertexBuffer[kMaxSliceSlots];
+        std::unique_ptr<QRhiBuffer> indexBuffer;
+        std::unique_ptr<QRhiSampler> sampler;
+        SliceSlot sliceSlots[kMaxSliceSlots];
+        int uniformBufferOffsetAlignment = 0;
+        int currentUniformOffset = 0;
+        bool indexUploaded = false;
+        bool initialized = false;
+    };
+    SliceResources sliceRes;
 };
 
 //=============================================================================================================
@@ -395,6 +425,7 @@ QRhiRenderTarget *BrainRenderer::rtPreserve() const
 void BrainRenderer::beginFrame(QRhiCommandBuffer *cb)
 {
     d->currentUniformOffset = 0;
+    d->sliceRes.currentUniformOffset = 0;
 
     auto *rt = d->rtClear.get();
     cb->beginPass(rt, QColor(0, 0, 0), { 1.0f, 0 });
@@ -955,6 +986,248 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi
     const QRhiCommandBuffer::VertexInput vbuf(surface->vertexBuffer(), 0);
     cb->setVertexInput(0, 1, &vbuf, surface->indexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
     cb->drawIndexed(surface->indexCount());
+}
+
+//=============================================================================================================
+// MRI slice rendering
+//=============================================================================================================
+
+void BrainRenderer::prepareSlice(QRhi *rhi,
+                                  QRhiResourceUpdateBatch *u,
+                                  DISP3DLIB::SliceObject *slice,
+                                  int slotIndex)
+{
+    if (!rhi || !u) return;
+    if (slotIndex < 0 || slotIndex >= Impl::kMaxSliceSlots) return;
+
+    auto &k = d->sliceRes;
+    auto &sliceSlot = k.sliceSlots[slotIndex];
+
+    if (!slice) {
+        sliceSlot.visible = false;
+        return;
+    }
+
+    const QImage &img = slice->image();
+    if (img.isNull()) {
+        sliceSlot.visible = false;
+        return;
+    }
+
+    // ── Lazy one-time resource creation ─────────────────────────────
+    if (!k.initialized) {
+        QFile vFile(QStringLiteral(":/slice.vert.qsb"));
+        QFile fFile(QStringLiteral(":/slice.frag.qsb"));
+        if (!vFile.open(QIODevice::ReadOnly) || !fFile.open(QIODevice::ReadOnly)) {
+            qWarning() << "BrainRenderer: failed to open MRI slice shaders";
+            return;
+        }
+        QShader vShader = QShader::fromSerialized(vFile.readAll());
+        QShader fShader = QShader::fromSerialized(fFile.readAll());
+        if (!vShader.isValid() || !fShader.isValid()) {
+            qWarning() << "BrainRenderer: invalid MRI slice shaders";
+            return;
+        }
+
+        k.uniformBufferOffsetAlignment = rhi->ubufAlignment();
+        k.uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
+                                             QRhiBuffer::UniformBuffer,
+                                             64 * k.uniformBufferOffsetAlignment));
+        k.uniformBuffer->create();
+
+        // Index buffer (shared by all 3 slots): 2 triangles = 6 indices
+        k.indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable,
+                                           QRhiBuffer::IndexBuffer,
+                                           6 * sizeof(quint32)));
+        k.indexBuffer->create();
+
+        k.sampler.reset(rhi->newSampler(QRhiSampler::Linear, QRhiSampler::Linear,
+                                        QRhiSampler::None,
+                                        QRhiSampler::ClampToEdge,
+                                        QRhiSampler::ClampToEdge));
+        k.sampler->create();
+
+        // Per-slot resources: vertex buffer + texture + SRB
+        for (int i = 0; i < Impl::kMaxSliceSlots; ++i) {
+            constexpr int kVbSize = 4 * 5 * sizeof(float); // 4 verts × (3 pos + 2 uv)
+            k.vertexBuffer[i].reset(rhi->newBuffer(QRhiBuffer::Dynamic,
+                                                    QRhiBuffer::VertexBuffer, kVbSize));
+            k.vertexBuffer[i]->create();
+
+            // 1×1 placeholder texture — real size set on first data
+            k.sliceSlots[i].texture.reset(rhi->newTexture(QRhiTexture::R8, QSize(1, 1)));
+            k.sliceSlots[i].texture->create();
+            k.sliceSlots[i].textureSize = QSize(1, 1);
+
+            k.srb[i].reset(rhi->newShaderResourceBindings());
+            k.srb[i]->setBindings({
+                QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(0,
+                    QRhiShaderResourceBinding::VertexStage |
+                    QRhiShaderResourceBinding::FragmentStage,
+                    k.uniformBuffer.get(), kUniformBlockSize),
+                QRhiShaderResourceBinding::sampledTexture(1,
+                    QRhiShaderResourceBinding::FragmentStage,
+                    k.sliceSlots[i].texture.get(), k.sampler.get())
+            });
+            k.srb[i]->create();
+        }
+
+        // Pipeline: alpha-blended, depth-test on, depth-write off
+        QRhiGraphicsPipeline::TargetBlend blend;
+        blend.enable = true;
+        blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
+        blend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+        blend.srcAlpha = QRhiGraphicsPipeline::One;
+        blend.dstAlpha = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+
+        k.pipeline.reset(rhi->newGraphicsPipeline());
+        k.pipeline->setShaderStages({
+            { QRhiShaderStage::Vertex, vShader },
+            { QRhiShaderStage::Fragment, fShader }
+        });
+        QRhiVertexInputLayout il;
+        il.setBindings({{ 5 * sizeof(float) }});
+        il.setAttributes({
+            { 0, 0, QRhiVertexInputAttribute::Float3, 0 },
+            { 0, 1, QRhiVertexInputAttribute::Float2, 3 * sizeof(float) }
+        });
+        k.pipeline->setVertexInputLayout(il);
+        k.pipeline->setShaderResourceBindings(k.srb[0].get());
+        k.pipeline->setRenderPassDescriptor(d->rtClear->renderPassDescriptor());
+        k.pipeline->setSampleCount(d->rtClear->sampleCount());
+        k.pipeline->setCullMode(QRhiGraphicsPipeline::None);
+        k.pipeline->setTargetBlends({blend});
+        k.pipeline->setDepthTest(true);
+        k.pipeline->setDepthWrite(false);
+        k.pipeline->setFlags(QRhiGraphicsPipeline::UsesScissor);
+        k.pipeline->create();
+
+        k.initialized = true;
+    }
+
+    // ── Index buffer (one-shot upload) ──────────────────────────────
+    if (!k.indexUploaded) {
+        const quint32 idx[6] = { 0, 1, 2,  2, 1, 3 };
+        u->uploadStaticBuffer(k.indexBuffer.get(), idx);
+        k.indexUploaded = true;
+    }
+
+    // ── Texture (re-create on size change, upload data) ─────────────
+    // Convert to R8 (grayscale) for the slice shader
+    QImage gray = img.convertToFormat(QImage::Format_Grayscale8);
+    const QSize imgSize = gray.size();
+
+    if (imgSize != sliceSlot.textureSize) {
+        sliceSlot.texture.reset(rhi->newTexture(QRhiTexture::R8, imgSize));
+        sliceSlot.texture->create();
+        sliceSlot.textureSize = imgSize;
+        // Rebuild SRB to point at new texture
+        k.srb[slotIndex]->setBindings({
+            QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(0,
+                QRhiShaderResourceBinding::VertexStage |
+                QRhiShaderResourceBinding::FragmentStage,
+                k.uniformBuffer.get(), kUniformBlockSize),
+            QRhiShaderResourceBinding::sampledTexture(1,
+                QRhiShaderResourceBinding::FragmentStage,
+                sliceSlot.texture.get(), k.sampler.get())
+        });
+        k.srb[slotIndex]->create();
+    }
+
+    // Upload texture — R8 needs tightly-packed row data
+    {
+        const qsizetype tightStride = qsizetype(gray.width());
+        QByteArray texData;
+        texData.resize(gray.height() * tightStride);
+        for (int y = 0; y < gray.height(); ++y) {
+            memcpy(texData.data() + y * tightStride,
+                   gray.constScanLine(y),
+                   size_t(tightStride));
+        }
+        QRhiTextureSubresourceUploadDescription sub(texData.constData(), texData.size());
+        sub.setSourceSize(imgSize);
+        QRhiTextureUploadDescription desc({ 0, 0, sub });
+        u->uploadTexture(sliceSlot.texture.get(), desc);
+    }
+
+    // ── Vertex data ─────────────────────────────────────────────────
+    slice->generateQuadVertices(sliceSlot.vertices);
+    u->updateDynamicBuffer(k.vertexBuffer[slotIndex].get(), 0,
+                           sliceSlot.vertices.size() * sizeof(float),
+                           sliceSlot.vertices.constData());
+
+    sliceSlot.opacity = slice->opacity();
+    sliceSlot.windowCenter = slice->windowCenter();
+    sliceSlot.windowWidth = slice->windowWidth();
+    sliceSlot.visible = true;
+}
+
+//=============================================================================================================
+
+int BrainRenderer::prepareSliceDraw(QRhiResourceUpdateBatch *u,
+                                     const SceneData &data,
+                                     int slotIndex)
+{
+    if (slotIndex < 0 || slotIndex >= Impl::kMaxSliceSlots) return -1;
+
+    auto &k = d->sliceRes;
+    if (!k.initialized || !k.pipeline) return -1;
+
+    const auto &sliceSlot = k.sliceSlots[slotIndex];
+    if (!sliceSlot.visible) return -1;
+    if (k.uniformBufferOffsetAlignment <= 0) return -1;
+
+    const int uniformOffset = k.currentUniformOffset;
+    k.currentUniformOffset += k.uniformBufferOffsetAlignment;
+    if (uniformOffset + kUniformBlockSize > k.uniformBuffer->size()) return -1;
+
+    // Uniform block matches slice.vert / slice.frag layout:
+    //   mat4 mvp         (64 bytes)
+    //   mat4 sliceToWorld (64 bytes)
+    //   float opacity     (4)
+    //   float windowCenter(4)
+    //   float windowWidth (4)
+    //   float _pad0       (4)
+    struct {
+        float mvp[16];
+        float sliceToWorld[16];
+        float opacity;
+        float windowCenter;
+        float windowWidth;
+        float _pad0;
+    } ub;
+    memcpy(ub.mvp, data.mvp.constData(), 64);
+    // SliceToWorld is identity for pre-transformed vertices (already in world coords)
+    QMatrix4x4 identity;
+    identity.setToIdentity();
+    memcpy(ub.sliceToWorld, identity.constData(), 64);
+    ub.opacity = sliceSlot.opacity;
+    ub.windowCenter = sliceSlot.windowCenter;
+    ub.windowWidth = sliceSlot.windowWidth;
+    ub._pad0 = 0.0f;
+    u->updateDynamicBuffer(k.uniformBuffer.get(), uniformOffset, sizeof(ub), &ub);
+
+    return uniformOffset;
+}
+
+//=============================================================================================================
+
+void BrainRenderer::issueSliceDraw(QRhiCommandBuffer *cb,
+                                    int slotIndex,
+                                    int uniformOffset)
+{
+    if (slotIndex < 0 || slotIndex >= Impl::kMaxSliceSlots) return;
+    if (uniformOffset < 0) return;
+
+    auto &k = d->sliceRes;
+    if (!k.initialized || !k.pipeline) return;
+
+    cb->setGraphicsPipeline(k.pipeline.get());
+    const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(uniformOffset) };
+    cb->setShaderResources(k.srb[slotIndex].get(), 1, &srbOffset);
+    const QRhiCommandBuffer::VertexInput vbuf(k.vertexBuffer[slotIndex].get(), 0);
+    cb->setVertexInput(0, 1, &vbuf, k.indexBuffer.get(), 0, QRhiCommandBuffer::IndexUInt32);
+    cb->drawIndexed(6);
 }
 
 //=============================================================================================================

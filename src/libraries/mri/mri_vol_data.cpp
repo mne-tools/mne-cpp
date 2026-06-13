@@ -173,3 +173,28 @@ Matrix4f MriVolData::computeVox2Ras() const
 
     return vox2ras;
 }
+
+//=============================================================================================================
+
+Matrix4f MriVolData::computeVox2RasTkr() const
+{
+    // Same as computeVox2Ras() but with c_ras = (0,0,0).
+    // This gives the tkregister (surface RAS) coordinate system
+    // that FreeSurfer surfaces use.
+    Matrix3f M;
+    M.col(0) = x_ras * xsize;
+    M.col(1) = y_ras * ysize;
+    M.col(2) = z_ras * zsize;
+
+    Vector3f center(static_cast<float>(width)  / 2.0f,
+                    static_cast<float>(height) / 2.0f,
+                    static_cast<float>(depth)  / 2.0f);
+
+    Vector3f P0 = -M * center;  // c_ras = (0,0,0) for tkRAS
+
+    Matrix4f vox2ras_tkr = Matrix4f::Identity();
+    vox2ras_tkr.block<3, 3>(0, 0) = M / 1000.0f;
+    vox2ras_tkr.block<3, 1>(0, 3) = P0 / 1000.0f;
+
+    return vox2ras_tkr;
+}

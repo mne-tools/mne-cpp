@@ -170,7 +170,7 @@ private:
     Eigen::Matrix4d     m_voxelToWorld = Eigen::Matrix4d::Identity();
     float               m_windowCenter = 0.5f;
     float               m_windowWidth  = 1.0f;
-    float               m_opacity      = 1.0f;
+    float               m_opacity      = 0.7f;
 
     // Cached corners in world coordinates (computed in setSlice)
     Eigen::Vector3d     m_corner00;  // (0,0) UV corner

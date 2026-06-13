@@ -58,7 +58,7 @@ class QRhiTextureRenderTarget;
 class BrainSurface;
 class DipoleObject;
 class NetworkObject;
-namespace DISP3DLIB { class VideoOverlay; }
+namespace DISP3DLIB { class VideoOverlay; class SliceObject; }
 
 //=============================================================================================================
 /**
@@ -343,6 +343,54 @@ public:
                                      const SceneData &data,
                                      DISP3DLIB::VideoOverlay *overlay,
                                      BrainSurface *surface);
+
+    //=========================================================================================================
+    /**
+     * Prepare MRI slice GPU resources and upload texture data.
+     *
+     * Must be called before a render pass starts. Creates the slice
+     * pipeline lazily on first use and uploads the slice texture.
+     *
+     * @param[in] rhi        QRhi pointer.
+     * @param[in] u          Resource update batch owned by the caller.
+     * @param[in] slice      Pointer to SliceObject; ignored when null.
+     * @param[in] slotIndex  Slot index (0=axial, 1=coronal, 2=sagittal).
+     */
+    void prepareSlice(QRhi *rhi,
+                      QRhiResourceUpdateBatch *u,
+                      DISP3DLIB::SliceObject *slice,
+                      int slotIndex);
+
+    //=========================================================================================================
+    /**
+     * Upload uniform data for an MRI slice into a shared resource batch.
+     *
+     * Call once per visible slice, then submit the batch with
+     * cb->resourceUpdate(), and finally call issueSliceDraw() for each slice.
+     *
+     * @param[in] u          Shared resource update batch.
+     * @param[in] data       Scene uniforms (MVP, camera position).
+     * @param[in] slotIndex  Slot index (0=axial, 1=coronal, 2=sagittal).
+     * @return Uniform buffer offset for this draw, or -1 on failure.
+     */
+    int prepareSliceDraw(QRhiResourceUpdateBatch *u,
+                         const SceneData &data,
+                         int slotIndex);
+
+    //=========================================================================================================
+    /**
+     * Issue draw commands for a prepared MRI slice.
+     *
+     * Call after cb->resourceUpdate() has been submitted with the batch
+     * from prepareSliceDraw(). Does not create resource batches.
+     *
+     * @param[in] cb             Command buffer (must be inside a render pass).
+     * @param[in] slotIndex      Slot index matching the prepareSliceDraw call.
+     * @param[in] uniformOffset  Offset returned by prepareSliceDraw().
+     */
+    void issueSliceDraw(QRhiCommandBuffer *cb,
+                        int slotIndex,
+                        int uniformOffset);
 
     //=========================================================================================================
     /**

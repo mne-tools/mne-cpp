@@ -85,6 +85,7 @@ struct DISP3DSHARED_EXPORT ViewVisibilityProfile
     bool sourceSpace     = false;
     bool network         = false;
     bool megFieldMapOnHead = false;
+    bool mriSlices       = true;
 
     //=========================================================================================================
     /**

@@ -63,7 +63,7 @@ class BrainRenderer;
 class BrainSurface;
 class DipoleObject;
 class NetworkObject;
-namespace DISP3DLIB { class VideoOverlay; }
+namespace DISP3DLIB { class VideoOverlay; class SliceObject; }
 namespace CONNECTIVITYLIB { class Network; }
 
 //=============================================================================================================
@@ -985,6 +985,33 @@ public slots:
      */
     bool intersectWorldRay(const QVector3D& origin, const QVector3D& direction, QVector3D& hitPoint) const;
 
+    //=========================================================================================================
+    // ── MRI slice rendering ────────────────────────────────────────────
+    //=========================================================================================================
+
+    /**
+     * Set an MRI slice to be rendered in the 3-D scene.
+     *
+     * @param[in] slotIndex  Slot index (0=axial, 1=coronal, 2=sagittal).
+     * @param[in] slice      Pointer to SliceObject, or nullptr to hide.
+     */
+    void setSlice(int slotIndex, DISP3DLIB::SliceObject *slice);
+
+    /**
+     * Toggle visibility of an MRI slice slot.
+     *
+     * @param[in] slotIndex  Slot index (0=axial, 1=coronal, 2=sagittal).
+     * @param[in] visible    Whether this slice should be drawn.
+     */
+    void setSliceVisible(int slotIndex, bool visible);
+
+    /**
+     * Toggle MRI slice visibility for the current edit-target viewport.
+     *
+     * @param[in] visible  Whether MRI slices should be drawn in the active viewport.
+     */
+    void setMriSlicesVisible(bool visible);
+
 signals:
     //=========================================================================================================
     /**
@@ -1214,6 +1241,11 @@ private:
     std::unique_ptr<DipoleObject> m_dipoles;        /**< Standalone dipole set (loaded via file). */
     std::unique_ptr<NetworkObject> m_network;       /**< Connectivity network visualization. */
     std::unique_ptr<DISP3DLIB::VideoOverlay> m_videoOverlay; /**< Live RGB video overlay decal. */
+
+    // ── MRI slices ─────────────────────────────────────────────────────
+    static constexpr int kMaxSliceSlots = 3;
+    DISP3DLIB::SliceObject *m_slices[kMaxSliceSlots] = {};   /**< Non-owning pointers to slice data. */
+    bool m_sliceVisible[kMaxSliceSlots] = {true, true, true}; /**< Per-slot visibility flags. */
 
     /** Update the scene bounding box based on visible objects. */
     void updateSceneBounds();

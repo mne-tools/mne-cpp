@@ -215,9 +215,20 @@ public:
      *   vox2ras = | M   P0 |  (in mm, converted to meters for FIFF)
      *             | 0    1 |
      *
-     * @return The 4×4 voxel-to-surface-RAS transform in meters.
+     * @return The 4×4 voxel-to-scanner-RAS transform in meters.
      */
     Eigen::Matrix4f computeVox2Ras() const;
+
+    //=========================================================================================================
+    /**
+     * Builds the voxel-to-surface-RAS (tkRAS / tkregister) 4×4 transform.
+     *
+     * Identical to computeVox2Ras() but forces c_ras = (0,0,0), producing
+     * the coordinate system used by FreeSurfer surfaces (lh.white, etc.).
+     *
+     * @return The 4×4 voxel-to-tkRAS transform in meters.
+     */
+    Eigen::Matrix4f computeVox2RasTkr() const;
 
     //=========================================================================================================
     // MGH Header Fields

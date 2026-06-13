@@ -120,6 +120,17 @@ BemFile="${SubjectPath}/${Subject}/bem/sample-5120-5120-5120-bem.fif"
 SrcSpaceFile="${SubjectPath}/${Subject}/bem/sample-oct-6-orig-src.fif"
 AtlasFile="${SubjectPath}/${Subject}/label/lh.aparc.annot"
 
+# MRI volume — prefer T1.mgz, fall back to brain.mgz, then orig.mgz
+MriFile=""
+for candidate in "${SubjectPath}/${Subject}/mri/T1.mgz" \
+                 "${SubjectPath}/${Subject}/mri/brain.mgz" \
+                 "${SubjectPath}/${Subject}/mri/orig.mgz"; do
+    if [ -f "$candidate" ]; then
+        MriFile="$candidate"
+        break
+    fi
+done
+
 echo "Launching MNE Inspect from $BuildPath..."
 
 declare -a STC_ARGS=()
@@ -133,6 +144,11 @@ if [ ${#STC_ARGS[@]} -eq 0 ]; then
     [ -f "$FallbackStc" ] && STC_ARGS=(--stc "$FallbackStc")
 fi
 
+declare -a MRI_ARGS=()
+if [ -n "$MriFile" ]; then
+    MRI_ARGS=(--mri "$MriFile")
+fi
+
 "$BuildPath" --subjectPath "$SubjectPath" --subject "$Subject" --hemi "$Hemi" --bem "$BemFile" \
     "${STC_ARGS[@]}" --digitizer "$DigitizerFile" --trans "$TransFile" --srcSpace "$SrcSpaceFile" \
-    --atlas "$AtlasFile" --evoked "$EvokedFile"
+    --atlas "$AtlasFile" --evoked "$EvokedFile" "${MRI_ARGS[@]}"

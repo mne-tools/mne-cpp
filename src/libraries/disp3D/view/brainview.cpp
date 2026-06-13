@@ -21,6 +21,7 @@
 #include "renderable/dipoleobject.h"
 #include "renderable/networkobject.h"
 #include "renderable/videooverlay.h"
+#include "renderable/sliceobject.h"
 #include "core/surfacekeys.h"
 #include "core/dataloader.h"
 #include "input/raypicker.h"
@@ -1552,6 +1553,15 @@ void BrainView::render(QRhiCommandBuffer *cb)
             m_renderer->prepareVideoOverlay(rhi(), preUpload, m_videoOverlay.get());
         }
 
+        // Prepare MRI slice textures and vertex data
+        for (int i = 0; i < kMaxSliceSlots; ++i) {
+            if (m_slices[i] && m_sliceVisible[i]) {
+                m_renderer->prepareSlice(rhi(), preUpload, m_slices[i], i);
+            } else {
+                m_renderer->prepareSlice(rhi(), preUpload, nullptr, i);
+            }
+        }
+
 #ifdef __EMSCRIPTEN__
         // WORKAROUND(QRhi-GLES2): Single merged buffer for ALL surfaces.
         // The Qt QRhi GLES2/WebGL backend only renders the first
@@ -1856,6 +1866,16 @@ void BrainView::render(QRhiCommandBuffer *cb)
         item.uniformOffset = m_renderer->prepareSurfaceDraw(surfBatch, batchData, item.surface);
     }
 
+    // Batch MRI slice uniform uploads into the same batch
+    int sliceOffsets[kMaxSliceSlots] = {-1, -1, -1};
+    if (sv.visibility.mriSlices) {
+        for (int i = 0; i < kMaxSliceSlots; ++i) {
+            if (m_slices[i] && m_sliceVisible[i]) {
+                sliceOffsets[i] = m_renderer->prepareSliceDraw(surfBatch, sceneData, i);
+            }
+        }
+    }
+
     cb->resourceUpdate(surfBatch);
 
     // Set viewport/scissor once for all batched draws
@@ -1865,6 +1885,17 @@ void BrainView::render(QRhiCommandBuffer *cb)
     // Issue all draw calls — no resource updates or state resets between them
     for (const auto &item : opaqueDraws)
         m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
+
+    // Issue MRI slice draws after opaque surfaces but before the holographic
+    // brain.  Background voxels are discarded in the shader; remaining anatomy
+    // alpha-blends into the framebuffer.  The subsequent holographic additive
+    // pass (SrcAlpha + One) adds its glow on top without being dimmed.
+    // depthTest=true, depthWrite=false keeps slices behind opaque geometry.
+    for (int i = 0; i < kMaxSliceSlots; ++i) {
+        if (sliceOffsets[i] >= 0) {
+            m_renderer->issueSliceDraw(cb, i, sliceOffsets[i]);
+        }
+    }
 
     BrainSurface *videoOverlayTargetSurface = nullptr;
     const bool hasVideoOverlay = m_videoOverlay
@@ -3610,4 +3641,34 @@ bool BrainView::intersectWorldRay(const QVector3D& origin, const QVector3D& dire
         }
     }
     return found;
+}
+
+//=============================================================================================================
+// MRI slice rendering
+//=============================================================================================================
+
+void BrainView::setSlice(int slotIndex, DISP3DLIB::SliceObject *slice)
+{
+    if (slotIndex < 0 || slotIndex >= kMaxSliceSlots) return;
+    m_slices[slotIndex] = slice;
+    m_sceneDirty = true;
+    update();
+}
+
+void BrainView::setSliceVisible(int slotIndex, bool visible)
+{
+    if (slotIndex < 0 || slotIndex >= kMaxSliceSlots) return;
+    m_sliceVisible[slotIndex] = visible;
+    m_sceneDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
+void BrainView::setMriSlicesVisible(bool visible)
+{
+    auto &profile = visibilityProfileForTarget(m_visualizationEditTarget);
+    profile.mriSlices = visible;
+    saveMultiViewSettings();
+    m_sceneDirty = true; update();
 }

@@ -36,6 +36,16 @@ set "BemFile=%SubjectPath%\%Subject%\bem\sample-5120-5120-5120-bem.fif"
 set "SrcSpaceFile=%SubjectPath%\%Subject%\bem\sample-oct-6-orig-src.fif"
 set "AtlasFile=%SubjectPath%\%Subject%\label\lh.aparc.annot"
 
+:: MRI volume — prefer T1.mgz, fall back to brain.mgz, then orig.mgz
+set "MriFile="
+if exist "%SubjectPath%\%Subject%\mri\T1.mgz" (
+    set "MriFile=%SubjectPath%\%Subject%\mri\T1.mgz"
+) else if exist "%SubjectPath%\%Subject%\mri\brain.mgz" (
+    set "MriFile=%SubjectPath%\%Subject%\mri\brain.mgz"
+) else if exist "%SubjectPath%\%Subject%\mri\orig.mgz" (
+    set "MriFile=%SubjectPath%\%Subject%\mri\orig.mgz"
+)
+
 echo launching MNE Inspect from %BuildPath%...
 
 :: Build --stc arguments: load all *-lh.stc files from the processed\ directory
@@ -51,8 +61,12 @@ if "%STC_ARGS%"=="" (
     if exist "!FallbackStc!" set "STC_ARGS=--stc "!FallbackStc!""
 )
 
+:: Build --mri argument if a volume was found
+set "MRI_ARGS="
+if defined MriFile if not "%MriFile%"=="" set "MRI_ARGS=--mri "%MriFile%""
+
 "%BuildPath%" --subjectPath "%SubjectPath%" --subject "%Subject%" --hemi "%Hemi%" --bem "%BemFile%" ^
     %STC_ARGS% --digitizer "%DigitizerFile%" --trans "%TransFile%" --srcSpace "%SrcSpaceFile%" ^
-    --atlas "%AtlasFile%" --evoked "%EvokedFile%"
+    --atlas "%AtlasFile%" --evoked "%EvokedFile%" %MRI_ARGS%
 
 endlocal

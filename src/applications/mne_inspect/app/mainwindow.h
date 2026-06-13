@@ -100,7 +100,7 @@ public:
     /**
      * Destructor
      */
-    ~MainWindow() override = default;
+    ~MainWindow() override;
 
     //=========================================================================================================
     /**
@@ -123,7 +123,8 @@ public:
                          const QString &digitizerPath = QString(),
                          const QString &srcSpacePath = QString(),
                          const QString &atlasPath = QString(),
-                         const QString &evokedPath = QString());
+                         const QString &evokedPath = QString(),
+                         const QString &mriPath = QString());
 
     //=========================================================================================================
     /**
@@ -243,8 +244,17 @@ private:
     /** File → Load Electrodes… (FIFF or CSV). */
     void onLoadElectrodes();
 
-    /** File → Load MRI… (MGH/MGZ). */
+    /** File → Load MRI… (MGH/MGZ/NIfTI). */
     void onLoadMri();
+
+    /** Update MRI slider positions from the plugin crosshair. */
+    void syncMriSlidersFromCrosshair();
+
+    /** Move the MRI crosshair from the current slider positions. */
+    void onMriSliderChanged();
+
+    /** Populate the MRI volume combo with sibling volumes in the same directory. */
+    void populateMriVolumeCombo(const QString& activePath);
 
     /** Push the current Overlay-dock thresholds and colormap down to the
      *  shared scene and to each affected renderable. */
@@ -353,6 +363,29 @@ private:
     // Control widgets - STC Playback
     QCheckBox *m_realtimeCheck = nullptr;
     QCheckBox *m_loopCheck = nullptr;
+
+    // Control widgets - MRI Volume
+    QGroupBox *m_mriGroup = nullptr;
+    QComboBox *m_mriVolumeCombo = nullptr;
+    QCheckBox *m_mriShowAllCheck = nullptr;
+    QLabel *m_mriFileLabel = nullptr;
+    QSlider *m_mriAxialSlider = nullptr;
+    QSlider *m_mriCoronalSlider = nullptr;
+    QSlider *m_mriSagittalSlider = nullptr;
+    QLabel *m_mriAxialLabel = nullptr;
+    QLabel *m_mriCoronalLabel = nullptr;
+    QLabel *m_mriSagittalLabel = nullptr;
+    QCheckBox *m_mriAxialCheck = nullptr;
+    QCheckBox *m_mriCoronalCheck = nullptr;
+    QCheckBox *m_mriSagittalCheck = nullptr;
+    QSlider *m_mriWindowCenterSlider = nullptr;
+    QSlider *m_mriWindowWidthSlider = nullptr;
+    QSlider *m_mriOpacitySlider = nullptr;
+    QLabel *m_mriWindowCenterLabel = nullptr;
+    QLabel *m_mriWindowWidthLabel = nullptr;
+    QLabel *m_mriOpacityLabel = nullptr;
+    bool m_mriSliderUpdating = false;
+    QStringList m_mriVolumePaths;
 
     // Control widgets - View (additional)
     QCheckBox *m_showInfoCheck = nullptr;

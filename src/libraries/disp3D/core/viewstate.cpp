@@ -51,6 +51,7 @@ bool ViewVisibilityProfile::isObjectVisible(const QString &object) const
     if (object == "dipoles")           return dipoles;
     if (object == "source_space")      return sourceSpace;
     if (object == "network")           return network;
+    if (object == "mri_slices")        return mriSlices;
     return true; // unknown objects default visible
 }
 
@@ -80,6 +81,7 @@ void ViewVisibilityProfile::setObjectVisible(const QString &object, bool visible
     else if (object == "dipoles")          dipoles = visible;
     else if (object == "source_space")     sourceSpace = visible;
     else if (object == "network")          network = visible;
+    else if (object == "mri_slices")       mriSlices = visible;
 }
 
 //=============================================================================================================
@@ -109,6 +111,7 @@ void ViewVisibilityProfile::load(const QSettings &settings, const QString &prefi
     sourceSpace     = isTrue(settings.value(prefix + "sourceSpace"),     sourceSpace);
     network         = isTrue(settings.value(prefix + "network"),         network);
     megFieldMapOnHead = isTrue(settings.value(prefix + "megFieldMapOnHead"), megFieldMapOnHead);
+    mriSlices       = isTrue(settings.value(prefix + "mriSlices"),       mriSlices);
 }
 
 //=============================================================================================================
@@ -138,6 +141,7 @@ void ViewVisibilityProfile::save(QSettings &settings, const QString &prefix) con
     settings.setValue(prefix + "sourceSpace",     sourceSpace);
     settings.setValue(prefix + "network",         network);
     settings.setValue(prefix + "megFieldMapOnHead", megFieldMapOnHead);
+    settings.setValue(prefix + "mriSlices",       mriSlices);
 }
 
 //=============================================================================================================

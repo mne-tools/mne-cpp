@@ -56,6 +56,8 @@
 #include <mna/mna_recording.h>
 #include <mna/mna_types.h>
 
+#include <mri/mri_slicer.h>
+
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QComboBox>
@@ -117,6 +119,7 @@
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace MNALIB;
+using namespace MRILIB;
 
 //=============================================================================================================
 // OVERLAY COLOR BAR
@@ -307,6 +310,21 @@ static QWidget *createFlatDockTitleBar(QDockWidget *dock, const QString &title)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+MainWindow::~MainWindow()
+{
+    // Clear GPU-visible slice pointers before plugin members (which own the
+    // SliceObjects) are destroyed.  Prevents stale-pointer access if a
+    // deferred render event fires during widget teardown.
+    if (m_brainView) {
+        for (int i = 0; i < 3; ++i) {
+            m_brainView->setSlice(i, nullptr);
+            m_brainView->setSliceVisible(i, false);
+        }
+    }
+}
+
+//=============================================================================================================
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_scene(this)
@@ -433,6 +451,115 @@ void MainWindow::setupUI()
     bemLayout->addWidget(bemShaderLabel);
     bemLayout->addWidget(m_bemShaderCombo);
     bemLayout->addWidget(m_linkShadersCheck);
+
+    // ===== MRI Volume Group =====
+    m_mriGroup = new QGroupBox("MRI Volume");
+    m_mriGroup->setEnabled(false);
+    QVBoxLayout *mriLayout = new QVBoxLayout(m_mriGroup);
+    mriLayout->setContentsMargins(6, 12, 6, 6);
+    mriLayout->setSpacing(6);
+
+    // Volume selector combo
+    m_mriVolumeCombo = new QComboBox;
+    m_mriVolumeCombo->setToolTip("Select active MRI volume (T1, T2, …)");
+    mriLayout->addWidget(m_mriVolumeCombo);
+
+    // Show-all / hide-all toggle
+    m_mriShowAllCheck = new QCheckBox("Show MRI Slices");
+    m_mriShowAllCheck->setChecked(true);
+    mriLayout->addWidget(m_mriShowAllCheck);
+
+    m_mriFileLabel = new QLabel("No MRI loaded");
+    m_mriFileLabel->setWordWrap(true);
+    m_mriFileLabel->setStyleSheet("color: #888;");
+    mriLayout->addWidget(m_mriFileLabel);
+
+    // Axial (Z) slice
+    m_mriAxialCheck = new QCheckBox("Axial");
+    m_mriAxialCheck->setChecked(true);
+    m_mriAxialLabel = new QLabel("Slice: 0");
+    m_mriAxialSlider = new QSlider(Qt::Horizontal);
+    m_mriAxialSlider->setMinimum(0);
+    m_mriAxialSlider->setMaximum(0);
+    {
+        QHBoxLayout *row = new QHBoxLayout;
+        row->addWidget(m_mriAxialCheck);
+        row->addStretch(1);
+        row->addWidget(m_mriAxialLabel);
+        mriLayout->addLayout(row);
+    }
+    mriLayout->addWidget(m_mriAxialSlider);
+
+    // Coronal (Y) slice
+    m_mriCoronalCheck = new QCheckBox("Coronal");
+    m_mriCoronalCheck->setChecked(true);
+    m_mriCoronalLabel = new QLabel("Slice: 0");
+    m_mriCoronalSlider = new QSlider(Qt::Horizontal);
+    m_mriCoronalSlider->setMinimum(0);
+    m_mriCoronalSlider->setMaximum(0);
+    {
+        QHBoxLayout *row = new QHBoxLayout;
+        row->addWidget(m_mriCoronalCheck);
+        row->addStretch(1);
+        row->addWidget(m_mriCoronalLabel);
+        mriLayout->addLayout(row);
+    }
+    mriLayout->addWidget(m_mriCoronalSlider);
+
+    // Sagittal (X) slice
+    m_mriSagittalCheck = new QCheckBox("Sagittal");
+    m_mriSagittalCheck->setChecked(true);
+    m_mriSagittalLabel = new QLabel("Slice: 0");
+    m_mriSagittalSlider = new QSlider(Qt::Horizontal);
+    m_mriSagittalSlider->setMinimum(0);
+    m_mriSagittalSlider->setMaximum(0);
+    {
+        QHBoxLayout *row = new QHBoxLayout;
+        row->addWidget(m_mriSagittalCheck);
+        row->addStretch(1);
+        row->addWidget(m_mriSagittalLabel);
+        mriLayout->addLayout(row);
+    }
+    mriLayout->addWidget(m_mriSagittalSlider);
+
+    // Window / Level controls (clinical MRI convention)
+    {
+        QLabel *wlHeader = new QLabel("<b>Image Adjustment</b>");
+        mriLayout->addWidget(wlHeader);
+
+        QHBoxLayout *wcRow = new QHBoxLayout;
+        wcRow->addWidget(new QLabel("Brightness:"));
+        m_mriWindowCenterSlider = new QSlider(Qt::Horizontal);
+        m_mriWindowCenterSlider->setRange(0, 100);
+        m_mriWindowCenterSlider->setValue(50);
+        m_mriWindowCenterLabel = new QLabel("50%");
+        m_mriWindowCenterLabel->setFixedWidth(32);
+        wcRow->addWidget(m_mriWindowCenterSlider, 1);
+        wcRow->addWidget(m_mriWindowCenterLabel);
+        mriLayout->addLayout(wcRow);
+
+        QHBoxLayout *wwRow = new QHBoxLayout;
+        wwRow->addWidget(new QLabel("Contrast:"));
+        m_mriWindowWidthSlider = new QSlider(Qt::Horizontal);
+        m_mriWindowWidthSlider->setRange(1, 100);
+        m_mriWindowWidthSlider->setValue(100);
+        m_mriWindowWidthLabel = new QLabel("100%");
+        m_mriWindowWidthLabel->setFixedWidth(32);
+        wwRow->addWidget(m_mriWindowWidthSlider, 1);
+        wwRow->addWidget(m_mriWindowWidthLabel);
+        mriLayout->addLayout(wwRow);
+
+        QHBoxLayout *opRow = new QHBoxLayout;
+        opRow->addWidget(new QLabel("Opacity:"));
+        m_mriOpacitySlider = new QSlider(Qt::Horizontal);
+        m_mriOpacitySlider->setRange(0, 100);
+        m_mriOpacitySlider->setValue(70);
+        m_mriOpacityLabel = new QLabel("70%");
+        m_mriOpacityLabel->setFixedWidth(32);
+        opRow->addWidget(m_mriOpacitySlider, 1);
+        opRow->addWidget(m_mriOpacityLabel);
+        mriLayout->addLayout(opRow);
+    }
 
     // ===== Source Estimate Group =====
     m_stcGroup = new QGroupBox("Source Estimate");
@@ -799,6 +926,7 @@ void MainWindow::setupUI()
     sideLayout->addWidget(m_evokedGroup);
     sideLayout->addWidget(m_sensorStreamGroup);
     sideLayout->addWidget(m_sensorGroup);
+    sideLayout->addWidget(m_mriGroup);
     sideLayout->addWidget(viewGroup);
     sideLayout->addStretch();
 
@@ -1807,6 +1935,101 @@ void MainWindow::setupConnections()
     connect(m_brainView, &BrainView::timePointChanged, [this](int /*index*/, float time) {
         m_statusTimeLabel->setText(QString("Time: %1 s").arg(time, 0, 'f', 3));
     });
+
+    // ── MRI Volume Slice Navigation ───────────────────────────────────
+
+    // Sliders → move crosshair in the plugin
+    auto mriSliderMoved = [this]() { onMriSliderChanged(); };
+    connect(m_mriAxialSlider,    &QSlider::valueChanged, this, mriSliderMoved);
+    connect(m_mriCoronalSlider,  &QSlider::valueChanged, this, mriSliderMoved);
+    connect(m_mriSagittalSlider, &QSlider::valueChanged, this, mriSliderMoved);
+
+    // Plugin crosshair → sync sliders (e.g. from pick events)
+    connect(&m_mriSlicesPlugin, &MRISLICESPLUGIN::MriSlicesPlugin::crosshairChanged,
+            this, &MainWindow::syncMriSlidersFromCrosshair);
+
+    // Plugin crosshair → push updated slice objects to BrainView for 3-D rendering
+    connect(&m_mriSlicesPlugin, &MRISLICESPLUGIN::MriSlicesPlugin::crosshairChanged,
+            this, [this]() {
+        m_brainView->setSlice(0, m_mriSlicesPlugin.axialSlice());
+        m_brainView->setSlice(1, m_mriSlicesPlugin.coronalSlice());
+        m_brainView->setSlice(2, m_mriSlicesPlugin.sagittalSlice());
+    });
+
+    // Per-plane visibility toggles
+    auto toggleMriPlane = [this](int planeIdx, bool visible) {
+        const auto ids = MRISLICESPLUGIN::MriSlicesPlugin::sceneLayerIds();
+        if (planeIdx >= 0 && planeIdx < 3) {
+            m_scene.setLayerVisible(ids[planeIdx], visible);
+            m_brainView->setSliceVisible(planeIdx, visible);
+        }
+    };
+    connect(m_mriAxialCheck,    &QCheckBox::toggled, this, [toggleMriPlane](bool v) { toggleMriPlane(0, v); });
+    connect(m_mriCoronalCheck,  &QCheckBox::toggled, this, [toggleMriPlane](bool v) { toggleMriPlane(1, v); });
+    connect(m_mriSagittalCheck, &QCheckBox::toggled, this, [toggleMriPlane](bool v) { toggleMriPlane(2, v); });
+
+    // Show-all toggle: per-viewport MRI slice visibility
+    connect(m_mriShowAllCheck, &QCheckBox::toggled, this, [this](bool visible) {
+        m_brainView->setMriSlicesVisible(visible);
+    });
+
+    // Window / Level / Opacity controls
+    auto updateSliceWindowing = [this]() {
+        const float center  = m_mriWindowCenterSlider->value() / 100.0f;
+        const float width   = m_mriWindowWidthSlider->value()  / 100.0f;
+        const float opacity = m_mriOpacitySlider->value()      / 100.0f;
+        m_mriWindowCenterLabel->setText(QString("%1%").arg(qRound(center * 100)));
+        m_mriWindowWidthLabel->setText(QString("%1%").arg(qRound(width * 100)));
+        m_mriOpacityLabel->setText(QString("%1%").arg(qRound(opacity * 100)));
+
+        for (int i = 0; i < 3; ++i) {
+            DISP3DLIB::SliceObject *s = (i == 0) ? m_mriSlicesPlugin.axialSlice()
+                                      : (i == 1) ? m_mriSlicesPlugin.coronalSlice()
+                                                  : m_mriSlicesPlugin.sagittalSlice();
+            if (s) {
+                s->setWindowLevel(center, width);
+                s->setOpacity(opacity);
+                m_brainView->setSlice(i, s);
+            }
+        }
+    };
+    connect(m_mriWindowCenterSlider, &QSlider::valueChanged, this, updateSliceWindowing);
+    connect(m_mriWindowWidthSlider,  &QSlider::valueChanged, this, updateSliceWindowing);
+    connect(m_mriOpacitySlider,      &QSlider::valueChanged, this, updateSliceWindowing);
+
+    // Volume combo: switch active MRI volume
+    connect(m_mriVolumeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int index) {
+        if (index < 0 || index >= m_mriVolumePaths.size()) return;
+        const QString path = m_mriVolumePaths[index];
+        if (path == m_mriSlicesPlugin.sourcePath()) return;
+        m_mriSlicesPlugin.loadVolume(path);
+    });
+
+    // Volume loaded → enable controls
+    connect(&m_mriSlicesPlugin, &MRISLICESPLUGIN::MriSlicesPlugin::volumeChanged, this, [this]() {
+        const MRILIB::MriVolData* vol = m_mriSlicesPlugin.volume();
+        if (!vol) return;
+        m_mriGroup->setEnabled(true);
+        m_mriFileLabel->setText(QFileInfo(m_mriSlicesPlugin.sourcePath()).fileName());
+        m_mriFileLabel->setStyleSheet(QString());
+
+        // Set slider ranges to volume dimensions
+        {
+            const QSignalBlocker bA(m_mriAxialSlider);
+            const QSignalBlocker bC(m_mriCoronalSlider);
+            const QSignalBlocker bS(m_mriSagittalSlider);
+            m_mriAxialSlider->setMaximum(vol->dimZ() - 1);
+            m_mriCoronalSlider->setMaximum(vol->dimY() - 1);
+            m_mriSagittalSlider->setMaximum(vol->dimX() - 1);
+        }
+        syncMriSlidersFromCrosshair();
+
+        // Push initial slice objects to BrainView
+        m_brainView->setSlice(0, m_mriSlicesPlugin.axialSlice());
+        m_brainView->setSlice(1, m_mriSlicesPlugin.coronalSlice());
+        m_brainView->setSlice(2, m_mriSlicesPlugin.sagittalSlice());
+    });
 }
 
 //=============================================================================================================
@@ -1819,7 +2042,8 @@ void MainWindow::loadInitialData(const QString &subjectPath,
                                   const QString &digitizerPath,
                                   const QString &srcSpacePath,
                                   const QString &atlasPath,
-                                  const QString &evokedPath)
+                                  const QString &evokedPath,
+                                  const QString &mriPath)
 {
     // Check if the subject directory actually exists before attempting to load
     QString subjectDir = subjectPath + "/" + subjectName + "/surf";
@@ -1930,6 +2154,19 @@ void MainWindow::loadInitialData(const QString &subjectPath,
             qInfo() << "Auto-loading source estimate from:" << stcPath;
             trackLoadedFile(stcPath, static_cast<int>(MnaFileRole::SourceEstimate));
             addStcEntry(stcPath, /*activate=*/ (i == 0));
+        }
+    }
+
+    // Auto-load MRI volume
+    if (!mriPath.isEmpty() && QFile::exists(mriPath)) {
+        qInfo() << "Auto-loading MRI volume from:" << mriPath;
+        if (m_mriSlicesPlugin.loadVolume(mriPath)) {
+            populateMriVolumeCombo(mriPath);
+            if (m_layerMriCheck) {
+                m_layerMriCheck->setChecked(true);
+            }
+        } else {
+            qWarning() << "Failed to load MRI volume:" << mriPath;
         }
     }
 
@@ -2194,6 +2431,11 @@ void MainWindow::syncUIToEditTarget(int target)
     m_showNetworkCheck->blockSignals(true);
     m_showNetworkCheck->setChecked(m_brainView->objectVisibleForTarget("network", target));
     m_showNetworkCheck->blockSignals(false);
+
+    // Sync MRI slice visibility
+    m_mriShowAllCheck->blockSignals(true);
+    m_mriShowAllCheck->setChecked(m_brainView->objectVisibleForTarget("mri_slices", target));
+    m_mriShowAllCheck->blockSignals(false);
 }
 
 //=============================================================================================================
@@ -2779,6 +3021,14 @@ void MainWindow::saveSettings()
     settings.setValue("geometry", saveGeometry());
     settings.setValue("windowState", saveState());
     settings.setValue("recentFiles", m_recentFiles);
+
+    // MRI display preferences
+    settings.setValue("mri/brightness", m_mriWindowCenterSlider->value());
+    settings.setValue("mri/contrast",   m_mriWindowWidthSlider->value());
+    settings.setValue("mri/opacity",    m_mriOpacitySlider->value());
+    settings.setValue("mri/showAxial",    m_mriAxialCheck->isChecked());
+    settings.setValue("mri/showCoronal",  m_mriCoronalCheck->isChecked());
+    settings.setValue("mri/showSagittal", m_mriSagittalCheck->isChecked());
 #endif
 }
 
@@ -2796,6 +3046,16 @@ void MainWindow::restoreSettings()
     }
     m_recentFiles = settings.value("recentFiles").toStringList();
     updateRecentFilesMenu();
+
+    // Restore MRI display preferences
+    if (settings.contains("mri/brightness")) {
+        m_mriWindowCenterSlider->setValue(settings.value("mri/brightness", 50).toInt());
+        m_mriWindowWidthSlider->setValue(settings.value("mri/contrast", 100).toInt());
+        m_mriOpacitySlider->setValue(settings.value("mri/opacity", 70).toInt());
+        m_mriAxialCheck->setChecked(settings.value("mri/showAxial", true).toBool());
+        m_mriCoronalCheck->setChecked(settings.value("mri/showCoronal", true).toBool());
+        m_mriSagittalCheck->setChecked(settings.value("mri/showSagittal", true).toBool());
+    }
 #else
     resize(1200, 800);
 #endif
@@ -2806,6 +3066,17 @@ void MainWindow::restoreSettings()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     saveSettings();
+
+    // Clear BrainView's slice pointers before the plugin (which owns the
+    // SliceObjects) is destroyed. This prevents stale-pointer access if
+    // a deferred render event fires during widget teardown.
+    if (m_brainView) {
+        for (int i = 0; i < 3; ++i) {
+            m_brainView->setSlice(i, nullptr);
+            m_brainView->setSliceVisible(i, false);
+        }
+    }
+
     QMainWindow::closeEvent(event);
 }
 
@@ -3076,7 +3347,7 @@ void MainWindow::onLoadElectrodes()
 
 void MainWindow::onLoadMri()
 {
-    const QString filter = QStringLiteral("MRI volume (*.mgh *.mgz);;All files (*)");
+    const QString filter = QStringLiteral("MRI volume (*.mgh *.mgz *.nii *.nii.gz);;All files (*)");
     const QString path = QFileDialog::getOpenFileName(this, tr("Load MRI"),
                                                       QString(), filter);
     if (path.isEmpty()) {
@@ -3087,6 +3358,7 @@ void MainWindow::onLoadMri()
                              tr("Failed to load MRI volume from:\n%1").arg(path));
         return;
     }
+    populateMriVolumeCombo(path);
     if (m_statusLabel) {
         m_statusLabel->setText(QStringLiteral("Loaded MRI: %1")
                                 .arg(QFileInfo(path).fileName()));
@@ -3094,6 +3366,97 @@ void MainWindow::onLoadMri()
     if (m_layerMriCheck) {
         m_layerMriCheck->setChecked(true);
     }
+}
+
+//=============================================================================================================
+
+void MainWindow::populateMriVolumeCombo(const QString& activePath)
+{
+    const QSignalBlocker block(m_mriVolumeCombo);
+    m_mriVolumeCombo->clear();
+    m_mriVolumePaths.clear();
+
+    // Scan the directory of the loaded file for sibling MRI volumes
+    const QDir dir = QFileInfo(activePath).absoluteDir();
+    const QStringList filters = {
+        QStringLiteral("*.mgh"), QStringLiteral("*.mgz"),
+        QStringLiteral("*.nii"), QStringLiteral("*.nii.gz")
+    };
+    QFileInfoList entries = dir.entryInfoList(filters, QDir::Files, QDir::Name);
+    int activeIndex = 0;
+    for (const QFileInfo& fi : entries) {
+        m_mriVolumeCombo->addItem(fi.fileName());
+        m_mriVolumePaths.append(fi.absoluteFilePath());
+        if (fi.absoluteFilePath() == QFileInfo(activePath).absoluteFilePath()) {
+            activeIndex = m_mriVolumeCombo->count() - 1;
+        }
+    }
+    // If the loaded file wasn't found in the listing (shouldn't happen), add it
+    if (m_mriVolumePaths.isEmpty()) {
+        m_mriVolumeCombo->addItem(QFileInfo(activePath).fileName());
+        m_mriVolumePaths.append(activePath);
+        activeIndex = 0;
+    }
+    m_mriVolumeCombo->setCurrentIndex(activeIndex);
+}
+
+//=============================================================================================================
+
+void MainWindow::syncMriSlidersFromCrosshair()
+{
+    const MriVolData* vol = m_mriSlicesPlugin.volume();
+    if (!vol || m_mriSliderUpdating) {
+        return;
+    }
+    m_mriSliderUpdating = true;
+
+    const Eigen::Vector3i voxel = MriSlicer::rasToVoxel(*vol, m_mriSlicesPlugin.crosshair());
+
+    const int sx = qBound(0, voxel.x(), vol->dimX() - 1);
+    const int sy = qBound(0, voxel.y(), vol->dimY() - 1);
+    const int sz = qBound(0, voxel.z(), vol->dimZ() - 1);
+
+    {
+        const QSignalBlocker bA(m_mriAxialSlider);
+        const QSignalBlocker bC(m_mriCoronalSlider);
+        const QSignalBlocker bS(m_mriSagittalSlider);
+        m_mriSagittalSlider->setValue(sx);
+        m_mriCoronalSlider->setValue(sy);
+        m_mriAxialSlider->setValue(sz);
+    }
+
+    m_mriSagittalLabel->setText(QStringLiteral("Slice: %1").arg(sx));
+    m_mriCoronalLabel->setText(QStringLiteral("Slice: %1").arg(sy));
+    m_mriAxialLabel->setText(QStringLiteral("Slice: %1").arg(sz));
+
+    m_mriSliderUpdating = false;
+}
+
+//=============================================================================================================
+
+void MainWindow::onMriSliderChanged()
+{
+    const MriVolData* vol = m_mriSlicesPlugin.volume();
+    if (!vol || m_mriSliderUpdating) {
+        return;
+    }
+    m_mriSliderUpdating = true;
+
+    const int sx = m_mriSagittalSlider->value();
+    const int sy = m_mriCoronalSlider->value();
+    const int sz = m_mriAxialSlider->value();
+
+    // Update labels
+    m_mriSagittalLabel->setText(QStringLiteral("Slice: %1").arg(sx));
+    m_mriCoronalLabel->setText(QStringLiteral("Slice: %1").arg(sy));
+    m_mriAxialLabel->setText(QStringLiteral("Slice: %1").arg(sz));
+
+    // Convert voxel to RAS and move crosshair
+    const Eigen::Vector3i voxel(sx, sy, sz);
+    const Eigen::Vector3f ras = MriSlicer::voxelToRas(*vol, voxel);
+    m_mriSlicesPlugin.setCrosshair(ras);
+
+    m_mriSliderUpdating = false;
 }
 
 //=============================================================================================================

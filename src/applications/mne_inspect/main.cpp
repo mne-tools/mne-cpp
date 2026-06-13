@@ -80,8 +80,9 @@ int main(int argc, char *argv[])
     QCommandLineOption srcSpaceOption("srcSpace", "Source space / forward solution file path", "path", "");
     QCommandLineOption atlasOption("atlas", "Atlas annotation file path (lh or rh, sibling auto-detected)", "path", "");
     QCommandLineOption evokedOption("evoked", "Evoked/average file path", "path", "");
+    QCommandLineOption mriOption("mri", "MRI volume file path (MGH/MGZ/NIfTI)", "path", "");
 
-    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption, transOption, stcOption, digitizerOption, srcSpaceOption, atlasOption, evokedOption});
+    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption, transOption, stcOption, digitizerOption, srcSpaceOption, atlasOption, evokedOption, mriOption});
     parser.process(app);
 
     MainWindow mainWindow;
@@ -94,7 +95,8 @@ int main(int argc, char *argv[])
         parser.value(digitizerOption),
         parser.value(srcSpaceOption),
         parser.value(atlasOption),
-        parser.value(evokedOption)
+        parser.value(evokedOption),
+        parser.value(mriOption)
     );
     mainWindow.show();
 

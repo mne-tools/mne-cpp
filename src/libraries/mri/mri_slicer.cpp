@@ -204,7 +204,7 @@ MriSliceImage MriSlicer::extractSlice(const MriVolData& vol,
                                        int sliceIndex)
 {
     return extractSlice(vol.voxelDataAsFloat(), vol.dims(),
-                        vol.computeVox2Ras(), orientation, sliceIndex);
+                        vol.computeVox2RasTkr(), orientation, sliceIndex);
 }
 
 //=============================================================================================================
@@ -213,7 +213,7 @@ QVector<MriSliceImage> MriSlicer::extractOrthogonal(const MriVolData& vol,
                                                      const Vector3f& rasPoint)
 {
     return extractOrthogonal(vol.voxelDataAsFloat(), vol.dims(),
-                             vol.computeVox2Ras(), rasPoint);
+                             vol.computeVox2RasTkr(), rasPoint);
 }
 
 //=============================================================================================================
@@ -221,7 +221,7 @@ QVector<MriSliceImage> MriSlicer::extractOrthogonal(const MriVolData& vol,
 Vector3i MriSlicer::rasToVoxel(const MriVolData& vol,
                                 const Vector3f& rasPoint)
 {
-    return rasToVoxel(vol.computeVox2Ras(), rasPoint);
+    return rasToVoxel(vol.computeVox2RasTkr(), rasPoint);
 }
 
 //=============================================================================================================
@@ -229,5 +229,5 @@ Vector3i MriSlicer::rasToVoxel(const MriVolData& vol,
 Vector3f MriSlicer::voxelToRas(const MriVolData& vol,
                                 const Vector3i& voxel)
 {
-    return voxelToRas(vol.computeVox2Ras(), voxel);
+    return voxelToRas(vol.computeVox2RasTkr(), voxel);
 }
