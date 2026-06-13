@@ -2,14 +2,16 @@
 
 All notable changes to MNE-CPP will be documented in this file.
 
-## [2.3.0] - 2026-06-02
+## [2.3.0] - 2026-06-13
 
 ### Highlights
 
 - **MNE Inspect multimodal visualization** — Unified `MultimodalScene` integrating sEEG depth electrodes, ECoG grids/strips (`ElectrodeObject`), MRI orthogonal slices (`SliceObject`), cortical surfaces with STC overlays, dipoles, connectivity arcs, and sensor locations; cross-modality picking with shared `PickResult` and timeline; data-driven colormap controls.
 - **MNE Scan production hardening** — Plugin audit, real-time CMNE wiring (MNE/dSPM/sLORETA/CMNE method selector), recording/replay/resume, quickstart/hardware/deployment documentation, packaging refinements.
 - **MNE Analyze cortical workflow** — FreeSurfer surface plugin, STC overlay with threshold/mid/max colormap and time slider, vertex picking and timecourse display.
-- **MNE Align coregistration wizard** — 7-step wizard-guided coregistration tool with Polhemus FASTRAK serial driver, fiducial/HSP/EEG-cap digitization, Kabsch SVD + ICP alignment, `-trans.fif` export.
+- **MNE Align coregistration wizard** — 7-step wizard-guided coregistration tool with Polhemus FASTRAK serial driver, fiducial/HSP/EEG-cap digitization, Kabsch SVD + ICP alignment, `-trans.fif` export; session persistence; optical calibration engine with constrained solver.
+- **Video overlay & probe tracking** — Tracker-driven video overlay projection on head surface with billboard fallback and vertex-displaced depth relief; catheter probe visualization (station 3) with tip-only crosshair, glow aura, and ethereal instrument shader.
+- **MRI slice rendering** — 3D orthogonal MRI slice rendering with per-viewport visibility, intensity windowing controls, voxel-to-world transforms, and session persistence.
 - **MNE-Python algorithm parity (~92%)** — Covariance estimation (auto/shrunk/OAS/FA/PCA), inverse convenience API, preprocessing & artifact detection, standard montages (10-20/10-10/10-05), Maxwell movement compensation, multitaper TFR, Picard ICA, surface Laplacian, auto ICA classification, depth priors, resolution metrics, SourceMorph, TRAP-MUSIC, TF-MxNE, CSP/SPoC/SSD decoding, simulation API.
 - **Skigen integration** — ML algorithms (StandardScaler, MinMaxScaler, LOF, LedoitWolf, OAS, EmpiricalCovariance, FactorAnalysis, CSP, SPoC, SSD) delegated to skigen; API provenance registry with CI validation.
 - **SPDX license-header normalization** — 1013 files migrated to unified SPDX+Doxygen headers; CI gate enforces compliance on every PR.
@@ -46,7 +48,9 @@ All notable changes to MNE-CPP will be documented in this file.
 
 - **Multimodal visualization** — Integrated `MultimodalScene` with electrode, MRI slice, brain surface, STC overlay, dipole, connectivity, and sensor renderables
 - **Electrode plugin** — sEEG depth electrodes and ECoG grid/strip visualization with instanced contact spheres
-- **MRI slices plugin** — Orthogonal MRI slice rendering with voxel-to-world transforms and intensity windowing
+- **MRI slices plugin** — 3D orthogonal MRI slice rendering with per-viewport visibility, intensity windowing controls, voxel-to-world transforms, and session persistence
+- **Video overlay** — Tracker-driven video texture projection on head surface with billboard fallback and vertex-displaced depth relief
+- **Probe tracking** — Catheter probe visualization (station 3) with tip-only rotating crosshair, glow aura, and ethereal instrument shader
 
 ### MNE Scan
 
@@ -58,6 +62,8 @@ All notable changes to MNE-CPP will be documented in this file.
 - **New coregistration application** — 7-step wizard: Load FIFF digitizer points → Verify → Acquire fiducials → Acquire head shape → Acquire EEG cap → ICP alignment → Save `-trans.fif`
 - **Polhemus FASTRAK integration** — Live serial acquisition with auto-detect, pivot calibration, hemisphere configuration
 - **3D visualization** — Interactive BrainView with signal-driven sync, session persistence, marker rendering
+- **Session persistence** — Full save/restore of coregistration state including acquired points and nested group prefixes
+- **Optical calibration** — Constrained solver with known tracker-to-objective distance, sample persistence, direct objective center capture
 
 ### Skigen Integration
 
@@ -74,6 +80,14 @@ All notable changes to MNE-CPP will be documented in this file.
 - Added SPDX license-header CI gate (`license-headers.yml`)
 - Added API registry validation CI gate (`api-registry-validate.yml`)
 - Added Doxygen API docs CI pipeline (`api-docs.yml`)
+- Added screenshot regression CI (`screenshot-regression.yml`)
+- Fixed CI deploy auth: replaced expired GIT_CREDENTIALS with GH_PAT
+- Fixed Linux Qt builds: added XKB/XCB/EGL/GLES dev library dependencies
+- Fixed Windows CI: use `vswhere` for VS toolchain discovery
+- Fixed macOS CI: clear stale pip cache before setup-python
+- Fixed 15 pipeline annotations in staging/codeql workflows
+- Removed broken auto-fix-build workflow
+- Consolidated license-headers workflow into staging pipeline
 - Qt 6.11.1 toolchain across all CI workflows
 
 ### Documentation
@@ -85,6 +99,7 @@ All notable changes to MNE-CPP will be documented in this file.
 - **MNE Analyze Studio manual** (`mne-analyze-studio.mdx`): Agent-based workflow documentation
 - **MNE Inspect multimodal manual** (`mne-inspect-multimodal.mdx`): Multimodal visualization guide
 - **Build guide**: Updated for init-script workflow, Skigen dependency, and script paths
+- **API sidebar**: Restructured — Namespaces/Classes/Files/Hierarchy/Members nested under Overview category
 - **Thin-plate-spline warp example** (Closes #475)
 
 ### Refactoring
@@ -107,7 +122,10 @@ All notable changes to MNE-CPP will be documented in this file.
 - Fixed cortical_surface plugin DLL resolution on Windows
 - Fixed connectivity registry header paths after library rename
 - Fixed WASM SerialPort, Doxygen MathJax, and deploy auth
+- Fixed WASM file dialog guard for MRI loading (`onLoadMri`)
 - Fixed Polhemus serial port disconnect, vertex-based frame flip, calibration flow
+- Fixed session restore: group existence check for nested prefix, repopulate AcquiredPoints
+- Fixed API docs: escaped `operator[]` headings causing broken Markdown links
 
 ## [2.2.1] - 2026-04-28
 
