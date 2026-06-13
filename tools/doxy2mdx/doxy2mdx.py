@@ -674,7 +674,9 @@ def _render_method(func, lines: List[str], *, self_name: str = "") -> None:
     name = func.findtext("name", "")
     param_names = [p.findtext("declname", "") for p in func.findall("param")]
     param_names = [p for p in param_names if p]
-    heading = f"{name}({', '.join(param_names)})"
+    # Escape brackets so Markdown doesn't parse operator[] as a link
+    display_name = name.replace("[", "\\[").replace("]", "\\]")
+    heading = f"{display_name}({', '.join(param_names)})"
     lines.append(f"### {heading}")
     lines.append("")
 
@@ -1029,7 +1031,9 @@ def _render_free_function(func, lines: List[str]) -> None:
     name = func.findtext("name", "")
     param_names = [p.findtext("declname", "") for p in func.findall("param")]
     param_names = [p for p in param_names if p]
-    heading = f"{name}({', '.join(param_names)})"
+    # Escape brackets so Markdown doesn't parse operator[] as a link
+    display_name = name.replace("[", "\\[").replace("]", "\\]")
+    heading = f"{display_name}({', '.join(param_names)})"
     lines.append(f"### {heading}")
     lines.append("")
 
@@ -1907,13 +1911,21 @@ def generate_sidebar_fragment(sidebar_out: Path,
         "--generate-sidebars ...`\n\n"
         "import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';\n\n"
         "const apiSidebar: SidebarsConfig['apiSidebar'] = [\n"
-        "    'api/index',\n"
-        "    'api/namespaces',\n"
-        "    'api/classes',\n"
-        "    'api/files',\n"
-        "    'api/hierarchy',\n"
-        "    'api/class-members',\n"
-        "    'api/namespace-members',\n"
+        "    {\n"
+        "      type: 'category',\n"
+        "      label: 'Overview',\n"
+        "      collapsible: true,\n"
+        "      collapsed: false,\n"
+        "      link: {type: 'doc', id: 'api/index'},\n"
+        "      items: [\n"
+        "        'api/namespaces',\n"
+        "        'api/classes',\n"
+        "        'api/files',\n"
+        "        'api/hierarchy',\n"
+        "        'api/class-members',\n"
+        "        'api/namespace-members',\n"
+        "      ],\n"
+        "    },\n"
         + ",\n".join(categories) + "\n"
         "];\n\n"
         "export default apiSidebar;\n"
