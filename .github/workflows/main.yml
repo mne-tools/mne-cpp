@@ -157,6 +157,11 @@ jobs:
           fi
         done
 
+    - name: Generate contributor data
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: bash tools/generate_contributors.sh
+
     - name: Build Docusaurus site (production)
       env:
         MNECPP_SITE_ENV: stable
