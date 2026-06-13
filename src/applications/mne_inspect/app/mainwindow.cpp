@@ -3347,6 +3347,27 @@ void MainWindow::onLoadElectrodes()
 
 void MainWindow::onLoadMri()
 {
+#ifdef WASMBUILD
+    QFileDialog::getOpenFileContent(
+        QStringLiteral("MRI volume (*.mgh *.mgz *.nii *.nii.gz)"),
+        [this](const QString &fileName, const QByteArray &fileContent) {
+            if (fileName.isEmpty()) return;
+            QString path = wasmSaveToTemp(fileName, fileContent);
+            if (path.isEmpty()) return;
+            if (!m_mriSlicesPlugin.loadVolume(path)) {
+                QMessageBox::warning(this, tr("Load MRI"),
+                                     tr("Failed to load MRI volume from:\n%1").arg(fileName));
+                return;
+            }
+            populateMriVolumeCombo(path);
+            if (m_statusLabel) {
+                m_statusLabel->setText(QStringLiteral("Loaded MRI: %1").arg(fileName));
+            }
+            if (m_layerMriCheck) {
+                m_layerMriCheck->setChecked(true);
+            }
+        });
+#else
     const QString filter = QStringLiteral("MRI volume (*.mgh *.mgz *.nii *.nii.gz);;All files (*)");
     const QString path = QFileDialog::getOpenFileName(this, tr("Load MRI"),
                                                       QString(), filter);
@@ -3366,6 +3387,7 @@ void MainWindow::onLoadMri()
     if (m_layerMriCheck) {
         m_layerMriCheck->setChecked(true);
     }
+#endif
 }
 
 //=============================================================================================================
