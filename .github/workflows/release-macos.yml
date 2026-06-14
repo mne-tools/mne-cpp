@@ -42,6 +42,9 @@ jobs:
       with:
         python-version: '3.10'
         architecture: 'arm64'
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
     - name: Download Qt toolchain
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -57,7 +60,7 @@ jobs:
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
-          --version "5.0.1" \
+          --version "$EIGEN_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
     - name: Download ONNX Runtime
       env:
@@ -65,10 +68,10 @@ jobs:
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind onnxruntime \
-          --version "1.21.0" \
+          --version "$ONNXRUNTIME_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
     - name: Clone Skigen
-      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
+      run: ./scripts/ci/clone_skigen.sh --release
     - name: Configure and compile MNE-CPP
       run: |
         ./scripts/build/build_project.sh -- -DUSE_ONNXRUNTIME=ON
@@ -167,13 +170,16 @@ jobs:
     - name: Install dependencies
       run: |
         brew list ninja >/dev/null 2>&1 || brew install ninja
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
     - name: Download Eigen package
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
-          --version "5.0.1" \
+          --version "$EIGEN_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
     - name: Download ONNX Runtime
       env:
@@ -181,10 +187,10 @@ jobs:
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind onnxruntime \
-          --version "1.21.0" \
+          --version "$ONNXRUNTIME_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
     - name: Clone Skigen
-      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
+      run: ./scripts/ci/clone_skigen.sh --release
     - name: Cache static Qt binaries
       id: cache-qt-static
       uses: actions/cache@v5

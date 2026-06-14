@@ -51,6 +51,10 @@ jobs:
         sudo apt-get update -q
         sudo apt-get install -q libgl1-mesa-dev libxkbcommon-dev
 
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
+
     - name: Download Qt toolchain (Linux)
       if: matrix.os == 'ubuntu-24.04'
       env:
@@ -79,7 +83,7 @@ jobs:
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
-          --version "5.0.1" \
+          --version "$EIGEN_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
 
     - name: Download ONNX Runtime
@@ -88,11 +92,11 @@ jobs:
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind onnxruntime \
-          --version "1.21.0" \
+          --version "$ONNXRUNTIME_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
 
     - name: Clone Skigen
-      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
+      run: ./scripts/ci/clone_skigen.sh
 
     - name: Configure and build
       run: |

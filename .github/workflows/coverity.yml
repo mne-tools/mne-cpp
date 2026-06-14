@@ -41,6 +41,9 @@ jobs:
             libgl1-mesa-dev \
             libvulkan-dev \
             libxkbcommon-dev
+      - name: Load external dependency versions
+        shell: bash
+        run: ./scripts/ci/load_external_deps.sh
       - name: Download Qt toolchain
         env:
           GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -56,10 +59,10 @@ jobs:
         run: |
           ./scripts/ci/download_toolchain.sh \
             --kind eigen \
-            --version "5.0.1" \
+            --version "$EIGEN_VERSION" \
             --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
       - name: Clone Skigen
-        run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
+        run: ./scripts/ci/clone_skigen.sh
       - name: Coverity scan
         run: |
           ./scripts/test/coverity_scan.sh "$COVTOKEN"

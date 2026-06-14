@@ -9,6 +9,9 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+  # Canonical Eigen version lives in src/external/external_deps.env (EIGEN_VERSION).
+  # This producer runs only on manual dispatch / the generateeigen branch; keep
+  # EIGEN_VERSION below in sync with external_deps.env when bumping Eigen.
   EIGEN_VERSION: '5.0.1'
   EIGEN_VERSION_TOKEN: '501'
   EIGEN_ARTIFACT_RELEASE_TAG: eigen_artifacts

@@ -41,6 +41,9 @@ jobs:
       with:
         python-version: '3.10'
         architecture: 'x64'
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
     - name: Download Qt toolchain
       shell: cmd
       env:
@@ -52,15 +55,16 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind eigen --version "5.0.1" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
+        call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
     - name: Download ONNX Runtime
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "1.21.0" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
+        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "%ONNXRUNTIME_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
     - name: Clone Skigen
-      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
+      shell: cmd
+      run: call scripts\ci\clone_skigen.bat --release
     - name: Configure and compile MNE-CPP
       run: |
         $vsInstallPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
@@ -138,20 +142,24 @@ jobs:
     - name: Install ninja
       run: |
         choco install ninja
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
     - name: Download Eigen package
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind eigen --version "5.0.1" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
+        call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
     - name: Download ONNX Runtime
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "1.21.0" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
+        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "%ONNXRUNTIME_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
     - name: Clone Skigen
-      run: git clone --depth 1 --branch staging https://github.com/skigen-project/skigen.git src/external/skigen
+      shell: cmd
+      run: call scripts\ci\clone_skigen.bat --release
     - name: Cache static Qt binaries
       id: cache-qt-static
       uses: actions/cache@v5

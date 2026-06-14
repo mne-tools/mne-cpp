@@ -5,8 +5,31 @@ set "SCRIPT_DIR=%~dp0"
 if "%SCRIPT_DIR:~-1%"=="\" set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
 for %%I in ("%SCRIPT_DIR%\..\..") do set "REPO_ROOT=%%~fI"
 
+rem Central source of truth for external dependency versions (Eigen, ONNX,
+rem Skigen). The env file owns the version data; this script owns the policy
+rem (e.g. ONNX is opt-in locally). CLI flags below still override the versions.
+set "EXTERNAL_DEPS_ENV=%SCRIPT_DIR%\external_deps.env"
+set "EIGEN_VERSION="
+set "ONNXRUNTIME_VERSION="
+if exist "%EXTERNAL_DEPS_ENV%" (
+    for /f "usebackq tokens=1,2 delims==" %%A in ("%EXTERNAL_DEPS_ENV%") do (
+        set "deps_key=%%A"
+        set "deps_key=!deps_key: =!"
+        if not "!deps_key!"=="" if not "!deps_key:~0,1!"=="#" set "%%A=%%B"
+    )
+)
+
+rem Capture the central ONNX version as the default used *when* ONNX is opted
+rem into; the empty ONNXRUNTIME_VERSION below remains the "ONNX disabled locally"
+rem flag so loading the env file never auto-enables it.
+if defined ONNXRUNTIME_VERSION (
+    set "ONNXRUNTIME_DEFAULT_VERSION=!ONNXRUNTIME_VERSION!"
+) else (
+    set "ONNXRUNTIME_DEFAULT_VERSION=1.21.0"
+)
+
 set "QT_VERSION=6.11.1"
-set "EIGEN_VERSION=5.0.1"
+if not defined EIGEN_VERSION set "EIGEN_VERSION=5.0.1"
 set "LINKAGE=dynamic"
 set "QT_DIR="
 set "EIGEN_DIR="
@@ -49,6 +72,12 @@ if /I "%~1"=="--qt-dir" (
 if /I "%~1"=="--eigen-dir" (
     set "EIGEN_DIR=%~2"
     shift
+    shift
+    goto parse_args
+)
+if /I "%~1"=="--onnxruntime" (
+    rem Opt into ONNX using the central default version from external_deps.env.
+    set "ONNXRUNTIME_VERSION=!ONNXRUNTIME_DEFAULT_VERSION!"
     shift
     goto parse_args
 )
@@ -191,15 +220,37 @@ if defined ONNXRUNTIME_VERSION (
 )
 
 rem ── Skigen — scikit-learn algorithms on Eigen (header-only) ──
+rem Ref is resolved from the central config scripts\ci\skigen_ref.env.
+rem Local setup defaults to the pinned release tag; override for co-development:
+rem   set SKIGEN_REF=staging  (track the dev branch) before running init.bat
+rem   set SKIGEN_REF=v1.0.0   (any explicit tag/branch)
+set "SKIGEN_REF_CONFIG=%SCRIPT_DIR%\..\..\scripts\ci\skigen_ref.env"
+set "SKIGEN_RELEASE_REF="
+set "SKIGEN_DEV_REF="
+if exist "%SKIGEN_REF_CONFIG%" (
+    for /f "usebackq tokens=1,2 delims==" %%A in ("%SKIGEN_REF_CONFIG%") do (
+        set "skigen_key=%%A"
+        set "skigen_key=!skigen_key: =!"
+        if not "!skigen_key!"=="" if not "!skigen_key:~0,1!"=="#" set "%%A=%%B"
+    )
+)
+if defined SKIGEN_REF (
+    set "SKIGEN_VERSION=%SKIGEN_REF%"
+) else if defined SKIGEN_RELEASE_REF (
+    set "SKIGEN_VERSION=%SKIGEN_RELEASE_REF%"
+) else (
+    set "SKIGEN_VERSION=v1.1.0"
+)
 set "SKIGEN_DIR=%SCRIPT_DIR%\skigen"
 if not exist "%SKIGEN_DIR%" (
-    echo Cloning skigen ^(staging branch^)...
-    git clone --branch staging https://github.com/skigen-project/skigen.git "%SKIGEN_DIR%"
+    echo Cloning skigen ^(!SKIGEN_VERSION!^)...
+    git clone --branch !SKIGEN_VERSION! https://github.com/skigen-project/skigen.git "%SKIGEN_DIR%"
 ) else (
-    echo Updating skigen ^(staging HEAD^)...
-    git -C "%SKIGEN_DIR%" pull --ff-only origin staging 2>nul
+    echo Checking out skigen !SKIGEN_VERSION!...
+    git -C "%SKIGEN_DIR%" fetch --tags origin 2>nul
+    git -C "%SKIGEN_DIR%" checkout !SKIGEN_VERSION! 2>nul
 )
-echo   Skigen: %SKIGEN_DIR%
+echo   Skigen: %SKIGEN_DIR% ^(!SKIGEN_VERSION!^)
 
 exit /b 0
 
@@ -222,6 +273,7 @@ echo   --eigen-version ^<version^>     Eigen version to download ^(default: 5.0.
 echo   --linkage ^<dynamic^|static^>   Qt linkage to prepare ^(default: dynamic^)
 echo   --qt-dir ^<path^>               Target directory for the Qt bundle
 echo   --eigen-dir ^<path^>            Target directory for the Eigen bundle
+echo   --onnxruntime                 Enable ONNX Runtime using the central default version
 echo   --onnxruntime-version ^<ver^>   ONNX Runtime version to download ^(default: none^)
 echo   --onnxruntime-dir ^<path^>      Target directory for the ONNX Runtime package
 echo   --onnxruntime-release-tag ^<t^> Override the ONNX Runtime prerelease tag

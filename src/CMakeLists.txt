@@ -312,7 +312,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/skigen/CMakeLists.txt")
 else()
     message(WARNING
         "[MNE-CPP] Skigen not found at external/skigen.\n"
-        "Clone it with: git clone --branch staging https://github.com/skigen-project/skigen.git src/external/skigen"
+        "Clone it with: git clone --branch v1.1.0 https://github.com/skigen-project/skigen.git src/external/skigen"
     )
 endif()
 

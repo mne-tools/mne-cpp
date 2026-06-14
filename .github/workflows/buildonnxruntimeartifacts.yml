@@ -9,6 +9,10 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+  # Canonical ONNX Runtime version lives in src/external/external_deps.env
+  # (ONNXRUNTIME_VERSION). This producer runs only on manual dispatch / the
+  # generateonnxruntime branch; keep ONNXRUNTIME_VERSION below in sync with
+  # external_deps.env when bumping ONNX Runtime.
   ONNXRUNTIME_VERSION: '1.21.0'
   ONNXRUNTIME_VERSION_TOKEN: '1210'
   ONNXRUNTIME_ARTIFACT_RELEASE_TAG: onnxruntime_artifacts
