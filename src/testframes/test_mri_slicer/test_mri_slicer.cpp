@@ -281,8 +281,9 @@ void TestMriSlicer::testVolDataSliceOverload()
 {
     int midAxial = m_dims[2] / 2;
 
-    // Extract via flat-array API using the MriVolData's own vox2ras
-    Matrix4f volVox2ras = m_vol.computeVox2Ras();
+    // Extract via flat-array API using the same tkRAS transform as the
+    // MriVolData convenience overloads.
+    Matrix4f volVox2ras = m_vol.computeVox2RasTkr();
     QVector<float> flat = m_vol.voxelDataAsFloat();
     QVector<int>   dims = m_vol.dims();
 
@@ -306,8 +307,9 @@ void TestMriSlicer::testVolDataSliceOverload()
 
 void TestMriSlicer::testVolDataOrthogonalOverload()
 {
-    // Use a RAS point in meters (computeVox2Ras returns meters)
-    Matrix4f volVox2ras = m_vol.computeVox2Ras();
+    // Use a RAS point in meters (computeVox2RasTkr returns meters), matching
+    // the MriVolData convenience overloads.
+    Matrix4f volVox2ras = m_vol.computeVox2RasTkr();
     QVector<float> flat = m_vol.voxelDataAsFloat();
     QVector<int>   dims = m_vol.dims();
 
@@ -339,7 +341,7 @@ void TestMriSlicer::testVolDataRasRoundTrip()
                << Vector3i(10, 3, 8)
                << Vector3i(1, 12, 7);
 
-    Matrix4f volVox2ras = m_vol.computeVox2Ras();
+    Matrix4f volVox2ras = m_vol.computeVox2RasTkr();
 
     for (const auto& vox : testVoxels) {
         // Via flat-array API
