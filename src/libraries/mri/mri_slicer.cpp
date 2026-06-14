@@ -32,6 +32,7 @@
 #include <Eigen/LU>
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 
 //=============================================================================================================
@@ -40,6 +41,104 @@
 
 using namespace MRILIB;
 using namespace Eigen;
+
+namespace {
+
+struct PlaneSpec
+{
+    int columnAxis;
+    int rowAxis;
+    int fixedAxis;
+};
+
+Vector3f anatomicalNormal(SliceOrientation orientation)
+{
+    switch (orientation) {
+    case SliceOrientation::Axial:    return Vector3f::UnitZ();
+    case SliceOrientation::Coronal:  return Vector3f::UnitY();
+    case SliceOrientation::Sagittal: return Vector3f::UnitX();
+    }
+    return Vector3f::UnitZ();
+}
+
+Vector3f anatomicalColumnDirection(SliceOrientation orientation)
+{
+    switch (orientation) {
+    case SliceOrientation::Axial:    return Vector3f::UnitX();
+    case SliceOrientation::Coronal:  return Vector3f::UnitX();
+    case SliceOrientation::Sagittal: return Vector3f::UnitY();
+    }
+    return Vector3f::UnitX();
+}
+
+Vector3f anatomicalRowDirection(SliceOrientation orientation)
+{
+    switch (orientation) {
+    case SliceOrientation::Axial:    return Vector3f::UnitY();
+    case SliceOrientation::Coronal:  return Vector3f::UnitZ();
+    case SliceOrientation::Sagittal: return Vector3f::UnitZ();
+    }
+    return Vector3f::UnitY();
+}
+
+int bestVoxelAxisForDirection(const Matrix4f& vox2ras,
+                              const Vector3f& target,
+                              const std::array<bool, 3>& used)
+{
+    int bestAxis = 0;
+    float bestScore = -1.0f;
+
+    for (int axis = 0; axis < 3; ++axis) {
+        if (used[axis]) {
+            continue;
+        }
+        Vector3f axisDirection = vox2ras.block<3, 1>(0, axis);
+        const float norm = axisDirection.norm();
+        if (norm > 0.0f) {
+            axisDirection /= norm;
+        }
+        const float score = std::abs(axisDirection.dot(target));
+        if (score > bestScore) {
+            bestScore = score;
+            bestAxis = axis;
+        }
+    }
+
+    return bestAxis;
+}
+
+PlaneSpec planeSpecForOrientation(const Matrix4f& vox2ras,
+                                  SliceOrientation orientation)
+{
+    std::array<bool, 3> used = {false, false, false};
+    const int fixedAxis = bestVoxelAxisForDirection(vox2ras,
+                                                    anatomicalNormal(orientation),
+                                                    used);
+    used[fixedAxis] = true;
+
+    const int columnAxis = bestVoxelAxisForDirection(vox2ras,
+                                                     anatomicalColumnDirection(orientation),
+                                                     used);
+    used[columnAxis] = true;
+
+    const int rowAxis = bestVoxelAxisForDirection(vox2ras,
+                                                  anatomicalRowDirection(orientation),
+                                                  used);
+
+    return {columnAxis, rowAxis, fixedAxis};
+}
+
+int axisDimension(const QVector<int>& dims, int axis)
+{
+    return dims[axis];
+}
+
+int flatIndex(int x, int y, int z, int dimX, int dimY)
+{
+    return x + dimX * (y + dimY * z);
+}
+
+} // anonymous namespace
 
 //=============================================================================================================
 // STATIC METHODS
@@ -54,83 +153,38 @@ MriSliceImage MriSlicer::extractSlice(
 {
     const int dimX = dims[0];
     const int dimY = dims[1];
-    const int dimZ = dims[2];
+    const PlaneSpec spec = planeSpecForOrientation(vox2ras, orientation);
+    const int width = axisDimension(dims, spec.columnAxis);
+    const int height = axisDimension(dims, spec.rowAxis);
+    const int fixedDim = axisDimension(dims, spec.fixedAxis);
+
+    sliceIndex = std::clamp(sliceIndex, 0, fixedDim - 1);
 
     MriSliceImage result;
     result.orientation = orientation;
+    result.width = width;
+    result.height = height;
+    result.sliceIndex = sliceIndex;
+    result.pixels.resize(width, height);
 
-    switch (orientation) {
-    case SliceOrientation::Axial: {
-        sliceIndex = std::clamp(sliceIndex, 0, dimZ - 1);
-        result.width = dimX;
-        result.height = dimY;
-        result.sliceIndex = sliceIndex;
-        result.pixels.resize(dimX, dimY);
-
-        for (int iy = 0; iy < dimY; ++iy) {
-            for (int ix = 0; ix < dimX; ++ix) {
-                result.pixels(ix, iy) = volData[ix + dimX * (iy + dimY * sliceIndex)];
-            }
+    for (int row = 0; row < height; ++row) {
+        for (int col = 0; col < width; ++col) {
+            std::array<int, 3> voxel = {0, 0, 0};
+            voxel[spec.columnAxis] = col;
+            voxel[spec.rowAxis] = row;
+            voxel[spec.fixedAxis] = sliceIndex;
+            result.pixels(col, row) = volData[flatIndex(voxel[0], voxel[1], voxel[2], dimX, dimY)];
         }
-
-        // sliceToRas: maps (col, row) in the 2D image to RAS
-        // col -> x voxel direction, row -> y voxel direction, fixed z = sliceIndex
-        result.sliceToRas = Matrix4f::Zero();
-        result.sliceToRas.col(0) = vox2ras.col(0); // x direction
-        result.sliceToRas.col(1) = vox2ras.col(1); // y direction
-        result.sliceToRas.col(2) = vox2ras.col(2); // z direction (unused for 2D but kept)
-        Vector4f origin;
-        origin << 0.0f, 0.0f, static_cast<float>(sliceIndex), 1.0f;
-        result.sliceToRas.col(3) = vox2ras * origin;
-        break;
     }
-    case SliceOrientation::Coronal: {
-        sliceIndex = std::clamp(sliceIndex, 0, dimY - 1);
-        result.width = dimX;
-        result.height = dimZ;
-        result.sliceIndex = sliceIndex;
-        result.pixels.resize(dimX, dimZ);
 
-        for (int iz = 0; iz < dimZ; ++iz) {
-            for (int ix = 0; ix < dimX; ++ix) {
-                result.pixels(ix, iz) = volData[ix + dimX * (sliceIndex + dimY * iz)];
-            }
-        }
-
-        // col -> x direction, row -> z direction, fixed y = sliceIndex
-        result.sliceToRas = Matrix4f::Zero();
-        result.sliceToRas.col(0) = vox2ras.col(0); // x direction
-        result.sliceToRas.col(1) = vox2ras.col(2); // z direction
-        result.sliceToRas.col(2) = vox2ras.col(1); // y direction (unused for 2D but kept)
-        Vector4f originC;
-        originC << 0.0f, static_cast<float>(sliceIndex), 0.0f, 1.0f;
-        result.sliceToRas.col(3) = vox2ras * originC;
-        break;
-    }
-    case SliceOrientation::Sagittal: {
-        sliceIndex = std::clamp(sliceIndex, 0, dimX - 1);
-        result.width = dimY;
-        result.height = dimZ;
-        result.sliceIndex = sliceIndex;
-        result.pixels.resize(dimY, dimZ);
-
-        for (int iz = 0; iz < dimZ; ++iz) {
-            for (int iy = 0; iy < dimY; ++iy) {
-                result.pixels(iy, iz) = volData[sliceIndex + dimX * (iy + dimY * iz)];
-            }
-        }
-
-        // col -> y direction, row -> z direction, fixed x = sliceIndex
-        result.sliceToRas = Matrix4f::Zero();
-        result.sliceToRas.col(0) = vox2ras.col(1); // y direction
-        result.sliceToRas.col(1) = vox2ras.col(2); // z direction
-        result.sliceToRas.col(2) = vox2ras.col(0); // x direction (unused for 2D but kept)
-        Vector4f originS;
-        originS << static_cast<float>(sliceIndex), 0.0f, 0.0f, 1.0f;
-        result.sliceToRas.col(3) = vox2ras * originS;
-        break;
-    }
-    }
+    result.sliceToRas = Matrix4f::Zero();
+    result.sliceToRas.col(0) = vox2ras.col(spec.columnAxis);
+    result.sliceToRas.col(1) = vox2ras.col(spec.rowAxis);
+    result.sliceToRas.col(2) = vox2ras.col(spec.fixedAxis);
+    Vector4f origin = Vector4f::Zero();
+    origin(spec.fixedAxis) = static_cast<float>(sliceIndex);
+    origin.w() = 1.0f;
+    result.sliceToRas.col(3) = vox2ras * origin;
 
     // Normalize pixels to [0, 1]
     float minVal = result.pixels.minCoeff();
@@ -146,6 +200,32 @@ MriSliceImage MriSlicer::extractSlice(
 
 //=============================================================================================================
 
+int MriSlicer::voxelAxisForOrientation(const Matrix4f& vox2ras,
+                                        SliceOrientation orientation)
+{
+    return planeSpecForOrientation(vox2ras, orientation).fixedAxis;
+}
+
+//=============================================================================================================
+
+int MriSlicer::dimensionForOrientation(const QVector<int>& dims,
+                                       const Matrix4f& vox2ras,
+                                       SliceOrientation orientation)
+{
+    return axisDimension(dims, voxelAxisForOrientation(vox2ras, orientation));
+}
+
+//=============================================================================================================
+
+int MriSlicer::sliceIndexForOrientation(const Matrix4f& vox2ras,
+                                        SliceOrientation orientation,
+                                        const Vector3i& voxel)
+{
+    return voxel(voxelAxisForOrientation(vox2ras, orientation));
+}
+
+//=============================================================================================================
+
 QVector<MriSliceImage> MriSlicer::extractOrthogonal(
     const QVector<float>& volData,
     const QVector<int>& dims,
@@ -156,9 +236,12 @@ QVector<MriSliceImage> MriSlicer::extractOrthogonal(
 
     QVector<MriSliceImage> slices;
     slices.reserve(3);
-    slices.append(extractSlice(volData, dims, vox2ras, SliceOrientation::Axial, voxel.z()));
-    slices.append(extractSlice(volData, dims, vox2ras, SliceOrientation::Coronal, voxel.y()));
-    slices.append(extractSlice(volData, dims, vox2ras, SliceOrientation::Sagittal, voxel.x()));
+    slices.append(extractSlice(volData, dims, vox2ras, SliceOrientation::Axial,
+                               sliceIndexForOrientation(vox2ras, SliceOrientation::Axial, voxel)));
+    slices.append(extractSlice(volData, dims, vox2ras, SliceOrientation::Coronal,
+                               sliceIndexForOrientation(vox2ras, SliceOrientation::Coronal, voxel)));
+    slices.append(extractSlice(volData, dims, vox2ras, SliceOrientation::Sagittal,
+                               sliceIndexForOrientation(vox2ras, SliceOrientation::Sagittal, voxel)));
 
     return slices;
 }
@@ -205,6 +288,31 @@ MriSliceImage MriSlicer::extractSlice(const MriVolData& vol,
 {
     return extractSlice(vol.voxelDataAsFloat(), vol.dims(),
                         vol.computeVox2RasTkr(), orientation, sliceIndex);
+}
+
+//=============================================================================================================
+
+int MriSlicer::voxelAxisForOrientation(const MriVolData& vol,
+                                       SliceOrientation orientation)
+{
+    return voxelAxisForOrientation(vol.computeVox2RasTkr(), orientation);
+}
+
+//=============================================================================================================
+
+int MriSlicer::dimensionForOrientation(const MriVolData& vol,
+                                       SliceOrientation orientation)
+{
+    return dimensionForOrientation(vol.dims(), vol.computeVox2RasTkr(), orientation);
+}
+
+//=============================================================================================================
+
+int MriSlicer::sliceIndexForOrientation(const MriVolData& vol,
+                                        SliceOrientation orientation,
+                                        const Vector3i& voxel)
+{
+    return sliceIndexForOrientation(vol.computeVox2RasTkr(), orientation, voxel);
 }
 
 //=============================================================================================================

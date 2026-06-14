@@ -286,16 +286,13 @@ void MriSlicesPlugin::rebuildSlices()
         return;
     }
 
-    const Eigen::Matrix4f vox2rasF = m_volume->computeVox2RasTkr();
-    const Eigen::Matrix4d vox2rasD = vox2rasF.cast<double>();
-
     for (int i = 0; i < 3; ++i) {
         const MriSliceImage& src = ortho[i];
         auto so = std::make_unique<SliceObject>();
-        so->setSlice(sliceImageToQImage(src),
-                     toDispOrientation(src.orientation),
-                     src.sliceIndex,
-                     vox2rasD);
+        so->setSliceToWorld(sliceImageToQImage(src),
+                            toDispOrientation(src.orientation),
+                            src.sliceIndex,
+                            src.sliceToRas.cast<double>());
         m_slices[i] = std::move(so);
     }
 

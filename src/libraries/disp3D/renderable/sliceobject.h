@@ -96,6 +96,20 @@ public:
 
     //=========================================================================================================
     /**
+     * Set the slice image data with an explicit image-to-world transform.
+     *
+     * @param[in] image         Greyscale slice image (QImage::Format_Grayscale8 or 16).
+     * @param[in] orientation   Anatomical orientation of the slice.
+     * @param[in] sliceIndex    Index along the perpendicular voxel axis.
+     * @param[in] imageToWorld  4x4 transform from image coordinates (column, row, 0) to RAS.
+     */
+    void setSliceToWorld(const QImage& image,
+                         SliceOrientation orientation,
+                         int sliceIndex,
+                         const Eigen::Matrix4d& imageToWorld);
+
+    //=========================================================================================================
+    /**
      * @return Current slice orientation.
      */
     SliceOrientation orientation() const;

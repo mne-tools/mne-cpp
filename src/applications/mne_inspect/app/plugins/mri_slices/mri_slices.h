@@ -191,16 +191,16 @@ public:
     float intensityAt(const QVector3D& worldPosition) const;
 
     //=========================================================================================================
-    /** @return Renderable for the axial slice (Z = const). May be null when
+    /** @return Renderable for the axial slice. May be null when
      *  no volume is loaded. */
     DISP3DLIB::SliceObject* axialSlice() const { return m_slices[0].get(); }
 
     //=========================================================================================================
-    /** @return Renderable for the coronal slice (Y = const). */
+    /** @return Renderable for the coronal slice. */
     DISP3DLIB::SliceObject* coronalSlice() const { return m_slices[1].get(); }
 
     //=========================================================================================================
-    /** @return Renderable for the sagittal slice (X = const). */
+    /** @return Renderable for the sagittal slice. */
     DISP3DLIB::SliceObject* sagittalSlice() const { return m_slices[2].get(); }
 
     //=========================================================================================================

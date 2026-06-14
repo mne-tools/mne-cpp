@@ -89,7 +89,7 @@ struct MRISHARED_EXPORT MriSliceImage
     int width;                       /**< Width of the slice image in pixels. */
     int height;                      /**< Height of the slice image in pixels. */
     SliceOrientation orientation;    /**< Orientation of the slice. */
-    int sliceIndex;                  /**< Index along the slicing axis. */
+    int sliceIndex;                  /**< Voxel index along the anatomical orientation's slicing axis. */
     Eigen::Matrix4f sliceToRas;      /**< 4x4 transform placing the slice in RAS space. */
 };
 
@@ -125,6 +125,50 @@ public:
         const Eigen::Matrix4f& vox2ras,
         SliceOrientation orientation,
         int sliceIndex);
+
+    //=========================================================================================================
+    /**
+     * Return the voxel axis used as the fixed slicing axis for an anatomical orientation.
+     *
+     * Uses the voxel-to-RAS transform to map anatomical planes onto the source volume's
+     * storage axes. For FreeSurfer tkRAS volumes, axial maps to voxel Y and coronal maps
+     * to voxel Z, while an identity transform keeps the conventional Z/Y/X mapping.
+     *
+     * @param[in] vox2ras       4x4 voxel-to-RAS transform.
+     * @param[in] orientation   Anatomical slice orientation.
+     *
+     * @return Voxel axis index: 0 = X, 1 = Y, 2 = Z.
+     */
+    static int voxelAxisForOrientation(const Eigen::Matrix4f& vox2ras,
+                                       SliceOrientation orientation);
+
+    //=========================================================================================================
+    /**
+     * Return the volume dimension used by an anatomical slice orientation.
+     *
+     * @param[in] dims          Volume dimensions {dimX, dimY, dimZ}.
+     * @param[in] vox2ras       4x4 voxel-to-RAS transform.
+     * @param[in] orientation   Anatomical slice orientation.
+     *
+     * @return Number of slices along the orientation's fixed voxel axis.
+     */
+    static int dimensionForOrientation(const QVector<int>& dims,
+                                       const Eigen::Matrix4f& vox2ras,
+                                       SliceOrientation orientation);
+
+    //=========================================================================================================
+    /**
+     * Return the slice index for an anatomical orientation from a voxel coordinate.
+     *
+     * @param[in] vox2ras       4x4 voxel-to-RAS transform.
+     * @param[in] orientation   Anatomical slice orientation.
+     * @param[in] voxel         Voxel coordinate.
+     *
+     * @return The voxel component that indexes the requested anatomical slice stack.
+     */
+    static int sliceIndexForOrientation(const Eigen::Matrix4f& vox2ras,
+                                        SliceOrientation orientation,
+                                        const Eigen::Vector3i& voxel);
 
     //=========================================================================================================
     /**
@@ -183,6 +227,25 @@ public:
     static MriSliceImage extractSlice(const MriVolData& vol,
                                        SliceOrientation orientation,
                                        int sliceIndex);
+
+    /**
+     * Return the voxel axis used as the fixed slicing axis for an anatomical orientation.
+     */
+    static int voxelAxisForOrientation(const MriVolData& vol,
+                                       SliceOrientation orientation);
+
+    /**
+     * Return the volume dimension used by an anatomical slice orientation.
+     */
+    static int dimensionForOrientation(const MriVolData& vol,
+                                       SliceOrientation orientation);
+
+    /**
+     * Return the slice index for an anatomical orientation from a voxel coordinate.
+     */
+    static int sliceIndexForOrientation(const MriVolData& vol,
+                                        SliceOrientation orientation,
+                                        const Eigen::Vector3i& voxel);
 
     /**
      * Extract all three orthogonal slices at a given RAS point.

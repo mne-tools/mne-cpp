@@ -92,6 +92,31 @@ void SliceObject::setSlice(const QImage& image,
 
 //=============================================================================================================
 
+void SliceObject::setSliceToWorld(const QImage& image,
+                                  SliceOrientation orientation,
+                                  int sliceIndex,
+                                  const Eigen::Matrix4d& imageToWorld)
+{
+    m_image       = image;
+    m_orientation = orientation;
+    m_sliceIndex  = sliceIndex;
+
+    const int w = m_image.width();
+    const int h = m_image.height();
+
+    const Eigen::Vector4d c00(0.0, 0.0, 0.0, 1.0);
+    const Eigen::Vector4d c10(static_cast<double>(w), 0.0, 0.0, 1.0);
+    const Eigen::Vector4d c01(0.0, static_cast<double>(h), 0.0, 1.0);
+    const Eigen::Vector4d c11(static_cast<double>(w), static_cast<double>(h), 0.0, 1.0);
+
+    m_corner00 = (imageToWorld * c00).head<3>();
+    m_corner10 = (imageToWorld * c10).head<3>();
+    m_corner01 = (imageToWorld * c01).head<3>();
+    m_corner11 = (imageToWorld * c11).head<3>();
+}
+
+//=============================================================================================================
+
 SliceOrientation SliceObject::orientation() const
 {
     return m_orientation;
