@@ -223,12 +223,11 @@ jobs:
         TAG="${GITHUB_REF#refs/tags/}"
         currentVersionPatch=$(echo "$TAG" | cut -d. -f3)
         if [[ "$currentVersionPatch" == 0 ]]; then
-          echo "New minor version — ensuring branch $TAG points at ${GITHUB_SHA}"
+          echo "New minor version — ensuring branch $TAG exists"
           git config --global user.email christoph.dinh@mne-cpp.org
           git config --global user.name chdinh
           if git ls-remote --exit-code --heads origin "$TAG" >/dev/null 2>&1; then
-            echo "Branch $TAG already exists — fast-forwarding it to ${GITHUB_SHA}"
-            git push origin "${GITHUB_SHA}:refs/heads/$TAG"
+            echo "Branch $TAG already exists — leaving it unchanged"
           else
             git checkout -b "$TAG"
             git push origin "refs/heads/$TAG"
