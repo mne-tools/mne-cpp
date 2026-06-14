@@ -1976,11 +1976,12 @@ void MainWindow::setupConnections()
     // Window / Level / Opacity controls
     auto updateSliceWindowing = [this]() {
         const float brightness = m_mriWindowCenterSlider->value() / 100.0f;
+        const float contrast = m_mriWindowWidthSlider->value() / 100.0f;
         const float center  = 1.0f - brightness;
-        const float width   = m_mriWindowWidthSlider->value()  / 100.0f;
+        const float width   = 1.01f - contrast;
         const float opacity = m_mriOpacitySlider->value()      / 100.0f;
         m_mriWindowCenterLabel->setText(QString("%1%").arg(qRound(brightness * 100)));
-        m_mriWindowWidthLabel->setText(QString("%1%").arg(qRound(width * 100)));
+        m_mriWindowWidthLabel->setText(QString("%1%").arg(qRound(contrast * 100)));
         m_mriOpacityLabel->setText(QString("%1%").arg(qRound(opacity * 100)));
 
         for (int i = 0; i < 3; ++i) {
