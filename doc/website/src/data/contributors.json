@@ -1,1 +1,192 @@
-[{"contributions":3783,"login":"LorenzE"},{"contributions":3493,"login":"chdinh"},{"contributions":1250,"login":"gabrielbmotta"},{"contributions":1126,"login":"juangpc"},{"contributions":598,"login":"RDoerfel"},{"contributions":267,"login":"1DIce"},{"contributions":194,"login":"LostSign"},{"contributions":178,"login":"ViktorKL"},{"contributions":169,"login":"GBeret"},{"contributions":153,"login":"rickytjen"},{"contributions":143,"login":"JanaKiesel"},{"contributions":73,"login":"floschl"},{"contributions":64,"login":"joewalter"},{"contributions":58,"login":"sheinke"},{"contributions":45,"login":"Andrey1994"},{"contributions":41,"login":"TiKunze"},{"contributions":39,"login":"farndt"},{"contributions":35,"login":"imsorryk"},{"contributions":20,"login":"louiseichhorst"},{"contributions":17,"login":"femigr"},{"contributions":13,"login":"johaenns"},{"contributions":12,"login":"jobehrens"},{"contributions":12,"login":"cdoshi"},{"contributions":11,"login":"cpieloth"},{"contributions":9,"login":"buildqa"},{"contributions":7,"login":"ag-fieldline"},{"contributions":7,"login":"SachdevaS"},{"contributions":7,"login":"alexrockhill"},{"contributions":6,"login":"mfarisyahya"},{"contributions":6,"login":"er06645810"},{"contributions":4,"login":"betaha"},{"contributions":4,"login":"Julius-L"},{"contributions":4,"login":"MKlamke"},{"contributions":4,"login":"fjpolo"},{"contributions":3,"login":"benkay86"},{"contributions":3,"login":"larsoner"},{"contributions":3,"login":"jasmainak"},{"contributions":3,"login":"PetrosSimidyan"}]
+[
+  {
+    "contributions": 3783,
+    "login": "LorenzE",
+    "name": "Lorenz Esch"
+  },
+  {
+    "contributions": 3493,
+    "login": "chdinh",
+    "name": "Christoph Dinh"
+  },
+  {
+    "contributions": 1250,
+    "login": "gabrielbmotta",
+    "name": "Gabriel Motta"
+  },
+  {
+    "contributions": 1126,
+    "login": "juangpc",
+    "name": "Juan Garcia-Prieto"
+  },
+  {
+    "contributions": 598,
+    "login": "RDoerfel",
+    "name": "Ruben D\u00f6rfel"
+  },
+  {
+    "contributions": 267,
+    "login": "1DIce",
+    "name": "Daniel Knobl"
+  },
+  {
+    "contributions": 194,
+    "login": "LostSign",
+    "name": "Lars Debor"
+  },
+  {
+    "contributions": 178,
+    "login": "ViktorKL",
+    "name": "Viktor Kl\u00fcber"
+  },
+  {
+    "contributions": 169,
+    "login": "GBeret",
+    "name": "Gab Beret"
+  },
+  {
+    "contributions": 153,
+    "login": "rickytjen",
+    "name": "Ricky Tjen"
+  },
+  {
+    "contributions": 143,
+    "login": "JanaKiesel",
+    "name": "Jana Kiesel"
+  },
+  {
+    "contributions": 73,
+    "login": "floschl",
+    "name": "Florian Schlembach"
+  },
+  {
+    "contributions": 64,
+    "login": "joewalter",
+    "name": "Daniel Strohmeier"
+  },
+  {
+    "contributions": 58,
+    "login": "sheinke",
+    "name": "Simon Heinke"
+  },
+  {
+    "contributions": 45,
+    "login": "Andrey1994",
+    "name": "Andrey Parfenov"
+  },
+  {
+    "contributions": 41,
+    "login": "TiKunze",
+    "name": "Tim Kunze"
+  },
+  {
+    "contributions": 39,
+    "login": "farndt",
+    "name": "Felix Arndt"
+  },
+  {
+    "contributions": 35,
+    "login": "imsorryk",
+    "name": "Felix Schwarzmeier"
+  },
+  {
+    "contributions": 20,
+    "login": "louiseichhorst",
+    "name": "Louis Eichhorst"
+  },
+  {
+    "contributions": 17,
+    "login": "femigr",
+    "name": "Felix Griesau"
+  },
+  {
+    "contributions": 13,
+    "login": "johaenns",
+    "name": "Johannes Fuhrwerk"
+  },
+  {
+    "contributions": 12,
+    "login": "jobehrens",
+    "name": "Johannes Behrens"
+  },
+  {
+    "contributions": 12,
+    "login": "cdoshi",
+    "name": "Chiran Doshi"
+  },
+  {
+    "contributions": 11,
+    "login": "cpieloth",
+    "name": "Christof Pieloth"
+  },
+  {
+    "contributions": 9,
+    "login": "buildqa",
+    "name": "buildqa"
+  },
+  {
+    "contributions": 7,
+    "login": "ag-fieldline",
+    "name": "ag-fieldline"
+  },
+  {
+    "contributions": 7,
+    "login": "SachdevaS",
+    "name": "Sugandha Sachdeva"
+  },
+  {
+    "contributions": 7,
+    "login": "alexrockhill",
+    "name": "Alex Rockhill"
+  },
+  {
+    "contributions": 6,
+    "login": "mfarisyahya",
+    "name": "Faris Yahya"
+  },
+  {
+    "contributions": 6,
+    "login": "er06645810",
+    "name": "Erik Hornberger"
+  },
+  {
+    "contributions": 4,
+    "login": "betaha",
+    "name": "betaha"
+  },
+  {
+    "contributions": 4,
+    "login": "Julius-L",
+    "name": "Julius Lerm"
+  },
+  {
+    "contributions": 4,
+    "login": "MKlamke",
+    "name": "Marco Klamke"
+  },
+  {
+    "contributions": 4,
+    "login": "fjpolo",
+    "name": "Franco Polo"
+  },
+  {
+    "contributions": 3,
+    "login": "benkay86",
+    "name": "Benjamin Kay"
+  },
+  {
+    "contributions": 3,
+    "login": "larsoner",
+    "name": "Eric Larson"
+  },
+  {
+    "contributions": 3,
+    "login": "jasmainak",
+    "name": "Mainak Jas"
+  },
+  {
+    "contributions": 3,
+    "login": "PetrosSimidyan",
+    "name": "Petros Simidyan"
+  }
+]

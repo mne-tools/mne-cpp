@@ -17,6 +17,55 @@ EXCLUDE_PATTERN='dependabot\[bot\]|claude|github-actions\[bot\]|web-flow'
 
 mkdir -p "$OUT_DIR"
 
+# GitHub login → display name mapping (sourced from Zenodo record 10.5281/zenodo.19498106)
+read -r -d '' DISPLAY_MAP_JSON << 'PYEOF' || true
+{
+    "LorenzE": "Lorenz Esch",
+    "chdinh": "Christoph Dinh",
+    "gabrielbmotta": "Gabriel Motta",
+    "juangpc": "Juan Garcia-Prieto",
+    "RDoerfel": "Ruben Dörfel",
+    "LostSign": "Lars Debor",
+    "1DIce": "Daniel Knobl",
+    "ViktorKL": "Viktor Klüber",
+    "MartinHenfworx": "Martin Henfling",
+    "rickytjen": "Ricky Tjen",
+    "JanaKiesel": "Jana Kiesel",
+    "limin-sun": "Limin Sun",
+    "floschl": "Florian Schlembach",
+    "joewalter": "Daniel Strohmeier",
+    "sheinke": "Simon Heinke",
+    "Andrey1994": "Andrey Parfenov",
+    "TiKunze": "Tim Kunze",
+    "farndt": "Felix Arndt",
+    "wayneMead": "Wayne Mead",
+    "louiseichhorst": "Louis Eichhorst",
+    "femigr": "Felix Griesau",
+    "jvorwerk": "Johannes Vorwerk",
+    "cdoshi": "Chiran Doshi",
+    "jobehrens": "Johannes Behrens",
+    "cpieloth": "Christof Pieloth",
+    "alexrockhill": "Alex Rockhill",
+    "robertdicamillo": "Robert Dicamillo",
+    "SachdevaS": "Sugandha Sachdeva",
+    "er06645810": "Erik Hornberger",
+    "mfarisyahya": "Faris Yahya",
+    "ag-fieldline": "ag-fieldline",
+    "fjpolo": "Franco Polo",
+    "MKlamke": "Marco Klamke",
+    "betaha": "betaha",
+    "Julius-L": "Julius Lerm",
+    "benkay86": "Benjamin Kay",
+    "jasmainak": "Mainak Jas",
+    "PetrosSimidyan": "Petros Simidyan",
+    "larsoner": "Eric Larson",
+    "GBeret": "Gab Beret",
+    "imsorryk": "Felix Schwarzmeier",
+    "johaenns": "Johannes Fuhrwerk",
+    "buildqa": "buildqa"
+}
+PYEOF
+
 # git shortlog -sne gives: <count> <TAB> <Name> <email>
 # We need GitHub login, so we map author email → login via git log.
 # Simpler approach: use git shortlog with mailmap, then map known
@@ -35,7 +84,15 @@ if command -v gh &>/dev/null && gh auth status &>/dev/null 2>&1; then
     echo "Using GitHub API to fetch contributors..."
     gh api "repos/mne-tools/mne-cpp/contributors?per_page=100&anon=0" \
         --jq '[.[] | select(.login != "dependabot[bot]" and .login != "claude" and .login != "github-actions[bot]" and .login != "web-flow") | {login: .login, contributions: .contributions}]' \
-        > "$OUT_FILE"
+    | python3 -c "
+import json, sys
+DISPLAY_MAP = ${DISPLAY_MAP_JSON}
+data = json.load(sys.stdin)
+for c in data:
+    c['name'] = DISPLAY_MAP.get(c['login'], c['login'])
+json.dump(data, sys.stdout, indent=2)
+print()
+" > "$OUT_FILE"
 elif [ -n "${GH_TOKEN:-${GITHUB_TOKEN:-}}" ]; then
     echo "Using GitHub API (curl) to fetch contributors..."
     TOKEN="${GH_TOKEN:-${GITHUB_TOKEN:-}}"
@@ -44,9 +101,11 @@ elif [ -n "${GH_TOKEN:-${GITHUB_TOKEN:-}}" ]; then
         "https://api.github.com/repos/mne-tools/mne-cpp/contributors?per_page=100&anon=0" \
     | python3 -c "
 import json, sys
+DISPLAY_MAP = ${DISPLAY_MAP_JSON}
 data = json.load(sys.stdin)
 exclude = {'dependabot[bot]', 'claude', 'github-actions[bot]', 'web-flow'}
-result = [{'login': c['login'], 'contributions': c['contributions']}
+result = [{'login': c['login'], 'contributions': c['contributions'],
+           'name': DISPLAY_MAP.get(c['login'], c['login'])}
           for c in data if c.get('login') not in exclude]
 json.dump(result, sys.stdout, indent=2)
 print()
@@ -74,11 +133,11 @@ NAME_MAP = {
     'daniel knobl': '1DIce',
     'lars debor': 'LostSign',
     'viktor klüber': 'ViktorKL',
-    'viktor klueber': 'ViktorKL',
     'gab beret': 'GBeret',
     'ricky tjandra': 'rickytjen',
     'jana kiesel': 'JanaKiesel',
     'florian schlegel': 'floschl',
+    'daniel strohmeier': 'joewalter',
     'joe walter': 'joewalter',
     'simon heinke': 'sheinke',
     'andrey parfenov': 'Andrey1994',
@@ -86,13 +145,14 @@ NAME_MAP = {
     'felix arndt': 'farndt',
     'felix schwarzmeier': 'imsorryk',
     'louise eichhorst': 'louiseichhorst',
+    'johannes fuhrwerk': 'johaenns',
     'johannes ahrens': 'johaenns',
     'johannes ehlers': 'johaenns',
     'felix gr.': 'femigr',
     'felix griesau': 'femigr',
     'johanna behrens': 'jobehrens',
     'chiran doshi': 'cdoshi',
-    'christine pieloth': 'cpieloth',
+    'christoph pieloth': 'cpieloth',
     'alex rockhill': 'alexrockhill',
     'buildqa': 'buildqa',
     'sugandha sachdeva': 'SachdevaS',
@@ -127,9 +187,13 @@ for line in result.stdout.strip().split('\n'):
     login = NAME_MAP.get(name.lower(), name)
     contributors[login] = contributors.get(login, 0) + count
 
+# Display name mapping (from Zenodo)
+DISPLAY_MAP = ${DISPLAY_MAP_JSON}
+
 # Sort by contributions descending
 sorted_c = sorted(contributors.items(), key=lambda x: -x[1])
-result = [{'login': login, 'contributions': count} for login, count in sorted_c]
+result = [{'login': login, 'contributions': count,
+           'name': DISPLAY_MAP.get(login, login)} for login, count in sorted_c]
 json.dump(result, sys.stdout, indent=2)
 print()
 " > "$OUT_FILE"

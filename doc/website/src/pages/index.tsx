@@ -53,7 +53,7 @@ const funders = [
 // during CI deploy. The JSON is sorted by commits descending and excludes
 // bot/AI accounts. Falls back to a static snapshot if the file is missing.
 import contributorsData from '../data/contributors.json';
-const contributors: { login: string; contributions: number }[] = contributorsData;
+const contributors: { login: string; contributions: number; name?: string }[] = contributorsData;
 
 function WaveBackground() {
     return (
@@ -148,15 +148,15 @@ export default function Home(): JSX.Element {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={styles.contributorLink}
-                                    title={`${c.login} — ${c.contributions} commits`}
+                                    title={`${c.name || c.login} — ${c.contributions} commits`}
                                 >
                                     <img
                                         src={`https://avatars.githubusercontent.com/${c.login}?s=96`}
-                                        alt={c.login}
+                                        alt={c.name || c.login}
                                         className={styles.contributorAvatar}
                                         loading="lazy"
                                     />
-                                    <span className={styles.contributorName}>{c.login}</span>
+                                    <span className={styles.contributorName}>{c.name || c.login}</span>
                                 </a>
                             ))}
                         </div>
