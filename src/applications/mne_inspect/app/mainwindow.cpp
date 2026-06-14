@@ -1951,9 +1951,7 @@ void MainWindow::setupConnections()
     // Plugin crosshair → push updated slice objects to BrainView for 3-D rendering
     connect(&m_mriSlicesPlugin, &MRISLICESPLUGIN::MriSlicesPlugin::crosshairChanged,
             this, [this]() {
-        m_brainView->setSlice(0, m_mriSlicesPlugin.axialSlice());
-        m_brainView->setSlice(1, m_mriSlicesPlugin.coronalSlice());
-        m_brainView->setSlice(2, m_mriSlicesPlugin.sagittalSlice());
+        applyMriDisplayPreferences();
     });
 
     // Per-plane visibility toggles
@@ -1975,25 +1973,7 @@ void MainWindow::setupConnections()
 
     // Window / Level / Opacity controls
     auto updateSliceWindowing = [this]() {
-        const float brightness = m_mriWindowCenterSlider->value() / 100.0f;
-        const float contrast = m_mriWindowWidthSlider->value() / 100.0f;
-        const float center  = 1.0f - brightness;
-        const float width   = 1.01f - contrast;
-        const float opacity = m_mriOpacitySlider->value()      / 100.0f;
-        m_mriWindowCenterLabel->setText(QString("%1%").arg(qRound(brightness * 100)));
-        m_mriWindowWidthLabel->setText(QString("%1%").arg(qRound(contrast * 100)));
-        m_mriOpacityLabel->setText(QString("%1%").arg(qRound(opacity * 100)));
-
-        for (int i = 0; i < 3; ++i) {
-            DISP3DLIB::SliceObject *s = (i == 0) ? m_mriSlicesPlugin.axialSlice()
-                                      : (i == 1) ? m_mriSlicesPlugin.coronalSlice()
-                                                  : m_mriSlicesPlugin.sagittalSlice();
-            if (s) {
-                s->setWindowLevel(center, width);
-                s->setOpacity(opacity);
-                m_brainView->setSlice(i, s);
-            }
-        }
+        applyMriDisplayPreferences();
     };
     connect(m_mriWindowCenterSlider, &QSlider::valueChanged, this, updateSliceWindowing);
     connect(m_mriWindowWidthSlider,  &QSlider::valueChanged, this, updateSliceWindowing);
@@ -2028,9 +2008,7 @@ void MainWindow::setupConnections()
         syncMriSlidersFromCrosshair();
 
         // Push initial slice objects to BrainView
-        m_brainView->setSlice(0, m_mriSlicesPlugin.axialSlice());
-        m_brainView->setSlice(1, m_mriSlicesPlugin.coronalSlice());
-        m_brainView->setSlice(2, m_mriSlicesPlugin.sagittalSlice());
+        applyMriDisplayPreferences();
     });
 }
 
@@ -3490,6 +3468,32 @@ void MainWindow::onMriSliderChanged()
     m_mriSlicesPlugin.setCrosshair(ras);
 
     m_mriSliderUpdating = false;
+}
+
+//=============================================================================================================
+
+void MainWindow::applyMriDisplayPreferences()
+{
+    const float brightness = m_mriWindowCenterSlider->value() / 100.0f;
+    const float contrast = m_mriWindowWidthSlider->value() / 100.0f;
+    const float center = 1.0f - brightness;
+    const float width = 1.01f - contrast;
+    const float opacity = m_mriOpacitySlider->value() / 100.0f;
+
+    m_mriWindowCenterLabel->setText(QString("%1%").arg(qRound(brightness * 100)));
+    m_mriWindowWidthLabel->setText(QString("%1%").arg(qRound(contrast * 100)));
+    m_mriOpacityLabel->setText(QString("%1%").arg(qRound(opacity * 100)));
+
+    for (int i = 0; i < 3; ++i) {
+        DISP3DLIB::SliceObject *slice = (i == 0) ? m_mriSlicesPlugin.axialSlice()
+                                      : (i == 1) ? m_mriSlicesPlugin.coronalSlice()
+                                                 : m_mriSlicesPlugin.sagittalSlice();
+        if (slice) {
+            slice->setWindowLevel(center, width);
+            slice->setOpacity(opacity);
+        }
+        m_brainView->setSlice(i, slice);
+    }
 }
 
 //=============================================================================================================

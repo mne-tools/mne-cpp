@@ -253,6 +253,9 @@ private:
     /** Move the MRI crosshair from the current slider positions. */
     void onMriSliderChanged();
 
+    /** Apply the current MRI brightness, contrast, and opacity controls to active slices. */
+    void applyMriDisplayPreferences();
+
     /** Populate the MRI volume combo with sibling volumes in the same directory. */
     void populateMriVolumeCombo(const QString& activePath);
 
