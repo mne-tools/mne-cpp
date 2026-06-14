@@ -220,13 +220,19 @@ jobs:
 
     - name: Create version branch for new minor releases
       run: |
-        currentVersionPatch=$(echo ${GITHUB_REF#refs/tags/} | cut -d. -f3)
+        TAG="${GITHUB_REF#refs/tags/}"
+        currentVersionPatch=$(echo "$TAG" | cut -d. -f3)
         if [[ "$currentVersionPatch" == 0 ]]; then
-          echo "New minor version — branching off ${GITHUB_REF#refs/tags/}"
+          echo "New minor version — ensuring branch $TAG points at ${GITHUB_SHA}"
           git config --global user.email christoph.dinh@mne-cpp.org
           git config --global user.name chdinh
-          git checkout -b ${GITHUB_REF#refs/tags/}
-          git push origin refs/heads/${GITHUB_REF#refs/tags/}
+          if git ls-remote --exit-code --heads origin "$TAG" >/dev/null 2>&1; then
+            echo "Branch $TAG already exists — fast-forwarding it to ${GITHUB_SHA}"
+            git push origin "${GITHUB_SHA}:refs/heads/$TAG"
+          else
+            git checkout -b "$TAG"
+            git push origin "refs/heads/$TAG"
+          fi
         fi
 
     - name: Create GitHub Release
@@ -234,10 +240,16 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         TAG="${GITHUB_REF#refs/tags/}"
-        gh release create "$TAG" \
-          --title "MNE-CPP $TAG" \
-          --generate-notes \
-          --target ${{ github.sha }}
+        if gh release view "$TAG" >/dev/null 2>&1; then
+          gh release edit "$TAG" \
+            --title "MNE-CPP $TAG" \
+            --target ${{ github.sha }}
+        else
+          gh release create "$TAG" \
+            --title "MNE-CPP $TAG" \
+            --generate-notes \
+            --target ${{ github.sha }}
+        fi
 
   # ── Release Doxygen qch (depends on CreateRelease) ────────────────────────
   ReleaseDocs:
@@ -349,6 +361,9 @@ jobs:
           --kind eigen \
           --version "$EIGEN_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+
+    - name: Clone Skigen
+      run: ./scripts/ci/clone_skigen.sh --release
 
     - name: Build WASM
       run: |
