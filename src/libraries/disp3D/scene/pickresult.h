@@ -104,7 +104,7 @@ struct DISP3DSHARED_EXPORT PickResult
     QVector3D   voxel;
 
     /** MRI slice orientation index for `MriVoxel`
-     *  (0 = axial, 1 = sagittal, 2 = coronal). */
+     *  (0 = axial, 1 = coronal, 2 = sagittal). */
     int         sliceOrientation = -1;
 
     /** Time index for time-varying overlays (`-1` = not time-resolved). */

@@ -62,19 +62,19 @@ void SliceObject::setSlice(const QImage& image,
         c01 << 0, h, sliceIndex, 1;
         c11 << w, h, sliceIndex, 1;
         break;
-    case SliceOrientation::Sagittal:
-        //  u → Y,  v → Z,  slice along X
-        c00 << sliceIndex, 0, 0, 1;
-        c10 << sliceIndex, w, 0, 1;
-        c01 << sliceIndex, 0, h, 1;
-        c11 << sliceIndex, w, h, 1;
-        break;
     case SliceOrientation::Coronal:
         //  u → X,  v → Z,  slice along Y
         c00 << 0, sliceIndex, 0, 1;
         c10 << w, sliceIndex, 0, 1;
         c01 << 0, sliceIndex, h, 1;
         c11 << w, sliceIndex, h, 1;
+        break;
+    case SliceOrientation::Sagittal:
+        //  u → Y,  v → Z,  slice along X
+        c00 << sliceIndex, 0, 0, 1;
+        c10 << sliceIndex, w, 0, 1;
+        c01 << sliceIndex, 0, h, 1;
+        c11 << sliceIndex, w, h, 1;
         break;
     }
 

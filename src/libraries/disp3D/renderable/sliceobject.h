@@ -59,9 +59,13 @@ namespace DISP3DLIB
  */
 enum class SliceOrientation {
     Axial = 0,      /**< XY plane (Z = const). */
-    Sagittal,        /**< YZ plane (X = const). */
-    Coronal          /**< XZ plane (Y = const). */
+    Coronal = 1,    /**< XZ plane (Y = const). */
+    Sagittal = 2    /**< YZ plane (X = const). */
 };
+
+static_assert(static_cast<int>(SliceOrientation::Axial) == 0, "MRI axial slice slot must be 0");
+static_assert(static_cast<int>(SliceOrientation::Coronal) == 1, "MRI coronal slice slot must be 1");
+static_assert(static_cast<int>(SliceOrientation::Sagittal) == 2, "MRI sagittal slice slot must be 2");
 
 //=============================================================================================================
 /**
