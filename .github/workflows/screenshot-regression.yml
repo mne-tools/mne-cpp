@@ -108,7 +108,9 @@ jobs:
       env:
         QT_QPA_PLATFORM: offscreen
       run: |
-        ./build/bin/mne_screenshot_regression \
+        SCREENSHOT_BIN="$GITHUB_WORKSPACE/out/Release/bin/mne_screenshot_regression"
+        test -x "$SCREENSHOT_BIN"
+        "$SCREENSHOT_BIN" \
           --subjects-dir resources/data/mne-cpp-test-data/subjects \
           --subject sample \
           --out screenshot_${{ matrix.os }}.png \
