@@ -1904,6 +1904,15 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice,
     fiff_int_t first_samp = 0;
     fiff_int_t first_skip = 0;
     //
+    //  A malformed file may have a raw data block with an empty directory.
+    //  Bail out cleanly instead of indexing past the end of dir below.
+    //
+    if (dir.isEmpty())
+    {
+        qWarning("No directory entries in raw data block of %s\n", t_sFileName.toUtf8().constData());
+        return false;
+    }
+    //
     //  Get first sample tag if it is there
     //
     FiffTag::UPtr t_pTag;
@@ -1916,7 +1925,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice,
     //
     //  Omit initial skip
     //
-    if (dir[first]->kind == FIFF_DATA_SKIP)
+    if (first < dir.size() && dir[first]->kind == FIFF_DATA_SKIP)
     {
         //
         //  This first skip can be applied only after we know the buffer size
