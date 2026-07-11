@@ -77,9 +77,9 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const FiffEvoked &p_fiffEvoke
 
 //=============================================================================================================
 
-InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd &data, float tmin, float tstep) const
+InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd &data, float tmin, float tstep, bool pick_normal) const
 {
-    return InvRapMusic::calculateInverse(data, tmin, tstep);
+    return InvRapMusic::calculateInverse(data, tmin, tstep, pick_normal);
 }
 
 //=============================================================================================================

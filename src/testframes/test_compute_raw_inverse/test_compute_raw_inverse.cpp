@@ -337,16 +337,6 @@ void TestComputeRawInverse::testInverseDSPM()
     // Verify vertices array has the right size
     QCOMPARE((int)m_stcDSPM.vertices.size(), (int)m_stcDSPM.data.rows());
 
-    // Verify vertices are sorted within each hemisphere
-    // (first half = lh, second half = rh in the inverse operator)
-    bool verticesSorted = true;
-    for (int i = 1; i < m_stcDSPM.vertices.size(); ++i) {
-        if (m_stcDSPM.vertices(i) < m_stcDSPM.vertices(i - 1)) {
-            // Allow one break at the hemisphere boundary
-            // After that, should be sorted again
-        }
-    }
-
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Test dSPM Inverse Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
 

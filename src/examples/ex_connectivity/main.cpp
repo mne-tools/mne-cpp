@@ -436,7 +436,7 @@ int main(int argc, char *argv[])
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onFreqBandChanged);
 
     QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
-                     [&](const QString& a, const QString& b, const Network& c) {
+                     [&]([[maybe_unused]] const QString& a, const QString& b, const Network& c) {
                          pBrainView->loadNetwork(c, b);
                          pBrainView->setNetworkThreshold(0.9);
                      });

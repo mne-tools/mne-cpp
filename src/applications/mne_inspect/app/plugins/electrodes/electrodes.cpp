@@ -218,11 +218,9 @@ bool ElectrodesPlugin::loadCsv(const QString& path)
     QHash<QString, ElectrodeArray> byLabel;
     QStringList order;
     int contacts = 0;
-    int lineNumber = 0;
 
     while (!in.atEnd()) {
         const QString rawLine = in.readLine().trimmed();
-        ++lineNumber;
         if (rawLine.isEmpty() || rawLine.startsWith(QLatin1Char('#'))) {
             continue;
         }

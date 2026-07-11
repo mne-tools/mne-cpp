@@ -1621,7 +1621,6 @@ void BrainView::render(QRhiCommandBuffer *cb)
     for (int slot = 0; slot < numEnabled; ++slot) {
         int vp = (m_viewMode == MultiView) ? enabledViewports[slot] : 0;
         const SubView &sv = (m_viewMode == MultiView) ? m_subViews[vp] : m_singleView;
-        const int preset = (m_viewMode == MultiView) ? std::clamp(sv.preset, 0, 6) : 1;
 
         const QRect paneRect = (m_viewMode == MultiView)
             ? multiViewSlotRect(slot, numEnabled, outputSize)
@@ -2727,11 +2726,9 @@ void BrainView::refreshSensorTransforms()
         qmat = SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans);
     }
 
-    int surfCount = 0;
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         if ((it.key().startsWith("sens_") || it.key().startsWith("dig_")) && it.value()) {
             it.value()->applyTransform(qmat);
-            surfCount++;
         }
     }
 
@@ -2989,13 +2986,6 @@ void BrainView::removeSurfacesByPrefix(const QString &prefix)
     // Remove corresponding itemSurfaceMap entries + model rows
     QList<const QStandardItem*> itemsToRemove;
     for (auto it = m_itemSurfaceMap.cbegin(); it != m_itemSurfaceMap.cend(); ++it) {
-        bool found = false;
-        for (const QString &key : keysToRemove) {
-            // Check if this item's surface matches any removed surface
-            for (auto sit = m_surfaces.cbegin(); sit != m_surfaces.cend(); ++sit) {
-                if (sit.value() == it.value()) { found = true; break; }
-            }
-        }
         // If the surface is no longer in m_surfaces, it was removed
         bool stillPresent = false;
         for (auto sit = m_surfaces.cbegin(); sit != m_surfaces.cend(); ++sit) {

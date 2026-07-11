@@ -113,9 +113,7 @@ public:
      *
      * @return
      */
-    using InvRapMusic::calculateInverse;
-
-    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep) const;
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const;
 
     virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& p_matMeasurement, QList< InvDipolePair<double> > &p_RapDipoles) const;
 

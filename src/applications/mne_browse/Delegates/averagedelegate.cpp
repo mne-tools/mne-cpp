@@ -70,13 +70,13 @@ AverageDelegate::AverageDelegate(QObject *parent)
 
 //*************************************************************************************************************
 
-void AverageDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void AverageDelegate::paint([[maybe_unused]] QPainter *painter, [[maybe_unused]] const QStyleOptionViewItem &option, [[maybe_unused]] const QModelIndex &index) const
 {
 }
 
 
 //*************************************************************************************************************
 
-void AverageDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const
+void AverageDelegate::createPlotPath([[maybe_unused]] const QModelIndex &index, [[maybe_unused]] const QStyleOptionViewItem &option, [[maybe_unused]] QPainterPath& path, [[maybe_unused]] QList<RowVectorPair>& listPairs) const
 {
 }

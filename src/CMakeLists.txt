@@ -130,6 +130,16 @@ if(MSVC)
   endif()
 else()
   add_compile_options(-Wall -Wextra -Wpedantic)
+  # Qt's QSKIP/QVERIFY-family macros are declared variadic (kind, ...) but are
+  # invariably called with no trailing argument, which -Wpedantic reports as a
+  # C++20 extension. The non-conformance lives in Qt's headers, not our code,
+  # and the project already targets C++20, so silence only that one diagnostic
+  # while keeping every other pedantic ISO check active.
+  include(CheckCXXCompilerFlag)
+  check_cxx_compiler_flag("-Wno-variadic-macro-arguments-omitted" HAVE_WNO_VARIADIC_MACRO_OMITTED)
+  if(HAVE_WNO_VARIADIC_MACRO_OMITTED)
+    add_compile_options(-Wno-variadic-macro-arguments-omitted)
+  endif()
   if(MNE_WARNINGS_AS_ERRORS)
     add_compile_options(-Werror)
   endif()

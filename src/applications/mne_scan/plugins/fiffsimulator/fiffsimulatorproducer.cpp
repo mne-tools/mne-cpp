@@ -72,8 +72,8 @@ using namespace UTILSLIB;
 FiffSimulatorProducer::FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator)
 : m_pFiffSimulator(p_pFiffSimulator)
 , m_bDataClientIsConnected(false)
-, m_iDataClientId(-1)
 , m_bFlagInfoRequest(false)
+, m_iDataClientId(-1)
 , m_iDefaultPortDataClient(4218)
 {
 }
@@ -163,8 +163,6 @@ void FiffSimulatorProducer::run()
     // Inits
     MatrixXf matData;
     fiff_int_t kind;
-    qint32 from = 0;
-    qint32 to = -1;
 
     while(!isInterruptionRequested()) {
         m_producerMutex.lock();
@@ -186,8 +184,6 @@ void FiffSimulatorProducer::run()
                                            kind);
 
             if(kind == FIFF_DATA_BUFFER) {
-                to += matData.cols();
-                from += matData.cols();
                 while(!m_pFiffSimulator->m_pCircularBuffer->push(matData) && !isInterruptionRequested()) {
                     //Do nothing until the circular buffer is ready to accept new data again
                 }

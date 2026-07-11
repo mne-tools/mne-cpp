@@ -70,6 +70,12 @@ using namespace MNELIB;
 constexpr int FAIL = -1;
 constexpr int OK   =  0;
 
+// Axis indices and mesh neighbour count (kept for documentation).
+[[maybe_unused]] constexpr int X = 0;
+[[maybe_unused]] constexpr int Y = 1;
+[[maybe_unused]] constexpr int Z = 2;
+[[maybe_unused]] constexpr int NNEIGHBORS = 26;
+
 
 
 

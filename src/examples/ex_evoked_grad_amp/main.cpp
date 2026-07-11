@@ -197,10 +197,8 @@ int main(int argc, char *argv[])
     }
 
     //Omit MEG channels but include others
-    qint16 k = npair;
     for(qint32 p=0; p < p_FiffEvokedSet.info.nchan; ++p) {
         if((p_FiffEvokedSet.info.channel_type(p) == "grad") || (p_FiffEvokedSet.info.channel_type(p) == "mag")) {
-            ++k;
             ch_sel_names.append(p_FiffEvokedSet.info.ch_names.at(p));
         }
     }

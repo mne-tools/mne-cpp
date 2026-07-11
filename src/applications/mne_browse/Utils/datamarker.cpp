@@ -123,7 +123,7 @@ void DataMarker::mouseMoveEvent(QMouseEvent *event)
 
 //*************************************************************************************************************
 
-void DataMarker::enterEvent(QEvent *event)
+void DataMarker::enterEvent(QEnterEvent *event)
 {
     Q_UNUSED(event);
     setCursor(QCursor(Qt::SizeHorCursor));

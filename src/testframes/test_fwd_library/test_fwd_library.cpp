@@ -210,7 +210,7 @@ void TestFwdLibrary::bemModel_loadThreeLayerSurfaces()
     auto model3 = FwdBemModel::fwd_bem_load_three_layer_surfaces(bem3Path);
     QVERIFY(model3 != nullptr);
     QVERIFY(model3->surfs.size() == 3);
-    for (int s = 0; s < model3->surfs.size(); s++) {
+    for (int s = 0; s < static_cast<int>(model3->surfs.size()); s++) {
         QVERIFY(model3->surfs[s]->np > 0);
         QVERIFY(model3->surfs[s]->ntri > 0);
     }
@@ -346,7 +346,7 @@ void TestFwdLibrary::bemModel_fieldIntegrals()
     auto model3 = FwdBemModel::fwd_bem_load_three_layer_surfaces(bem3Path);
     QVERIFY(model3 != nullptr);
     QVERIFY(model3->surfs.size() == 3);
-    for (int s = 0; s < model3->surfs.size(); s++) {
+    for (int s = 0; s < static_cast<int>(model3->surfs.size()); s++) {
         QVERIFY(model3->surfs[s]->np > 0);
         QVERIFY(model3->surfs[s]->ntri > 0);
     }

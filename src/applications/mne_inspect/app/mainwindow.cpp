@@ -2884,7 +2884,7 @@ void MainWindow::createMenus()
             "https://mne-cpp.github.io");
     });
 
-    m_helpMenu->addAction("About Qt", [this]() {
+    m_helpMenu->addAction("About Qt", []() {
         QApplication::aboutQt();
     });
 }

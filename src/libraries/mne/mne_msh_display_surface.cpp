@@ -50,6 +50,11 @@ using namespace MNELIB;
 constexpr int FAIL = -1;
 constexpr int OK   =  0;
 
+// Axis indices for coordinate access (kept for documentation).
+[[maybe_unused]] constexpr int X = 0;
+[[maybe_unused]] constexpr int Y = 1;
+[[maybe_unused]] constexpr int Z = 2;
+
 constexpr int  SHOW_CURVATURE_NONE    = 0;
 constexpr int  SHOW_CURVATURE_OVERLAY = 1;
 constexpr int  SHOW_OVERLAY_HEAT      = 1;

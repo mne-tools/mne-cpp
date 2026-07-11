@@ -72,13 +72,13 @@ FilterOperator::FilterOperator()
 
 FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, double sFreq, qint32 fftlength, DesignMethod designMethod)
 : MNEOperator(OperatorType::FILTER)
+, m_designMethod(designMethod)
 , m_Type(type)
+, m_sFreq(sFreq)
 , m_iFilterOrder(order)
 , m_iFFTlength(fftlength)
 , m_dCenterFreq(centerfreq)
 , m_dBandwidth(bandwidth)
-, m_sFreq(sFreq)
-, m_designMethod(designMethod)
 , m_sName(unique_name)
 {
     switch(designMethod) {

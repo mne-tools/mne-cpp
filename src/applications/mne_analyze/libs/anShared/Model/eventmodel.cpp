@@ -200,7 +200,7 @@ QVariant EventModel::data(const QModelIndex &index,
 
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
 
-    if(index.row() >= events->size())
+    if(index.row() >= static_cast<int>(events->size()))
         return QVariant();
 
     if (index.isValid()) {
@@ -507,7 +507,7 @@ MatrixXi EventModel::getEventMatrix()
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
 
     matEventDataMatrix.resize(events->size(), 3);
-    for (int i = 0; i < events->size(); i++){
+    for (int i = 0; i < static_cast<int>(events->size()); i++){
         matEventDataMatrix(i,0) = events->at(i).sample;
         matEventDataMatrix(i,1) = 0;
         matEventDataMatrix(i,2) = 1;

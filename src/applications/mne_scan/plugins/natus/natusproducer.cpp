@@ -99,19 +99,17 @@ void NatusProducer::processDatagram(const QNetworkDatagram &datagram)
     QDataStream stream(data);
 
     // Read info
-    float fPackageNumber, fNumberSamples, fNumberChannels;
+    float fNumberSamples, fNumberChannels;
 
     char cInfo[3*sizeof(float)];
     stream.readRawData(cInfo, sizeof(cInfo));
 
     float* fInfo = reinterpret_cast<float*>(cInfo);
 
-    fPackageNumber = fInfo[0];
     fNumberSamples = fInfo[1];
     fNumberChannels = fInfo[2];
 
 //    // Print info about received data
-//    qDebug()<<"fPackageNumber "<<fPackageNumber;
 //    qDebug()<<"fNumberSamples "<<fNumberSamples;
 //    qDebug()<<"fNumberChannels "<<fNumberChannels;
 //    qDebug()<<"data.size() "<<data.size();

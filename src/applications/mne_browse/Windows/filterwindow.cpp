@@ -64,8 +64,8 @@ using namespace DISPLIB;
 FilterWindow::FilterWindow(MainWindow *mainWindow, QWidget *parent)
 : QDockWidget(parent)
 , ui(new Ui::FilterWindowDockWidget)
-, m_pFilterPlotScene(new FilterPlotScene)
 , m_pMainWindow(mainWindow)
+, m_pFilterPlotScene(new FilterPlotScene)
 {
     ui->setupUi(this);
 

@@ -136,9 +136,9 @@ DataWindow::DataWindow(QWidget *parent)
 : QWidget(parent)
 , ui(new Ui::DataWindowDockWidget)
 , m_pMainWindow(static_cast<MainWindow*>(parent))
-, m_bHideBadChannels(false)
 , m_pRawDelegate(Q_NULLPTR)
 , m_pKineticScroller(Q_NULLPTR)
+, m_bHideBadChannels(false)
 {
     ui->setupUi(this);
     m_pRawModel = new RawModel(this);

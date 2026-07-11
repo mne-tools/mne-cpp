@@ -55,6 +55,12 @@ constexpr int  SURF_RIGHT_MORPH_HEMI = (1 << 16 | FIFFV_MNE_SURF_RIGHT_HEMI);
 constexpr int  SHOW_CURVATURE_NONE    = 0;
 constexpr int  SHOW_OVERLAY_HEAT      = 1;
 
+// Curvature overlay mode and colours (kept for documentation).
+[[maybe_unused]] constexpr int   SHOW_CURVATURE_OVERLAY = 1;
+[[maybe_unused]] constexpr float POS_CURV_COLOR  = 0.25f;
+[[maybe_unused]] constexpr float NEG_CURV_COLOR  = 0.375f;
+[[maybe_unused]] constexpr float EVEN_CURV_COLOR = 0.375f;
+
 } // anonymous namespace
 
 //=============================================================================================================

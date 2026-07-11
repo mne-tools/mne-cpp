@@ -111,6 +111,13 @@ bool check_matching_chnames_conventions(const QStringList& chNamesA, const QStri
 // CONSTANTS
 //=============================================================================================================
 
+// Return codes and axis indices (kept for documentation).
+[[maybe_unused]] constexpr int FAIL = -1;
+[[maybe_unused]] constexpr int OK   =  0;
+[[maybe_unused]] constexpr int X = 0;
+[[maybe_unused]] constexpr int Y = 1;
+[[maybe_unused]] constexpr int Z = 2;
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================

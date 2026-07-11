@@ -61,6 +61,8 @@ constexpr int OK        =  0;
 constexpr int LOADED    =  1;  // fwd_bem_load_solution: successfully loaded
 constexpr int NOT_FOUND =  0;  // fwd_bem_load_solution: solution not available
 
+// BEM file suffixes (kept for documentation).
+[[maybe_unused]] constexpr auto BEM_SUFFIX     = "-bem.fif";
 constexpr auto BEM_SOL_SUFFIX = "-bem-sol.fif";
 constexpr float EPS  = 1e-5f;  // Points closer to origin than this are considered at the origin
 constexpr float CEPS = 1e-5f;

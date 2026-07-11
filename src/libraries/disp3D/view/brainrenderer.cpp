@@ -188,15 +188,16 @@ namespace {
     constexpr int kUniformSlotCount   = 8192;   // Max draw calls before overflow
     constexpr int kUniformBlockSize   = 256;    // Bound size per SRB dynamic slot (bytes)
 
-    // Per-object uniform byte offsets (must match .vert shader layout)
-    constexpr int kOffsetMVP          = 0;      // mat4  (64 bytes)
-    constexpr int kOffsetCameraPos    = 64;     // vec3  (12 bytes)
-    constexpr int kOffsetSelected     = 76;     // float
-    constexpr int kOffsetLightDir     = 80;     // vec3  (12 bytes)
-    constexpr int kOffsetTissueType   = 92;     // float
-    constexpr int kOffsetLighting     = 96;     // float
-    constexpr int kOffsetOverlayMode  = 100;    // float
-    constexpr int kOffsetSelectedSurfaceId = 104; // float — WORKAROUND(QRhi-GLES2)
+    // Per-object uniform byte offsets (must match .vert shader layout).
+    // Kept as documentation of the UBO layout even where not directly indexed.
+    [[maybe_unused]] constexpr int kOffsetMVP          = 0;      // mat4  (64 bytes)
+    [[maybe_unused]] constexpr int kOffsetCameraPos    = 64;     // vec3  (12 bytes)
+    [[maybe_unused]] constexpr int kOffsetSelected     = 76;     // float
+    [[maybe_unused]] constexpr int kOffsetLightDir     = 80;     // vec3  (12 bytes)
+    [[maybe_unused]] constexpr int kOffsetTissueType   = 92;     // float
+    [[maybe_unused]] constexpr int kOffsetLighting     = 96;     // float
+    [[maybe_unused]] constexpr int kOffsetOverlayMode  = 100;    // float
+    [[maybe_unused]] constexpr int kOffsetSelectedSurfaceId = 104; // float — WORKAROUND(QRhi-GLES2)
 }
 
 //=============================================================================================================
@@ -437,7 +438,7 @@ void BrainRenderer::beginFrame(QRhiCommandBuffer *cb)
 
 //=============================================================================================================
 
-void BrainRenderer::updateSceneUniforms(QRhi *rhi, const SceneData &data)
+void BrainRenderer::updateSceneUniforms([[maybe_unused]] QRhi *rhi, [[maybe_unused]] const SceneData &data)
 {
     // NO-OP: packed into per-object slots for simplicity
 }
@@ -496,7 +497,6 @@ void BrainRenderer::prepareVideoOverlay(QRhi *rhi,
         }
 
         // Uniform buffer (mat4 + vec4 + 4 floats = 96 bytes, pad to 256)
-        constexpr int kUbSize = 256;
         k.uniformBufferOffsetAlignment = rhi->ubufAlignment();
         k.uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
                                              QRhiBuffer::UniformBuffer,
@@ -794,7 +794,7 @@ void BrainRenderer::renderVideoOverlay(QRhiCommandBuffer *cb, QRhi *rhi,
     QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
     const int uniformOffset = k.currentUniformOffset;
     k.currentUniformOffset += k.uniformBufferOffsetAlignment;
-    if (uniformOffset + kUniformBlockSize > k.uniformBuffer->size()) return;
+    if (static_cast<quint32>(uniformOffset + kUniformBlockSize) > k.uniformBuffer->size()) return;
 
     // ── Billboard the quad to face the camera ──────────────────────
     const QVector3D centre = overlay->focusPosition();
@@ -889,7 +889,7 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer *cb, QRhi *rhi
     QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
     const int uniformOffset = k.currentUniformOffset;
     k.currentUniformOffset += k.uniformBufferOffsetAlignment;
-    if (uniformOffset + kUniformBlockSize > k.uniformBuffer->size()) return;
+    if (static_cast<quint32>(uniformOffset + kUniformBlockSize) > k.uniformBuffer->size()) return;
 
     // Approximate the local scalp normal from the focus position vector.
     QVector3D localNormal = overlay->focusPosition();
@@ -1179,7 +1179,7 @@ int BrainRenderer::prepareSliceDraw(QRhiResourceUpdateBatch *u,
 
     const int uniformOffset = k.currentUniformOffset;
     k.currentUniformOffset += k.uniformBufferOffsetAlignment;
-    if (uniformOffset + kUniformBlockSize > k.uniformBuffer->size()) return -1;
+    if (static_cast<quint32>(uniformOffset + kUniformBlockSize) > k.uniformBuffer->size()) return -1;
 
     // Uniform block matches slice.vert / slice.frag layout:
     //   mat4 mvp         (64 bytes)
@@ -1249,7 +1249,7 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     // Dynamic slot update
     int offset = d->currentUniformOffset;
     d->currentUniformOffset += d->uniformBufferOffsetAlignment;
-    if (d->currentUniformOffset >= d->uniformBuffer->size()) {
+    if (static_cast<quint32>(d->currentUniformOffset) >= d->uniformBuffer->size()) {
         qWarning("BrainRenderer: uniform buffer overflow (%d / %d bytes) — too many surfaces. Some draws will be skipped.",
                  d->currentUniformOffset, (int)d->uniformBuffer->size());
         return;  // Skip this draw rather than silently corrupt earlier viewport data
@@ -1324,7 +1324,7 @@ int BrainRenderer::prepareSurfaceDraw(QRhiResourceUpdateBatch *u,
 
     int offset = d->currentUniformOffset;
     d->currentUniformOffset += d->uniformBufferOffsetAlignment;
-    if (d->currentUniformOffset >= d->uniformBuffer->size()) {
+    if (static_cast<quint32>(d->currentUniformOffset) >= d->uniformBuffer->size()) {
         qWarning("BrainRenderer: uniform buffer overflow in prepareSurfaceDraw");
         return -1;
     }
@@ -1401,7 +1401,7 @@ void BrainRenderer::renderDipoles(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     // Dynamic slot update
     int offset = d->currentUniformOffset;
     d->currentUniformOffset += d->uniformBufferOffsetAlignment;
-    if (d->currentUniformOffset >= d->uniformBuffer->size()) {
+    if (static_cast<quint32>(d->currentUniformOffset) >= d->uniformBuffer->size()) {
         qWarning("BrainRenderer: uniform buffer overflow in renderDipoles");
         return;
     }
@@ -1460,7 +1460,7 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
 
         int offset = d->currentUniformOffset;
         d->currentUniformOffset += d->uniformBufferOffsetAlignment;
-        if (d->currentUniformOffset >= d->uniformBuffer->size()) {
+        if (static_cast<quint32>(d->currentUniformOffset) >= d->uniformBuffer->size()) {
             qWarning("BrainRenderer: uniform buffer overflow in renderNetwork (nodes)");
             return;
         }
@@ -1497,7 +1497,7 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
 
         int offset = d->currentUniformOffset;
         d->currentUniformOffset += d->uniformBufferOffsetAlignment;
-        if (d->currentUniformOffset >= d->uniformBuffer->size()) {
+        if (static_cast<quint32>(d->currentUniformOffset) >= d->uniformBuffer->size()) {
             qWarning("BrainRenderer: uniform buffer overflow in renderNetwork (edges)");
             return;
         }
@@ -1755,7 +1755,7 @@ void BrainRenderer::drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
 
     int offset = d->currentUniformOffset;
     d->currentUniformOffset += d->uniformBufferOffsetAlignment;
-    if (d->currentUniformOffset >= d->uniformBuffer->size()) {
+    if (static_cast<quint32>(d->currentUniformOffset) >= d->uniformBuffer->size()) {
         qWarning("BrainRenderer: uniform buffer overflow in drawMergedSurfaces");
         return;
     }

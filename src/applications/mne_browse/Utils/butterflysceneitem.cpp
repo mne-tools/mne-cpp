@@ -62,8 +62,8 @@ ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, int setUnit
 : m_sSetName(setName)
 , m_iSetKind(setKind)
 , m_iSetUnit(setUnit)
-, m_cAverageColors(defaultColors)
 , m_pFiffInfo(Q_NULLPTR)
+, m_cAverageColors(defaultColors)
 {
     //Init m_scaleMap
     m_scaleMap["MEG_grad"] = RawSettingsConstants::DELEGATE_SCALE_MEG_GRAD;
@@ -367,10 +367,6 @@ void ButterflySceneItem::paintAveragePaths(QPainter *painter)
     }
 
     const QRectF pa = plotArea();
-    const double sfreq = m_pFiffInfo->sfreq;
-    const double tMin = m_firstLastSample.first / sfreq;
-    const double tMax = m_firstLastSample.second / sfreq;
-    const double tRange = tMax - tMin;
 
     //Create path for all channels
     for(int i = 0; i < m_pFiffInfo->chs.size() ;i++) {

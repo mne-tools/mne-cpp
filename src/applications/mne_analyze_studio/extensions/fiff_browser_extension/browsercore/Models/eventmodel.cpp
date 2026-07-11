@@ -70,12 +70,12 @@ using namespace Eigen;
 
 EventModel::EventModel(QObject *parent)
 : QAbstractTableModel(parent)
-, m_iFirstSample(0)
 , m_bFileloaded(false)
-, m_sFilterEventType("All")
 , m_pFiffInfo(new FiffInfo)
+, m_iFirstSample(0)
 , m_iLastSample(0)
 , m_iCurrentMarkerPos(0)
+, m_sFilterEventType("All")
 {
     //Create default event type color map
     m_eventTypeColor[1] = QColor(Qt::black);
@@ -94,10 +94,10 @@ EventModel::EventModel(QObject *parent)
 
 EventModel::EventModel(QFile &qFile, QObject *parent)
 : QAbstractTableModel(parent)
-, m_iFirstSample(0)
 , m_bFileloaded(false)
-, m_sFilterEventType("All")
 , m_pFiffInfo(new FiffInfo)
+, m_iFirstSample(0)
+, m_sFilterEventType("All")
 {
     //Create default event type color map
     m_eventTypeColor[1] = QColor(Qt::black);

@@ -273,7 +273,7 @@ double MneBrowseRawDelegate::scaleForChannel(const MNEBROWSE::RawModel* model, i
     }
 }
 
-void MneBrowseRawDelegate::drawEvents(const QModelIndex& index,
+void MneBrowseRawDelegate::drawEvents([[maybe_unused]] const QModelIndex& index,
                                       const QStyleOptionViewItem& option,
                                       QPainter* painter,
                                       const MNEBROWSE::RawModel* rawModel) const

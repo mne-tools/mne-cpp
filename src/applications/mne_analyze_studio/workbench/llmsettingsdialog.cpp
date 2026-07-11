@@ -141,7 +141,7 @@ QString formatToolInventory(const QJsonArray& toolDefinitions)
     return lines.isEmpty() ? QString("No tools available.") : lines.join("\n\n");
 }
 
-QStringList suggestedModelsForMode(const QString& mode)
+[[maybe_unused]] QStringList suggestedModelsForMode(const QString& mode)
 {
     if(mode == QLatin1String("openai_responses")) {
         return QStringList() << "gpt-5-mini" << "gpt-5" << "gpt-4.1-mini";

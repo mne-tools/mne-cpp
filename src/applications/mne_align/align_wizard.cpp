@@ -59,13 +59,13 @@ using UTILSLIB::StandardMontage;
 
 namespace {
 
-constexpr int kSetupIdx     = 0;
-constexpr int kFiducialsIdx = 1;
-constexpr int kEegIdx       = 2;
-constexpr int kHspIdx       = 3;
-constexpr int kVerifyIdx    = 4;
-constexpr int kSaveIdx      = 5;
-constexpr int kDoneIdx      = 6;
+[[maybe_unused]] constexpr int kSetupIdx     = 0;
+[[maybe_unused]] constexpr int kFiducialsIdx = 1;
+[[maybe_unused]] constexpr int kEegIdx       = 2;
+[[maybe_unused]] constexpr int kHspIdx       = 3;
+[[maybe_unused]] constexpr int kVerifyIdx    = 4;
+[[maybe_unused]] constexpr int kSaveIdx      = 5;
+[[maybe_unused]] constexpr int kDoneIdx      = 6;
 
 /** Canonical fiducial capture order. */
 constexpr FiducialId kFiducialOrder[] = {FiducialId::NAS, FiducialId::LPA, FiducialId::RPA};

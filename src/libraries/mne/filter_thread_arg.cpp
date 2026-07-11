@@ -22,6 +22,8 @@
 #include <fiff/fiff_coord_trans.h>
 
 constexpr int FAIL = -1;
+// Return code (kept for documentation).
+[[maybe_unused]] constexpr int OK = 0;
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -65,12 +65,12 @@ using namespace MNEBROWSE;
 
 RawDelegate::RawDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
-, m_qSettings()
 , m_bShowSelectedEventsOnly(false)
 , m_bActivateEvents(true)
 , m_bRemoveDC(false)
 , m_dMaxValue(RawSettingsConstants::DELEGATE_INITIAL_MAX_VALUE)
 , m_dScaleY(1)
+, m_qSettings()
 {
     m_iDefaultPlotHeight = RawSettingsConstants::DELEGATE_PLOT_HEIGHT;
     m_dDx = RawSettingsConstants::DELEGATE_DX;

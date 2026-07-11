@@ -116,7 +116,7 @@ void LSLAdapterProducer::readStream()
             m_vBufferedSamples.insert(std::end(m_vBufferedSamples), std::begin(chunk), std::end(chunk));
 
             // check if we can output another block
-            if(m_vBufferedSamples.size() >= m_iOutputBlockSize) {
+            if(static_cast<int>(m_vBufferedSamples.size()) >= m_iOutputBlockSize) {
                 Eigen::MatrixXd matOutput(m_StreamInfo.channel_count(), m_iOutputBlockSize);
 
                 // copy samples

@@ -172,6 +172,15 @@ int check_vertex(int no, int maxno)
     return OK;
 }
 
+// Deep-copy a volume geometry (kept for documentation / future use).
+[[maybe_unused]] static MNEVolGeom dup_vol_geom(const MNEVolGeom& g)
+{
+    MNEVolGeom dup;
+    dup = g;
+    dup.filename = g.filename;
+    return dup;
+}
+
 //=========================================================================
 // read_vol_geom
 //=========================================================================

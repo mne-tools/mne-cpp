@@ -437,7 +437,7 @@ private slots:
         MatrixXd epoch = MatrixXd::Random(nCh, nSamples);
         // Add a known offset
         epoch.array() += 5.0;
-        QPair<float, float> baseline(0, 50);
+        [[maybe_unused]] QPair<float, float> baseline(0, 50);
 
         FiffEvokedSet::subtractBaseline(epoch, 0, 49);
 

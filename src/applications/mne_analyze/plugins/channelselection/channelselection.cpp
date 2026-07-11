@@ -273,7 +273,7 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
 
 //=============================================================================================================
 
-void ChannelSelection::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+void ChannelSelection::onModelRemoved([[maybe_unused]] QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
     if(m_pAnalyzeData->getModelsByType(ANSHAREDLIB_FIFFRAW_MODEL).size() == 0 && m_pAnalyzeData->getModelsByType(ANSHAREDLIB_AVERAGING_MODEL).size() == 0){
         m_pChannelSelectionView->clearView();

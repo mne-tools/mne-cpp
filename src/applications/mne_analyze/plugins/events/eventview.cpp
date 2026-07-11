@@ -378,7 +378,7 @@ void EventView::keyReleaseEvent(QKeyEvent* event)
 //=============================================================================================================
 
 bool EventView::newUserGroup(const QString& sName,
-                                          int iType,
+                                          [[maybe_unused]] int iType,
                                           bool bDefaultColor)
 {
     if(!m_pEventModel){

@@ -29,6 +29,11 @@
 using namespace Eigen;
 using namespace MNELIB;
 
+// Axis indices for coordinate access (kept for documentation).
+[[maybe_unused]] constexpr int X = 0;
+[[maybe_unused]] constexpr int Y = 1;
+[[maybe_unused]] constexpr int Z = 2;
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================

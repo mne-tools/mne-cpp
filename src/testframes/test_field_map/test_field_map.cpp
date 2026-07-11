@@ -227,7 +227,7 @@ double compareMatrices(const MatrixXd& a, const MatrixXd& b,
  * Compute vertex normals from vertices and triangles.
  * (Simple area-weighted averaging per face.)
  */
-MatrixX3f computeVertexNormals(const MatrixX3f& verts, const MatrixX3i& tris)
+[[maybe_unused]] MatrixX3f computeVertexNormals(const MatrixX3f& verts, const MatrixX3i& tris)
 {
     MatrixX3f norms = MatrixX3f::Zero(verts.rows(), 3);
     for (int t = 0; t < tris.rows(); ++t) {

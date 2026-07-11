@@ -52,6 +52,7 @@
 #include <QWidget>
 #include <QPalette>
 #include <QMouseEvent>
+#include <QEnterEvent>
 #include <QRect>
 #include <QRegion>
 #include <QDebug>
@@ -117,7 +118,7 @@ private:
     /**
      * Reimplemnted enter event handler
      */
-    void enterEvent(QEvent *event);
+    void enterEvent(QEnterEvent *event);
 
     //=========================================================================================================
     /**

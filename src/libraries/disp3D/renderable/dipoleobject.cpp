@@ -206,9 +206,6 @@ void DipoleObject::createGeometry()
     vertices.push_back(baseCenter); // Index 1
     
     // Rim vertices
-    int centerIdx = 1;
-    int firstRimIdx = 2;
-    
     for (int i = 0; i < segments; ++i) {
         float angle = 2.0f * M_PI * i / segments;
         float x = radius * cos(angle);
@@ -228,8 +225,6 @@ void DipoleObject::createGeometry()
     
     // Indices
     for (int i = 0; i < segments; ++i) {
-        int next = (i + 1) % segments;
-        
         // Cone sides
         // Tip (0), current(i), next(next)
         // Side vertices start at firstRimIdx.

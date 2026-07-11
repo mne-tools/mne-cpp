@@ -78,13 +78,13 @@ using namespace Eigen;
 
 FiffSimulator::FiffSimulator()
 : m_pFiffSimulatorProducer(new FiffSimulatorProducer(this))
+, m_pRtCmdClient(QSharedPointer<RtCmdClient>::create())
+, m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(40)))
 , m_bCmdClientIsConnected(false)
 , m_sFiffSimulatorIP("127.0.0.1")
 , m_sFiffSimulatorClientAlias("mne_scan")
 , m_iActiveConnectorId(0)
 , m_iBufferSize(-1)
-, m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(40)))
-, m_pRtCmdClient(QSharedPointer<RtCmdClient>::create())
 , m_iDefaultPortCmdClient(4217)
 {
     //init channels when fiff info is available

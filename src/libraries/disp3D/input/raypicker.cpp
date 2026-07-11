@@ -150,8 +150,8 @@ PickResult RayPicker::pick(const QVector3D &rayOrigin,
 //=============================================================================================================
 
 QString RayPicker::buildLabel(const PickResult &result,
-                               const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> &itemSurfaceMap,
-                               const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces)
+                               [[maybe_unused]] const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> &itemSurfaceMap,
+                               [[maybe_unused]] const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces)
 {
     if (!result.hit) return QString();
 

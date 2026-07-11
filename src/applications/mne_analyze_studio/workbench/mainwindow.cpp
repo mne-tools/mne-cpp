@@ -106,7 +106,7 @@ const char* kWorkspaceArtifactStepEntry = "__mne_analyze_studio_analysis_step_en
 const char* kActiveWorkflowGraphUri = "mne://workspace/active_graph";
 const char* kWorkflowWorkspaceUriPrefix = "mne://workspace/";
 const char* kWorkflowCenterTabKey = "__mne_analyze_studio_workflow_graph__";
-constexpr int kWorkflowItemKindRole = Qt::UserRole + 20;
+[[maybe_unused]] constexpr int kWorkflowItemKindRole = Qt::UserRole + 20;
 constexpr int kWorkflowPayloadRole = Qt::UserRole + 21;
 constexpr int kWorkflowOpenPathRole = Qt::UserRole + 22;
 constexpr int kWorkflowStableIdRole = Qt::UserRole + 23;
@@ -845,7 +845,7 @@ bool hasQtSignal(const QObject* object, const char* normalizedSignal)
     return object->metaObject()->indexOfSignal(normalizedSignal) >= 0;
 }
 
-bool hasQtMethod(const QObject* object, const char* normalizedMethod)
+[[maybe_unused]] bool hasQtMethod(const QObject* object, const char* normalizedMethod)
 {
     if(!object || !normalizedMethod) {
         return false;
@@ -1375,13 +1375,13 @@ MainWindow::MainWindow(QWidget* parent)
 , m_extensionSocket(new QLocalSocket(this))
 , m_kernelProcess(new QProcess(this))
 , m_extensionHostProcess(new QProcess(this))
+, m_activePipelineTotalSteps(0)
+, m_isAdvancingPipeline(false)
+, m_isShuttingDown(false)
 , m_llmPlanner(this)
 , m_sceneRegistry(this)
 , m_viewProviderRegistry(new ViewProviderRegistry(this))
 , m_viewManager(&m_sceneRegistry, m_viewProviderRegistry, this)
-, m_activePipelineTotalSteps(0)
-, m_isAdvancingPipeline(false)
-, m_isShuttingDown(false)
 {
     setWindowTitle("MNE Analyze Studio");
     resize(1440, 900);
@@ -1953,7 +1953,7 @@ void MainWindow::createConnections()
 
             if(toolName == "neurokernel.psd_summary") {
                 QAction* overlayAction = contextMenu.addAction("Open Result And Enable PSD Compare");
-                connect(overlayAction, &QAction::triggered, this, [this, item, entry]() {
+                connect(overlayAction, &QAction::triggered, this, [this, entry]() {
                     openAnalysisArtifact(entry, true);
                 });
             }

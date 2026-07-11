@@ -459,7 +459,7 @@ void NetworkObject::updateNodeBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 
     if (m_nodeInstancesDirty && m_nodeInstanceCount > 0) {
         int requiredSize = m_nodeInstanceData.size();
-        if (!m_gpu->nodeInstanceBuffer || m_gpu->nodeInstanceBuffer->size() < requiredSize) {
+        if (!m_gpu->nodeInstanceBuffer || m_gpu->nodeInstanceBuffer->size() < static_cast<quint32>(requiredSize)) {
             m_gpu->nodeInstanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, requiredSize));
             m_gpu->nodeInstanceBuffer->create();
         }
@@ -488,7 +488,7 @@ void NetworkObject::updateEdgeBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 
     if (m_edgeInstancesDirty && m_edgeInstanceCount > 0) {
         int requiredSize = m_edgeInstanceData.size();
-        if (!m_gpu->edgeInstanceBuffer || m_gpu->edgeInstanceBuffer->size() < requiredSize) {
+        if (!m_gpu->edgeInstanceBuffer || m_gpu->edgeInstanceBuffer->size() < static_cast<quint32>(requiredSize)) {
             m_gpu->edgeInstanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, requiredSize));
             m_gpu->edgeInstanceBuffer->create();
         }

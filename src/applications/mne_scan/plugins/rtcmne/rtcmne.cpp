@@ -100,6 +100,7 @@ RtcMne::RtcMne()
 , m_pCircularEvokedBuffer(CircularBuffer<FIFFLIB::FiffEvoked>::SPtr::create(40))
 , m_bEvokedInput(false)
 , m_bRawInput(false)
+, m_bUpdateMinimumNorm(false)
 , m_iNumAverages(1)
 , m_iDownSample(1)
 , m_iTimePointSps(0)
@@ -108,7 +109,6 @@ RtcMne::RtcMne()
 , m_sAvrType("3")
 , m_sMethod("dSPM")
 , m_fMriHeadTrans(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/all-trans.fif")
-, m_bUpdateMinimumNorm(false)
 {
 }
 
