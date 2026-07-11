@@ -1,15 +1,20 @@
 # MNE-CPP Gap Analysis — Comprehensive Feature Comparison
 
-Internal developer reference. Compares mne-cpp against MNE-C (SVN) and MNE-Python
-to identify all features and algorithms not yet ported.
+Internal developer reference. Compares MNE-CPP against MNE-Python (and
+MNE-C SVN) to identify features and algorithms not yet ported.
 
-Last updated: 28 April 2026 (v2.3.0 planning sweep — gaps prioritised against
-v2.3.0 release story; see [v2.3.0-requirements.md](v2.3.0-requirements.md) for
-the seven-pillar plan: Pillar 0 = MNE Inspect multimodal viz (sEEG/ECoG/MRI/
-source overlay) — **HIGHEST PRIORITY**, Pillar A = MNE Scan production
-hardening, Pillar B = mne_analyze cortical workflow, Pillar C = mne_analyze_studio,
-Pillar D = MNE-Python algorithm parity push, Pillar E = mne-mna Python pkg,
-Pillar F = NeuralSet interop)
+> **Parity numbers below are machine-rendered from `doc/api_registry.json`.**
+> The authoritative, per-API machine-readable inventory lives in
+> [`doc/release/v2.4.0/mne-python-gap.json`](../release/v2.4.0/mne-python-gap.json)
+> and its rendered view
+> [`mne-python-gap.md`](../release/v2.4.0/mne-python-gap.md), both produced
+> by `tools/parity/gap_analysis.py`. Regenerate them before quoting any
+> parity figure. The domain narratives further below are hand-maintained
+> context and must not contradict the generated data.
+
+- Generated reference: **MNE-Python 1.11.0** (pinned 1.11.x), on **2026-07-11**.
+- Inventoried public APIs: **443** — implemented **251**, partial **47**, missing **137**, not-applicable **8**.
+- Machine-rendered parity: **63.1%** of 435 in-scope APIs (implemented + ½·partial; not-applicable excluded).
 
 ---
 
@@ -17,10 +22,9 @@ Pillar F = NeuralSet interop)
 
 - **Source**: which reference codebase has the feature (C = MNE-C SVN, Py = MNE-Python, Both)
 - **Priority**: High / Medium / Low — based on user demand and scientific utility
-- ✅ = mne-cpp already has this    ❌ = missing from mne-cpp
+- ✅ = MNE-CPP already has this    ❌ = missing from MNE-CPP
 
 ---
-
 ## 1. Inverse & Source Estimation (INVLIB)
 
 ### What mne-cpp already has
@@ -271,15 +275,16 @@ Pillar F = NeuralSet interop)
 | Cholesky decomposition | ✅ | For whitening |
 | Whitening / dewhitening | ✅ | Applied in inverse |
 | Real-time covariance (streaming) | ✅ | `RtCov` for online estimation |
+| Ledoit-Wolf shrinkage | ✅ | `StsCovEstimators` via skigen `LedoitWolf` (added v2.3.0) |
+| Oracle Approximating Shrinkage (OAS) | ✅ | `StsCovEstimators` via skigen `OAS` (added v2.3.0) |
+| Factor Analysis covariance | ✅ | `StsCovEstimators::factorAnalysis` via skigen (added v2.3.0) |
 
 ### Gaps
 
 | Feature | Source | Priority | Description |
 |---|---|---|---|
-| Ledoit-Wolf shrinkage | Py | High | Optimal shrinkage estimator — better for rank-deficient data |
 | Diagonal regularisation method | Py | Low | Simple diagonal covariance model |
 | Empirical Bayes regularisation | Py | Low | Cross-validated regularisation |
-| Shrunk covariance | Py | Low | Oracle Approximating Shrinkage (OAS) |
 | Cross-validated method selection | Py | Medium | Automatically pick best regularisation method |
 
 ---
@@ -297,6 +302,10 @@ Pillar F = NeuralSet interop)
 | TFCE (Threshold-Free Cluster Enhancement) | ✅ | `StatsCluster::tfce()` (Smith & Nichols 2009) |
 | Ledoit–Wolf / OAS shrinkage | ✅ | sts library |
 | Cortical-mesh adjacency | ✅ | `StatsAdjacency::fromSourceSpace()` |
+| CSP (Common Spatial Patterns) | ✅ | `MlCsp` via skigen (added v2.3.0) |
+| SPoC (Source Power Comodulation) | ✅ | `MlSpoc` via skigen (added v2.3.0) |
+| SSD (Spatio-Spectral Decomposition) | ✅ | `MlSsd` via skigen (added v2.3.0) |
+| xDAWN spatial filter | ✅ | `XdawnTransformer` (DSP library) |
 
 ### Gaps
 
@@ -305,11 +314,10 @@ Pillar F = NeuralSet interop)
 | FDR / Bonferroni correction | Py | Medium | Multiple comparison correction |
 | Bootstrap confidence intervals | Py | Low | Non-parametric confidence intervals |
 | Linear regression (channel-wise) | Py | Low | Regression on raw/epochs data |
-| CSP (Common Spatial Patterns) | Py | Medium | Spatial filter for BCI classification |
-| SPoC (Source Power Comodulation) | Py | Low | Covariance-based feature extraction |
-| SSD (Spatio-Spectral Decomposition) | Py | Low | Frequency-selective spatial components |
+| RM-ANOVA (`f_mway_rm`) | Py | Low | Repeated-measures ANOVA |
 | EMS (Eigenvector Methods) | Py | Low | Supervised spatial extraction |
 | SlidingEstimator / GeneralizingEstimator | Py | Low | Time-resolved decoding wrappers |
+| ReceptiveField / TimeDelayingRidge (TRF) | Py | Low | Encoding/decoding temporal response function |
 | Cross-validation utilities | Py | Low | Scikit-learn integration for M/EEG |
 
 ---
@@ -644,11 +652,17 @@ is a modern plugin-based Qt application with QRhi rendering and WebAssembly supp
 
 ## Summary: Gap Counts by Priority
 
-| Priority | Count | Key items |
-|---|---|---|
-| **High** | 12 | TF-MxNE, standard montages, Ledoit-Wolf covariance, Maxwell movement compensation, **mne_analyze**: cortical surface loading, STC overlay, source estimation in GUI, label management, vertex picking |
-| **Medium** | 31 | Multitaper TFR, directed connectivity, Picard ICA, auto ICA classification, cluster permutation stats, SourceMorph, depth priors, resolution metrics, volume rendering, simulation, surface Laplacian, topomap sequences, **mne_analyze**: field mapping, overlay controls, sensor display, timecourse manager, view presets |
-| **Low** | 32 | Niche I/O formats (EEGLAB, EGI, SNIRF, etc.), Stockwell TFR, FEM forward, OTP, AR PSD, decoding/ML wrappers, **mne_analyze**: MRI viewer, HPI vis, remote control, movie export, curvature |
+> **Authoritative counts are machine-generated.** For the exact, per-API,
+> versioned gap totals against the pinned MNE-Python reference, see
+> [`doc/release/v2.4.0/mne-python-gap.md`](../release/v2.4.0/mne-python-gap.md)
+> (rendered from `doc/api_registry.json`). The priority buckets below are a
+> hand-maintained planning view and must not contradict that data.
+
+| Priority | Key items |
+|---|---|
+| **High** | TF-MxNE, standard montages (10-20/10-10/10-05), Maxwell movement compensation, inverse resolution metrics (PSF/CTF), **mne_analyze**: cortical surface loading, STC overlay, source estimation in GUI, label management, vertex picking |
+| **Medium** | Multitaper TFR, directed connectivity, Picard ICA, auto ICA classification, SourceMorph, depth priors, volume rendering, simulation (`simulate_raw`/`_stc`/`_evoked`), surface Laplacian (CSD), topomap sequences, **mne_analyze**: field mapping, overlay controls, sensor display, timecourse manager, view presets |
+| **Low** | Niche I/O formats (EEGLAB, EGI, SNIRF, Curry, GDF, FieldTrip, Neuralynx, NSx, etc.), Stockwell TFR, FEM forward, OTP, PCA-OBS, AR PSD, decoding/ML wrappers (SlidingEstimator/GeneralizingEstimator/ReceptiveField/EMS), **mne_analyze**: MRI viewer, HPI vis, remote control, movie export, curvature |
 
 ### Closed since v2.1.0 (now in staging)
 

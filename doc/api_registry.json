@@ -1,10 +1,10 @@
 {
   "$comment": "Single source of truth for all MNE-CPP public API classes and their provenance. Tracks where each implementation originates (mne-python, mne-c/SVN, scikit-learn, scipy, custom), where it is tested, and whether an example exists. Used for systematic porting coverage analysis.",
   "meta": {
-    "version": "1.0.0",
-    "last_updated": "2026-05-28",
-    "mne_cpp_version": "2.3.0-dev",
-    "mne_python_ref": "1.9.x",
+    "version": "1.1.0",
+    "last_updated": "2026-07-11",
+    "mne_cpp_version": "2.4.0-dev",
+    "mne_python_ref": "1.11.0",
     "mne_c_ref": "SVN r12960"
   },
   "modules": {
@@ -6262,6 +6262,2508 @@
       "python_url": null
     }
   ],
+  "parity": {
+    "$comment": "Qualitative MNE-CPP<->MNE-Python parity map. Hand-curated data (NOT generated): each record classifies one public MNE-Python API against the pinned reference. Existing C++ classes above with a 'mne_python'/'python_equiv' field are auto-counted as implemented and need NOT be repeated here; this array captures APIs realised as CLI tools/methods, partial coverage, genuine gaps (missing), and out-of-scope (not-applicable). tools/parity/gap_analysis.py extracts the pinned MNE-Python inventory, checks every symbol is classified here or in 'classes', and renders doc/release/v2.4.0/mne-python-gap.{json,md}.",
+    "mne_python_pinned": "1.11",
+    "status_values": [
+      "implemented",
+      "partial",
+      "missing",
+      "not-applicable"
+    ],
+    "records": [
+      {
+        "python": "mne.AcqParserFIF",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Elekta acquisition-parameter parser not ported"
+      },
+      {
+        "python": "mne.BaseEpochs",
+        "status": "implemented",
+        "mne_cpp": "MNEEpochDataList",
+        "note": "base epochs container"
+      },
+      {
+        "python": "mne.BiHemiLabel",
+        "status": "implemented",
+        "mne_cpp": "Label (FSLIB)",
+        "note": "bi-hemisphere label"
+      },
+      {
+        "python": "mne.Dipole",
+        "status": "implemented",
+        "mne_cpp": "ECD (INVERSELIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.DipoleFixed",
+        "status": "partial",
+        "mne_cpp": "ECD (partial)",
+        "note": "fixed-dipole time course limited"
+      },
+      {
+        "python": "mne.EpochsArray",
+        "status": "implemented",
+        "mne_cpp": "MNEEpochDataList (constructed directly)",
+        "note": ""
+      },
+      {
+        "python": "mne.EvokedArray",
+        "status": "implemented",
+        "mne_cpp": "FiffEvoked (constructed directly)",
+        "note": ""
+      },
+      {
+        "python": "mne.Label",
+        "status": "implemented",
+        "mne_cpp": "Label (FSLIB)",
+        "note": "cortical ROI"
+      },
+      {
+        "python": "mne.MixedSourceEstimate",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "mixed STC not ported"
+      },
+      {
+        "python": "mne.MixedVectorSourceEstimate",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "mixed vector STC not ported"
+      },
+      {
+        "python": "mne.Report",
+        "status": "not-applicable",
+        "mne_cpp": "",
+        "note": "HTML report generator; Python-ecosystem tool"
+      },
+      {
+        "python": "mne.VolSourceEstimate",
+        "status": "partial",
+        "mne_cpp": "MNESourceEstimate (partial)",
+        "note": "volume STC limited"
+      },
+      {
+        "python": "mne.VolVectorSourceEstimate",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "volume vector STC not ported"
+      },
+      {
+        "python": "mne.add_reference_channels",
+        "status": "implemented",
+        "mne_cpp": "RTPROCESSINGLIB rereference",
+        "note": ""
+      },
+      {
+        "python": "mne.add_source_space_distances",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "geodesic src distances not ported"
+      },
+      {
+        "python": "mne.annotations_from_events",
+        "status": "implemented",
+        "mne_cpp": "FiffAnnotationEventUtils",
+        "note": ""
+      },
+      {
+        "python": "mne.apply_forward",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution apply",
+        "note": ""
+      },
+      {
+        "python": "mne.apply_forward_raw",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution apply",
+        "note": ""
+      },
+      {
+        "python": "mne.average_forward_solutions",
+        "status": "implemented",
+        "mne_cpp": "mne_average_forward_solutions (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.beamformer.Beamformer",
+        "status": "implemented",
+        "mne_cpp": "Lcmv/Dics (container)",
+        "note": ""
+      },
+      {
+        "python": "mne.beamformer.apply_dics",
+        "status": "implemented",
+        "mne_cpp": "Dics",
+        "note": ""
+      },
+      {
+        "python": "mne.beamformer.apply_dics_csd",
+        "status": "implemented",
+        "mne_cpp": "Dics (CSD)",
+        "note": ""
+      },
+      {
+        "python": "mne.beamformer.apply_dics_epochs",
+        "status": "partial",
+        "mne_cpp": "Dics (partial)",
+        "note": "epochs DICS"
+      },
+      {
+        "python": "mne.beamformer.apply_dics_tfr_epochs",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "TFR-epochs DICS not ported"
+      },
+      {
+        "python": "mne.beamformer.apply_lcmv",
+        "status": "implemented",
+        "mne_cpp": "Lcmv",
+        "note": ""
+      },
+      {
+        "python": "mne.beamformer.apply_lcmv_cov",
+        "status": "partial",
+        "mne_cpp": "Lcmv (partial)",
+        "note": "covariance source power"
+      },
+      {
+        "python": "mne.beamformer.apply_lcmv_epochs",
+        "status": "implemented",
+        "mne_cpp": "Lcmv (epochs)",
+        "note": ""
+      },
+      {
+        "python": "mne.beamformer.apply_lcmv_raw",
+        "status": "implemented",
+        "mne_cpp": "Lcmv (raw)",
+        "note": ""
+      },
+      {
+        "python": "mne.beamformer.make_dics",
+        "status": "implemented",
+        "mne_cpp": "Dics",
+        "note": ""
+      },
+      {
+        "python": "mne.beamformer.make_lcmv",
+        "status": "implemented",
+        "mne_cpp": "Lcmv",
+        "note": ""
+      },
+      {
+        "python": "mne.beamformer.make_lcmv_resolution_matrix",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "LCMV resolution matrix not ported"
+      },
+      {
+        "python": "mne.beamformer.read_beamformer",
+        "status": "partial",
+        "mne_cpp": "Lcmv/Dics (partial)",
+        "note": "beamformer I/O limited"
+      },
+      {
+        "python": "mne.channel_indices_by_type",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB channel picking",
+        "note": ""
+      },
+      {
+        "python": "mne.channel_type",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB channel-type query",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.DigMontage",
+        "status": "partial",
+        "mne_cpp": "FIFFLIB dig (partial)",
+        "note": "montage container limited"
+      },
+      {
+        "python": "mne.channels.Layout",
+        "status": "implemented",
+        "mne_cpp": "DISPLIB Layout",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.combine_channels",
+        "status": "implemented",
+        "mne_cpp": "MNEDeriv combinations",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.compute_dev_head_t",
+        "status": "implemented",
+        "mne_cpp": "mne_coreg ICP",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.compute_native_head_t",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "native->head transform not ported"
+      },
+      {
+        "python": "mne.channels.equalize_channels",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB channel alignment",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.find_ch_adjacency",
+        "status": "implemented",
+        "mne_cpp": "StatsAdjacency",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.find_layout",
+        "status": "implemented",
+        "mne_cpp": "DISPLIB layout",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.fix_mag_coil_types",
+        "status": "implemented",
+        "mne_cpp": "mne_fix_mag_coil_types (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.generate_2d_layout",
+        "status": "implemented",
+        "mne_cpp": "DISPLIB layout generation",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.get_builtin_ch_adjacencies",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "builtin adjacency database not ported"
+      },
+      {
+        "python": "mne.channels.get_builtin_montages",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "builtin montage database not ported"
+      },
+      {
+        "python": "mne.channels.make_1020_channel_selections",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "10-20 channel selection groups not ported"
+      },
+      {
+        "python": "mne.channels.make_dig_montage",
+        "status": "partial",
+        "mne_cpp": "FIFFLIB dig (partial)",
+        "note": "montage builder limited"
+      },
+      {
+        "python": "mne.channels.make_eeg_layout",
+        "status": "implemented",
+        "mne_cpp": "mne_make_eeg_layout (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.make_grid_layout",
+        "status": "implemented",
+        "mne_cpp": "DISPLIB grid layout",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.make_standard_montage",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "standard 10-20/10-10/10-05 montages"
+      },
+      {
+        "python": "mne.channels.read_ch_adjacency",
+        "status": "partial",
+        "mne_cpp": "StatsAdjacency (partial)",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.read_custom_montage",
+        "status": "partial",
+        "mne_cpp": "FIFFLIB dig (partial)",
+        "note": "custom montage limited"
+      },
+      {
+        "python": "mne.channels.read_dig_captrak",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "CapTrak dig reader not ported"
+      },
+      {
+        "python": "mne.channels.read_dig_curry",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Curry dig reader not ported"
+      },
+      {
+        "python": "mne.channels.read_dig_dat",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Neuroscan .dat dig reader not ported"
+      },
+      {
+        "python": "mne.channels.read_dig_egi",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EGI dig reader not ported"
+      },
+      {
+        "python": "mne.channels.read_dig_fif",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB dig I/O",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.read_dig_hpts",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB HPTS dig I/O",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.read_dig_localite",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Localite dig reader not ported"
+      },
+      {
+        "python": "mne.channels.read_dig_polhemus_isotrak",
+        "status": "implemented",
+        "mne_cpp": "mne_coreg Polhemus driver",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.read_layout",
+        "status": "implemented",
+        "mne_cpp": "DISPLIB layout I/O",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.read_polhemus_fastscan",
+        "status": "implemented",
+        "mne_cpp": "mne_coreg Polhemus driver",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.read_vectorview_selection",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB selection I/O",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.rename_channels",
+        "status": "implemented",
+        "mne_cpp": "mne_rename_channels (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.transform_to_head",
+        "status": "implemented",
+        "mne_cpp": "FiffCoordTrans",
+        "note": ""
+      },
+      {
+        "python": "mne.channels.unify_bad_channels",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB bad-channel utils",
+        "note": ""
+      },
+      {
+        "python": "mne.combine_evoked",
+        "status": "implemented",
+        "mne_cpp": "FiffEvoked arithmetic",
+        "note": ""
+      },
+      {
+        "python": "mne.compute_covariance",
+        "status": "implemented",
+        "mne_cpp": "StsCovEstimators / RtCov",
+        "note": "epochs covariance"
+      },
+      {
+        "python": "mne.compute_proj_epochs",
+        "status": "implemented",
+        "mne_cpp": "DSPLIB SSP",
+        "note": ""
+      },
+      {
+        "python": "mne.compute_proj_evoked",
+        "status": "implemented",
+        "mne_cpp": "DSPLIB SSP",
+        "note": ""
+      },
+      {
+        "python": "mne.compute_proj_raw",
+        "status": "implemented",
+        "mne_cpp": "DSPLIB SSP",
+        "note": ""
+      },
+      {
+        "python": "mne.compute_rank",
+        "status": "implemented",
+        "mne_cpp": "MATHLIB rank estimation",
+        "note": ""
+      },
+      {
+        "python": "mne.compute_raw_covariance",
+        "status": "implemented",
+        "mne_cpp": "StsCovEstimators",
+        "note": "raw covariance"
+      },
+      {
+        "python": "mne.compute_source_morph",
+        "status": "partial",
+        "mne_cpp": "MNEMorphMap (partial)",
+        "note": "surface morph; no unified vol morph"
+      },
+      {
+        "python": "mne.concatenate_epochs",
+        "status": "implemented",
+        "mne_cpp": "MNEEpochDataList",
+        "note": ""
+      },
+      {
+        "python": "mne.concatenate_events",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB event utils",
+        "note": ""
+      },
+      {
+        "python": "mne.concatenate_raws",
+        "status": "implemented",
+        "mne_cpp": "FiffRawData concatenation",
+        "note": ""
+      },
+      {
+        "python": "mne.convert_forward_solution",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution",
+        "note": "fixed/free orientation"
+      },
+      {
+        "python": "mne.count_annotations",
+        "status": "implemented",
+        "mne_cpp": "FiffAnnotations",
+        "note": ""
+      },
+      {
+        "python": "mne.count_events",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB event utils",
+        "note": ""
+      },
+      {
+        "python": "mne.create_default_subject",
+        "status": "not-applicable",
+        "mne_cpp": "",
+        "note": "fsaverage setup; FreeSurfer helper"
+      },
+      {
+        "python": "mne.create_info",
+        "status": "implemented",
+        "mne_cpp": "FiffInfo (constructed directly)",
+        "note": ""
+      },
+      {
+        "python": "mne.decimate_surface",
+        "status": "implemented",
+        "mne_cpp": "MNESurface decimation",
+        "note": ""
+      },
+      {
+        "python": "mne.decoding.BaseEstimator",
+        "status": "not-applicable",
+        "mne_cpp": "",
+        "note": "sklearn base class; Python framework"
+      },
+      {
+        "python": "mne.decoding.CSP",
+        "status": "implemented",
+        "mne_cpp": "MlCsp (skigen)",
+        "note": ""
+      },
+      {
+        "python": "mne.decoding.EMS",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "eigenvector method"
+      },
+      {
+        "python": "mne.decoding.FilterEstimator",
+        "status": "partial",
+        "mne_cpp": "DSPLIB filters (partial)",
+        "note": "no sklearn wrapper"
+      },
+      {
+        "python": "mne.decoding.GeneralizingEstimator",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "temporal generalization wrapper"
+      },
+      {
+        "python": "mne.decoding.LinearModel",
+        "status": "partial",
+        "mne_cpp": "MlLinearModel (partial)",
+        "note": "predict-only container"
+      },
+      {
+        "python": "mne.decoding.PSDEstimator",
+        "status": "partial",
+        "mne_cpp": "Spectral (partial)",
+        "note": "no sklearn wrapper"
+      },
+      {
+        "python": "mne.decoding.ReceptiveField",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "encoding/decoding TRF"
+      },
+      {
+        "python": "mne.decoding.SPoC",
+        "status": "implemented",
+        "mne_cpp": "MlSpoc (skigen)",
+        "note": ""
+      },
+      {
+        "python": "mne.decoding.SSD",
+        "status": "implemented",
+        "mne_cpp": "MlSsd (skigen)",
+        "note": ""
+      },
+      {
+        "python": "mne.decoding.Scaler",
+        "status": "implemented",
+        "mne_cpp": "MlScaler (skigen)",
+        "note": ""
+      },
+      {
+        "python": "mne.decoding.SlidingEstimator",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "time-resolved decoding wrapper"
+      },
+      {
+        "python": "mne.decoding.SpatialFilter",
+        "status": "implemented",
+        "mne_cpp": "MlCsp/MlSpoc/MlSsd base",
+        "note": ""
+      },
+      {
+        "python": "mne.decoding.TemporalFilter",
+        "status": "partial",
+        "mne_cpp": "DSPLIB filters (partial)",
+        "note": "no sklearn wrapper"
+      },
+      {
+        "python": "mne.decoding.TimeDelayingRidge",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "time-delaying ridge (TRF) not ported"
+      },
+      {
+        "python": "mne.decoding.TimeFrequency",
+        "status": "partial",
+        "mne_cpp": "DSPLIB TFR (partial)",
+        "note": "no sklearn wrapper"
+      },
+      {
+        "python": "mne.decoding.TransformerMixin",
+        "status": "not-applicable",
+        "mne_cpp": "",
+        "note": "sklearn mixin; Python framework"
+      },
+      {
+        "python": "mne.decoding.UnsupervisedSpatialFilter",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "sklearn PCA/ICA wrapper"
+      },
+      {
+        "python": "mne.decoding.Vectorizer",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "flatten wrapper not ported"
+      },
+      {
+        "python": "mne.decoding.XdawnTransformer",
+        "status": "implemented",
+        "mne_cpp": "xDAWN (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.decoding.compute_ems",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EMS not ported"
+      },
+      {
+        "python": "mne.decoding.cross_val_multiscore",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "cross-validation helper"
+      },
+      {
+        "python": "mne.decoding.get_coef",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "coefficient extraction helper"
+      },
+      {
+        "python": "mne.decoding.get_spatial_filter_from_estimator",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "sklearn helper not ported"
+      },
+      {
+        "python": "mne.dig_mri_distances",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "dig<->MRI distance QA not ported"
+      },
+      {
+        "python": "mne.equalize_channels",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB channel alignment",
+        "note": ""
+      },
+      {
+        "python": "mne.events_from_annotations",
+        "status": "implemented",
+        "mne_cpp": "FiffAnnotationEventUtils",
+        "note": ""
+      },
+      {
+        "python": "mne.export.export_epochs",
+        "status": "partial",
+        "mne_cpp": "EDF/BrainVision export (partial)",
+        "note": "epochs export limited"
+      },
+      {
+        "python": "mne.export.export_evokeds",
+        "status": "partial",
+        "mne_cpp": "EDF/BrainVision export (partial)",
+        "note": "evoked export limited"
+      },
+      {
+        "python": "mne.export.export_evokeds_mff",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EGI-MFF evoked export not ported"
+      },
+      {
+        "python": "mne.export.export_raw",
+        "status": "partial",
+        "mne_cpp": "EDF/BrainVision export (partial)",
+        "note": "not all formats"
+      },
+      {
+        "python": "mne.find_events",
+        "status": "implemented",
+        "mne_cpp": "RTPROCESSINGLIB event detection",
+        "note": ""
+      },
+      {
+        "python": "mne.find_layout",
+        "status": "implemented",
+        "mne_cpp": "DISPLIB layout",
+        "note": ""
+      },
+      {
+        "python": "mne.find_stim_steps",
+        "status": "implemented",
+        "mne_cpp": "RTPROCESSINGLIB event detection",
+        "note": ""
+      },
+      {
+        "python": "mne.forward.apply_forward",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution apply",
+        "note": ""
+      },
+      {
+        "python": "mne.forward.apply_forward_raw",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution apply",
+        "note": ""
+      },
+      {
+        "python": "mne.forward.average_forward_solutions",
+        "status": "implemented",
+        "mne_cpp": "mne_average_forward_solutions (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.forward.compute_depth_prior",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "depth weighting not ported"
+      },
+      {
+        "python": "mne.forward.compute_orient_prior",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "orientation prior not ported"
+      },
+      {
+        "python": "mne.forward.convert_forward_solution",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution",
+        "note": ""
+      },
+      {
+        "python": "mne.forward.is_fixed_orient",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution",
+        "note": ""
+      },
+      {
+        "python": "mne.forward.make_field_map",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "field map interpolation (viz overlay planned)"
+      },
+      {
+        "python": "mne.forward.make_forward_dipole",
+        "status": "partial",
+        "mne_cpp": "ComputeFwd (partial)",
+        "note": "dipole forward limited"
+      },
+      {
+        "python": "mne.forward.read_forward_solution",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution::read",
+        "note": ""
+      },
+      {
+        "python": "mne.forward.restrict_forward_to_label",
+        "status": "partial",
+        "mne_cpp": "MNEForwardSolution (partial)",
+        "note": "label restriction limited"
+      },
+      {
+        "python": "mne.forward.restrict_forward_to_stc",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "stc restriction not ported"
+      },
+      {
+        "python": "mne.forward.use_coil_def",
+        "status": "implemented",
+        "mne_cpp": "FWDLIB coil definitions",
+        "note": ""
+      },
+      {
+        "python": "mne.forward.write_forward_solution",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution::write",
+        "note": ""
+      },
+      {
+        "python": "mne.get_head_surf",
+        "status": "implemented",
+        "mne_cpp": "FSLIB head surface",
+        "note": ""
+      },
+      {
+        "python": "mne.get_meg_helmet_surf",
+        "status": "implemented",
+        "mne_cpp": "FWDLIB helmet surface",
+        "note": ""
+      },
+      {
+        "python": "mne.get_volume_labels_from_aseg",
+        "status": "partial",
+        "mne_cpp": "MRILIB aseg (partial)",
+        "note": ""
+      },
+      {
+        "python": "mne.get_volume_labels_from_src",
+        "status": "partial",
+        "mne_cpp": "MRILIB aseg (partial)",
+        "note": ""
+      },
+      {
+        "python": "mne.grade_to_tris",
+        "status": "implemented",
+        "mne_cpp": "MNESurface triangulation",
+        "note": ""
+      },
+      {
+        "python": "mne.grade_to_vertices",
+        "status": "implemented",
+        "mne_cpp": "MNESourceSpace decimation",
+        "note": ""
+      },
+      {
+        "python": "mne.grand_average",
+        "status": "implemented",
+        "mne_cpp": "FiffEvoked averaging",
+        "note": ""
+      },
+      {
+        "python": "mne.grow_labels",
+        "status": "partial",
+        "mne_cpp": "FSLIB (partial)",
+        "note": "label grow present, split limited"
+      },
+      {
+        "python": "mne.head_to_mni",
+        "status": "partial",
+        "mne_cpp": "FSLIB (partial)",
+        "note": "MNI transform limited"
+      },
+      {
+        "python": "mne.head_to_mri",
+        "status": "implemented",
+        "mne_cpp": "FiffCoordTrans head->MRI",
+        "note": ""
+      },
+      {
+        "python": "mne.inverse_sparse.gamma_map",
+        "status": "implemented",
+        "mne_cpp": "GammaMap",
+        "note": ""
+      },
+      {
+        "python": "mne.inverse_sparse.make_stc_from_dipoles",
+        "status": "implemented",
+        "mne_cpp": "MixedNorm/GammaMap output",
+        "note": ""
+      },
+      {
+        "python": "mne.inverse_sparse.mixed_norm",
+        "status": "implemented",
+        "mne_cpp": "MixedNorm (MxNE)",
+        "note": ""
+      },
+      {
+        "python": "mne.inverse_sparse.tf_mixed_norm",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "TF-MxNE not yet ported"
+      },
+      {
+        "python": "mne.io.BaseRaw",
+        "status": "implemented",
+        "mne_cpp": "FiffRawData (BaseRaw)",
+        "note": ""
+      },
+      {
+        "python": "mne.io.RawArray",
+        "status": "implemented",
+        "mne_cpp": "FiffRawData (constructed directly)",
+        "note": ""
+      },
+      {
+        "python": "mne.io.anonymize_info",
+        "status": "implemented",
+        "mne_cpp": "mne_anonymize (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.io.concatenate_raws",
+        "status": "implemented",
+        "mne_cpp": "FiffRawData concatenation",
+        "note": ""
+      },
+      {
+        "python": "mne.io.get_channel_type_constants",
+        "status": "implemented",
+        "mne_cpp": "FIFF constants",
+        "note": ""
+      },
+      {
+        "python": "mne.io.match_channel_orders",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB channel alignment",
+        "note": ""
+      },
+      {
+        "python": "mne.io.read_epochs_eeglab",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EEGLAB epochs reader not ported"
+      },
+      {
+        "python": "mne.io.read_epochs_fieldtrip",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "FieldTrip epochs reader not ported"
+      },
+      {
+        "python": "mne.io.read_epochs_kit",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "KIT epochs reader not ported"
+      },
+      {
+        "python": "mne.io.read_evoked_besa",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "BESA evoked reader not ported"
+      },
+      {
+        "python": "mne.io.read_evoked_fieldtrip",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "FieldTrip evoked reader not ported"
+      },
+      {
+        "python": "mne.io.read_evokeds_mff",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EGI-MFF evoked reader not ported"
+      },
+      {
+        "python": "mne.io.read_fiducials",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB fiducial I/O",
+        "note": ""
+      },
+      {
+        "python": "mne.io.read_info",
+        "status": "implemented",
+        "mne_cpp": "FiffInfo::read",
+        "note": ""
+      },
+      {
+        "python": "mne.io.read_raw",
+        "status": "implemented",
+        "mne_cpp": "BIDS reader dispatch / CLI converters",
+        "note": ""
+      },
+      {
+        "python": "mne.io.read_raw_ant",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "ANT Neuro reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_artemis123",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Artemis123 reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_bdf",
+        "status": "implemented",
+        "mne_cpp": "mne_edf2fiff (CLI) / BIDS reader",
+        "note": "BDF is EDF-family"
+      },
+      {
+        "python": "mne.io.read_raw_boxy",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "BOXY fNIRS reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_brainvision",
+        "status": "implemented",
+        "mne_cpp": "mne_brain_vision2fiff (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.io.read_raw_bti",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "BTi/4D reader not ported (mne_insert_4D_comp exists)"
+      },
+      {
+        "python": "mne.io.read_raw_cnt",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Neuroscan CNT reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_ctf",
+        "status": "implemented",
+        "mne_cpp": "mne_ctf2fiff (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.io.read_raw_curry",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Curry reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_edf",
+        "status": "implemented",
+        "mne_cpp": "mne_edf2fiff (CLI) / BIDS reader",
+        "note": ""
+      },
+      {
+        "python": "mne.io.read_raw_eeglab",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EEGLAB .set reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_egi",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EGI-MFF reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_eximia",
+        "status": "implemented",
+        "mne_cpp": "mne_eximia2fiff (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.io.read_raw_eyelink",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EyeLink eye-tracking reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_fieldtrip",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "FieldTrip reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_fif",
+        "status": "implemented",
+        "mne_cpp": "FiffRawData",
+        "note": ""
+      },
+      {
+        "python": "mne.io.read_raw_fil",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "FIL OPM reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_gdf",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "GDF reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_hitachi",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Hitachi fNIRS reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_kit",
+        "status": "implemented",
+        "mne_cpp": "mne_kit2fiff (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.io.read_raw_nedf",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "NEDF reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_neuralynx",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Neuralynx reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_nicolet",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Nicolet reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_nihon",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Nihon Kohden reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_nirx",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "NIRx fNIRS reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_nsx",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Blackrock NSx reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_persyst",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Persyst reader not ported"
+      },
+      {
+        "python": "mne.io.read_raw_snirf",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "SNIRF fNIRS reader not ported"
+      },
+      {
+        "python": "mne.io.show_fiff",
+        "status": "implemented",
+        "mne_cpp": "mne_show_fiff (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.io.write_fiducials",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB fiducial I/O",
+        "note": ""
+      },
+      {
+        "python": "mne.io.write_info",
+        "status": "implemented",
+        "mne_cpp": "FiffInfo::write",
+        "note": ""
+      },
+      {
+        "python": "mne.label_sign_flip",
+        "status": "implemented",
+        "mne_cpp": "FSLIB label sign flip",
+        "note": ""
+      },
+      {
+        "python": "mne.labels_to_stc",
+        "status": "partial",
+        "mne_cpp": "FSLIB (partial)",
+        "note": "label->stc limited"
+      },
+      {
+        "python": "mne.make_ad_hoc_cov",
+        "status": "implemented",
+        "mne_cpp": "FiffCov (ad-hoc)",
+        "note": ""
+      },
+      {
+        "python": "mne.make_bem_model",
+        "status": "implemented",
+        "mne_cpp": "mne_prepare_bem_model (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.make_bem_solution",
+        "status": "implemented",
+        "mne_cpp": "mne_setup_forward_model (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.make_field_map",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "field map interpolation (viz overlay planned)"
+      },
+      {
+        "python": "mne.make_fixed_length_epochs",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "fixed-length epochs helper"
+      },
+      {
+        "python": "mne.make_fixed_length_events",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "fixed-length events helper"
+      },
+      {
+        "python": "mne.make_forward_dipole",
+        "status": "partial",
+        "mne_cpp": "ComputeFwd (partial)",
+        "note": "dipole forward limited"
+      },
+      {
+        "python": "mne.make_forward_solution",
+        "status": "implemented",
+        "mne_cpp": "mne_forward_solution (CLI) / ComputeFwd",
+        "note": "forward pipeline"
+      },
+      {
+        "python": "mne.make_sphere_model",
+        "status": "implemented",
+        "mne_cpp": "mne_make_sphere_bem (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.match_channel_orders",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB channel alignment",
+        "note": ""
+      },
+      {
+        "python": "mne.merge_events",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB event utils",
+        "note": ""
+      },
+      {
+        "python": "mne.minimum_norm.apply_inverse",
+        "status": "implemented",
+        "mne_cpp": "MinimumNorm",
+        "note": ""
+      },
+      {
+        "python": "mne.minimum_norm.apply_inverse_cov",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "covariance source power convenience"
+      },
+      {
+        "python": "mne.minimum_norm.apply_inverse_epochs",
+        "status": "implemented",
+        "mne_cpp": "MinimumNorm (epochs)",
+        "note": ""
+      },
+      {
+        "python": "mne.minimum_norm.apply_inverse_raw",
+        "status": "implemented",
+        "mne_cpp": "mne_compute_raw_inverse (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.minimum_norm.apply_inverse_tfr_epochs",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "TFR-epochs inverse convenience not ported"
+      },
+      {
+        "python": "mne.minimum_norm.compute_rank_inverse",
+        "status": "implemented",
+        "mne_cpp": "MNEInverseOperator rank",
+        "note": ""
+      },
+      {
+        "python": "mne.minimum_norm.compute_source_psd",
+        "status": "partial",
+        "mne_cpp": "Welch PSD + inverse (manual)",
+        "note": "no single convenience API"
+      },
+      {
+        "python": "mne.minimum_norm.compute_source_psd_epochs",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "epochs source PSD convenience"
+      },
+      {
+        "python": "mne.minimum_norm.estimate_snr",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "SNR estimation not ported"
+      },
+      {
+        "python": "mne.minimum_norm.get_cross_talk",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "CTF resolution metric not ported"
+      },
+      {
+        "python": "mne.minimum_norm.get_point_spread",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "PSF resolution metric not ported"
+      },
+      {
+        "python": "mne.minimum_norm.make_inverse_operator",
+        "status": "implemented",
+        "mne_cpp": "MNEInverseOperator",
+        "note": ""
+      },
+      {
+        "python": "mne.minimum_norm.prepare_inverse_operator",
+        "status": "implemented",
+        "mne_cpp": "MNEInverseOperator::prepare",
+        "note": ""
+      },
+      {
+        "python": "mne.minimum_norm.read_inverse_operator",
+        "status": "implemented",
+        "mne_cpp": "MNEInverseOperator::read",
+        "note": ""
+      },
+      {
+        "python": "mne.minimum_norm.resolution_metrics",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "resolution metrics not ported"
+      },
+      {
+        "python": "mne.minimum_norm.source_band_induced_power",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "banded source power convenience"
+      },
+      {
+        "python": "mne.minimum_norm.source_induced_power",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "source induced power convenience"
+      },
+      {
+        "python": "mne.minimum_norm.write_inverse_operator",
+        "status": "implemented",
+        "mne_cpp": "MNEInverseOperator::write",
+        "note": ""
+      },
+      {
+        "python": "mne.morph_labels",
+        "status": "implemented",
+        "mne_cpp": "mne_morph_labels (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.morph_source_spaces",
+        "status": "partial",
+        "mne_cpp": "MNEMorphMap (partial)",
+        "note": ""
+      },
+      {
+        "python": "mne.parse_config",
+        "status": "not-applicable",
+        "mne_cpp": "",
+        "note": "MNE-C .cfg parser; Python helper"
+      },
+      {
+        "python": "mne.pick_channels",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB channel picking",
+        "note": ""
+      },
+      {
+        "python": "mne.pick_channels_cov",
+        "status": "implemented",
+        "mne_cpp": "FiffCov picking",
+        "note": ""
+      },
+      {
+        "python": "mne.pick_channels_forward",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution::pick_channels",
+        "note": ""
+      },
+      {
+        "python": "mne.pick_channels_regexp",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB channel picking",
+        "note": ""
+      },
+      {
+        "python": "mne.pick_events",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB event utils",
+        "note": ""
+      },
+      {
+        "python": "mne.pick_info",
+        "status": "implemented",
+        "mne_cpp": "FiffInfo::pick_info",
+        "note": ""
+      },
+      {
+        "python": "mne.pick_types",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB channel picking",
+        "note": ""
+      },
+      {
+        "python": "mne.pick_types_forward",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution::pick_types",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.EOGRegression",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EOG regression not ported"
+      },
+      {
+        "python": "mne.preprocessing.ICA",
+        "status": "implemented",
+        "mne_cpp": "FastICA / Infomax (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.annotate_amplitude",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "amplitude annotation not ported"
+      },
+      {
+        "python": "mne.preprocessing.annotate_break",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "break annotation not ported"
+      },
+      {
+        "python": "mne.preprocessing.annotate_movement",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "movement annotation not ported"
+      },
+      {
+        "python": "mne.preprocessing.annotate_muscle_zscore",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "muscle annotation not ported"
+      },
+      {
+        "python": "mne.preprocessing.annotate_nan",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "NaN annotation not ported"
+      },
+      {
+        "python": "mne.preprocessing.apply_pca_obs",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "PCA-OBS cardiac removal not ported"
+      },
+      {
+        "python": "mne.preprocessing.compute_average_dev_head_t",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "average device->head transform not ported"
+      },
+      {
+        "python": "mne.preprocessing.compute_current_source_density",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "surface Laplacian/CSD not ported"
+      },
+      {
+        "python": "mne.preprocessing.compute_fine_calibration",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "fine calibration not ported"
+      },
+      {
+        "python": "mne.preprocessing.compute_maxwell_basis",
+        "status": "implemented",
+        "mne_cpp": "SSS basis (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.compute_proj_ecg",
+        "status": "implemented",
+        "mne_cpp": "DSPLIB ECG SSP",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.compute_proj_eog",
+        "status": "implemented",
+        "mne_cpp": "DSPLIB EOG SSP",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.compute_proj_hfc",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "homogeneous field correction not ported"
+      },
+      {
+        "python": "mne.preprocessing.corrmap",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "ICA corrmap not ported"
+      },
+      {
+        "python": "mne.preprocessing.cortical_signal_suppression",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "CSS not ported"
+      },
+      {
+        "python": "mne.preprocessing.create_ecg_epochs",
+        "status": "implemented",
+        "mne_cpp": "DSPLIB ECG epochs",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.create_eog_epochs",
+        "status": "implemented",
+        "mne_cpp": "DSPLIB EOG epochs",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.equalize_bads",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB bad-channel utils",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.find_bad_channels_lof",
+        "status": "implemented",
+        "mne_cpp": "BadChannelsLof (skigen LOF)",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.find_bad_channels_maxwell",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Maxwell-basis bad-ch detection"
+      },
+      {
+        "python": "mne.preprocessing.find_ecg_events",
+        "status": "implemented",
+        "mne_cpp": "DSPLIB ECG detection",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.find_eog_events",
+        "status": "implemented",
+        "mne_cpp": "DSPLIB EOG detection",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.get_score_funcs",
+        "status": "not-applicable",
+        "mne_cpp": "",
+        "note": "sklearn score-func registry; Python helper"
+      },
+      {
+        "python": "mne.preprocessing.ica_find_ecg_events",
+        "status": "implemented",
+        "mne_cpp": "DSPLIB ECG detection",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.ica_find_eog_events",
+        "status": "implemented",
+        "mne_cpp": "DSPLIB EOG detection",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.infomax",
+        "status": "implemented",
+        "mne_cpp": "Infomax ICA (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.preprocessing.interpolate_bridged_electrodes",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "bridged electrode repair not ported"
+      },
+      {
+        "python": "mne.preprocessing.maxwell_filter",
+        "status": "partial",
+        "mne_cpp": "SSS/tSSS (DSPLIB)",
+        "note": "no movement compensation"
+      },
+      {
+        "python": "mne.preprocessing.maxwell_filter_prepare_emptyroom",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "empty-room Maxwell prep not ported"
+      },
+      {
+        "python": "mne.preprocessing.oversampled_temporal_projection",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "OTP not ported"
+      },
+      {
+        "python": "mne.preprocessing.read_eog_regression",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EOG regression I/O not ported"
+      },
+      {
+        "python": "mne.preprocessing.read_ica",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "ICA solution I/O not ported"
+      },
+      {
+        "python": "mne.preprocessing.read_ica_eeglab",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EEGLAB ICA reader not ported"
+      },
+      {
+        "python": "mne.preprocessing.realign_raw",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "raw realignment not ported"
+      },
+      {
+        "python": "mne.preprocessing.regress_artifact",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EOG regression not ported"
+      },
+      {
+        "python": "mne.preprocessing.write_fine_calibration",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "fine-calibration I/O not ported"
+      },
+      {
+        "python": "mne.random_parcellation",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "random parcellation not ported"
+      },
+      {
+        "python": "mne.read_annotations",
+        "status": "implemented",
+        "mne_cpp": "FiffAnnotations",
+        "note": ""
+      },
+      {
+        "python": "mne.read_bem_solution",
+        "status": "implemented",
+        "mne_cpp": "FWDLIB BEM",
+        "note": ""
+      },
+      {
+        "python": "mne.read_bem_surfaces",
+        "status": "implemented",
+        "mne_cpp": "mne_list_bem (CLI) / FWDLIB",
+        "note": ""
+      },
+      {
+        "python": "mne.read_cov",
+        "status": "implemented",
+        "mne_cpp": "FiffCov::FiffCov(io)",
+        "note": "FIFF covariance I/O"
+      },
+      {
+        "python": "mne.read_dipole",
+        "status": "implemented",
+        "mne_cpp": "ECD / mne_dipole_fit (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.read_epochs",
+        "status": "implemented",
+        "mne_cpp": "FiffEpochs / MNEEpochDataList",
+        "note": ""
+      },
+      {
+        "python": "mne.read_epochs_eeglab",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EEGLAB epochs reader not ported"
+      },
+      {
+        "python": "mne.read_epochs_fieldtrip",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "FieldTrip epochs reader not ported"
+      },
+      {
+        "python": "mne.read_epochs_kit",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "KIT epochs reader not ported"
+      },
+      {
+        "python": "mne.read_events",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB event I/O",
+        "note": ""
+      },
+      {
+        "python": "mne.read_evoked_besa",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "BESA evoked reader not ported"
+      },
+      {
+        "python": "mne.read_evoked_fieldtrip",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "FieldTrip evoked reader not ported"
+      },
+      {
+        "python": "mne.read_evokeds",
+        "status": "implemented",
+        "mne_cpp": "FiffEvoked::read",
+        "note": ""
+      },
+      {
+        "python": "mne.read_evokeds_mff",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EGI-MFF evoked reader not ported"
+      },
+      {
+        "python": "mne.read_forward_solution",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution::read",
+        "note": "FIFF forward I/O"
+      },
+      {
+        "python": "mne.read_freesurfer_lut",
+        "status": "implemented",
+        "mne_cpp": "FSLIB LUT reader",
+        "note": ""
+      },
+      {
+        "python": "mne.read_label",
+        "status": "implemented",
+        "mne_cpp": "Label::read (FSLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.read_labels_from_annot",
+        "status": "implemented",
+        "mne_cpp": "mne_annot2labels (CLI) / FSLIB",
+        "note": ""
+      },
+      {
+        "python": "mne.read_lta",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "FreeSurfer LTA transform reader not ported"
+      },
+      {
+        "python": "mne.read_morph_map",
+        "status": "implemented",
+        "mne_cpp": "mne_make_morph_maps (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.read_proj",
+        "status": "implemented",
+        "mne_cpp": "FiffProj::read",
+        "note": ""
+      },
+      {
+        "python": "mne.read_reject_parameters",
+        "status": "not-applicable",
+        "mne_cpp": "",
+        "note": "MNE-C reject-param parser"
+      },
+      {
+        "python": "mne.read_source_estimate",
+        "status": "implemented",
+        "mne_cpp": "MNESourceEstimate::read",
+        "note": ""
+      },
+      {
+        "python": "mne.read_source_morph",
+        "status": "partial",
+        "mne_cpp": "MNEMorphMap (partial)",
+        "note": "surface morph only"
+      },
+      {
+        "python": "mne.read_source_spaces",
+        "status": "implemented",
+        "mne_cpp": "MNESourceSpace::read",
+        "note": "FIFF source-space I/O"
+      },
+      {
+        "python": "mne.read_talxfm",
+        "status": "partial",
+        "mne_cpp": "FSLIB (partial)",
+        "note": "Talairach xfm limited"
+      },
+      {
+        "python": "mne.read_trans",
+        "status": "implemented",
+        "mne_cpp": "FiffCoordTrans::read",
+        "note": ""
+      },
+      {
+        "python": "mne.read_tri",
+        "status": "implemented",
+        "mne_cpp": "mne_convert_surface (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.read_vectorview_selection",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB selection I/O",
+        "note": ""
+      },
+      {
+        "python": "mne.rename_channels",
+        "status": "implemented",
+        "mne_cpp": "mne_rename_channels (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.scale_bem",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "BEM scaling not ported"
+      },
+      {
+        "python": "mne.scale_labels",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "label scaling not ported"
+      },
+      {
+        "python": "mne.scale_mri",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "MRI scaling coregistration not ported"
+      },
+      {
+        "python": "mne.scale_source_space",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "source space scaling not ported"
+      },
+      {
+        "python": "mne.sensitivity_map",
+        "status": "implemented",
+        "mne_cpp": "mne_sensitivity_map (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.set_bipolar_reference",
+        "status": "implemented",
+        "mne_cpp": "MNEDeriv / mne_make_derivations (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.set_eeg_reference",
+        "status": "implemented",
+        "mne_cpp": "RTPROCESSINGLIB rereference",
+        "note": ""
+      },
+      {
+        "python": "mne.setup_source_space",
+        "status": "implemented",
+        "mne_cpp": "mne_make_source_space (CLI)",
+        "note": "surface source space"
+      },
+      {
+        "python": "mne.setup_volume_source_space",
+        "status": "implemented",
+        "mne_cpp": "mne_volume_source_space (CLI)",
+        "note": "volume source space"
+      },
+      {
+        "python": "mne.simulation.SourceSimulator",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "source simulator not ported"
+      },
+      {
+        "python": "mne.simulation.add_chpi",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "cHPI injection not ported"
+      },
+      {
+        "python": "mne.simulation.add_ecg",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "ECG injection not ported"
+      },
+      {
+        "python": "mne.simulation.add_eog",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "EOG injection not ported"
+      },
+      {
+        "python": "mne.simulation.add_noise",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "noise injection not ported"
+      },
+      {
+        "python": "mne.simulation.select_source_in_label",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "source selection in label not ported"
+      },
+      {
+        "python": "mne.simulation.simulate_evoked",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "evoked simulation not ported"
+      },
+      {
+        "python": "mne.simulation.simulate_raw",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "raw simulation not ported"
+      },
+      {
+        "python": "mne.simulation.simulate_sparse_stc",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "sparse STC simulation not ported"
+      },
+      {
+        "python": "mne.simulation.simulate_stc",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "STC simulation not ported"
+      },
+      {
+        "python": "mne.source_space.add_source_space_distances",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "geodesic src distances not ported"
+      },
+      {
+        "python": "mne.source_space.compute_distance_to_sensors",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "src-sensor distance not ported"
+      },
+      {
+        "python": "mne.source_space.get_decimated_surfaces",
+        "status": "implemented",
+        "mne_cpp": "MNESurface decimation",
+        "note": ""
+      },
+      {
+        "python": "mne.source_space.read_source_spaces",
+        "status": "implemented",
+        "mne_cpp": "MNESourceSpace::read",
+        "note": ""
+      },
+      {
+        "python": "mne.source_space.setup_source_space",
+        "status": "implemented",
+        "mne_cpp": "mne_make_source_space (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.source_space.setup_volume_source_space",
+        "status": "implemented",
+        "mne_cpp": "mne_volume_source_space (CLI)",
+        "note": ""
+      },
+      {
+        "python": "mne.source_space.write_source_spaces",
+        "status": "implemented",
+        "mne_cpp": "MNESourceSpace::write",
+        "note": ""
+      },
+      {
+        "python": "mne.spatial_dist_adjacency",
+        "status": "partial",
+        "mne_cpp": "StatsAdjacency (partial)",
+        "note": "distance-based adjacency limited"
+      },
+      {
+        "python": "mne.spatial_inter_hemi_adjacency",
+        "status": "partial",
+        "mne_cpp": "StatsAdjacency (partial)",
+        "note": "inter-hemi adjacency limited"
+      },
+      {
+        "python": "mne.spatial_src_adjacency",
+        "status": "implemented",
+        "mne_cpp": "StatsAdjacency::fromSourceSpace",
+        "note": ""
+      },
+      {
+        "python": "mne.spatial_tris_adjacency",
+        "status": "implemented",
+        "mne_cpp": "StatsAdjacency",
+        "note": ""
+      },
+      {
+        "python": "mne.spatio_temporal_dist_adjacency",
+        "status": "partial",
+        "mne_cpp": "StatsAdjacency (partial)",
+        "note": "distance adjacency limited"
+      },
+      {
+        "python": "mne.spatio_temporal_src_adjacency",
+        "status": "implemented",
+        "mne_cpp": "StatsAdjacency::fromSourceSpaceTemporal",
+        "note": ""
+      },
+      {
+        "python": "mne.spatio_temporal_tris_adjacency",
+        "status": "implemented",
+        "mne_cpp": "StatsAdjacency",
+        "note": ""
+      },
+      {
+        "python": "mne.split_label",
+        "status": "partial",
+        "mne_cpp": "FSLIB (partial)",
+        "note": "split limited"
+      },
+      {
+        "python": "mne.stats.bonferroni_correction",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Bonferroni correction not ported"
+      },
+      {
+        "python": "mne.stats.bootstrap_confidence_interval",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "bootstrap CI not ported"
+      },
+      {
+        "python": "mne.stats.combine_adjacency",
+        "status": "partial",
+        "mne_cpp": "StatsAdjacency (partial)",
+        "note": ""
+      },
+      {
+        "python": "mne.stats.f_mway_rm",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "RM-ANOVA not ported"
+      },
+      {
+        "python": "mne.stats.f_oneway",
+        "status": "implemented",
+        "mne_cpp": "StatsCluster f-test",
+        "note": ""
+      },
+      {
+        "python": "mne.stats.f_threshold_mway_rm",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "RM-ANOVA threshold not ported"
+      },
+      {
+        "python": "mne.stats.fdr_correction",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "FDR correction not ported"
+      },
+      {
+        "python": "mne.stats.linear_regression",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "channel-wise regression not ported"
+      },
+      {
+        "python": "mne.stats.linear_regression_raw",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "raw linear regression (rERP) not ported"
+      },
+      {
+        "python": "mne.stats.permutation_cluster_1samp_test",
+        "status": "implemented",
+        "mne_cpp": "StatsCluster::oneSamplePermutationTest",
+        "note": ""
+      },
+      {
+        "python": "mne.stats.permutation_cluster_test",
+        "status": "implemented",
+        "mne_cpp": "StatsCluster::fTestPermutationTest",
+        "note": ""
+      },
+      {
+        "python": "mne.stats.permutation_t_test",
+        "status": "implemented",
+        "mne_cpp": "StatsCluster::permutationTest",
+        "note": ""
+      },
+      {
+        "python": "mne.stats.spatio_temporal_cluster_1samp_test",
+        "status": "implemented",
+        "mne_cpp": "StatsCluster",
+        "note": ""
+      },
+      {
+        "python": "mne.stats.spatio_temporal_cluster_test",
+        "status": "implemented",
+        "mne_cpp": "StatsCluster",
+        "note": ""
+      },
+      {
+        "python": "mne.stats.summarize_clusters_stc",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "cluster summary stc not ported"
+      },
+      {
+        "python": "mne.stats.ttest_1samp_no_p",
+        "status": "implemented",
+        "mne_cpp": "StatsCluster",
+        "note": ""
+      },
+      {
+        "python": "mne.stats.ttest_ind_no_p",
+        "status": "implemented",
+        "mne_cpp": "StatsCluster t-test",
+        "note": ""
+      },
+      {
+        "python": "mne.stc_near_sensors",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "sensor-space stc projection not ported"
+      },
+      {
+        "python": "mne.stc_to_label",
+        "status": "partial",
+        "mne_cpp": "FSLIB (partial)",
+        "note": "stc->label limited"
+      },
+      {
+        "python": "mne.time_frequency.AverageTFR",
+        "status": "implemented",
+        "mne_cpp": "TFR containers (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.AverageTFRArray",
+        "status": "implemented",
+        "mne_cpp": "TFR containers (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.BaseTFR",
+        "status": "implemented",
+        "mne_cpp": "TFR containers (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.CrossSpectralDensity",
+        "status": "implemented",
+        "mne_cpp": "CrossSpectralDensity",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.EpochsSpectrum",
+        "status": "partial",
+        "mne_cpp": "Spectral (partial)",
+        "note": "epochs spectrum container"
+      },
+      {
+        "python": "mne.time_frequency.EpochsSpectrumArray",
+        "status": "partial",
+        "mne_cpp": "Spectral (partial)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.EpochsTFR",
+        "status": "implemented",
+        "mne_cpp": "TFR containers (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.EpochsTFRArray",
+        "status": "implemented",
+        "mne_cpp": "TFR containers (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.RawTFR",
+        "status": "implemented",
+        "mne_cpp": "TFR containers (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.RawTFRArray",
+        "status": "implemented",
+        "mne_cpp": "TFR containers (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.Spectrum",
+        "status": "implemented",
+        "mne_cpp": "Spectral (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.SpectrumArray",
+        "status": "implemented",
+        "mne_cpp": "Spectral (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.combine_spectrum",
+        "status": "partial",
+        "mne_cpp": "Spectral (partial)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.combine_tfr",
+        "status": "partial",
+        "mne_cpp": "TFR (partial)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.csd_array_fourier",
+        "status": "implemented",
+        "mne_cpp": "CrossSpectralDensity",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.csd_array_morlet",
+        "status": "implemented",
+        "mne_cpp": "CrossSpectralDensity",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.csd_array_multitaper",
+        "status": "implemented",
+        "mne_cpp": "CrossSpectralDensity",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.csd_fourier",
+        "status": "implemented",
+        "mne_cpp": "CrossSpectralDensity",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.csd_morlet",
+        "status": "implemented",
+        "mne_cpp": "CrossSpectralDensity",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.csd_multitaper",
+        "status": "implemented",
+        "mne_cpp": "CrossSpectralDensity",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.csd_tfr",
+        "status": "partial",
+        "mne_cpp": "CrossSpectralDensity (partial)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.dpss_windows",
+        "status": "implemented",
+        "mne_cpp": "DPSS tapers (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.fit_iir_model_raw",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "AR/IIR model PSD not ported"
+      },
+      {
+        "python": "mne.time_frequency.fwhm",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "wavelet FWHM helper not ported"
+      },
+      {
+        "python": "mne.time_frequency.istft",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "inverse STFT not ported"
+      },
+      {
+        "python": "mne.time_frequency.morlet",
+        "status": "implemented",
+        "mne_cpp": "Morlet wavelets (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.pick_channels_csd",
+        "status": "implemented",
+        "mne_cpp": "CrossSpectralDensity picking",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.psd_array_multitaper",
+        "status": "implemented",
+        "mne_cpp": "Spectral multitaper",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.psd_array_welch",
+        "status": "implemented",
+        "mne_cpp": "Spectral::psdWelch",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.read_csd",
+        "status": "partial",
+        "mne_cpp": "CrossSpectralDensity (partial)",
+        "note": "CSD I/O limited"
+      },
+      {
+        "python": "mne.time_frequency.read_spectrum",
+        "status": "partial",
+        "mne_cpp": "Spectral (partial)",
+        "note": "spectrum I/O limited"
+      },
+      {
+        "python": "mne.time_frequency.read_tfrs",
+        "status": "partial",
+        "mne_cpp": "TFR (partial)",
+        "note": "TFR I/O limited"
+      },
+      {
+        "python": "mne.time_frequency.stft",
+        "status": "implemented",
+        "mne_cpp": "Spectrogram STFT (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.stftfreq",
+        "status": "implemented",
+        "mne_cpp": "Spectrogram STFT (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.tfr_array_morlet",
+        "status": "implemented",
+        "mne_cpp": "Morlet TFR (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.tfr_array_multitaper",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "multitaper TFR not ported"
+      },
+      {
+        "python": "mne.time_frequency.tfr_array_stockwell",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Stockwell TFR not ported"
+      },
+      {
+        "python": "mne.time_frequency.tfr_morlet",
+        "status": "implemented",
+        "mne_cpp": "Morlet TFR (DSPLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.time_frequency.tfr_multitaper",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "multitaper TFR (PSD multitaper exists)"
+      },
+      {
+        "python": "mne.time_frequency.tfr_stockwell",
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "Stockwell TFR not ported"
+      },
+      {
+        "python": "mne.time_frequency.write_tfrs",
+        "status": "partial",
+        "mne_cpp": "TFR (partial)",
+        "note": "TFR I/O limited"
+      },
+      {
+        "python": "mne.transform_surface_to",
+        "status": "implemented",
+        "mne_cpp": "FSLIB surface transform",
+        "note": ""
+      },
+      {
+        "python": "mne.use_coil_def",
+        "status": "implemented",
+        "mne_cpp": "FWDLIB coil definitions",
+        "note": ""
+      },
+      {
+        "python": "mne.vertex_to_mni",
+        "status": "partial",
+        "mne_cpp": "FSLIB (partial)",
+        "note": "MNI mapping limited"
+      },
+      {
+        "python": "mne.what",
+        "status": "not-applicable",
+        "mne_cpp": "",
+        "note": "Python file-type guesser"
+      },
+      {
+        "python": "mne.whiten_evoked",
+        "status": "implemented",
+        "mne_cpp": "INVERSELIB whitening",
+        "note": ""
+      },
+      {
+        "python": "mne.write_bem_solution",
+        "status": "implemented",
+        "mne_cpp": "FWDLIB BEM I/O",
+        "note": ""
+      },
+      {
+        "python": "mne.write_bem_surfaces",
+        "status": "implemented",
+        "mne_cpp": "FWDLIB BEM I/O",
+        "note": ""
+      },
+      {
+        "python": "mne.write_cov",
+        "status": "implemented",
+        "mne_cpp": "FiffCov::write",
+        "note": "FIFF covariance I/O"
+      },
+      {
+        "python": "mne.write_events",
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB event I/O",
+        "note": ""
+      },
+      {
+        "python": "mne.write_evokeds",
+        "status": "implemented",
+        "mne_cpp": "FiffEvoked::write",
+        "note": ""
+      },
+      {
+        "python": "mne.write_forward_solution",
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution::write",
+        "note": "FIFF forward I/O"
+      },
+      {
+        "python": "mne.write_head_bem",
+        "status": "implemented",
+        "mne_cpp": "FWDLIB BEM I/O",
+        "note": ""
+      },
+      {
+        "python": "mne.write_label",
+        "status": "implemented",
+        "mne_cpp": "Label::write (FSLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.write_labels_to_annot",
+        "status": "implemented",
+        "mne_cpp": "FSLIB annotation writer",
+        "note": ""
+      },
+      {
+        "python": "mne.write_proj",
+        "status": "implemented",
+        "mne_cpp": "FiffProj::write",
+        "note": ""
+      },
+      {
+        "python": "mne.write_source_spaces",
+        "status": "implemented",
+        "mne_cpp": "MNESourceSpace::write",
+        "note": "FIFF source-space I/O"
+      },
+      {
+        "python": "mne.write_surface",
+        "status": "implemented",
+        "mne_cpp": "Surface::write (FSLIB)",
+        "note": ""
+      },
+      {
+        "python": "mne.write_trans",
+        "status": "implemented",
+        "mne_cpp": "FiffCoordTrans::write",
+        "note": ""
+      }
+    ]
+  },
   "skigen_migration_candidates": [
     {
       "mne_cpp_class": "KMeans",

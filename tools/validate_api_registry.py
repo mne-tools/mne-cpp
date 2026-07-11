@@ -141,6 +141,65 @@ def validate_documented_flag(registry: Dict[str, Any]) -> Tuple[bool, List[str]]
     return (len(issues) == 0, issues)
 
 
+PARITY_STATUS_VALUES = {"implemented", "partial", "missing", "not-applicable"}
+
+
+def validate_parity_block(registry: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """Enforce invariants on the ``parity`` block (v2.4.0 TASK T7.0/T7.3).
+
+    * ``parity`` (when present) must be an object with a ``records`` list.
+    * ``mne_python_pinned`` must be a non-empty string.
+    * Every record must have a non-empty string ``python`` and a ``status`` in
+      the allowed enum.
+    * ``python`` keys must be unique.
+    * ``implemented``/``partial`` records must name a non-empty ``mne_cpp``
+      equivalent; ``missing``/``not-applicable`` must leave ``mne_cpp`` empty.
+    """
+    issues: List[str] = []
+    parity = registry.get("parity")
+    if parity is None:
+        return (True, [])  # optional block
+    if not isinstance(parity, dict):
+        return (False, ["'parity' must be a JSON object"])
+    if not str(parity.get("mne_python_pinned", "")).strip():
+        issues.append("'parity.mne_python_pinned' must be a non-empty string")
+    records = parity.get("records")
+    if not isinstance(records, list):
+        return (False, ["'parity.records' must be a list"])
+
+    seen: Dict[str, int] = {}
+    for idx, rec in enumerate(records):
+        if not isinstance(rec, dict):
+            issues.append(f"parity record #{idx} is not an object")
+            continue
+        py = rec.get("python")
+        if not isinstance(py, str) or not py.strip():
+            issues.append(f"parity record #{idx} has empty/missing 'python'")
+            continue
+        if py in seen:
+            issues.append(f"duplicate parity 'python' key: '{py}'")
+            continue
+        seen[py] = idx
+        status = rec.get("status")
+        if status not in PARITY_STATUS_VALUES:
+            issues.append(
+                f"'{py}': status '{status}' not in "
+                f"{sorted(PARITY_STATUS_VALUES)}"
+            )
+            continue
+        mne_cpp = (rec.get("mne_cpp") or "").strip()
+        if status in ("implemented", "partial") and not mne_cpp:
+            issues.append(
+                f"'{py}': status '{status}' requires a non-empty 'mne_cpp'"
+            )
+        if status in ("missing", "not-applicable") and mne_cpp:
+            issues.append(
+                f"'{py}': status '{status}' must not name an 'mne_cpp' "
+                f"equivalent (found '{mne_cpp}')"
+            )
+    return (len(issues) == 0, issues)
+
+
 def validate_skigen_cross_reference(
     repo_root: Path,
     mne_cpp_registry: Dict[str, Any],
@@ -202,13 +261,13 @@ def main() -> int:
     all_passed = True
     total = len(registry.get("classes", []))
 
-    print("[1/6] JSON well-formed...")
+    print("[1/7] JSON well-formed...")
     if not validate_json_wellformed(registry):
         all_passed = False
     else:
         print("  OK")
 
-    print("[2/6] Header paths under src/libraries/...")
+    print("[2/7] Header paths under src/libraries/...")
     ok, missing = validate_headers(repo_root, registry)
     if not ok:
         all_passed = False
@@ -217,7 +276,7 @@ def main() -> int:
     else:
         print(f"  OK ({total} entries)")
 
-    print("[3/6] Test directories under src/testframes/...")
+    print("[3/7] Test directories under src/testframes/...")
     ok, missing = validate_tests(repo_root, registry)
     if not ok:
         all_passed = False
@@ -227,7 +286,7 @@ def main() -> int:
         with_tests = sum(1 for c in registry.get("classes", []) if c.get("test"))
         print(f"  OK ({with_tests} entries with test)")
 
-    print("[4/6] skigen_target presence on done candidates...")
+    print("[4/7] skigen_target presence on done candidates...")
     ok, issues = validate_skigen_targets(registry)
     if not ok:
         all_passed = False
@@ -236,7 +295,7 @@ def main() -> int:
     else:
         print("  OK")
 
-    print("[5/6] documented flag + sidebar invariants (TASK 18.3)...")
+    print("[5/7] documented flag + sidebar invariants (TASK 18.3)...")
     ok, issues = validate_documented_flag(registry)
     if not ok:
         all_passed = False
@@ -247,7 +306,17 @@ def main() -> int:
                         if c.get("documented", False))
         print(f"  OK ({doc_count} documented entries)")
 
-    print("[6/6] Cross-reference with skigen registry...")
+    print("[6/7] Parity block invariants (TASK T7.0/T7.3)...")
+    ok, issues = validate_parity_block(registry)
+    if not ok:
+        all_passed = False
+        for i in issues:
+            print(f"  VIOLATION: {i}")
+    else:
+        parity_count = len(registry.get("parity", {}).get("records", []))
+        print(f"  OK ({parity_count} parity records)")
+
+    print("[7/7] Cross-reference with skigen registry...")
     ok, _ = validate_skigen_cross_reference(repo_root, registry, args.skigen_registry, args.strict)
     if not ok:
         all_passed = False
