@@ -413,10 +413,6 @@ void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
     int iNumSamples = t_pModel->getMaxSamples();
     double dPixelsPerSample = static_cast<double>(iPlotSizePx) / static_cast<double>(iNumSamples);
 
-    // locate time-cursor
-    int iTimeCursorSample = t_pModel->getCurrentSampleIndex();
-    double firstValuePreviousPlot = t_pModel->getLastBlockFirstValue(index.row());
-
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     double dMaxYValueEstimate = t_pModel->getMaxValueFromRawViewModel(index.row());
     double dScaleY = option.rect.height()/(2 * dMaxYValueEstimate);

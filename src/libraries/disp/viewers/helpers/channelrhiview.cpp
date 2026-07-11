@@ -61,9 +61,6 @@ constexpr int kUboOffsetShowClipping   = 48; // float
 
 constexpr int kMaxChannels = 1024;  // Upper hard limit for UBO pre-allocation
 
-// Prefetch: VBO covers (1 + 2*prefetch) × visible window.
-// A scroll of up to prefetch×visible in either direction needs no VBO rebuild.
-constexpr float kDefaultPrefetch = 1.0f;
 } // namespace
 
 //=============================================================================================================
@@ -820,7 +817,7 @@ void ChannelRhiView::ensurePipeline()
 
     // ── Uniform buffer ──────────────────────────────────────────────────
     bool uboRecreated = false;
-    if (!m_ubo || m_ubo->size() < nCh * m_uboStride) {
+    if (!m_ubo || m_ubo->size() < static_cast<quint32>(nCh * m_uboStride)) {
         m_ubo.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
                                    QRhiBuffer::UniformBuffer,
                                    nCh * m_uboStride));

@@ -614,7 +614,6 @@ void ChannelInfoModel::mapLayoutToChannels()
         FiffChInfo chInfo = channelList.at(i);
         QString chName = chInfo.ch_name;
         QRegularExpression regExpRemove;
-        bool flagOk = false;
 
         switch(chInfo.kind) {
             case FIFFV_MEG_CH:
@@ -623,7 +622,6 @@ void ChannelInfoModel::mapLayoutToChannels()
                 chName.remove(regExpRemove);
 
                 //After cleaning the string try to convert the residual to an int number
-                flagOk = false;
                 m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("MEG").arg(chName));
 
                 break;
@@ -634,7 +632,6 @@ void ChannelInfoModel::mapLayoutToChannels()
                 chName.remove(regExpRemove);
 
                 //After cleaning the string try to convert the residual to an int number
-                flagOk = false;
                 m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("EEG").arg(chName));
 
                 break;

@@ -54,15 +54,15 @@ using namespace Eigen;
 
 EvokedSetModel::EvokedSetModel(QObject *parent)
 : QAbstractTableModel(parent)
-, m_fSps(1024.0f)
-, m_bIsFreezed(false)
-, m_bProjActivated(false)
-, m_bCompActivated(false)
-, m_bIsInit(false)
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 , m_qMapAverageColorOld(QSharedPointer<QMap<QString, QColor> >::create())
 , m_qMapAverageActivationOld(QSharedPointer<QMap<QString, bool> >::create())
+, m_bIsInit(false)
+, m_bIsFreezed(false)
+, m_bProjActivated(false)
+, m_bCompActivated(false)
+, m_fSps(1024.0f)
 {
 }
 

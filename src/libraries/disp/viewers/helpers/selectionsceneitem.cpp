@@ -48,11 +48,11 @@ SelectionSceneItem::SelectionSceneItem(QString channelName,
                                        bool bIsBadChannel)
 : m_sChannelName(channelName)
 , m_iChannelNumber(channelNumber)
+, m_iChannelKind(channelKind)
+, m_iChannelUnit(channelUnit)
 , m_qpChannelPosition(channelPosition)
 , m_cChannelColor(channelColor)
 , m_bHighlightItem(false)
-, m_iChannelKind(channelKind)
-, m_iChannelUnit(channelUnit)
 , m_bIsBadChannel(bIsBadChannel)
 {
     this->setAcceptHoverEvents(true);

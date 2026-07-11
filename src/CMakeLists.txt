@@ -40,10 +40,10 @@ option(USE_FFTW "Use fftw backend for Eigen3::Eigen" OFF)
 
 option(USE_ONNXRUNTIME "Enable ONNX Runtime backend for the ml library" ON)
 
-# v2.4.0 G5 quality gate: build must be warning-free. Enabling this treats
-# compiler warnings on MNE-CPP's own sources as errors so regressions cannot
-# land. Third-party/external and generated (moc/uic/rcc) translation units are
-# not affected here (they are compiled through their own targets/flags).
+# Keep the build warning-free. Enabling this treats compiler warnings on
+# MNE-CPP's own sources as errors so regressions cannot land. Third-party/
+# external and generated (moc/uic/rcc) translation units are not affected here
+# (they are compiled through their own targets/flags).
 option(MNE_WARNINGS_AS_ERRORS "Treat compiler warnings as errors on MNE-CPP sources" OFF)
 
 set(MNE_LOG_LEVEL "INFO" CACHE STRING "Minimum log level: DEBUG, INFO, WARN, CRIT, FATAL")
@@ -117,17 +117,19 @@ if(MSVC)
   add_compile_definitions(_USE_MATH_DEFINES)
 endif()
 
-# Warning policy (v2.4.0 G5). Enable a common warning set on our own sources and,
-# when MNE_WARNINGS_AS_ERRORS is ON, promote them to errors so the build stays
-# warning-free. Applied globally here; external/generated sources compiled by
-# their own targets are unaffected.
+# Warning policy. Enable a strict-but-reasonable warning set on our own sources
+# and, when MNE_WARNINGS_AS_ERRORS is ON, promote them to errors so the build
+# stays warning-free. /W4 is the highest practical MSVC level (/Wall is
+# unusably noisy in system headers); -Wall -Wextra -Wpedantic is the equivalent
+# strict baseline for GCC/Clang. Applied globally here; external and generated
+# (moc/uic/rcc) sources compiled by their own targets are unaffected.
 if(MSVC)
-  add_compile_options(/W3)
+  add_compile_options(/W4)
   if(MNE_WARNINGS_AS_ERRORS)
     add_compile_options(/WX)
   endif()
 else()
-  add_compile_options(-Wall -Wextra)
+  add_compile_options(-Wall -Wextra -Wpedantic)
   if(MNE_WARNINGS_AS_ERRORS)
     add_compile_options(-Werror)
   endif()

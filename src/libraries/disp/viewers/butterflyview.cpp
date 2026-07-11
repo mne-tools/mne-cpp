@@ -47,18 +47,18 @@ using namespace DISPLIB;
 
 ButterflyView::ButterflyView(const QString& sSettingsPath,
                              QWidget *parent,
-                             Qt::WindowFlags f)
+                             [[maybe_unused]] Qt::WindowFlags f)
 :
   QRhiWidget(parent)
-, m_sSettingsPath(sSettingsPath)
-, m_pEvokedSetModel(nullptr)
-, m_bIsInit(false)
 , m_bShowMAG(true)
 , m_bShowGRAD(true)
 , m_bShowEEG(true)
 , m_bShowEOG(true)
 , m_bShowMISC(true)
+, m_bIsInit(false)
+, m_sSettingsPath(sSettingsPath)
 , m_colCurrentBackgroundColor(Qt::white)
+, m_pEvokedSetModel(nullptr)
 , m_qMapAverageActivation(QSharedPointer<QMap<QString, bool> >::create())
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor> >::create())
 {

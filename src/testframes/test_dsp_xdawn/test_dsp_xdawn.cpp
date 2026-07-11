@@ -99,7 +99,7 @@ SyntheticXdawnData makeSyntheticEpochs()
     return out;
 }
 
-double correlation(const RowVectorXd& a, const RowVectorXd& b)
+[[maybe_unused]] double correlation(const RowVectorXd& a, const RowVectorXd& b)
 {
     RowVectorXd ac = a.array() - a.mean();
     RowVectorXd bc = b.array() - b.mean();

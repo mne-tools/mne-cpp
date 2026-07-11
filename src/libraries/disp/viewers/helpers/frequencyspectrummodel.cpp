@@ -44,11 +44,11 @@ FrequencySpectrumModel::FrequencySpectrumModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_fSps(1024.0f)
 , m_iT(10)
-, m_bIsFreezed(false)
-, m_bInitialized(false)
 , m_iLowerFrqIdx(0)
 , m_iUpperFrqIdx(0)
 , m_iScaleType(0)
+, m_bIsFreezed(false)
+, m_bInitialized(false)
 {
 }
 
