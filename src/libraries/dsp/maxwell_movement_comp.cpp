@@ -95,7 +95,6 @@ MatrixXd MaxwellMovementComp::apply(const MatrixXd& matData,
         return matData;
     }
 
-    const int nChannels = matData.rows();
     const int nSamples = matData.cols();
 
     // Determine reference head position

@@ -479,7 +479,7 @@ static bool writePredictedData(const QString &fileName,
 // HELPER: compose output STC file name
 //=============================================================================================================
 
-static QString composeStcName(const QString &measFile, const QString &method,
+[[maybe_unused]] static QString composeStcName(const QString &measFile, const QString &method,
                               int setNo, const QString &hemi)
 {
     QFileInfo fi(measFile);

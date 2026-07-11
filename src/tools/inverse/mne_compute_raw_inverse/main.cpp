@@ -144,7 +144,7 @@ static QString sanitizeForFilename(const QString &s)
 // HELPER: compose output file name from label file name
 //=============================================================================================================
 
-static QString composeOutName(const QString &labelName, const QString &tag, bool raw)
+[[maybe_unused]] static QString composeOutName(const QString &labelName, const QString &tag, bool raw)
 {
     QFileInfo fi(labelName);
     QString base = fi.completeBaseName();

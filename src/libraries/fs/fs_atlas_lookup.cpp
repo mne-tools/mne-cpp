@@ -112,10 +112,6 @@ bool FsAtlasLookup::load(const QString& sParcellationPath)
         return qFromBigEndian<qint32>(raw + offset);
     };
 
-    auto readFloat32 = [&](int offset) -> float {
-        return qFromBigEndian<qint32>(raw + offset);  // Read as int32 bits, reinterpret
-    };
-
     qint32 version = readInt32(0);
     if(version != 1) {
         qWarning() << "[FsAtlasLookup::load] Unsupported MGH version:" << version;

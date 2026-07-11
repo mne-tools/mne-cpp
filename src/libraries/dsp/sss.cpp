@@ -202,23 +202,20 @@ Vector3d SSS::basisGradCart(int l, int m, bool bInternal,
     double Plm   = P(l, absM);    // normalised, at (θ,φ)
     double dPlm  = dP(l, absM);   // normalised dP/dθ
 
-    double angFactor, dAngFactor_theta, dAngFactor_phi;
+    double angFactor, dAngFactor_phi;
     if (m == 0) {
         angFactor        = 1.0;
-        dAngFactor_theta = 0.0;  // handled through dPlm
         dAngFactor_phi   = 0.0;
     } else if (m > 0) {
         double cosmPhi   = std::cos(static_cast<double>(m) * std::atan2(sinPhi, cosPhi));
         double sinmPhi   = std::sin(static_cast<double>(m) * std::atan2(sinPhi, cosPhi));
         angFactor        =  cosmPhi;
-        dAngFactor_theta =  0.0;   // cos(mφ) doesn't depend on θ
         dAngFactor_phi   = -static_cast<double>(m) * sinmPhi;
     } else {
         // m < 0
         double cosmPhi   = std::cos(static_cast<double>(absM) * std::atan2(sinPhi, cosPhi));
         double sinmPhi   = std::sin(static_cast<double>(absM) * std::atan2(sinPhi, cosPhi));
         angFactor        =  sinmPhi;
-        dAngFactor_theta =  0.0;
         dAngFactor_phi   =  static_cast<double>(absM) * cosmPhi;
     }
 

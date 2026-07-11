@@ -305,7 +305,6 @@ std::vector<int> InvHpiFit::findCoilOrder(const MatrixXd& matCoilsDev,
     MatrixXd matTrans(4,4);
     std::vector<int> vecOrderBest = vecOrder;
 
-    bool bSuccess = false;
     // permutation
     do {
         for(int i = 0; i < iNumCoils; i++) {
@@ -317,7 +316,6 @@ std::vector<int> InvHpiFit::findCoilOrder(const MatrixXd& matCoilsDev,
             // exit
             dErrorBest = dErrorActual;
             vecOrderBest = vecOrder;
-            bSuccess = true;
         }
     } while (std::next_permutation(vecOrder.begin(), vecOrder.end()));
     return vecOrderBest;
@@ -407,7 +405,7 @@ Eigen::Matrix4d InvHpiFit::computeTransformation(Eigen::MatrixXd matNH, MatrixXd
     Matrix4d matTransFinal = Matrix4d::Identity(4,4);
     Matrix4d matRot = Matrix4d::Zero(4,4);
     Matrix4d matTrans = Matrix4d::Identity(4,4);
-    double dMeanX,dMeanY,dMeanZ,dNormf;
+    double dMeanX,dMeanY,dMeanZ;
 
     for(int i = 0; i < 15; ++i) {
         // Calculate mean translation for all points -> centroid of both data sets
@@ -442,9 +440,6 @@ Eigen::Matrix4d InvHpiFit::computeTransformation(Eigen::MatrixXd matNH, MatrixXd
 
         // Apply rotation on translated points
         matBT = matBT * matQ;
-
-        // Calculate GOF
-        dNormf = (matNH.transpose()-matBT.transpose()).norm();
 
         // Store rotation part to transformation matrix
         matRot(3,3) = 1;

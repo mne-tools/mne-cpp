@@ -428,7 +428,7 @@ void MNEProjOp::report_data(QTextStream &out, const QString &tag, bool list_data
      * Output info about the projection operator
      */
 {
-    int j,p,q;
+    int p,q;
     MNENamedMatrix* vecs;
     bool found;
 

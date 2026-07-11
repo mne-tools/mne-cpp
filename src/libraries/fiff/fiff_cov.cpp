@@ -321,12 +321,9 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
     }
 
     //Allways exclude all STI channels from covariance computation
-    int iNoStimCh = 0;
-
     for(int i=0; i<p_info.chs.size(); i++) {
         if(p_info.chs[i].kind == FIFFV_STIM_CH) {
             p_exclude << p_info.chs[i].ch_name;
-            iNoStimCh++;
         }
     }
 

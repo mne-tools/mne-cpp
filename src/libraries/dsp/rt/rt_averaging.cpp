@@ -57,13 +57,13 @@ RtAveragingWorker::RtAveragingWorker(quint32 numAverages,
 , m_iNumAverages(numAverages)
 , m_iPreStimSamples(iPreStimSamples)
 , m_iPostStimSamples(iPostStimSamples)
-, m_pFiffInfo(pFiffInfo)
-, m_fTriggerThreshold(0.5f)
 , m_iTriggerChIndex(-1)
 , m_iNewTriggerIndex(iTriggerIndex)
+, m_fTriggerThreshold(0.5f)
+, m_bActivateThreshold(false)
 , m_bDoBaselineCorrection(false)
 , m_pairBaselineSec(qMakePair(float(iBaselineFromMSecs),float(iBaselineToMSecs)))
-, m_bActivateThreshold(false)
+, m_pFiffInfo(pFiffInfo)
 {
     m_mapThresholds["eog"] = 300e-6;
 

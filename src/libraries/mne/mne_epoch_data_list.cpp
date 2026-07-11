@@ -388,7 +388,6 @@ FiffEvokedSet MNEEpochDataList::averageCategories(const FiffRawData &raw,
     evokedSet.info = raw.info;
 
     float sfreq = raw.info.sfreq;
-    int nchan   = raw.info.nchan;
 
     bool doBaseline = (baseline.first != baseline.second);
 

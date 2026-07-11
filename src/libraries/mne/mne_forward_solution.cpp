@@ -111,13 +111,6 @@ bool check_matching_chnames_conventions(const QStringList& chNamesA, const QStri
 // CONSTANTS
 //=============================================================================================================
 
-constexpr int FAIL = -1;
-constexpr int OK   =  0;
-
-constexpr int X = 0;
-constexpr int Y = 1;
-constexpr int Z = 2;
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -1332,7 +1325,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
             return false;
         }
 
-        fwd = std::move(MNEForwardSolution(megfwd));
+        fwd = MNEForwardSolution(megfwd);
         fwd.sol->data = MatrixXd(megfwd.sol->nrow + eegfwd.sol->nrow, megfwd.sol->ncol);
 
         fwd.sol->data.block(0,0,megfwd.sol->nrow,megfwd.sol->ncol) = megfwd.sol->data;
@@ -1569,7 +1562,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
     }
 
     fwd.surf_ori = surf_ori;
-    fwd = std::move(fwd.pick_channels(include, exclude_bads));
+    fwd = fwd.pick_channels(include, exclude_bads);
 
     //garbage collecting
     t_pStream->close();

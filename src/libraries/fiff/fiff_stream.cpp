@@ -1947,7 +1947,6 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice,
     QList<FiffRawDir> rawdir;
 //        rawdir = struct('ent',{},'first',{},'last',{},'nsamp',{});
     fiff_int_t nskip = 0;
-    fiff_int_t ndir  = 0;
     fiff_int_t nsamp = 0;
     for (qint32 k = first; k < nent; ++k)
     {
@@ -2001,7 +2000,6 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice,
                 rawdir.append(t_RawDir);
                 first_samp = first_samp + nskip*nsamp;
                 nskip = 0;
-                ++ndir;
             }
             //
             //  Add a data buffer
@@ -2013,7 +2011,6 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice,
             t_RawDir.nsamp = nsamp;
             rawdir.append(t_RawDir);
             first_samp += nsamp;
-            ++ndir;
         }
     }
     data.last_samp  = first_samp - 1;//ToDo -1 right or is that MATLAB syntax

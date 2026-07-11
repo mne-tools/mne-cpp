@@ -389,7 +389,6 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
         // --- Grid data ---
         else if (tok.id == InvTokenId::GridBegin) {
             ++pos;
-            int nSrc = 0, nTime = 0;
             std::vector<int> verts;
             std::vector<std::vector<float>> rows;
 
@@ -397,9 +396,9 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
                 const InvToken &g = tokens[pos];
 
                 if (g.id == InvTokenId::NSources) {
-                    nSrc = static_cast<int>(g.value); ++pos;
+                    ++pos;
                 } else if (g.id == InvTokenId::NTimes) {
-                    nTime = static_cast<int>(g.value); ++pos;
+                    ++pos;
                 } else if (g.id == InvTokenId::TimeVal && est.tmin == 0 && est.tstep == -1) {
                     est.tmin = g.value; ++pos;
                 } else if (g.id == InvTokenId::TStep) {
@@ -469,7 +468,6 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
                 if (peek() == InvTokenId::GroupBegin) {
                     ++pos;
                     InvSourceCoupling grp;
-                    int nIdx = 0;
 
                     while (pos < len && peek() != InvTokenId::GroupEnd) {
                         const InvToken &ct = tokens[pos];
@@ -480,7 +478,7 @@ InvSourceEstimate fromTokens(const std::vector<InvToken> &tokens)
                                 grp.tmax = ct.value;
                             ++pos;
                         } else if (ct.id == InvTokenId::NIndices) {
-                            nIdx = static_cast<int>(ct.value); ++pos;
+                            ++pos;
                         } else if (ct.id == InvTokenId::GridIndex) {
                             grp.gridIndices.push_back(static_cast<int>(ct.value)); ++pos;
                         } else if (ct.id == InvTokenId::MomX && pos + 2 < len) {

@@ -90,7 +90,6 @@ void DecodingCsp::fit(const std::vector<MatrixXd>& epochs,
 
     auto it = classSet.begin();
     int label1 = *it++;
-    int label2 = *it;
 
     // Split epochs by class
     std::vector<MatrixXd> epochs1, epochs2;

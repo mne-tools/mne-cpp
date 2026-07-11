@@ -335,7 +335,7 @@ void MNEFiffExpSet::print_dig_point(FILE *out, const FiffTag::UPtr& tag)
 
 //*************************************************************************************************************
 
-void MNEFiffExpSet::print_matrix(FILE *out, FiffStream::SPtr stream, FiffDirEntry::SPtr this_ent)
+void MNEFiffExpSet::print_matrix(FILE *out, [[maybe_unused]] FiffStream::SPtr stream, FiffDirEntry::SPtr this_ent)
 {
     // Simplified matrix info since we don't want to read the whole tag yet if it's large,
     // but FiffStream has some matrix reading logic.
@@ -360,7 +360,6 @@ bool MNEFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
 
     FiffDirEntry::SPtr this_ent;
     FiffTag::UPtr tag;
-    int             day,month,year;
     int             block;
     int             count = 0;
     int             prev_kind;

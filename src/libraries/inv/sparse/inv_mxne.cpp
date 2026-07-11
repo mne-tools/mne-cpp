@@ -49,7 +49,7 @@ InvMxneResult InvMxne::compute(
     int nIterations,
     double tolerance)
 {
-    const int nChannels = static_cast<int>(matGain.rows());
+
     const int nSources = static_cast<int>(matGain.cols());
     const int nTimes = static_cast<int>(matData.cols());
 

@@ -698,11 +698,8 @@ int MNECTFCompDataSet::apply_transpose(bool do_it, Eigen::MatrixXf& data)
      * Apply compensation or revert to uncompensated data
      */
 {
-    using RowMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
-
     MNECTFCompData* this_comp;
     int   ndata = static_cast<int>(data.rows());
-    int   ns    = static_cast<int>(data.cols());
     int   ncompdata  = ndata;
 
     if (!current)

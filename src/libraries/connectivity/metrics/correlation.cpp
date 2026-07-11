@@ -144,7 +144,6 @@ MatrixXd Correlation::compute(const ConnectivitySettings::IntermediateTrialData&
 {
     MatrixXd matDist = MatrixXd::Zero(inputData.matData.rows(), inputData.matData.rows());
     RowVectorXd vecRow;
-    int j;
 
     matDist = inputData.matData * inputData.matData.transpose();
 

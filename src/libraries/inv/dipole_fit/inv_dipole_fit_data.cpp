@@ -87,13 +87,13 @@ InvDipoleFitData::InvDipoleFitData()
 : coord_frame(FIFFV_COORD_UNKNOWN)
 , nmeg (0)
 , neeg (0)
+, r0(Eigen::Vector3f::Zero())
 , funcs (nullptr)
 , fixed_noise (false)
 , nave (1)
 , column_norm (COLUMN_NORM_NONE)
 , fit_mag_dipoles (false)
 , user (nullptr)
-, r0(Eigen::Vector3f::Zero())
 {
 }
 
@@ -527,7 +527,7 @@ InvDipoleFitData *InvDipoleFitData::setup_dipole_fit_data(const QString &mriname
     QStringList     badlist;
     int             nbad      = 0;
     QStringList     file_bads;
-    int             file_nbad;
+    int             file_nbad = 0;
     int             coord_frame = FIFFV_COORD_HEAD;
     std::unique_ptr<MNECovMatrix> cov;
     std::unique_ptr<FwdCoilSet> templates;

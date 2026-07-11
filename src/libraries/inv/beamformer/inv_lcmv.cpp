@@ -52,7 +52,7 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InvBeamformer InvLCMV::makeLCMV(const FiffInfo &info,
+InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo &info,
                                 const MNEForwardSolution &forward,
                                 const FiffCov &dataCov,
                                 double reg,

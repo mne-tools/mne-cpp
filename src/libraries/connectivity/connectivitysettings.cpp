@@ -59,9 +59,9 @@ using namespace FSLIB;
 //=============================================================================================================
 
 ConnectivitySettings::ConnectivitySettings()
-: m_fFreqResolution(1.0f)
+: m_sWindowType("hanning")
 , m_fSFreq(1000.0f)
-, m_sWindowType("hanning")
+, m_fFreqResolution(1.0f)
 {
     m_iNfft = int(m_fSFreq/m_fFreqResolution);
     qRegisterMetaType<CONNECTIVITYLIB::ConnectivitySettings>("CONNECTIVITYLIB::ConnectivitySettings");

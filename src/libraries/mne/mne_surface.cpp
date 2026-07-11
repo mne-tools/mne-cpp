@@ -47,12 +47,7 @@ using namespace MNELIB;
 
 //=============================================================================================================
 
-constexpr int FAIL = -1;
 constexpr int OK   =  0;
-
-constexpr int X = 0;
-constexpr int Y = 1;
-constexpr int Z = 2;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -237,19 +232,16 @@ int MNESurface::project_to_surface(const MNEProjData *proj_data, const Eigen::Ve
 {
     float dist;
     float p, q;
-    float p0, q0, dist0;
+    float dist0;
     int best;
     int k;
 
-    p0 = q0 = 0.0;
     dist0 = 0.0;
     for (best = -1, k = 0; k < ntri; k++) {
         if (nearest_triangle_point(r, proj_data, k, p, q, dist)) {
             if (best < 0 || std::fabs(dist) < std::fabs(dist0)) {
                 dist0 = dist;
                 best = k;
-                p0 = p;
-                q0 = q;
             }
         }
     }

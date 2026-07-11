@@ -84,7 +84,7 @@ using namespace Eigen;
 
 //=============================================================================================================
 
-static QColor valueToColor(double value, double fthresh, double fmid, double fmax, bool isSigned)
+static QColor valueToColor(double value, double fthresh, [[maybe_unused]] double fmid, double fmax, bool isSigned)
 {
     double absVal = std::abs(value);
     if (absVal < fthresh) return QColor(128, 128, 128);

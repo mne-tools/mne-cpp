@@ -71,7 +71,7 @@ IcaResult PicardIca::run(const MatrixXd& matData,
                           int    nComponents,
                           int    maxIter,
                           double tol,
-                          int    lbfgsMemory,
+                          [[maybe_unused]] int    lbfgsMemory,
                           int    randomSeed)
 {
     IcaResult result;

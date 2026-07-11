@@ -290,7 +290,7 @@ void TestEvents::testDeleteEvents()
 {
     EventManager mgr;
     Event e1 = mgr.addEvent(100);
-    Event e2 = mgr.addEvent(200);
+    mgr.addEvent(200);
     Event e3 = mgr.addEvent(300);
 
     std::vector<idNum> toDelete = {e1.id, e3.id};

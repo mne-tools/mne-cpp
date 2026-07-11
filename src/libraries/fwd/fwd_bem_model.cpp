@@ -55,14 +55,12 @@ static const Eigen::Vector3f Qz(0.0f, 0.0f, 1.0f);
 
 namespace {
 constexpr int X = 0;
-constexpr int Y = 1;
 constexpr int Z = 2;
 constexpr int FAIL      = -1;
 constexpr int OK        =  0;
 constexpr int LOADED    =  1;  // fwd_bem_load_solution: successfully loaded
 constexpr int NOT_FOUND =  0;  // fwd_bem_load_solution: solution not available
 
-constexpr auto BEM_SUFFIX     = "-bem.fif";
 constexpr auto BEM_SOL_SUFFIX = "-bem-sol.fif";
 constexpr float EPS  = 1e-5f;  // Points closer to origin than this are considered at the origin
 constexpr float CEPS = 1e-5f;
@@ -701,7 +699,7 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_lin_pot_coeff(const std::vector<MNESurface*
     MNESurface* surf1;
     MNESurface* surf2;
 
-    for (p = 0, np_tot = np_max = 0; p < surfs.size(); p++) {
+    for (p = 0, np_tot = np_max = 0; p < static_cast<int>(surfs.size()); p++) {
         np_tot += surfs[p]->np;
         if (surfs[p]->np > np_max)
             np_max = surfs[p]->np;
@@ -709,10 +707,10 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_lin_pot_coeff(const std::vector<MNESurface*
 
     Eigen::MatrixXf mat = Eigen::MatrixXf::Zero(np_tot, np_tot);
     Eigen::VectorXd row(np_max);
-    for (p = 0, joff = 0; p < surfs.size(); p++, joff = joff + np1) {
+    for (p = 0, joff = 0; p < static_cast<int>(surfs.size()); p++, joff = joff + np1) {
         surf1 = surfs[p];
         np1   = surf1->np;
-        for (q = 0, koff = 0; q < surfs.size(); q++, koff = koff + np2) {
+        for (q = 0, koff = 0; q < static_cast<int>(surfs.size()); q++, koff = koff + np2) {
             surf2 = surfs[q];
             np2   = surf2->np;
             ntri  = surf2->ntri;
@@ -883,13 +881,12 @@ void FwdBemModel::fwd_bem_ip_modify_solution(Eigen::MatrixXf &solution, Eigen::M
           */
 {
     int s;
-    int j,k,joff,koff,ntot,nlast;
+    int j,k,joff,koff,nlast;
     float mult;
 
     for (s = 0, koff = 0; s < nsurf-1; s++)
         koff = koff + ntri[s];
     nlast = ntri[nsurf-1];
-    ntot  = koff + nlast;
 
     Eigen::VectorXf row(nlast);
     mult = (1.0 + ip_mult)/ip_mult;
@@ -982,14 +979,14 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_solid_angles(const std::vector<MNESurface*>
     float result;
     float desired;
 
-    for (p = 0,ntri_tot = 0; p < surfs.size(); p++)
+    for (p = 0,ntri_tot = 0; p < static_cast<int>(surfs.size()); p++)
         ntri_tot += surfs[p]->ntri;
 
     Eigen::MatrixXf solids = Eigen::MatrixXf::Zero(ntri_tot, ntri_tot);
-    for (p = 0, joff = 0; p < surfs.size(); p++, joff = joff + ntri1) {
+    for (p = 0, joff = 0; p < static_cast<int>(surfs.size()); p++, joff = joff + ntri1) {
         surf1 = surfs[p];
         ntri1 = surf1->ntri;
-        for (q = 0, koff = 0; q < surfs.size(); q++, koff = koff + ntri2) {
+        for (q = 0, koff = 0; q < static_cast<int>(surfs.size()); q++, koff = koff + ntri2) {
             surf2 = surfs[q];
             ntri2 = surf2->ntri;
             qInfo("\t\t%s (%d) -> %s (%d) ... ",fwd_bem_explain_surface(surf1->id).toUtf8().constData(),ntri1,fwd_bem_explain_surface(surf2->id).toUtf8().constData(),ntri2);
@@ -1305,7 +1302,6 @@ void FwdBemModel::fwd_bem_lin_pot_calc(const Eigen::Vector3f& rd, const Eigen::V
  * using the linear potential approximation
  */
 {
-    float *rr_row;
     int   np;
     int   s,k,p,nsol;
     float mult;
@@ -1494,12 +1490,10 @@ int FwdBemModel::fwd_bem_pot_grad_els(const Eigen::Vector3f& rd, const Eigen::Ve
         return FAIL;
     }
     if (m->bem_method == FWD_BEM_CONSTANT_COLL) {
-        int n = els.ncoil();
         m->fwd_bem_pot_calc(rd,Q,&els,false,pot);
         m->fwd_bem_pot_grad_calc(rd,Q,&els,false,xgrad,ygrad,zgrad);
     }
     else if (m->bem_method == FWD_BEM_LINEAR_COLL) {
-        int n = els.ncoil();
         m->fwd_bem_lin_pot_calc(rd,Q,&els,false,pot);
         m->fwd_bem_lin_pot_grad_calc(rd,Q,&els,false,xgrad,ygrad,zgrad);
     }
@@ -1556,7 +1550,7 @@ void FwdBemModel::field_integrals(const Eigen::Vector3f& from, MNETriangle& to, 
     double A,B,z,dx;
     Eigen::Vector3d beta;
     double I1,Tx,Ty,Txx,Tyy,Sxx,mult;
-    double S1x,S1y,S2x,S2y;
+    double S1x,S1y,S2x;
     double D1,B2;
     int k;
     /*
@@ -1601,7 +1595,6 @@ void FwdBemModel::field_integrals(const Eigen::Vector3f& from, MNETriangle& to, 
     S1x = 0.0;
     S1y = 0.0;
     S2x = 0.0;
-    S2y = 0.0;
     for (k = 0; k < 2; k++) {
         dx = xx[k+1] - xx[k];
         A = (yy[k]*xx[k+1] - yy[k+1]*xx[k])/dx;
@@ -2375,12 +2368,10 @@ int FwdBemModel::fwd_bem_field_grad(const Eigen::Vector3f& rd,
     }
 
     if (m->bem_method == FWD_BEM_CONSTANT_COLL) {
-        int n = coils.ncoil();
         m->fwd_bem_field_calc(rd,Q,coils,Bval);
 
         m->fwd_bem_field_grad_calc(rd,Q,coils,xgrad,ygrad,zgrad);
     } else if (m->bem_method == FWD_BEM_LINEAR_COLL) {
-        int n = coils.ncoil();
         m->fwd_bem_lin_field_calc(rd,Q,coils,Bval);
 
         m->fwd_bem_lin_field_grad_calc(rd,Q,coils,xgrad,ygrad,zgrad);
@@ -3000,8 +2991,8 @@ int FwdBemModel::fwd_sphere_field(const Eigen::Vector3f& rd, const Eigen::Vector
     float a,a2,r,r2;
     float ar,ar0,rr0;
     float vr,ve,re,r0e;
-    float F,g0,gr,result,sum;
-    int   j,k,p;
+    float F,g0,gr,sum;
+    int   j,k;
     FwdCoil* this_coil;
     int   np;
 
@@ -3032,7 +3023,6 @@ int FwdBemModel::fwd_sphere_field(const Eigen::Vector3f& rd, const Eigen::Vector
                     Eigen::Map<const Eigen::Vector3f> this_dir = this_coil->dir(j);
 
                     Eigen::Vector3f pos = this_pos_raw - Eigen::Map<const Eigen::Vector3f>(r0);
-                    result = 0.0;
 
                     /* Vector from dipole to the field point */
 
@@ -3312,7 +3302,7 @@ int FwdBemModel::fwd_sphere_field_grad(const Eigen::Vector3f& rd, const Eigen::V
 
 //=============================================================================================================
 
-int FwdBemModel::fwd_mag_dipole_field(const Eigen::Vector3f& rm, const Eigen::Vector3f& M, FwdCoilSet &coils, Eigen::Ref<Eigen::VectorXf> Bval, void *client)	/* Client data will be the sphere model origin */
+int FwdBemModel::fwd_mag_dipole_field(const Eigen::Vector3f& rm, const Eigen::Vector3f& M, FwdCoilSet &coils, Eigen::Ref<Eigen::VectorXf> Bval, [[maybe_unused]] void *client)	/* Client data will be the sphere model origin */
 /*
  * This is for a specific dipole component
  */
@@ -3349,7 +3339,7 @@ int FwdBemModel::fwd_mag_dipole_field(const Eigen::Vector3f& rm, const Eigen::Ve
 
 //=============================================================================================================
 
-int FwdBemModel::fwd_mag_dipole_field_vec(const Eigen::Vector3f& rm, FwdCoilSet &coils, Eigen::Ref<Eigen::MatrixXf> Bval, void *client)     /* Client data will be the sphere model origin */
+int FwdBemModel::fwd_mag_dipole_field_vec(const Eigen::Vector3f& rm, FwdCoilSet &coils, Eigen::Ref<Eigen::MatrixXf> Bval, [[maybe_unused]] void *client)     /* Client data will be the sphere model origin */
 /*
  * This is for all dipole components
  * For EEG this produces a zero result

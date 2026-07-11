@@ -79,7 +79,6 @@ static MNEBemSurface createIcosahedron(float radius, int surfId)
 
     // Golden ratio
     const float phi = (1.0f + std::sqrt(5.0f)) / 2.0f;
-    const float scale = radius / std::sqrt(1.0f + phi * phi);
 
     // 12 vertices of an icosahedron
     surf.np = 12;

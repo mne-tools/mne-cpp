@@ -182,7 +182,6 @@ void TestMnaRegistryLoader::testRoundTripSaveLoad()
 
     // Load master registry into the singleton
     MnaOpRegistry& originalRegistry = MnaOpRegistry::instance();
-    int nBefore = originalRegistry.registeredOps().size();
     int nOriginal = MnaRegistryLoader::loadFile(m_registryPath, originalRegistry);
     QVERIFY(nOriginal > 0);
 

@@ -88,11 +88,11 @@ const QString FiffSimulator::Commands::SIMFILE      = "simfile";
 
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
+, m_pRawMatrixBuffer(nullptr)
 , m_sResourceDataPath(QString("%1/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
 , m_uiBufferSampleSize(200)//(4)
 , m_AccelerationFactor(1.0)
 , m_TrueSamplingRate(0.0)
-, m_pRawMatrixBuffer(nullptr)
 , m_bIsRunning(false)
 {
     this->init();

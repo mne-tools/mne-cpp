@@ -350,7 +350,6 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
     fiff_int_t   *this_sample;
 
     int s,c;
-    int do_all;
 
 //    tag.data = NULL;
 
@@ -358,11 +357,8 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
     if (npick == 0) {
         pickno_vec = Eigen::VectorXi::LinSpaced(nchan, 0, nchan - 1);
         pickno = pickno_vec.data();
-        do_all = true;
         npick = nchan;
     }
-    else
-        do_all = false;
 
     Eigen::VectorXf mult(npick);
     for (c = 0; c < npick; c++)
@@ -707,7 +703,6 @@ int MNERawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
     int          k,s,p,start,c,fills;
     int          ns2,s2;
     MNERawBufDef* this_buf;
-    float        *values;
     int          need_some;
 
     RowMajorMatrixXf deriv_vals;

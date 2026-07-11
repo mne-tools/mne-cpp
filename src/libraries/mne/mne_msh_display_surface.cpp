@@ -50,10 +50,6 @@ using namespace MNELIB;
 constexpr int FAIL = -1;
 constexpr int OK   =  0;
 
-constexpr int X = 0;
-constexpr int Y = 1;
-constexpr int Z = 2;
-
 constexpr int  SHOW_CURVATURE_NONE    = 0;
 constexpr int  SHOW_CURVATURE_OVERLAY = 1;
 constexpr int  SHOW_OVERLAY_HEAT      = 1;
@@ -455,7 +451,7 @@ void MNEMshDisplaySurface::scale(const Eigen::Vector3f& scales)
 
 //=============================================================================================================
 
-void MNEMshDisplaySurface::decide_surface_extent(const QString& tag)
+void MNEMshDisplaySurface::decide_surface_extent([[maybe_unused]] const QString& tag)
 {
     Eigen::Vector3f mn = rr.row(0).transpose();
     Eigen::Vector3f mx = mn;
@@ -504,7 +500,7 @@ void MNEMshDisplaySurface::setup_curvature_colors()
     if (vertex_colors.size() == 0)
         vertex_colors.resize(totalSize);
 
-    float curv_sum = 0.0f;
+    [[maybe_unused]] float curv_sum = 0.0f;
     if (curvature_color_mode == SHOW_CURVATURE_OVERLAY) {
         for (int k = 0; k < np; k++) {
             const int base = k * ncolor;

@@ -64,6 +64,7 @@
 #include <QObject>
 #include <QTemporaryDir>
 #include <QJsonDocument>
+#include <QTimeZone>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -622,7 +623,7 @@ void TestMnaSerialization::testVerificationResultJsonRoundTrip()
     result.severity = "error";
     result.message = "PASS: covariance is positive-definite";
     result.actualValue = 64;
-    result.evaluatedAt = QDateTime(QDate(2026, 4, 19), QTime(12, 0, 0), Qt::UTC);
+    result.evaluatedAt = QDateTime(QDate(2026, 4, 19), QTime(12, 0, 0), QTimeZone::UTC);
 
     QJsonObject json = result.toJson();
     MnaVerificationResult restored = MnaVerificationResult::fromJson(json);
@@ -667,8 +668,8 @@ void TestMnaSerialization::testProvenanceJsonRoundTrip()
     prov.wallTimeMs = 12345;
     prov.peakMemoryBytes = 256 * 1024 * 1024;
     prov.randomSeed = 42;
-    prov.startedAt = QDateTime(QDate(2026, 4, 19), QTime(10, 0, 0), Qt::UTC);
-    prov.finishedAt = QDateTime(QDate(2026, 4, 19), QTime(10, 0, 12), Qt::UTC);
+    prov.startedAt = QDateTime(QDate(2026, 4, 19), QTime(10, 0, 0), QTimeZone::UTC);
+    prov.finishedAt = QDateTime(QDate(2026, 4, 19), QTime(10, 0, 12), QTimeZone::UTC);
 
     prov.inputHashes["raw"] = "sha256:aabb";
     prov.inputHashes["noise_cov"] = "sha256:ccdd";

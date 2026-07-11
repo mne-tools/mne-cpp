@@ -45,8 +45,8 @@ FwdThreadArg::FwdThreadArg()
 ,client        (nullptr)
 ,s             (nullptr)
 ,fixed_ori     (false)
-,stat          (-1)
 ,comp          (-1)
+,stat          (-1)
 {
 }
 

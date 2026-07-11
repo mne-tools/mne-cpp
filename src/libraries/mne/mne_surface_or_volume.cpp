@@ -70,18 +70,12 @@ using namespace MNELIB;
 constexpr int FAIL = -1;
 constexpr int OK   =  0;
 
-constexpr int X = 0;
-constexpr int Y = 1;
-constexpr int Z = 2;
-
-constexpr int NNEIGHBORS = 26;
-
 
 
 
 //============================= make_volume_source_space.c =============================
 
-static std::optional<FiffCoordTrans> make_voxel_ras_trans(const Eigen::Vector3f& r0,
+[[maybe_unused]] static std::optional<FiffCoordTrans> make_voxel_ras_trans(const Eigen::Vector3f& r0,
                                                   const Eigen::Vector3f& x_ras,
                                                   const Eigen::Vector3f& y_ras,
                                                   const Eigen::Vector3f& z_ras,

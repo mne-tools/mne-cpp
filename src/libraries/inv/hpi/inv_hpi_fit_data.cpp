@@ -204,7 +204,7 @@ bool InvHpiFitData::compare(HPISortStruct a, HPISortStruct b)
 Eigen::MatrixXd InvHpiFitData::fminsearch(const Eigen::MatrixXd& matPos,
                                        int iMaxiter,
                                        int iMaxfun,
-                                       int iDisplay,
+                                       [[maybe_unused]] int iDisplay,
                                        const Eigen::MatrixXd& matData,
                                        const Eigen::MatrixXd& matProjectors,
                                        const InvSensorSet& sensors,
@@ -212,7 +212,7 @@ Eigen::MatrixXd InvHpiFitData::fminsearch(const Eigen::MatrixXd& matPos,
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;
     std::string header, how;
-    int n, itercount, prnt;
+    int n, itercount;
     Eigen::MatrixXd onesn, two2np1, one2n, v, y, v1, tempX1, tempX2, xbar, xr, x, xe, xc, xcc, xin,posCopy;
     std::vector <double> fv, fv1;
     std::vector <int> idx;
@@ -220,14 +220,6 @@ Eigen::MatrixXd InvHpiFitData::fminsearch(const Eigen::MatrixXd& matPos,
     DipFitError tempdip, fxr, fxe, fxc, fxcc;
 
     tolx = tolf = m_fAbortError;
-
-    switch(iDisplay) {
-        case 0:
-            prnt = 0;
-            break;
-        default:
-            prnt = 1;
-    }
 
     header = " Iteration   Func-count     min f(x) Procedure";
 
@@ -285,7 +277,7 @@ Eigen::MatrixXd InvHpiFitData::fminsearch(const Eigen::MatrixXd& matPos,
     // Sort elements of fv
     std::vector<HPISortStruct> vecSortStruct;
 
-    for (int i = 0; i < fv.size(); i++) {
+    for (int i = 0; i < static_cast<int>(fv.size()); i++) {
         HPISortStruct structTemp;
         structTemp.base_arr = fv[i];
         structTemp.idx = i;
@@ -294,7 +286,7 @@ Eigen::MatrixXd InvHpiFitData::fminsearch(const Eigen::MatrixXd& matPos,
 
     std::sort(vecSortStruct.begin(), vecSortStruct.end(), compare);
 
-    for (int i = 0; i < vecSortStruct.size(); i++) {
+    for (int i = 0; i < static_cast<int>(vecSortStruct.size()); i++) {
         idx[i] = vecSortStruct[i].idx;
     }
 
@@ -413,7 +405,7 @@ Eigen::MatrixXd InvHpiFitData::fminsearch(const Eigen::MatrixXd& matPos,
         // Sort elements of fv
         vecSortStruct.clear();
 
-        for (int i = 0; i < fv.size(); i++) {
+        for (int i = 0; i < static_cast<int>(fv.size()); i++) {
             HPISortStruct structTemp;
             structTemp.base_arr = fv[i];
             structTemp.idx = i;
@@ -421,7 +413,7 @@ Eigen::MatrixXd InvHpiFitData::fminsearch(const Eigen::MatrixXd& matPos,
         }
 
         std::sort(vecSortStruct.begin(), vecSortStruct.end(), compare);
-        for (int i = 0; i < vecSortStruct.size(); i++) {
+        for (int i = 0; i < static_cast<int>(vecSortStruct.size()); i++) {
             idx[i] = vecSortStruct[i].idx;
         }
 

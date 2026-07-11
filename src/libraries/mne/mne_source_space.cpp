@@ -172,14 +172,6 @@ int check_vertex(int no, int maxno)
     return OK;
 }
 
-MNEVolGeom dup_vol_geom(const MNEVolGeom& g)
-{
-    MNEVolGeom dup;
-    dup = g;
-    dup.filename = g.filename;
-    return dup;
-}
-
 //=========================================================================
 // read_vol_geom
 //=========================================================================
@@ -1103,7 +1095,6 @@ std::unique_ptr<MNESourceSpace> MNESourceSpace::load_surface_geom(const QString&
      * Load the surface and add the geometry information
      */
 {
-    int   k;
     std::unique_ptr<MNESourceSpace> s;
     std::optional<MNEMghTagGroup> tags;
     Eigen::VectorXf curvs;

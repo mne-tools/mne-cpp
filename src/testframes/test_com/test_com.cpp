@@ -379,21 +379,6 @@ void TestCom::testRawCommandExecuteSignal()
 // CommandParser tests
 //=============================================================================================================
 
-static QByteArray makeJsonDoc(const QString& cmdName, const QJsonObject& params = QJsonObject())
-{
-    QJsonObject cmdContent;
-    cmdContent.insert("description", QString("test command"));
-    QJsonObject paramsObj;
-    cmdContent.insert("parameters", paramsObj);
-
-    QJsonObject cmdObj;
-    cmdObj.insert(cmdName, params.isEmpty() ? QJsonObject() : params);
-
-    QJsonObject root;
-    root.insert("commands", cmdObj);
-    return QJsonDocument(root).toJson(QJsonDocument::Compact);
-}
-
 void TestCom::testCommandParserCLI()
 {
     CommandManager manager;

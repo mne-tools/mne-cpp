@@ -109,7 +109,6 @@ static Matrix4f procrustes(const MatrixX3f& source, const MatrixX3f& target)
 {
     // Procrustes alignment: find rotation + translation to map source onto target
     // Both matrices should have the same number of rows (corresponding points)
-    int n = static_cast<int>(source.rows());
 
     // Centroids
     Vector3f centS = source.colwise().mean();

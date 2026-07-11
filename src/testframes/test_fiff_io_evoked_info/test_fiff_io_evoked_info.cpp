@@ -158,7 +158,7 @@ void TestFiffIoEvokedInfo::fiffIO_writeRawRoundTrip()
     QFile fileOut(outPath);
     QVERIFY(fileOut.open(QIODevice::WriteOnly));
 
-    bool ok = fioIn.write_raw(fileOut, 0);
+    QVERIFY(fioIn.write_raw(fileOut, 0));
     fileOut.close();
 
     // Verify the output file exists and is non-empty

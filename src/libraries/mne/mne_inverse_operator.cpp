@@ -362,7 +362,6 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
     //
     // Assemble input data
     //
-    qint32 count;
     qint32 offset;
 
     MatrixXd t_MT_new;
@@ -370,7 +369,6 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
     for(qint32 h = 0; h < this->src.size(); ++h )
     {
 
-        count = 0;
         offset = 0;
 
         if(h > 0)
@@ -548,8 +546,6 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
                         }
                     }
                     (void)j_min;
-
-                    ++count;
                 }
             }
 

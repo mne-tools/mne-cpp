@@ -40,6 +40,12 @@ option(USE_FFTW "Use fftw backend for Eigen3::Eigen" OFF)
 
 option(USE_ONNXRUNTIME "Enable ONNX Runtime backend for the ml library" ON)
 
+# v2.4.0 G5 quality gate: build must be warning-free. Enabling this treats
+# compiler warnings on MNE-CPP's own sources as errors so regressions cannot
+# land. Third-party/external and generated (moc/uic/rcc) translation units are
+# not affected here (they are compiled through their own targets/flags).
+option(MNE_WARNINGS_AS_ERRORS "Treat compiler warnings as errors on MNE-CPP sources" OFF)
+
 set(MNE_LOG_LEVEL "INFO" CACHE STRING "Minimum log level: DEBUG, INFO, WARN, CRIT, FATAL")
 set_property(CACHE MNE_LOG_LEVEL PROPERTY STRINGS DEBUG INFO WARN CRIT FATAL)
 
@@ -109,6 +115,25 @@ endif()
 if(MSVC)
   add_compile_options(/EHsc /MP)
   add_compile_definitions(_USE_MATH_DEFINES)
+endif()
+
+# Warning policy (v2.4.0 G5). Enable a common warning set on our own sources and,
+# when MNE_WARNINGS_AS_ERRORS is ON, promote them to errors so the build stays
+# warning-free. Applied globally here; external/generated sources compiled by
+# their own targets are unaffected.
+if(MSVC)
+  add_compile_options(/W3)
+  if(MNE_WARNINGS_AS_ERRORS)
+    add_compile_options(/WX)
+  endif()
+else()
+  add_compile_options(-Wall -Wextra)
+  if(MNE_WARNINGS_AS_ERRORS)
+    add_compile_options(-Werror)
+  endif()
+endif()
+if(MNE_WARNINGS_AS_ERRORS)
+  message(STATUS "[MNE-CPP] Treating compiler warnings as errors (MNE_WARNINGS_AS_ERRORS=ON)")
 endif()
 
 ##==============================================================================

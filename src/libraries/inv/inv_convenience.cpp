@@ -85,7 +85,6 @@ VectorXd computeRowPsd(const VectorXd& row, int nFft, double sfreq)
     VectorXd psd(nFreqs);
 
     for (int f = 0; f < nFreqs; ++f) {
-        double freq = static_cast<double>(f) * sfreq / nFft;
         double re = 0.0, im = 0.0;
         for (int t = 0; t < nFft; ++t) {
             double angle = -2.0 * M_PI * f * t / nFft;

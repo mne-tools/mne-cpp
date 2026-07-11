@@ -41,12 +41,12 @@ using namespace FWDLIB;
 //=============================================================================================================
 
 FwdCompData::FwdCompData()
-:comp_coils (nullptr)
+:set        (nullptr)
+,comp_coils (nullptr)
 ,field      (nullptr)
 ,vec_field  (nullptr)
 ,field_grad (nullptr)
 ,client     (nullptr)
-,set        (nullptr)
 {
 }
 

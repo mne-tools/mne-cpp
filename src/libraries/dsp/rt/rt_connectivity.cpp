@@ -55,7 +55,6 @@ void RtConnectivityWorker::doWork(const ConnectivitySettings &connectivitySettin
     ConnectivitySettings connectivitySettingsTemp = connectivitySettings;
 
     QElapsedTimer time;
-    qint64 iTime = 0;
     time.start();
 
     QList<Network> finalNetworks = Connectivity::calculate(connectivitySettingsTemp);

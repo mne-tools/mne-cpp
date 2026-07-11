@@ -79,7 +79,7 @@ using namespace Eigen;
  * Projects to a 2D plane preserving angles from the center.
  */
 static void azimuthalProjection(const Vector3f &pos, const Vector3f &center,
-                                 float radius, float &x, float &y)
+                                 [[maybe_unused]] float radius, float &x, float &y)
 {
     Vector3f d = pos - center;
     d.normalize();

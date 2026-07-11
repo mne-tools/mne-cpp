@@ -57,7 +57,6 @@ double evalMagnitude(const QVector<IirBiquad>& sos, double omega)
 {
     std::complex<double> z(std::cos(omega), std::sin(omega));
     std::complex<double> H(1.0, 0.0);
-    std::complex<double> z1(1.0, 0.0);    // z^{-1} placeholder
 
     for (const IirBiquad& bq : sos) {
         std::complex<double> zinv  = 1.0 / z;

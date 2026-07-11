@@ -72,7 +72,6 @@ MatrixXd UTILSLIB::computeElectricalDistance(const MatrixXd& data,
 
     // Compute electrical distance matrix
     MatrixXd edist = MatrixXd::Zero(nEeg, nEeg);
-    const int nTimes = static_cast<int>(data.cols());
 
     for (int i = 0; i < nEeg; ++i) {
         for (int j = i + 1; j < nEeg; ++j) {

@@ -158,7 +158,6 @@ int main(int argc, char *argv[])
     printf("\n");
 
     int nMatch = 0, nDiff = 0, nMissing = 0;
-    int maxEntries = (int)std::max(dir1.size(), dir2.size());
     int minEntries = (int)std::min(dir1.size(), dir2.size());
 
     for (int i = 0; i < minEntries; ++i) {

@@ -128,9 +128,6 @@ private slots:
 
         MNEForwardSolution fwdCopy = m_fwd;
 
-        // Get gain matrix dimensions before conversion
-        int ncolsBefore = fwdCopy.sol->data.cols();
-
         fwdCopy.to_fixed_ori();
 
         // After fixed orientation: sols should still be valid

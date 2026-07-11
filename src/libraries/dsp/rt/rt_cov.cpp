@@ -42,8 +42,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 RtCov::RtCov(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
-: m_fiffInfo(*pFiffInfo)
-, m_iSamples(0)
+: m_iSamples(0)
+, m_fiffInfo(*pFiffInfo)
 , m_bPicksReady(false)
 {
 }

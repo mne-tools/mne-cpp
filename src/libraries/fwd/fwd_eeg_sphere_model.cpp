@@ -897,9 +897,9 @@ static void sort_parameters(VectorXd& mu,VectorXd& lambda,int nfit)
     }
 }
 
-static bool report_fit(int    loop,
-                      const VectorXd &fitpar,
-                      double Smin,
+static bool report_fit([[maybe_unused]] int    loop,
+                      [[maybe_unused]] const VectorXd &fitpar,
+                      [[maybe_unused]] double Smin,
                       double /*fval_hi*/,
                       double /*par_diff*/)
 {

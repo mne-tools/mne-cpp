@@ -53,12 +53,7 @@ constexpr int  SURF_LEFT_MORPH_HEMI  = (1 << 16 | FIFFV_MNE_SURF_LEFT_HEMI);
 constexpr int  SURF_RIGHT_MORPH_HEMI = (1 << 16 | FIFFV_MNE_SURF_RIGHT_HEMI);
 
 constexpr int  SHOW_CURVATURE_NONE    = 0;
-constexpr int  SHOW_CURVATURE_OVERLAY = 1;
 constexpr int  SHOW_OVERLAY_HEAT      = 1;
-
-constexpr float POS_CURV_COLOR  = 0.25f;
-constexpr float NEG_CURV_COLOR  = 0.375f;
-constexpr float EVEN_CURV_COLOR = 0.375f;
 
 } // anonymous namespace
 

@@ -50,7 +50,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InvBeamformer InvDICS::makeDICS(const FiffInfo &info,
+InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
                                 const MNEForwardSolution &forward,
                                 const std::vector<MatrixXd> &csdMatrices,
                                 const VectorXd &frequencies,
@@ -214,7 +214,7 @@ InvSourceEstimate InvDICS::applyDICSCsd(const std::vector<MatrixXd> &csdMatrices
 
     const int nOrient = filters.nOrient();
     const int nSources = filters.nSources();
-    const int nChannels = filters.nChannels();
+
 
     // Power matrix: (nSources, nFreqs)
     MatrixXd powerMat(nSources, nFreqs);

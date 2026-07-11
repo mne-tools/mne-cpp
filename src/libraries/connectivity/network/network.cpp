@@ -60,8 +60,8 @@ Network::Network(const QString& sConnectivityMethod,
 , m_minMaxThresholdedWeights(QPair<double,double>(std::numeric_limits<double>::max(),0.0))
 , m_dThreshold(dThreshold)
 , m_fSFreq(0.0f)
-, m_iFFTSize(128)
 , m_iNumberFreqBins(0)
+, m_iFFTSize(128)
 {
     qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
     qRegisterMetaType<CONNECTIVITYLIB::Network::SPtr>("CONNECTIVITYLIB::Network::SPtr");

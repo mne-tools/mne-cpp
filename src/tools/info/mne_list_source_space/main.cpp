@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     QString dipName = parser.value(dipOpt);
     QString vertName = parser.value(vertOpt);
     bool listAll = parser.isSet(allOpt);
-    int coordFrame = FIFFV_COORD_MRI;
+    [[maybe_unused]] int coordFrame = FIFFV_COORD_MRI;
     QString coordStr = parser.value(coordOpt);
     if (coordStr == "head") coordFrame = FIFFV_COORD_HEAD;
     else if (coordStr == "mri") coordFrame = FIFFV_COORD_MRI;

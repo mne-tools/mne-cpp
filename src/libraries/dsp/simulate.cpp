@@ -212,7 +212,6 @@ FiffEvoked UTILSLIB::simulateEvokedNoiseless(
     }
 
     MatrixXd G = fwd.sol->data;  // (n_channels x n_dipoles)
-    const int nChan = static_cast<int>(G.rows());
     const int nDipoles = static_cast<int>(G.cols());
     const int nSrc = static_cast<int>(stc.data.rows());
     const int nTimes = static_cast<int>(stc.data.cols());

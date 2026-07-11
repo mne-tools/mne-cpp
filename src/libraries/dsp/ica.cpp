@@ -253,7 +253,6 @@ MatrixXd ICA::whiten(const MatrixXd& matCentered,
     // Eigendecomposition — SelfAdjointEigenSolver returns eigenvalues in ascending order
     SelfAdjointEigenSolver<MatrixXd> eig(cov);
 
-    const int nCh = static_cast<int>(cov.rows());
     // Take the nComponents largest eigenvalues/vectors (rightmost columns)
     VectorXd eigenvalues  = eig.eigenvalues().tail(nComponents).cwiseMax(1e-12);
     MatrixXd eigenvectors = eig.eigenvectors().rightCols(nComponents);   // n_ch x n_comp

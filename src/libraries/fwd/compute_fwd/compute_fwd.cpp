@@ -53,11 +53,11 @@ constexpr int Z = 2;
 //=============================================================================================================
 
 ComputeFwd::ComputeFwd(std::shared_ptr<ComputeFwdSettings> pSettings)
-    : m_meg_forward(new FiffNamedMatrix)
+    : m_pSettings(pSettings)
+    , m_meg_forward(new FiffNamedMatrix)
     , m_meg_forward_grad(new FiffNamedMatrix)
     , m_eeg_forward(new FiffNamedMatrix)
     , m_eeg_forward_grad(new FiffNamedMatrix)
-    , m_pSettings(pSettings)
 {
     initFwd();
 }
