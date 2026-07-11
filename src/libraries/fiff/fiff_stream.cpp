@@ -1909,6 +1909,16 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice,
         return false;
     }
     //
+    //  The per-buffer sample count below is derived by dividing the data
+    //  buffer size by the channel count. A malformed measurement info with no
+    //  channels would cause a division by zero, so reject it up front.
+    //
+    if (nchan <= 0)
+    {
+        qWarning("Measurement info of %s reports %d channels; cannot read raw data\n", t_sFileName.toUtf8().constData(), nchan);
+        return false;
+    }
+    //
     //  Get first sample tag if it is there
     //
     FiffTag::UPtr t_pTag;

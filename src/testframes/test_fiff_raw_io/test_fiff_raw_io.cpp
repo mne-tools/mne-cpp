@@ -19,6 +19,7 @@
 #include <QDir>
 #include <QBuffer>
 #include <QTemporaryFile>
+#include <stdexcept>
 #include <Eigen/Dense>
 
 #include <utils/generics/mne_logger.h>
@@ -737,6 +738,53 @@ private slots:
         QVERIFY2(ok, "read_raw_segment failed with persistent QFile");
         QVERIFY(data.rows() > 0);
         QVERIFY(data.cols() > 0);
+    }
+
+    //=========================================================================
+    // Regression: loading a raw FIFF whose raw-data block has an empty
+    // directory (no data buffers) must fail gracefully instead of indexing
+    // past the end of the directory and crashing. See PR #1003 and the
+    // FiffStream::setup_read_raw guards.
+    //=========================================================================
+    void fiffRawData_emptyRawDirectoryFailsGracefully()
+    {
+        if (!hasData()) QSKIP("No test data");
+
+        // Borrow a valid measurement info from the real test file so the
+        // written file has a well-formed meas-info block ...
+        QFile srcFile(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        FiffRawData src(srcFile);
+        QVERIFY(!src.isEmpty());
+
+        // ... then write a raw file that opens a FIFFB_RAW_DATA block but never
+        // writes a single data buffer, leaving that block's directory empty.
+        QTemporaryFile tmpFile;
+        QVERIFY(tmpFile.open());
+        tmpFile.close();
+
+        {
+            QFile outFile(tmpFile.fileName());
+            RowVectorXd cals;
+            FiffStream::SPtr outStream =
+                FiffStream::start_writing_raw(outFile, src.info, cals);
+            QVERIFY(outStream);
+            // Deliberately write no raw buffers before finishing.
+            outStream->finish_writing_raw();
+        }
+
+        // Reading it back must fail cleanly. setup_read_raw returns false for
+        // the empty directory, which FiffRawData surfaces as a runtime_error
+        // rather than an out-of-bounds crash. The point of the regression is
+        // that we reach this controlled failure at all.
+        QFile badFile(tmpFile.fileName());
+        bool threw = false;
+        try {
+            FiffRawData bad(badFile);
+        } catch (const std::runtime_error&) {
+            threw = true;
+        }
+        QVERIFY2(threw,
+                 "raw with empty data directory should fail to load, not crash");
     }
 
     //=========================================================================
