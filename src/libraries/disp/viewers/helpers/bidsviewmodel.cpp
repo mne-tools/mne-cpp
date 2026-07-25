@@ -162,7 +162,9 @@ QModelIndex BidsViewModel::addSessionToSubject(const QString &sSubjectName,
         return QModelIndex();
     }
 
-    QStandardItem* pNewSessionItem;
+    // Stays null when the loop body never runs, which the return below guards
+    // against; dereferencing it unconditionally would be undefined.
+    QStandardItem* pNewSessionItem = nullptr;
 
     //Add session to subjects with mathcing names. Renames them if multiple.
     for (int i = 0; i < listItems.size(); i++){
@@ -181,6 +183,10 @@ QModelIndex BidsViewModel::addSessionToSubject(const QString &sSubjectName,
         pNewSessionItem->setData(QVariant::fromValue(pNewSessionItem->index()), BIDS_ITEM_SESSION);
 
         emit newItemIndex(pNewSessionItem->index());
+    }
+
+    if(!pNewSessionItem) {
+        return QModelIndex();
     }
 
     return pNewSessionItem->index();
@@ -237,6 +243,7 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
             break;
         case BIDS_BEHAVIORALDATA:
             sFolderName = "beh";
+            break;
         default:
             sFolderName = "unknown";
     }

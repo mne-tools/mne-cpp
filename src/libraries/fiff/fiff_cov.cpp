@@ -398,7 +398,10 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
                     this_C(i,j) = cov_good.data(idx[i], idx[j]);
 
             MatrixXd U;
-            qint32 ncomp;
+            // Only assigned when projecting, but read again below to decide
+            // whether the SSP operator has to be undone. Without projection
+            // there are no components to remove.
+            qint32 ncomp = 0;
             if(p_bProj)
             {
                 QStringList this_ch_names;

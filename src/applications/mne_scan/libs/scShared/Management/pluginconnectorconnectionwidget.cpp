@@ -147,7 +147,10 @@ void PluginConnectorConnectionWidget::updateReceiver(const QString &p_sCurrentRe
 
     //get active control using focus
     QString t_sCurrentSender;
-    QComboBox* t_qComboBox;
+    // Only assigned for the focused combo box; the second loop compares against
+    // it to skip that entry, so it must be null rather than indeterminate when
+    // nothing has focus.
+    QComboBox* t_qComboBox = nullptr;
     QMap<QString, QComboBox*>::iterator it;
     for (it = m_qMapSenderToReceiverConnections.begin(); it != m_qMapSenderToReceiverConnections.end(); ++it)
     {

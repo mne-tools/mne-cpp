@@ -588,7 +588,9 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
 
     m_selectionGroupsMap.clear();
 
-    bool state;
+    // An empty path, or one with neither recognised extension, reads nothing
+    // and must report failure rather than an indeterminate value.
+    bool state = false;
     if(!path.isEmpty()) {
         if(path.contains(".sel"))
             state = SelectionIO::readMNESelFile(newPath, m_selectionGroupsMap);

@@ -257,7 +257,11 @@ static FiffExplainEntry _fiff_block_explanations[] = {
 
 //=============================================================================================================
 
-static FiffExplainEntry _fiff_unit_explanations[] = {
+// Reference tables kept alongside the tag and block explanations for
+// completeness. Nothing consumes them yet, so they are marked maybe_unused to
+// stay in the header without tripping -Wunused-variable in every translation
+// unit that includes it.
+[[maybe_unused]] static FiffExplainEntry _fiff_unit_explanations[] = {
   /*
    * SI base units
    */
@@ -297,7 +301,7 @@ static FiffExplainEntry _fiff_unit_explanations[] = {
   { FIFF_UNIT_T_M,"T/m" }, /* T/m */ 
   { -1, nullptr }};
 
-static FiffExplainEntry _fiff_unit_mul_explanations[] = {
+[[maybe_unused]] static FiffExplainEntry _fiff_unit_mul_explanations[] = {
   { FIFF_UNITM_E, "E" },
   { FIFF_UNITM_PET,  "P" },
   { FIFF_UNITM_T, "T" },

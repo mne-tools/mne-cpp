@@ -311,14 +311,15 @@ bool KMeans::calculate(const MatrixXd& X_in,
 
 bool KMeans::batchUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
 {
-    // Every point moved, every cluster will need an update
-    qint32 i = 0;
+    // Every point moved, every cluster will need an update.
+    // Both indices are loop-local: a function-scope `i` was shadowed by every
+    // later loop in this function.
     VectorXi moved(n);
-    for (i = 0; i < n; ++i)
+    for (qint32 i = 0; i < n; ++i)
         moved[i] = i;
 
     VectorXi changed(k);
-    for (i = 0; i < k; ++i)
+    for (qint32 i = 0; i < k; ++i)
         changed[i] = i;
 
     previdx = VectorXi::Zero(n);
