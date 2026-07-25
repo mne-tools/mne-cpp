@@ -443,6 +443,15 @@ protected:
 
     //=========================================================================================================
     /**
+     * Recomputes the row height so the currently visible rows fill the view.
+     *
+     * Has to be called whenever rows are hidden or shown, otherwise the rows
+     * keep the height they were given for the previous number of channels.
+     */
+    void updateRowHeight();
+
+    //=========================================================================================================
+    /**
      * Gets called when the bad channels are about to be marked as bad or good
      */
     void markChBad();

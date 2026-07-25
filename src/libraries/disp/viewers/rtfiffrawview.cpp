@@ -209,6 +209,9 @@ void RtFiffRawView::addData(const QList<Eigen::MatrixXd> &data)
                     m_pTableView->showRow(m_qListBadChannels.at(i));
                 }
             }
+
+            //The set of visible rows changed, so the row height has to follow
+            updateRowHeight();
         }
     } else {
         qWarning() << "[RtFiffRawView::addData] Received data list is empty.";
@@ -306,8 +309,42 @@ void RtFiffRawView::hideBadChannels()
         }
     }
 
+    //The rows that remain have to share the freed space
+    updateRowHeight();
+
     //Update the visible channel list which are to be filtered
     visibleRowsChanged();
+}
+
+//=============================================================================================================
+
+void RtFiffRawView::updateRowHeight()
+{
+    if(!m_pTableView || !m_pModel) {
+        return;
+    }
+
+    //
+    // The row height is derived from the height of the whole view, so it has to
+    // be recomputed whenever rows appear or disappear. Otherwise hiding a
+    // channel leaves the remaining rows at their previous height and the view
+    // no longer fills the widget.
+    //
+    int iVisibleRows = 0;
+    for(int i = 0; i < m_pModel->rowCount(); ++i) {
+        if(!m_pTableView->isRowHidden(i)) {
+            ++iVisibleRows;
+        }
+    }
+
+    if(iVisibleRows <= 0) {
+        return;
+    }
+
+    const int iHeight = static_cast<int>(static_cast<float>(m_pTableView->height() * m_pModel->rowCount())
+                                         / (static_cast<float>(iVisibleRows) * m_fZoomFactor));
+
+    m_pTableView->verticalHeader()->setDefaultSectionSize(iHeight);
 }
 
 //=============================================================================================================
@@ -335,6 +372,9 @@ void RtFiffRawView::showSelectedChannelsOnly(const QStringList &selectedChannels
         }
     }
 
+    //The rows that remain have to share the freed space
+    updateRowHeight();
+
     //Update the visible channel list which are to be filtered
     visibleRowsChanged();
 }
@@ -345,7 +385,7 @@ void RtFiffRawView::setZoom(double zoomFac)
 {
     m_fZoomFactor = zoomFac;
 
-    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pTableView->height() / m_fZoomFactor);//Row Height
+    updateRowHeight();
 }
 
 //=============================================================================================================
