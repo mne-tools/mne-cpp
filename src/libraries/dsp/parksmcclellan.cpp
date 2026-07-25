@@ -357,11 +357,10 @@ int ParksMcClellan::Remez2(int GridIndex)
     KNZ = ExchangeIndex[HalfTapCount+1];
     KLOW = 0;
     NUT = -NU;
-    j = 1;
 
     //Search for the extremal frequencies of the best approximation.
 
-    j=1;
+    j = 1;
     while(j<HalfTapCount+2)
     {
         KUP = ExchangeIndex[j+1];

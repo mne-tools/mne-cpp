@@ -749,8 +749,6 @@ void InvRapMusic::calcOrthProj(const MatrixXT& p_matA_k_1, MatrixXT& p_matOrthPr
 
     t_matA_k_1_tmp_inv.block(0,0,t_size,t_size) = t_matA_k_1_tmp.block(0,0,t_size,t_size).inverse();//(A_k_1_tmp)^-1 = A_k_1_tmp_inv
 
-    t_matA_k_1_tmp = MatrixXT::Zero(p_matA_k_1.rows(), p_matA_k_1.cols());
-
     t_matA_k_1_tmp = p_matA_k_1*t_matA_k_1_tmp_inv;//(A_k_1*A_k_1_tmp_inv) = A_k_1_tmp
 
     MatrixXT t_matA_k_1_tmp2(p_matA_k_1.rows(), p_matA_k_1.rows());
