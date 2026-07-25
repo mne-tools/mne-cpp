@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
         srcStream->close();
         return 1;
     }
-    printf("Found %lld processing history block(s) in source.\n",
+    qInfo("Found %lld processing history block(s) in source." ,
            static_cast<long long>(histNodes.size()));
 
     // Open destination file for update
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
     srcStream->close();
     dstStream->close();
 
-    printf("Successfully copied processing history from %s to %s\n",
+    qInfo("Successfully copied processing history from %s to %s" ,
            qPrintable(fromFile), qPrintable(toFile));
     return 0;
 }

@@ -125,10 +125,10 @@ int FlashBem::run()
 
     QDateTime startTime = QDateTime::currentDateTime();
 
-    printf("\n");
-    printf("Processing the flash MRI data for subject %s to produce\n", qPrintable(m_settings.subject()));
-    printf("BEM meshes under %s\n", qPrintable(flashBemDir));
-    printf("\n");
+    qInfo("");
+    qInfo("Processing the flash MRI data for subject %s to produce" , qPrintable(m_settings.subject()));
+    qInfo("BEM meshes under %s" , qPrintable(flashBemDir));
+    qInfo("");
 
     //
     // Step 1: Convert DICOM images to MGZ format
@@ -169,7 +169,7 @@ int FlashBem::run()
         QDir paramDirObj(paramDir);
         paramDirObj.removeRecursively();
         QDir().mkpath(paramDir);
-        printf("Parameter maps directory cleared\n");
+        qInfo("Parameter maps directory cleared");
     }
 
     //
@@ -223,12 +223,12 @@ int FlashBem::run()
     //
     cleanup(bemDir, mriDir, convertedT1, convertedBrain);
 
-    printf("\nThank you for waiting.\n");
-    printf("The BEM triangulations for this subject are now available at %s\n",
+    qInfo("\nThank you for waiting.");
+    qInfo("The BEM triangulations for this subject are now available at %s" ,
            qPrintable(flashBemDir));
-    printf("We hope the BEM meshes created will facilitate your MEG and EEG data analyses.\n");
-    printf("\nProcessing started at %s\n", qPrintable(startTime.toString()));
-    printf("Processing finished at %s\n\n", qPrintable(QDateTime::currentDateTime().toString()));
+    qInfo("We hope the BEM meshes created will facilitate your MEG and EEG data analyses.");
+    qInfo("\nProcessing started at %s" , qPrintable(startTime.toString()));
+    qInfo("Processing finished at %s\n" , qPrintable(QDateTime::currentDateTime().toString()));
 
     return 0;
 }
@@ -243,7 +243,7 @@ bool FlashBem::runCommand(const QString& program, const QStringList& args,
     for (const QString& arg : args) {
         printf(" %s", qPrintable(arg));
     }
-    printf("\n");
+    qInfo("");
 
     QProcess process;
     process.setProcessChannelMode(QProcess::ForwardedChannels);
@@ -285,8 +285,8 @@ bool FlashBem::convertImages(const QString& flashDir, const QString& mriFlashDir
                              int& echosConverted)
 {
     m_step++;
-    printf("\n");
-    printf("Step %d : Converting images...\n\n", m_step);
+    qInfo("");
+    qInfo("Step %d : Converting images...\n" , m_step);
 
     //
     // Determine which flash angles to process
@@ -347,7 +347,7 @@ bool FlashBem::convertImages(const QString& flashDir, const QString& mriFlashDir
 
             // Skip if already converted
             if (QFileInfo::exists(destFile)) {
-                printf("%s is already there\n", qPrintable(destFile));
+                qInfo("%s is already there" , qPrintable(destFile));
                 continue;
             }
 
@@ -375,7 +375,7 @@ bool FlashBem::convertImages(const QString& flashDir, const QString& mriFlashDir
 
 bool FlashBem::unwarpImages(const QString& mriFlashDir)
 {
-    printf("\nApplying gradient unwarping...\n\n");
+    qInfo("\nApplying gradient unwarping...\n");
 
     QDir dir(mriFlashDir);
     QStringList filters;
@@ -405,15 +405,15 @@ bool FlashBem::unwarpImages(const QString& mriFlashDir)
 bool FlashBem::createParameterMaps(const QString& mriFlashDir, const QString& paramDir)
 {
     m_step++;
-    printf("\n");
-    printf("Step %d : Creating the parameter maps...\n\n", m_step);
+    qInfo("");
+    qInfo("Step %d : Creating the parameter maps...\n" , m_step);
 
     //
     // Check if parameter maps already exist
     //
     QDir paramDirObj(paramDir);
     if (paramDirObj.entryList(QDir::Files | QDir::NoDotAndDotDot).size() > 0) {
-        printf("Parameter maps were already computed\n");
+        qInfo("Parameter maps were already computed");
         return true;
     }
 
@@ -453,11 +453,11 @@ bool FlashBem::createFlash5Volume(const QString& mriFlashDir, const QString& par
         //
         // With flash30: synthesize from T1 and PD parameter maps
         //
-        printf("\n");
-        printf("Step %d : Synthesizing flash 5...\n\n", m_step);
+        qInfo("");
+        qInfo("Step %d : Synthesizing flash 5...\n" , m_step);
 
         if (QFileInfo::exists(flash5File)) {
-            printf("Synthesized flash 5 volume is already there\n");
+            qInfo("Synthesized flash 5 volume is already there");
             return true;
         }
 
@@ -474,8 +474,8 @@ bool FlashBem::createFlash5Volume(const QString& mriFlashDir, const QString& par
         //
         // Without flash30: average all flash-5 echoes
         //
-        printf("\n");
-        printf("Step %d : Averaging flash5 echoes...\n\n", m_step);
+        qInfo("");
+        qInfo("Step %d : Averaging flash5 echoes...\n" , m_step);
 
         QDir flashDirObj(mriFlashDir);
         QStringList pattern;
@@ -505,12 +505,12 @@ bool FlashBem::createFlash5Volume(const QString& mriFlashDir, const QString& par
 bool FlashBem::registerWithMprage(const QString& paramDir, const QString& mriDir)
 {
     m_step++;
-    printf("\n");
-    printf("Step %d : Registering flash 5 with MPRAGE...\n\n", m_step);
+    qInfo("");
+    qInfo("Step %d : Registering flash 5 with MPRAGE...\n" , m_step);
 
     QString flash5Reg = paramDir + "/flash5_reg.mgz";
     if (QFileInfo::exists(flash5Reg)) {
-        printf("Registered flash 5 image is already there\n");
+        qInfo("Registered flash 5 image is already there");
         return true;
     }
 
@@ -542,8 +542,8 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
     //
     // Step 5a: Convert flash5_reg.mgz to COR format
     //
-    printf("\n");
-    printf("Step %da: Converting flash5 volume into COR format...\n\n", m_step);
+    qInfo("");
+    qInfo("Step %da: Converting flash5 volume into COR format...\n" , m_step);
 
     QString flash5Dir = mriDir + "/flash5";
     QDir().mkpath(flash5Dir);
@@ -578,8 +578,8 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
     }
 
     if (needT1) {
-        printf("\n");
-        printf("Step %db : Converting T1 volume into COR format...\n\n", m_step);
+        qInfo("");
+        qInfo("Step %db : Converting T1 volume into COR format...\n" , m_step);
 
         QString t1Mgz = mriDir + "/T1.mgz";
         if (!QFileInfo::exists(t1Mgz)) {
@@ -594,8 +594,8 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
         }
         convertedT1 = true;
     } else {
-        printf("\n");
-        printf("Step %db : T1 volume is already in COR format\n\n", m_step);
+        qInfo("");
+        qInfo("Step %db : T1 volume is already in COR format\n" , m_step);
     }
 
     //
@@ -616,8 +616,8 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
     }
 
     if (needBrain) {
-        printf("\n");
-        printf("Step %dc : Converting brain volume into COR format...\n\n", m_step);
+        qInfo("");
+        qInfo("Step %dc : Converting brain volume into COR format...\n" , m_step);
 
         QString brainMgz = mriDir + "/brain.mgz";
         if (!QFileInfo::exists(brainMgz)) {
@@ -632,8 +632,8 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
         }
         convertedBrain = true;
     } else {
-        printf("\n");
-        printf("Step %dc : brain volume is already in COR format\n\n", m_step);
+        qInfo("");
+        qInfo("Step %dc : brain volume is already in COR format\n" , m_step);
     }
 
     return true;
@@ -644,8 +644,8 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
 bool FlashBem::createBemSurfaces()
 {
     m_step++;
-    printf("\n");
-    printf("Step %d : Creating the BEM surfaces...\n\n", m_step);
+    qInfo("");
+    qInfo("Step %d : Creating the BEM surfaces...\n" , m_step);
 
     return runCommand(m_settings.freeSurferHome() + "/bin/mri_make_bem_surfaces",
                       {m_settings.subject()});
@@ -656,8 +656,8 @@ bool FlashBem::createBemSurfaces()
 bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
 {
     m_step++;
-    printf("\n");
-    printf("Step %d : Converting the tri files into surf files...\n", m_step);
+    qInfo("");
+    qInfo("Step %d : Converting the tri files into surf files..." , m_step);
 
     //
     // Create flash output directory
@@ -684,7 +684,7 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
     surfNames << "inner_skull" << "outer_skull" << "outer_skin";
 
     for (const QString& surfName : surfNames) {
-        printf("\n%s ...\n\n", qPrintable(surfName));
+        qInfo("\n%s ...\n" , qPrintable(surfName));
 
         // Move .tri file from bem/ to bem/flash/
         QString triSrc = bemDir + "/" + surfName + ".tri";
@@ -753,7 +753,7 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
             //   4. Apply the transform to vertex coordinates
             //   5. Write as FreeSurfer binary surface
             //
-            printf("mne_convert_surface not found, using built-in conversion.\n");
+            qInfo("mne_convert_surface not found, using built-in conversion.");
 
             // Read .tri file
             QFile triFile(triDst);
@@ -797,7 +797,7 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
             }
             triFile.close();
 
-            printf("Read %d vertices, %d triangles from %s\n",
+            qInfo("Read %d vertices, %d triangles from %s" ,
                    nvert, ntri, qPrintable(triDst));
 
             //
@@ -869,7 +869,7 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
             }
 
             surfFile.close();
-            printf("Written %s\n", qPrintable(surfOut));
+            qInfo("Written %s" , qPrintable(surfOut));
         } else {
             //
             // mne_convert_surface is available — use it directly
@@ -893,8 +893,8 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
 void FlashBem::cleanup(const QString& bemDir, const QString& mriDir,
                        bool convertedT1, bool convertedBrain)
 {
-    printf("\n");
-    printf("Final step : Cleaning up...\n\n");
+    qInfo("");
+    qInfo("Final step : Cleaning up...\n");
 
     // Remove inner_skull_tmp.tri
     QFile::remove(bemDir + "/inner_skull_tmp.tri");
@@ -902,14 +902,14 @@ void FlashBem::cleanup(const QString& bemDir, const QString& mriDir,
     // Remove COR volumes created during this run
     if (convertedT1) {
         QDir(mriDir + "/T1").removeRecursively();
-        printf("Deleted the T1 COR volume\n");
+        qInfo("Deleted the T1 COR volume");
     }
     if (convertedBrain) {
         QDir(mriDir + "/brain").removeRecursively();
-        printf("Deleted the brain COR volume\n");
+        qInfo("Deleted the brain COR volume");
     }
 
     // Always remove flash5 COR volume (created fresh each run)
     QDir(mriDir + "/flash5").removeRecursively();
-    printf("Deleted the flash5 COR volume\n");
+    qInfo("Deleted the flash5 COR volume");
 }

@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
         qCritical("No triggers read from: %s", qPrintable(trgFile));
         return 1;
     }
-    printf("Read %lld trigger events from %s\n",
+    qInfo("Read %lld trigger events from %s" ,
            static_cast<long long>(triggers.size()), qPrintable(trgFile));
 
     // Open raw data
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
         qCritical("No STI/stimulus channel found in data.");
         return 1;
     }
-    printf("Using stimulus channel: %s (index %d)\n",
+    qInfo("Using stimulus channel: %s (index %d)" ,
            qPrintable(raw.info.chs[stiIdx].ch_name), stiIdx);
 
     // Read all data
@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
                      evt.sample, raw.first_samp, raw.last_samp);
         }
     }
-    printf("Added %d trigger events.\n", nAdded);
+    qInfo("Added %d trigger events." , nAdded);
 
     // Write output
     QFile fileOut(outFile);
@@ -213,6 +213,6 @@ int main(int argc, char *argv[])
     }
     outStream->finish_writing_raw();
 
-    printf("Written modified raw data to: %s\n", qPrintable(outFile));
+    qInfo("Written modified raw data to: %s" , qPrintable(outFile));
     return 0;
 }

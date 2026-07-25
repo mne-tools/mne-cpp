@@ -378,7 +378,7 @@ bool FiffSimulator::readRawInfo()
 
         if(!FiffStream::setup_read_raw(t_File, m_RawInfo))
         {
-            printf("Error: Not able to read raw info!\n");
+            qInfo("Error: Not able to read raw info!");
             m_RawInfo.clear();
             return false;
         }

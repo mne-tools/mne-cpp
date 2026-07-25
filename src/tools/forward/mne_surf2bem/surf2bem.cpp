@@ -92,15 +92,15 @@ int Surf2Bem::run()
     const QVector<SurfaceInput>& inputs = m_settings.surfaces();
 
     if (inputs.isEmpty()) {
-        printf("Usage: mne_surf2bem [options]\n");
-        printf("Use --help for available options.\n");
+        qInfo("Usage: mne_surf2bem [options]");
+        qInfo("Use --help for available options.");
         return 1;
     }
 
     //
     // Report input summary
     //
-    printf("\n");
+    qInfo("");
     for (int k = 0; k < inputs.size(); ++k) {
         fprintf(stderr, "input  file # %3d : %s", k + 1, qPrintable(inputs[k].fileName));
         if (inputs[k].id > 0)

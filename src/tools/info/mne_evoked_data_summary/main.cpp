@@ -142,21 +142,21 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("File: %s\n", qPrintable(measFile));
-    printf("Number of evoked data sets: %lld\n\n", static_cast<long long>(evokedSet.evoked.size()));
+    qInfo("File: %s" , qPrintable(measFile));
+    qInfo("Number of evoked data sets: %lld\n" , static_cast<long long>(evokedSet.evoked.size()));
 
     for (int i = 0; i < evokedSet.evoked.size(); ++i) {
         const FiffEvoked &evoked = evokedSet.evoked[i];
 
-        printf("--- Set %d ---\n", i + 1);
-        printf("  Comment    : %s\n", qPrintable(evoked.comment));
-        printf("  Type       : %s\n", qPrintable(evoked.aspectKindToString()));
-        printf("  Nave       : %d\n", evoked.nave);
+        qInfo("--- Set %d ---" , i + 1);
+        qInfo("  Comment    : %s" , qPrintable(evoked.comment));
+        qInfo("  Type       : %s" , qPrintable(evoked.aspectKindToString()));
+        qInfo("  Nave       : %d" , evoked.nave);
 
         float tmin = evoked.times.size() > 0 ? evoked.times(0) : 0.0f;
         float tmax = evoked.times.size() > 0 ? evoked.times(evoked.times.size() - 1) : 0.0f;
-        printf("  Time range : %.3f to %.3f s\n", tmin, tmax);
-        printf("  Channels   : %d\n", evoked.info.nchan);
+        qInfo("  Time range : %.3f to %.3f s" , tmin, tmax);
+        qInfo("  Channels   : %d" , evoked.info.nchan);
 
         // Count channel types
         QMap<QString, int> typeCounts;
@@ -166,11 +166,11 @@ int main(int argc, char *argv[])
             typeCounts[typeName]++;
         }
 
-        printf("  Channel types:\n");
+        qInfo("  Channel types:");
         for (auto it = typeCounts.constBegin(); it != typeCounts.constEnd(); ++it) {
-            printf("    %-12s : %d\n", qPrintable(it.key()), it.value());
+            qInfo("    %-12s : %d" , qPrintable(it.key()), it.value());
         }
-        printf("\n");
+        qInfo("");
     }
 
     return 0;

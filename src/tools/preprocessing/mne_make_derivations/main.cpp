@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
         qCritical("No derivation rules read from: %s", qPrintable(inFile));
         return 1;
     }
-    printf("Read %lld derivation rule(s) from %s\n",
+    qInfo("Read %lld derivation rule(s) from %s" ,
            static_cast<long long>(rules.size()), qPrintable(inFile));
 
     // Collect all unique input channel names (columns)
@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    printf("Derivation matrix: %lld x %lld\n",
+    qInfo("Derivation matrix: %lld x %lld" ,
            static_cast<long long>(mat.rows()), static_cast<long long>(mat.cols()));
 
     // Create FiffNamedMatrix
@@ -155,6 +155,6 @@ int main(int argc, char *argv[])
     stream->end_block(FIFFB_MNE);
     stream->end_file();
 
-    printf("Written derivation matrix to: %s\n", qPrintable(outFile));
+    qInfo("Written derivation matrix to: %s" , qPrintable(outFile));
     return 0;
 }

@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
         }
         tris = surface.tris();
         nVert = surface.rr().rows();
-        printf("Read surface: %d vertices, %d triangles\n", nVert, (int)tris.rows());
+        qInfo("Read surface: %d vertices, %d triangles" , nVert, (int)tris.rows());
     } else {
         // Read source space
         QFile file(srcFile);
@@ -191,12 +191,12 @@ int main(int argc, char *argv[])
         // Use first hemisphere's triangulation
         tris = srcSpaces[0].itris;
         nVert = srcSpaces[0].np;
-        printf("Read source space: %d vertices, %d triangles\n", nVert, (int)tris.rows());
+        qInfo("Read source space: %d vertices, %d triangles" , nVert, (int)tris.rows());
     }
 
     // Build smoothing operator
     SparseMatrix<double> S = buildSmoothingOperator(tris, nVert);
-    printf("Built smoothing operator: %d x %d\n", (int)S.rows(), (int)S.cols());
+    qInfo("Built smoothing operator: %d x %d" , (int)S.rows(), (int)S.cols());
 
     // Read STC data (text format: one value per line, or vertex value pairs)
     QFile stcIn(stcFile);
@@ -226,14 +226,14 @@ int main(int argc, char *argv[])
         if (pair.first >= 0 && pair.first < nVert)
             data(pair.first) = pair.second;
     }
-    printf("Read %d data values\n", (int)dataList.size());
+    qInfo("Read %d data values" , (int)dataList.size());
 
     // Apply iterative smoothing
     VectorXd smoothed = data;
     for (int iter = 0; iter < nSmooth; ++iter) {
         smoothed = S * smoothed;
     }
-    printf("Applied %d iterations of Laplacian smoothing\n", nSmooth);
+    qInfo("Applied %d iterations of Laplacian smoothing" , nSmooth);
 
     // Write output
     QFile stcOut(outFile);
@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
             out << i << " " << QString::number(smoothed(i), 'g', 10) << "\n";
     }
     stcOut.close();
-    printf("Written smoothed data to: %s\n", qPrintable(outFile));
+    qInfo("Written smoothed data to: %s" , qPrintable(outFile));
 
     return 0;
 }

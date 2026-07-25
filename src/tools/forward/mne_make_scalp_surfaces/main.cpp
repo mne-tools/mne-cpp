@@ -84,7 +84,7 @@ static MNEBemSurface decimateSurface(const MNEBemSurface &src, int targetNVert)
     MNEBemSurface dst(src);
 
     if (targetNVert >= src.np) {
-        printf("  Target %d >= source %d vertices, keeping original.\n", targetNVert, src.np);
+        qInfo("  Target %d >= source %d vertices, keeping original." , targetNVert, src.np);
         return dst;
     }
 
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Read BEM with %d surface(s) from %s\n", bem.size(), qPrintable(bemFile));
+    qInfo("Read BEM with %d surface(s) from %s" , bem.size(), qPrintable(bemFile));
 
     // Find outer skin surface (typically the last/outermost surface, or id == FIFFV_BEM_SURF_ID_HEAD)
     int skinIdx = -1;
@@ -204,11 +204,11 @@ int main(int argc, char *argv[])
     // Fallback: use the last surface (outermost)
     if (skinIdx < 0) {
         skinIdx = bem.size() - 1;
-        printf("No explicit outer skin surface found, using surface %d.\n", skinIdx);
+        qInfo("No explicit outer skin surface found, using surface %d." , skinIdx);
     }
 
     const MNEBemSurface &skin = bem[skinIdx];
-    printf("Using surface %d: %d vertices, %d triangles\n", skinIdx, skin.np, skin.ntri);
+    qInfo("Using surface %d: %d vertices, %d triangles" , skinIdx, skin.np, skin.ntri);
 
     // Create output directory
     QDir dir;
@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
 
     // Generate decimated surfaces
     for (int targetVerts : grades) {
-        printf("Decimating to %d vertices...\n", targetVerts);
+        qInfo("Decimating to %d vertices..." , targetVerts);
         MNEBemSurface decimated = decimateSurface(skin, targetVerts);
 
         // Write as FIFF BEM surface
@@ -232,10 +232,10 @@ int main(int argc, char *argv[])
         QFile outFile(outPath);
         outBem.write(outFile);
 
-        printf("  Written %d vertices, %d triangles to %s\n",
+        qInfo("  Written %d vertices, %d triangles to %s" ,
                decimated.np, decimated.ntri, qPrintable(outPath));
     }
 
-    printf("Done.\n");
+    qInfo("Done.");
     return 0;
 }

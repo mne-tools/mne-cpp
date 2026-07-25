@@ -116,14 +116,14 @@ MNERTServer::MNERTServer()
     // Run instruction server
     //
     if (!m_commandServer.listen(QHostAddress::Any, 4217)) {
-        printf("Unable to start the command server: %s\n", m_commandServer.errorString().toUtf8().constData());
+        qInfo("Unable to start the command server: %s" , m_commandServer.errorString().toUtf8().constData());
         return;
     }
     //
     // Run data server
     //
     if (!m_fiffStreamServer.listen(QHostAddress::Any, 4218)) {
-        printf("Unable to start the fiff stream server: %s\n", m_fiffStreamServer.errorString().toUtf8().constData());
+        qInfo("Unable to start the fiff stream server: %s" , m_fiffStreamServer.errorString().toUtf8().constData());
         return;
     }
 
@@ -141,7 +141,7 @@ MNERTServer::MNERTServer()
     if (ipAddress.isEmpty())
         ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
 
-    printf("mne_rt_server is running on\n\tIP:\t\t%s\n\tcommand port:\t%d\n\tfiff data port:\t%d\n\n",ipAddress.toUtf8().constData(), m_commandServer.serverPort(), m_fiffStreamServer.serverPort());
+    qInfo("mne_rt_server is running on\n\tIP:\t\t%s\n\tcommand port:\t%d\n\tfiff data port:\t%d\n" ,ipAddress.toUtf8().constData(), m_commandServer.serverPort(), m_fiffStreamServer.serverPort());
 }
 
 //=============================================================================================================

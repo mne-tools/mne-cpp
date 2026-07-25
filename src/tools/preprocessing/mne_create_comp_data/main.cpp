@@ -131,7 +131,7 @@ static bool readAsciiMatrix(const QString& filename,
         }
     }
 
-    printf("Read matrix: %d x %d\n", nrow, ncol);
+    qInfo("Read matrix: %d x %d" , nrow, ncol);
     return true;
 }
 
@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
     stream->end_block(FIFFB_MNE_CTF_COMP);
     stream->end_file();
 
-    printf("Wrote CTF compensation data (kind=%d, %dx%d, %s) to %s\n",
+    qInfo("Wrote CTF compensation data (kind=%d, %dx%d, %s) to %s" ,
            ctfKind, nrow, ncol,
            calibrated ? "calibrated" : "uncalibrated",
            outFile.toUtf8().constData());

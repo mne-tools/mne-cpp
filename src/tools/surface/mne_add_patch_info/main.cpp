@@ -200,16 +200,16 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Read source space: %d hemispheres\n", (int)src.size());
+    qInfo("Read source space: %d hemispheres" , (int)src.size());
 
     // Process each hemisphere
     for (int h = 0; h < src.size(); ++h) {
         MNESourceSpace& sp = src[h];
-        printf("\nHemisphere %d: %d vertices, %d active, %d triangles\n",
+        qInfo("\nHemisphere %d: %d vertices, %d active, %d triangles" ,
                h + 1, sp.np, sp.nuse, sp.ntri);
 
         if (sp.ntri == 0 || sp.np == 0) {
-            printf("  Skipping (no triangulation)\n");
+            qInfo("  Skipping (no triangulation)");
             continue;
         }
 
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
         for (int i = 0; i < activeList.size(); ++i)
             sourceVerts(i) = activeList[i];
 
-        printf("  Running multi-source Dijkstra with %d source vertices...\n", (int)sourceVerts.size());
+        qInfo("  Running multi-source Dijkstra with %d source vertices..." , (int)sourceVerts.size());
 
         VectorXi nearest;
         VectorXf dist;
@@ -254,12 +254,12 @@ int main(int argc, char *argv[])
         if (!patchSizes.isEmpty())
             avgPatch /= patchSizes.size();
 
-        printf("  Patch info: %d patches, size range %d..%d (avg %.1f)\n",
+        qInfo("  Patch info: %d patches, size range %d..%d (avg %.1f)" ,
                (int)patchSizes.size(), minPatch, maxPatch, avgPatch);
     }
 
     // Write output
-    printf("\nWriting source space with patch info to: %s\n", qPrintable(outFile));
+    qInfo("\nWriting source space with patch info to: %s" , qPrintable(outFile));
 
     QFile outF(outFile);
     if (!outF.open(QIODevice::WriteOnly)) {
@@ -270,6 +270,6 @@ int main(int argc, char *argv[])
     src.writeToStream(outStream.data());
     outF.close();
 
-    printf("Done.\n");
+    qInfo("Done.");
     return 0;
 }

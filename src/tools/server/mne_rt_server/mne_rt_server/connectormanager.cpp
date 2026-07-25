@@ -206,7 +206,7 @@ void ConnectorManager::connectActiveConnector()
     }
     else
     {
-        printf("Error: Can't connect, no connector active!\n");
+        qInfo("Error: Can't connect, no connector active!");
     }
 }
 
@@ -255,7 +255,7 @@ void ConnectorManager::disconnectActiveConnector()
     }
     else
     {
-        printf("Error: Can't connect, no connector active!\n");
+        qInfo("Error: Can't connect, no connector active!");
     }
 }
 
@@ -374,7 +374,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
 #else
     QDir ConnectorsDir(dir);
 
-    printf("Loading connectors in directory... %s\n", ConnectorsDir.path().toUtf8().constData() );
+    qInfo("Loading connectors in directory... %s" , ConnectorsDir.path().toUtf8().constData() );
 
     foreach(QString fileName, ConnectorsDir.entryList(QDir::Files))
     {
@@ -415,7 +415,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
     QString configFileName("plugin.cfg");
     QFile configFile(QString("%1/../resources/mne_rt_server/plugins/"+configFileName).arg(QCoreApplication::applicationDirPath()));
     if(!configFile.open(QIODevice::ReadOnly)) {
-        printf("Not able to read config file... %s\n", configFile.fileName().toUtf8().constData());
+        qInfo("Not able to read config file... %s" , configFile.fileName().toUtf8().constData());
     }
     else
     {
@@ -453,7 +453,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
                 }
             }
         }
-        printf("[done]\n");
+        qInfo("[done]");
 
         //default
         if(!activated)
@@ -461,7 +461,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
     }
 
     //print
-    printf("Connector list\n");
+    qInfo("Connector list");
     printf("%s", getConnectorList().data());
 }
 

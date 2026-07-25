@@ -252,7 +252,7 @@ int main(int argc, char *argv[])
     const FiffInfo& info = raw.info;
 
     int nChan = info.nchan;
-    printf("Measurement file: %d channels\n", nChan);
+    qInfo("Measurement file: %d channels" , nChan);
 
     //=========================================================================
     // Parse LISP covariance matrix
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
     }
     lspFile.close();
 
-    printf("Parsed %dx%d matrix from LISP file\n",
+    qInfo("Parsed %dx%d matrix from LISP file" ,
            static_cast<int>(covMat.rows()), static_cast<int>(covMat.cols()));
 
     if (covMat.rows() != nChan) {
@@ -303,7 +303,7 @@ int main(int argc, char *argv[])
             out << "\n";
         }
         ascFile.close();
-        printf("Written ASCII covariance to: %s\n", qPrintable(outascFile));
+        qInfo("Written ASCII covariance to: %s" , qPrintable(outascFile));
     }
 
     //=========================================================================
@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        printf("Written FIFF covariance to: %s\n", qPrintable(outFile));
+        qInfo("Written FIFF covariance to: %s" , qPrintable(outFile));
     }
 
     return 0;

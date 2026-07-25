@@ -84,36 +84,36 @@ MNESurf2BemSettings::MNESurf2BemSettings(int *argc, char **argv)
         const QString& arg = args[i];
 
         if (arg == "--help" || arg == "-h") {
-            printf("Usage: %s [options]\n", qPrintable(args[0]));
-            printf("Convert FreeSurfer surfaces into BEM FIFF files.\n\n");
-            printf("Ported from the original MNE C tool mne_surf2bem by Matti Hamalainen\n");
-            printf("(SVN $Id: mne_surf2bem.c 3351 2012-03-05 12:03:50Z msh $).\n\n");
-            printf("Options:\n");
-            printf("  --surf name       Input FreeSurfer binary surface file.\n");
-            printf("  --tri name        Input ASCII triangle file.\n");
-            printf("  --fif name        Output FIFF BEM surface file.\n");
-            printf("  --id id           BEM surface id to assign:\n");
-            printf("                      %d = head (outer skin)\n", FIFFV_BEM_SURF_ID_HEAD);
-            printf("                      %d = outer skull\n", FIFFV_BEM_SURF_ID_SKULL);
-            printf("                      %d = inner skull (brain)\n", FIFFV_BEM_SURF_ID_BRAIN);
-            printf("  --swap            Swap vertex winding order (ASCII tri files).\n");
-            printf("  --meters          Coordinates in meters (ASCII files only, default: mm).\n");
-            printf("  --coordf no       Coordinate frame for ASCII file vertices.\n");
-            printf("  --shift val       Shift vertices by val [mm] along normals.\n");
-            printf("  --ico number      Downsample to icosahedron subdivision (0-6).\n");
-            printf("  --sigma val       Compartment conductivity [S/m].\n");
-            printf("  --force           Load surface despite topological defects.\n");
-            printf("  --check           Perform topology and solid angle checks.\n");
-            printf("  --checkmore       Also check skull/skin thicknesses.\n");
-            printf("  --help            Print this help.\n");
-            printf("  --version         Print version info.\n\n");
-            printf("Note: --id, --swap, --meters, --shift, --ico, --sigma apply to the\n");
-            printf("most recently specified --surf or --tri.\n\n");
+            qInfo("Usage: %s [options]" , qPrintable(args[0]));
+            qInfo("Convert FreeSurfer surfaces into BEM FIFF files.\n");
+            qInfo("Ported from the original MNE C tool mne_surf2bem by Matti Hamalainen");
+            qInfo("(SVN $Id: mne_surf2bem.c 3351 2012-03-05 12:03:50Z msh $).\n");
+            qInfo("Options:");
+            qInfo("  --surf name       Input FreeSurfer binary surface file.");
+            qInfo("  --tri name        Input ASCII triangle file.");
+            qInfo("  --fif name        Output FIFF BEM surface file.");
+            qInfo("  --id id           BEM surface id to assign:");
+            qInfo("                      %d = head (outer skin)" , FIFFV_BEM_SURF_ID_HEAD);
+            qInfo("                      %d = outer skull" , FIFFV_BEM_SURF_ID_SKULL);
+            qInfo("                      %d = inner skull (brain)" , FIFFV_BEM_SURF_ID_BRAIN);
+            qInfo("  --swap            Swap vertex winding order (ASCII tri files).");
+            qInfo("  --meters          Coordinates in meters (ASCII files only, default: mm).");
+            qInfo("  --coordf no       Coordinate frame for ASCII file vertices.");
+            qInfo("  --shift val       Shift vertices by val [mm] along normals.");
+            qInfo("  --ico number      Downsample to icosahedron subdivision (0-6).");
+            qInfo("  --sigma val       Compartment conductivity [S/m].");
+            qInfo("  --force           Load surface despite topological defects.");
+            qInfo("  --check           Perform topology and solid angle checks.");
+            qInfo("  --checkmore       Also check skull/skin thicknesses.");
+            qInfo("  --help            Print this help.");
+            qInfo("  --version         Print version info.\n");
+            qInfo("Note: --id, --swap, --meters, --shift, --ico, --sigma apply to the");
+            qInfo("most recently specified --surf or --tri.\n");
             m_bShouldExit = true; m_iExitCode = 0; return;
         }
         else if (arg == "--version") {
-            printf("mne_surf2bem version 2.0 (mne-cpp port)\n");
-            printf("Based on MNE C version 1.8 by Matti Hamalainen\n");
+            qInfo("mne_surf2bem version 2.0 (mne-cpp port)");
+            qInfo("Based on MNE C version 1.8 by Matti Hamalainen");
             m_bShouldExit = true; m_iExitCode = 0; return;
         }
         else if (arg == "--surf" || arg == "--tri") {

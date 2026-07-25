@@ -115,16 +115,16 @@ int SetupMri::run()
     // Process each MRI set
     QStringList mriSets = m_settings.mriSets();
     for (const QString& mriName : mriSets) {
-        printf("-----------------------------------------------------------------------------------------------\n");
-        printf("Setting up %s...\n", qPrintable(mriName));
+        qInfo("-----------------------------------------------------------------------------------------------");
+        qInfo("Setting up %s..." , qPrintable(mriName));
 
         if (!processMriSet(mriName)) {
             return 1;
         }
     }
 
-    printf("-----------------------------------------------------------------------------------------------\n");
-    printf("\nComplete.\n\n");
+    qInfo("-----------------------------------------------------------------------------------------------");
+    qInfo("\nComplete.\n");
     return 0;
 }
 
@@ -198,7 +198,7 @@ bool SetupMri::processMriSet(const QString& mriName)
 
     if (mgzInfo.exists()) {
         // MGZ/MGH path — use MRILIB::MriMghIO
-        printf("Reading %s...\n", qPrintable(thisMgz));
+        qInfo("Reading %s..." , qPrintable(thisMgz));
 
         MriVolData volData;
         QString subjectMriDir = m_settings.subjectsDir() + "/" + m_settings.subject() + "/mri";
@@ -210,7 +210,7 @@ bool SetupMri::processMriSet(const QString& mriName)
         slices = volData.slices;
     } else {
         // COR slices path — use MRILIB::MriCorIO
-        printf("Reading COR files from %s...\n", qPrintable(thisDir));
+        qInfo("Reading COR files from %s..." , qPrintable(thisDir));
 
         // Create symbolic links (like the shell script does)
         QDir corDir(thisDir);
@@ -234,12 +234,12 @@ bool SetupMri::processMriSet(const QString& mriName)
     QString corFifPath = setsDir + "/COR.fif";
     QFile::remove(corFifPath);
 
-    printf("Creating %s...\n", qPrintable(corFifPath));
+    qInfo("Creating %s..." , qPrintable(corFifPath));
     if (!MriCorFifIO::write(corFifPath, slices, additionalTrans)) {
         qCritical() << "Failed to write" << corFifPath;
         return false;
     }
-    printf("Created %s\n", qPrintable(corFifPath));
+    qInfo("Created %s" , qPrintable(corFifPath));
 
     return true;
 }

@@ -169,9 +169,9 @@ int main(int argc, char *argv[])
     }
 
     // Print summary
-    printf("Source space file : %s\n", qPrintable(srcName));
-    printf("Number of spaces  : %d\n", sourceSpaces.size());
-    printf("\n");
+    qInfo("Source space file : %s" , qPrintable(srcName));
+    qInfo("Number of spaces  : %d" , sourceSpaces.size());
+    qInfo("");
 
     int totalActive = 0;
     int totalVerts = 0;
@@ -185,17 +185,17 @@ int main(int argc, char *argv[])
         totalActive += nuse;
         totalVerts += nvert;
 
-        printf("--- Space %d ---\n", s + 1);
-        printf("  Type            : %s\n", spaceTypeName(space.type));
-        printf("  Vertices        : %d\n", nvert);
-        printf("  Active vertices : %d\n", nuse);
-        printf("  Triangles       : %d\n", ntri);
-        printf("  Coord frame     : %s\n", coordFrameName(space.coord_frame));
+        qInfo("--- Space %d ---" , s + 1);
+        qInfo("  Type            : %s" , spaceTypeName(space.type));
+        qInfo("  Vertices        : %d" , nvert);
+        qInfo("  Active vertices : %d" , nuse);
+        qInfo("  Triangles       : %d" , ntri);
+        qInfo("  Coord frame     : %s" , coordFrameName(space.coord_frame));
 
         if (space.id == FIFFV_MNE_SURF_LEFT_HEMI)
-            printf("  Hemisphere      : Left\n");
+            qInfo("  Hemisphere      : Left");
         else if (space.id == FIFFV_MNE_SURF_RIGHT_HEMI)
-            printf("  Hemisphere      : Right\n");
+            qInfo("  Hemisphere      : Right");
 
         if (nuse > 0 && space.rr.rows() > 0) {
             // Compute bounding box of active vertices
@@ -216,13 +216,13 @@ int main(int argc, char *argv[])
                 if (z < zmin) zmin = z;
                 if (z > zmax) zmax = z;
             }
-            printf("  Extent (mm)     : x [%.1f, %.1f] y [%.1f, %.1f] z [%.1f, %.1f]\n",
+            qInfo("  Extent (mm)     : x [%.1f, %.1f] y [%.1f, %.1f] z [%.1f, %.1f]" ,
                    xmin, xmax, ymin, ymax, zmin, zmax);
         }
-        printf("\n");
+        qInfo("");
     }
 
-    printf("Total active vertices : %d / %d\n", totalActive, totalVerts);
+    qInfo("Total active vertices : %d / %d" , totalActive, totalVerts);
 
     // Write point file (MRIlab format)
     if (!pntName.isEmpty()) {
@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
                     space.rr(v, 2) * 1000.0f);
             }
         }
-        printf("Wrote point file: %s\n", qPrintable(pntName));
+        qInfo("Wrote point file: %s" , qPrintable(pntName));
     }
 
     // Write dipole file (MRIlab format: position + orientation)
@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
                     space.nn(v, 0), space.nn(v, 1), space.nn(v, 2));
             }
         }
-        printf("Wrote dipole file: %s\n", qPrintable(dipName));
+        qInfo("Wrote dipole file: %s" , qPrintable(dipName));
     }
 
     // Write vertex file (text: vertex_number x y z)
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
                     space.rr(v, 0) * 1000.0f, space.rr(v, 1) * 1000.0f, space.rr(v, 2) * 1000.0f);
             }
         }
-        printf("Wrote vertex file: %s\n", qPrintable(vertName));
+        qInfo("Wrote vertex file: %s" , qPrintable(vertName));
     }
 
     return 0;

@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
     int totalEvents = 0;
 
     for (const CtfMarker &marker : markers) {
-        printf("Marker '%s' (id=%d): %lld events\n",
+        qInfo("Marker '%s' (id=%d): %lld events" ,
                qPrintable(marker.name),
                marker.eventId,
                static_cast<long long>(marker.samples.size()));
@@ -233,6 +233,6 @@ int main(int argc, char *argv[])
     }
 
     fOut.close();
-    printf("Written %d events to: %s\n", totalEvents, qPrintable(outFile));
+    qInfo("Written %d events to: %s" , totalEvents, qPrintable(outFile));
     return 0;
 }

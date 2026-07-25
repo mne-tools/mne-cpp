@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
     }
 
     const MNEBemSurface& innerSurf = bem[innerIdx];
-    printf("Using surface: %s (%d vertices, %d triangles)\n",
+    qInfo("Using surface: %s (%d vertices, %d triangles)" ,
            qPrintable(MNEBemSurface::id_name(innerSurf.id)),
            innerSurf.np, innerSurf.ntri);
 
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
     surf.id = innerSurf.id;
     surf.coord_frame = innerSurf.coord_frame;
 
-    printf("Creating volume source space (grid=%.1f mm, mindist=%.1f mm, exclude=%.1f mm)...\n",
+    qInfo("Creating volume source space (grid=%.1f mm, mindist=%.1f mm, exclude=%.1f mm)..." ,
            gridMm, mindistMm, excludeMm);
 
     // Use the existing library function
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Volume source space: %d total points, %d active\n", sp->np, sp->nuse);
+    qInfo("Volume source space: %d total points, %d active" , sp->np, sp->nuse);
 
     // Write output
     QFile outF(outFile);
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
     outStream->end_block(FIFFB_MNE);
     outStream->end_file();
     outF.close();
-    printf("Written volume source space to: %s\n", qPrintable(outFile));
+    qInfo("Written volume source space to: %s" , qPrintable(outFile));
 
     delete sp;
     return 0;

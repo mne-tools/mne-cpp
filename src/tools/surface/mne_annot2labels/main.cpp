@@ -108,7 +108,7 @@ static bool processHemisphere(const QString &subjectsDir, const QString &subject
         qCritical("Cannot read surface: %s", qPrintable(surfPath));
         return false;
     }
-    printf("Read surface: %s (%lld vertices)\n",
+    qInfo("Read surface: %s (%lld vertices)" ,
            qPrintable(surfPath),
            static_cast<long long>(surface.rr().rows()));
 
@@ -119,14 +119,14 @@ static bool processHemisphere(const QString &subjectsDir, const QString &subject
         qCritical("Cannot read annotation: %s", qPrintable(annotPath));
         return false;
     }
-    printf("Read annotation: %s\n", qPrintable(annotPath));
+    qInfo("Read annotation: %s" , qPrintable(annotPath));
 
     // Convert to labels using the library method
     QList<FsLabel> labels;
     QList<Eigen::RowVector4i> labelRgbas;
     annot.toLabels(surface, labels, labelRgbas);
 
-    printf("Found %lld labels in %s hemisphere\n",
+    qInfo("Found %lld labels in %s hemisphere" ,
            static_cast<long long>(labels.size()),
            qPrintable(hemi));
 
@@ -159,7 +159,7 @@ static bool processHemisphere(const QString &subjectsDir, const QString &subject
         }
     }
 
-    printf("Wrote %d label files for %s hemisphere\n", written, qPrintable(hemi));
+    qInfo("Wrote %d label files for %s hemisphere" , written, qPrintable(hemi));
     return true;
 }
 

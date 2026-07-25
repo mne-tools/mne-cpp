@@ -160,11 +160,11 @@ int SetupForwardModel::run()
     //
     // Step 1: Read surfaces and create BEM geometry
     //
-    printf("\n");
-    printf("Setting up the BEM with the following parameters:\n");
-    printf("\n");
-    printf("SUBJECTS_DIR       = %s\n", qPrintable(m_settings.subjectsDir()));
-    printf("Subject            = %s\n", qPrintable(m_settings.subject()));
+    qInfo("");
+    qInfo("Setting up the BEM with the following parameters:");
+    qInfo("");
+    qInfo("SUBJECTS_DIR       = %s" , qPrintable(m_settings.subjectsDir()));
+    qInfo("Subject            = %s" , qPrintable(m_settings.subject()));
 
     // Read inner skull
     MNEBemSurface innerSkull;
@@ -181,7 +181,7 @@ int SetupForwardModel::run()
             return 1;
         }
     }
-    printf("Inner skull        = %s (%d triangles)\n",
+    qInfo("Inner skull        = %s (%d triangles)" ,
            qPrintable(innerSkullFile), innerSkull.ntri);
 
     MNEBemSurface outerSkull, outerSkin;
@@ -200,7 +200,7 @@ int SetupForwardModel::run()
                 return 1;
             }
         }
-        printf("Outer skull        = %s (%d triangles)\n",
+        qInfo("Outer skull        = %s (%d triangles)" ,
                qPrintable(outerSkullFile), outerSkull.ntri);
 
         // Read outer skin (scalp)
@@ -217,14 +217,14 @@ int SetupForwardModel::run()
                 return 1;
             }
         }
-        printf("Scalp              = %s (%d triangles)\n",
+        qInfo("Scalp              = %s (%d triangles)" ,
                qPrintable(outerSkinFile), outerSkin.ntri);
     }
 
-    printf("brain conductivity = %g S/m\n", m_settings.brainConductivity());
+    qInfo("brain conductivity = %g S/m" , m_settings.brainConductivity());
     if (!m_settings.homogeneous()) {
-        printf("skull conductivity = %g S/m\n", m_settings.skullConductivity());
-        printf("scalp conductivity = %g S/m\n", m_settings.scalpConductivity());
+        qInfo("skull conductivity = %g S/m" , m_settings.skullConductivity());
+        qInfo("scalp conductivity = %g S/m" , m_settings.scalpConductivity());
     }
 
     //
@@ -249,7 +249,7 @@ int SetupForwardModel::run()
         modelFile = bemDir + "/" + m_settings.modelName() + "-bem.fif";
     }
 
-    printf("Resulting BEM      = %s\n\n", qPrintable(modelFile));
+    qInfo("Resulting BEM      = %s\n" , qPrintable(modelFile));
 
     //
     // Check if file already exists
@@ -263,7 +263,7 @@ int SetupForwardModel::run()
     //
     // >> 1. Creating the BEM geometry file
     //
-    printf(">> 1. Creating the BEM geometry file...\n");
+    qInfo(">> 1. Creating the BEM geometry file...");
 
     MNEBem bem;
     if (m_settings.homogeneous()) {
@@ -279,12 +279,12 @@ int SetupForwardModel::run()
         QFile file(modelFile);
         bem.write(file);
     }
-    printf("BEM geometry file written to %s\n\n", qPrintable(modelFile));
+    qInfo("BEM geometry file written to %s\n" , qPrintable(modelFile));
 
     //
     // >> 2. Creating ascii pnt files and surf files
     //
-    printf(">> 2. Creating ascii pnt files and surf files...\n");
+    qInfo(">> 2. Creating ascii pnt files and surf files...");
 
     if (m_settings.homogeneous()) {
         QString pntFile = QString("%1/%2-inner_skull-%3.pnt")
@@ -328,13 +328,13 @@ int SetupForwardModel::run()
             if (!exportSurfFile(innerSkull, surfFile)) return 1;
         }
     }
-    printf("\n");
+    qInfo("");
 
     //
     // >> 3. Calculating BEM geometry data (solution)
     //
     if (!m_settings.noSolution()) {
-        printf(">> 3. Calculating BEM geometry data (this takes several minutes)...\n\n");
+        qInfo(">> 3. Calculating BEM geometry data (this takes several minutes)...\n");
 
         QString solFile = modelFile;
         solFile.replace(".fif", "-sol.fif");
@@ -343,11 +343,11 @@ int SetupForwardModel::run()
             qCritical() << "Model preparation failed.";
             return 1;
         }  else {
-            printf("\nThe model %s is now ready for use\n", qPrintable(solFile));
+            qInfo("\nThe model %s is now ready for use" , qPrintable(solFile));
         }
     }
 
-    printf("\nComplete.\n");
+    qInfo("\nComplete.");
     return 0;
 }
 
@@ -568,7 +568,7 @@ void SetupForwardModel::shiftVertices(MNEBemSurface& surf, float shift) const
     // Recompute normals after shifting
     surf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
-    printf("FsSurface vertices shifted by %6.1f mm.\n", 1000.0f * shift);
+    qInfo("FsSurface vertices shifted by %6.1f mm." , 1000.0f * shift);
 }
 
 //=============================================================================================================
@@ -597,7 +597,7 @@ bool SetupForwardModel::exportPntFile(const MNEBemSurface& surf,
             .arg(static_cast<double>(surf.rr(k, 2)) * 1000.0, 0, 'f', 4);
     }
     file.close();
-    printf("Written %s\n", qPrintable(fileName));
+    qInfo("Written %s" , qPrintable(fileName));
     return true;
 }
 
@@ -645,7 +645,7 @@ bool SetupForwardModel::exportSurfFile(const MNEBemSurface& surf,
     }
 
     file.close();
-    printf("Written %s\n", qPrintable(fileName));
+    qInfo("Written %s" , qPrintable(fileName));
     return true;
 }
 
@@ -676,7 +676,7 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
         return false;
     }
 
-    printf("Computing the linear collocation solution...\n");
+    qInfo("Computing the linear collocation solution...");
 
     int result = bemModel->fwd_bem_compute_solution(FWD_BEM_LINEAR_COLL);
     if (result != 0) {
@@ -684,7 +684,7 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
         return false;
     }
 
-    printf("Solution computed.\n");
+    qInfo("Solution computed.");
 
     //
     // Save the BEM solution:
@@ -695,7 +695,7 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
     //       - FIFF_BEM_POT_SOLUTION (float matrix: nsol x nsol)
     //       - FIFFB_BEM_SURF blocks for each surface
     //
-    printf("Saving...\n");
+    qInfo("Saving...");
 
     {
         QFile file(solFile);
@@ -770,7 +770,7 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
         stream->end_file();
     }
 
-    printf("Saved the result to %s\n", qPrintable(solFile));
+    qInfo("Saved the result to %s" , qPrintable(solFile));
 
 
     return true;

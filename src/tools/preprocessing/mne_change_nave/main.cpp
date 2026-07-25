@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Changing nave for set %d (%s): %d -> %d\n",
+    qInfo("Changing nave for set %d (%s): %d -> %d" ,
            setIdx, qPrintable(evokedSet.evoked[setIdx].comment),
            evokedSet.evoked[setIdx].nave, newNave);
 
@@ -132,6 +132,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Written updated evoked data to: %s\n", qPrintable(outFile));
+    qInfo("Written updated evoked data to: %s" , qPrintable(outFile));
     return 0;
 }

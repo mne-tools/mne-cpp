@@ -216,7 +216,7 @@ static InvSourceEstimate processLabel(const QString &labelFile,
     }
     label.hemi = hemi;
 
-    printf("  FsLabel %s: %ld vertices (%s hemisphere)\n",
+    qInfo("  FsLabel %s: %ld vertices (%s hemisphere)" ,
            labelFile.toUtf8().constData(),
            (long)label.vertices.size(),
            hemi == 0 ? "left" : "right");
@@ -271,7 +271,7 @@ static InvSourceEstimate processLabelDir(const QString &labelDir,
         return InvSourceEstimate();
     }
 
-    printf("Found %lld label files in %s\n", (long long)labelFiles.size(), labelDir.toUtf8().constData());
+    qInfo("Found %lld label files in %s" , (long long)labelFiles.size(), labelDir.toUtf8().constData());
 
     // Compute full inverse solution first (with pickNormal=true for labeldir)
     InvMinimumNorm minimumNorm(invOp, lambda2, method);
@@ -326,7 +326,7 @@ static InvSourceEstimate processLabelDir(const QString &labelDir,
         QFileInfo fi(labelFiles[i]);
         labelNames.append(fi.fileName());
 
-        printf("  FsLabel %s: %ld vertices, averaged\n",
+        qInfo("  FsLabel %s: %ld vertices, averaged" ,
                fi.fileName().toUtf8().constData(), (long)labelIndices.size());
 
         validLabels++;
@@ -535,36 +535,36 @@ int main(int argc, char *argv[])
     // Report configuration
     //=========================================================================================================
 
-    printf("\n");
-    printf("mne_compute_raw_inverse v%s\n", PROGRAM_VERSION);
-    printf("========================================\n");
-    printf("Input file             : %s\n", inName.toUtf8().constData());
+    qInfo("");
+    qInfo("mne_compute_raw_inverse v%s" , PROGRAM_VERSION);
+    qInfo("========================================");
+    qInfo("Input file             : %s" , inName.toUtf8().constData());
     if (doBaseline) {
-        printf("Baseline               : %10.2f ... %10.2f ms\n", 1000.0f * bmin, 1000.0f * bmax);
+        qInfo("Baseline               : %10.2f ... %10.2f ms" , 1000.0f * bmin, 1000.0f * bmax);
     }
-    printf("Inverse operator file  : %s\n", invName.toUtf8().constData());
-    printf("SNR                    : %f\n", snr);
-    printf("Method                 : %s\n", method.toUtf8().constData());
+    qInfo("Inverse operator file  : %s" , invName.toUtf8().constData());
+    qInfo("SNR                    : %f" , snr);
+    qInfo("Method                 : %s" , method.toUtf8().constData());
     if (pickNormal) {
-        printf("Picking normal component to cortex\n");
+        qInfo("Picking normal component to cortex");
     }
 
     if (!labelFiles.isEmpty()) {
-        printf("FsLabel files to process :\n");
+        qInfo("FsLabel files to process :");
         for (const QString &label : labelFiles) {
-            printf("  %s\n", label.toUtf8().constData());
+            qInfo("  %s" , label.toUtf8().constData());
         }
     } else if (!labelDir.isEmpty()) {
-        printf("FsLabel directory        : %s\n", labelDir.toUtf8().constData());
+        qInfo("FsLabel directory        : %s" , labelDir.toUtf8().constData());
     } else {
-        printf("Full source space inverse (no label restriction)\n");
+        qInfo("Full source space inverse (no label restriction)");
     }
 
     //=========================================================================================================
     // Read the inverse operator
     //=========================================================================================================
 
-    printf("\nReading the inverse operator...\n");
+    qInfo("\nReading the inverse operator...");
     QFile invFile(invName);
     MNEInverseOperator inverseOperator(invFile);
 
@@ -572,8 +572,8 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Error: Failed to read inverse operator from %s\n", invName.toUtf8().constData());
         return 1;
     }
-    printf("  Inverse operator read successfully.\n");
-    printf("  %d channels, %d sources\n", inverseOperator.nchan, inverseOperator.nsource);
+    qInfo("  Inverse operator read successfully.");
+    qInfo("  %d channels, %d sources" , inverseOperator.nchan, inverseOperator.nsource);
 
     // Pre-extract label list name for use in processing
     QString labelListName = parser.value(labelListOpt);
@@ -591,7 +591,7 @@ int main(int argc, char *argv[])
         //-----------------------------------------------------------------------------------------------------
         // FsLabel directory mode: compute average waveform for each label
         //-----------------------------------------------------------------------------------------------------
-        printf("\nProcessing label directory: %s\n", labelDir.toUtf8().constData());
+        qInfo("\nProcessing label directory: %s" , labelDir.toUtf8().constData());
 
         QStringList labelNames;
         InvSourceEstimate stc = processLabelDir(labelDir, inverseOperator,
@@ -615,7 +615,7 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Error: Failed to write STC file: %s\n", stcOut.toUtf8().constData());
             return 1;
         }
-        printf("\nWrote %s (%d labels, %d time points)\n",
+        qInfo("\nWrote %s (%d labels, %d time points)" ,
                stcOut.toUtf8().constData(), (int)stc.data.rows(), (int)stc.data.cols());
 
         // Write label list if requested
@@ -627,7 +627,7 @@ int main(int argc, char *argv[])
                     out << name << "\n";
                 }
                 labelListFile.close();
-                printf("FsLabel names output to %s\n", labelListName.toUtf8().constData());
+                qInfo("FsLabel names output to %s" , labelListName.toUtf8().constData());
             }
         }
 
@@ -636,7 +636,7 @@ int main(int argc, char *argv[])
         // Individual label mode: process each label file separately
         //-----------------------------------------------------------------------------------------------------
         for (const QString &labelFile : labelFiles) {
-            printf("\nProcessing label: %s\n", labelFile.toUtf8().constData());
+            qInfo("\nProcessing label: %s" , labelFile.toUtf8().constData());
 
             InvSourceEstimate stc = processLabel(labelFile, inverseOperator,
                                                  inputData, tmin, tstep,
@@ -670,7 +670,7 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "Error: Failed to write STC file: %s\n", stcOut.toUtf8().constData());
                 continue;
             }
-            printf("  Wrote %s (%d sources, %d time points)\n",
+            qInfo("  Wrote %s (%d sources, %d time points)" ,
                    stcOut.toUtf8().constData(), (int)stc.data.rows(), (int)stc.data.cols());
         }
 
@@ -678,7 +678,7 @@ int main(int argc, char *argv[])
         //-----------------------------------------------------------------------------------------------------
         // Full source space mode: compute inverse for all sources
         //-----------------------------------------------------------------------------------------------------
-        printf("\nComputing full source space inverse...\n");
+        qInfo("\nComputing full source space inverse...");
 
         InvMinimumNorm minimumNorm(inverseOperator, lambda2, method);
         minimumNorm.doInverseSetup(curNave, pickNormal);
@@ -721,7 +721,7 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "Error: Failed to write STC file: %s\n", stcOutLh.toUtf8().constData());
                 return 1;
             }
-            printf("  Wrote %s (%d sources, %d time points)\n",
+            qInfo("  Wrote %s (%d sources, %d time points)" ,
                    stcOutLh.toUtf8().constData(), nSrcTotal, (int)stc.data.cols());
         } else {
             // Write left hemisphere STC
@@ -736,7 +736,7 @@ int main(int argc, char *argv[])
                     fprintf(stderr, "Error: Failed to write LH STC file: %s\n", stcOutLh.toUtf8().constData());
                     return 1;
                 }
-                printf("  Wrote %s (%d sources, %d time points)\n",
+                qInfo("  Wrote %s (%d sources, %d time points)" ,
                        stcOutLh.toUtf8().constData(), nSrcLh, (int)stc.data.cols());
             }
 
@@ -752,7 +752,7 @@ int main(int argc, char *argv[])
                     fprintf(stderr, "Error: Failed to write RH STC file: %s\n", stcOutRh.toUtf8().constData());
                     return 1;
                 }
-                printf("  Wrote %s (%d sources, %d time points)\n",
+                qInfo("  Wrote %s (%d sources, %d time points)" ,
                        stcOutRh.toUtf8().constData(), nSrcRh, (int)stc.data.cols());
             }
         }
@@ -768,10 +768,10 @@ int main(int argc, char *argv[])
     bool isRaw = isRawFile(inName);
 
     if (isRaw) {
-        printf("\nReading raw data file: %s\n", inName.toUtf8().constData());
+        qInfo("\nReading raw data file: %s" , inName.toUtf8().constData());
 
         if (nave <= 0) nave = 1;
-        printf("  nave = %d\n", nave);
+        qInfo("  nave = %d" , nave);
 
         QFile rawFile(inName);
         FiffRawData raw(rawFile);
@@ -788,7 +788,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        printf("  Picked %d channels from raw data\n", (int)picks.size());
+        qInfo("  Picked %d channels from raw data" , (int)picks.size());
 
         // Activate projectors
         for (int k = 0; k < raw.info.projs.size(); ++k) {
@@ -806,7 +806,7 @@ int main(int argc, char *argv[])
         float tstep = 1.0f / raw.info.sfreq;
         float tmin = static_cast<float>(raw.first_samp) * tstep;
 
-        printf("  Read %d samples (%d channels)\n",
+        qInfo("  Read %d samples (%d channels)" ,
                (int)inputData.cols(), (int)inputData.rows());
 
         int result = processInverseResults(inputData, tmin, tstep, nave, outName);
@@ -816,7 +816,7 @@ int main(int argc, char *argv[])
         //-----------------------------------------------------------------------------------------------------
         // Read all evoked data sets
         //-----------------------------------------------------------------------------------------------------
-        printf("\nReading evoked data file: %s\n", inName.toUtf8().constData());
+        qInfo("\nReading evoked data file: %s" , inName.toUtf8().constData());
 
         QFile evokedFile(inName);
         QPair<float, float> baseline;
@@ -840,9 +840,9 @@ int main(int argc, char *argv[])
         // Determine which sets to process
         QList<int> setsToProcess;
         if (processAllSets) {
-            printf("  Found %d evoked data set(s):\n", (int)evokedSet.evoked.size());
+            qInfo("  Found %d evoked data set(s):" , (int)evokedSet.evoked.size());
             for (int i = 0; i < evokedSet.evoked.size(); ++i) {
-                printf("    [%d] %s\n", i, evokedSet.evoked[i].comment.toUtf8().constData());
+                qInfo("    [%d] %s" , i, evokedSet.evoked[i].comment.toUtf8().constData());
                 setsToProcess.append(i);
             }
         } else {
@@ -860,26 +860,26 @@ int main(int argc, char *argv[])
             QString setComment = evoked.comment;
             QString commentTag = sanitizeForFilename(setComment);
 
-            printf("\n=== Evoked set %d: \"%s\" ===\n", setIdx, setComment.toUtf8().constData());
+            qInfo("\n=== Evoked set %d: \"%s\" ===" , setIdx, setComment.toUtf8().constData());
 
             int curNave = (nave > 0) ? nave : evoked.nave;
-            printf("  nave = %d\n", curNave);
+            qInfo("  nave = %d" , curNave);
 
             // Pick channels matching inverse operator
             FiffEvoked pickedEvoked = evoked.pick_channels(inverseOperator.noise_cov->names);
-            printf("  Picked %d channels from evoked data\n", pickedEvoked.info.nchan);
+            qInfo("  Picked %d channels from evoked data" , pickedEvoked.info.nchan);
 
             if (doBaseline) {
-                printf("  Baseline correction: %10.2f ... %10.2f ms\n", 1000.0f * bmin, 1000.0f * bmax);
+                qInfo("  Baseline correction: %10.2f ... %10.2f ms" , 1000.0f * bmin, 1000.0f * bmax);
             } else {
-                printf("  No baseline setting in effect.\n");
+                qInfo("  No baseline setting in effect.");
             }
 
             MatrixXd inputData = pickedEvoked.data;
             float tmin = pickedEvoked.times(0);
             float tstep = 1.0f / pickedEvoked.info.sfreq;
 
-            printf("  Read %d time points (%d channels)\n",
+            qInfo("  Read %d time points (%d channels)" ,
                    (int)inputData.cols(), (int)inputData.rows());
 
             // Compose per-set output name with set description
@@ -898,6 +898,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    printf("\nFinished.\n");
+    qInfo("\nFinished.");
     return 0;
 }

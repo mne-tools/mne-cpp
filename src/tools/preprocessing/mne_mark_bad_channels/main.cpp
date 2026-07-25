@@ -127,9 +127,9 @@ int main(int argc, char *argv[])
         qWarning("Bad channel list is empty.");
     }
 
-    printf("Bad channels to mark (%lld):\n", static_cast<long long>(bads.size()));
+    qInfo("Bad channels to mark (%lld):" , static_cast<long long>(bads.size()));
     for (const QString &ch : bads) {
-        printf("  %s\n", qPrintable(ch));
+        qInfo("  %s" , qPrintable(ch));
     }
 
     // Open the FIFF file and read raw data
@@ -141,9 +141,9 @@ int main(int argc, char *argv[])
     }
 
     // Update bad channels
-    printf("Previous bad channels: %lld\n", static_cast<long long>(raw.info.bads.size()));
+    qInfo("Previous bad channels: %lld" , static_cast<long long>(raw.info.bads.size()));
     raw.info.bads = bads;
-    printf("New bad channels: %lld\n", static_cast<long long>(raw.info.bads.size()));
+    qInfo("New bad channels: %lld" , static_cast<long long>(raw.info.bads.size()));
 
     // Read all data
     Eigen::MatrixXd data;
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
     QFile::remove(fifName);
     QFile::rename(tmpName, fifName);
 
-    printf("Successfully updated bad channels in %s\n", qPrintable(fifName));
+    qInfo("Successfully updated bad channels in %s" , qPrintable(fifName));
 
     return 0;
 }

@@ -156,7 +156,7 @@ void FiffProducer::run()
 
         if (!m_pFiffSimulator->m_RawInfo.read_raw_segment(data,times,first,last))
         {
-            printf("error during read_raw_segment\n");
+            qInfo("error during read_raw_segment");
         }
 
         MatrixXf tmp = data.cast<float>();//(inv_calsMat*data).cast<float>();
@@ -166,14 +166,14 @@ void FiffProducer::run()
             //
             // Case end of Simulation: restart file from the beginning and read remaining bytes
             //
-            printf("### RESTART Simulation File ###\r\n");
+            qInfo("### RESTART Simulation File ###\r");
 
             first = from;
             last = first+t_iDiff-1;
 
             if (!m_pFiffSimulator->m_RawInfo.read_raw_segment(data,times,first,last))
             {
-                printf("error during read_raw_segment\n");
+                qInfo("error during read_raw_segment");
             }
 
             MatrixXf tmp2 = data.cast<float>();//(inv_calsMat*data).cast<float>();

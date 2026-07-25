@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 
     int nChan = fwd.sol->data.rows();
     int nSrc = fwd.sol->data.cols();
-    printf("Forward: %d channels x %d sources\n", nChan, nSrc);
+    qInfo("Forward: %d channels x %d sources" , nChan, nSrc);
 
     if (sourceIdx < 0 || sourceIdx >= nSrc) {
         qCritical("Source index %d out of range [0, %d)", sourceIdx, nSrc);
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 
     double sfreq = raw.info.sfreq;
     int nSamples = static_cast<int>(duration * sfreq);
-    printf("Sampling rate: %.1f Hz, duration: %.1f s, samples: %d\n", sfreq, duration, nSamples);
+    qInfo("Sampling rate: %.1f Hz, duration: %.1f s, samples: %d" , sfreq, duration, nSamples);
 
     // Get gain vector for selected source
     VectorXd gainCol = fwd.sol->data.col(sourceIdx);
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
 
     // Compute simulated sensor data: data = gain * signal
     MatrixXd data = gainCol * sourceSignal.transpose();
-    printf("Signal: source=%d, freq=%.1f Hz, amplitude=1 nAm\n", sourceIdx, signalFreq);
+    qInfo("Signal: source=%d, freq=%.1f Hz, amplitude=1 nAm" , sourceIdx, signalFreq);
 
     // Add noise if covariance provided
     if (!covFile.isEmpty()) {
@@ -200,9 +200,9 @@ int main(int argc, char *argv[])
 
             noise = noiseScale * L * noise;
             data += noise;
-            printf("Added noise: SNR=%.1f dB, noise scale=%g\n", snrDb, noiseScale);
+            qInfo("Added noise: SNR=%.1f dB, noise scale=%g" , snrDb, noiseScale);
         } else {
-            printf("Warning: Covariance dimensions mismatch, skipping noise.\n");
+            qInfo("Warning: Covariance dimensions mismatch, skipping noise.");
         }
     } else {
         // Add simple white noise based on SNR
@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
         for (int i = 0; i < nChan; ++i)
             for (int t = 0; t < nSamples; ++t)
                 data(i, t) += dist(rng);
-        printf("Added white noise: SNR=%.1f dB\n", snrDb);
+        qInfo("Added white noise: SNR=%.1f dB" , snrDb);
     }
 
     // Write output
@@ -237,6 +237,6 @@ int main(int argc, char *argv[])
     }
 
     stream->finish_writing_raw();
-    printf("Written simulated data to: %s\n", qPrintable(outFile));
+    qInfo("Written simulated data to: %s" , qPrintable(outFile));
     return 0;
 }

@@ -167,11 +167,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Source sphere: %d vertices\n", (int)srcSphere.rr().rows());
-    printf("Dest sphere:   %d vertices\n", (int)dstSphere.rr().rows());
+    qInfo("Source sphere: %d vertices" , (int)srcSphere.rr().rows());
+    qInfo("Dest sphere:   %d vertices" , (int)dstSphere.rr().rows());
 
     // Build nearest-neighbor mapping on sphere
-    printf("Building nearest-neighbor mapping on sphere...\n");
+    qInfo("Building nearest-neighbor mapping on sphere...");
     VectorXi mapping = buildNearestMap(srcSphere.rr(), dstSphere.rr());
 
     // Read input label
@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
         qCritical("Cannot read label: %s", qPrintable(labelFile));
         return 1;
     }
-    printf("Input label: %d vertices\n", (int)label.vertices.size());
+    qInfo("Input label: %d vertices" , (int)label.vertices.size());
 
     // Morph label vertices
     std::set<int> morphedSet;
@@ -210,6 +210,6 @@ int main(int argc, char *argv[])
     }
     outF.close();
 
-    printf("Morphed label: %d vertices -> %s\n", (int)morphedSet.size(), qPrintable(outFile));
+    qInfo("Morphed label: %d vertices -> %s" , (int)morphedSet.size(), qPrintable(outFile));
     return 0;
 }

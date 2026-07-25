@@ -450,7 +450,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Read surface: %ld vertices, %ld triangles\n",
+    qInfo("Read surface: %ld vertices, %ld triangles" ,
            static_cast<long>(rr.rows()), static_cast<long>(tris.rows()));
 
     // Apply scale factor to convert to meters (internal representation)
@@ -486,6 +486,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Wrote surface to %s\n", outputFile.toUtf8().constData());
+    qInfo("Wrote surface to %s" , outputFile.toUtf8().constData());
     return 0;
 }

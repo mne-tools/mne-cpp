@@ -124,7 +124,7 @@ bool MriCorIO::read(const QString& dir,
     }
 
     if (verbose) {
-        printf("Read %d COR slices from %s\n", COR_NSLICE, qPrintable(dir));
+        qInfo("Read %d COR slices from %s", COR_NSLICE, qPrintable(dir));
     }
 
     return true;

@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
     MatrixX3f unitVerts;
     MatrixX3i tris;
     makeIcosphere(icoLevel, unitVerts, tris);
-    printf("Icosphere subdivision %d: %d vertices, %d triangles\n",
+    qInfo("Icosphere subdivision %d: %d vertices, %d triangles" ,
            icoLevel, (int)unitVerts.rows(), (int)tris.rows());
 
     // Create BEM model
@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
         surf.itris = tris;
         surf.nn = unitVerts; // normals point outward on unit sphere
 
-        printf("Surface %d (%s): radius=%6.1f mm, sigma=%g S/m, %d vertices\n",
+        qInfo("Surface %d (%s): radius=%6.1f mm, sigma=%g S/m, %d vertices" ,
                i + 1, qPrintable(MNEBemSurface::id_name(surfId)),
                1000.0f * radius, sigma, surf.np);
 
@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
     // Write BEM
     QFile file(outFile);
     bem.write(file);
-    printf("Written spherical BEM model to: %s\n", qPrintable(outFile));
+    qInfo("Written spherical BEM model to: %s" , qPrintable(outFile));
 
     return 0;
 }

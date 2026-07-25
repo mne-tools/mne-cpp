@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    printf("Measurement: %lld MEG channels, %lld EEG channels, %d total\n",
+    qInfo("Measurement: %lld MEG channels, %lld EEG channels, %d total" ,
            static_cast<long long>(megIdx.size()), static_cast<long long>(eegIdx.size()), info.nchan);
 
     //=========================================================================
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
     int nFree = dims[2].toInt();
     int nTotal = nMegFile + nEegFile;
 
-    printf("Ncov file: %d MEG + %d EEG = %d channels, nfree = %d\n",
+    qInfo("Ncov file: %d MEG + %d EEG = %d channels, nfree = %d" ,
            nMegFile, nEegFile, nTotal, nFree);
 
     // Validate dimensions
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
     }
     ncFile.close();
 
-    printf("Read %dx%d covariance matrix\n", nTotal, nTotal);
+    qInfo("Read %dx%d covariance matrix" , nTotal, nTotal);
 
     //=========================================================================
     // Extract requested submatrix
@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
     // Symmetrize
     selCov = (selCov + selCov.transpose()) / 2.0;
 
-    printf("Selected %d channels (%s%s)\n", nSel,
+    qInfo("Selected %d channels (%s%s)" , nSel,
            includeMeg ? "MEG" : "",
            (includeMeg && includeEeg) ? "+EEG" : (includeEeg ? "EEG" : ""));
 
@@ -269,6 +269,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Written FIFF covariance (%d channels) to: %s\n", nSel, qPrintable(covFile));
+    qInfo("Written FIFF covariance (%d channels) to: %s" , nSel, qPrintable(covFile));
     return 0;
 }

@@ -126,16 +126,15 @@ static FiffInfo buildInfoFromForward(const MNEForwardSolution &forward,
     //   1. Projectors embedded in the noise covariance file
     //   2. Projectors from explicit --proj files (only if noise cov had none)
     if (!noiseCov.projs.isEmpty()) {
-        printf("  Using %lld SSP projectors from noise covariance file.\n",
+        qInfo("  Using %lld SSP projectors from noise covariance file." ,
                noiseCov.projs.size());
         info.projs = noiseCov.projs;
         FiffProj::activate_projs(info.projs);
         if (!extraProjs.isEmpty()) {
-            printf("  NOTE: Noise covariance already contains projectors; "
-                   "ignoring --proj files.\n");
+            qInfo("  NOTE: Noise covariance already contains projectors; ignoring --proj files.");
         }
     } else if (!extraProjs.isEmpty()) {
-        printf("  Using %lld SSP projectors from --proj files.\n",
+        qInfo("  Using %lld SSP projectors from --proj files." ,
                extraProjs.size());
         info.projs = extraProjs;
         FiffProj::activate_projs(info.projs);
@@ -154,7 +153,7 @@ static FiffInfo buildInfoFromForward(const MNEForwardSolution &forward,
             hasEegAvRef = true;
     }
     if (hasEeg && !hasEegAvRef) {
-        printf("  Adding average EEG reference projector.\n");
+        qInfo("  Adding average EEG reference projector.");
         // Build EEG average reference projector
         QStringList eegNames;
         for (int i = 0; i < info.nchan; ++i) {
@@ -381,7 +380,7 @@ int main(int argc, char *argv[])
     bool useMeg = parser.isSet(megOpt);
     bool useEeg = parser.isSet(eegOpt);
     if (!useMeg && !useEeg) {
-        printf("Neither --meg nor --eeg specified; using all available channels.\n");
+        qInfo("Neither --meg nor --eeg specified; using all available channels.");
         useMeg = true;
         useEeg = true;
     }
@@ -423,9 +422,9 @@ int main(int argc, char *argv[])
     // Read forward solution
     //=========================================================================================================
 
-    printf("\n");
-    printf("========================================\n");
-    printf("Reading forward solution from %s...\n", fwdName.toUtf8().constData());
+    qInfo("");
+    qInfo("========================================");
+    qInfo("Reading forward solution from %s..." , fwdName.toUtf8().constData());
 
     QFile fwdFile(fwdName);
     MNEForwardSolution forward(fwdFile, false, true);
@@ -435,29 +434,29 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("  Forward solution: %d sources, %d channels\n",
+    qInfo("  Forward solution: %d sources, %d channels" ,
            forward.nsource, forward.nchan);
-    printf("  Source orientation: %s\n",
+    qInfo("  Source orientation: %s" ,
            forward.isFixedOrient() ? "fixed" : "free");
-    printf("  Source space type: %d hemispheres\n", forward.src.size());
+    qInfo("  Source space type: %d hemispheres" , forward.src.size());
 
     // Pick channel types according to --meg/--eeg options
     if (!(useMeg && useEeg)) {
-        printf("Restricting forward solution to %s channels...\n",
+        qInfo("Restricting forward solution to %s channels..." ,
                useMeg ? "MEG" : "EEG");
         forward = forward.pick_types(useMeg, useEeg);
         if (forward.isEmpty()) {
             qCritical() << "Error: No channels remaining after channel type restriction.";
             return 1;
         }
-        printf("  After restriction: %d channels\n", forward.nchan);
+        qInfo("  After restriction: %d channels" , forward.nchan);
     }
 
     //=========================================================================================================
     // Read noise covariance
     //=========================================================================================================
 
-    printf("\nReading noise covariance from %s...\n",
+    qInfo("\nReading noise covariance from %s..." ,
            parser.value(noisecovOpt).toUtf8().constData());
 
     QFile covFile(parser.value(noisecovOpt));
@@ -469,10 +468,10 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("  Noise covariance: %d x %d\n",
+    qInfo("  Noise covariance: %d x %d" ,
            (int)noiseCov.data.rows(), (int)noiseCov.data.cols());
     if (!noiseCov.projs.isEmpty()) {
-        printf("  Noise covariance contains %lld SSP projectors.\n",
+        qInfo("  Noise covariance contains %lld SSP projectors." ,
                noiseCov.projs.size());
     }
 
@@ -483,10 +482,10 @@ int main(int argc, char *argv[])
     QList<FiffProj> extraProjs;
     QStringList projFiles = parser.values(projOpt);
     for (const QString &projFileName : projFiles) {
-        printf("Reading SSP projectors from %s...\n",
+        qInfo("Reading SSP projectors from %s..." ,
                projFileName.toUtf8().constData());
         QList<FiffProj> fileProjs = readProjFile(projFileName);
-        printf("  Found %lld projectors.\n", fileProjs.size());
+        qInfo("  Found %lld projectors." , fileProjs.size());
         extraProjs.append(fileProjs);
     }
 
@@ -495,9 +494,9 @@ int main(int argc, char *argv[])
     // (same approach as the original MNE-C tool — no measurement file needed)
     //=========================================================================================================
 
-    printf("\nBuilding measurement info from forward solution...\n");
+    qInfo("\nBuilding measurement info from forward solution...");
     FiffInfo info = buildInfoFromForward(forward, noiseCov, extraProjs);
-    printf("  Info: %d channels, %lld projectors\n",
+    qInfo("  Info: %d channels, %lld projectors" ,
            info.nchan, info.projs.size());
 
     //=========================================================================================================
@@ -506,7 +505,7 @@ int main(int argc, char *argv[])
 
     QStringList badFiles = parser.values(badOpt);
     for (const QString &badFileName : badFiles) {
-        printf("Reading bad channels from %s...\n",
+        qInfo("Reading bad channels from %s..." ,
                badFileName.toUtf8().constData());
         QStringList fileBads = readBadFile(badFileName);
         for (const QString &bad : fileBads) {
@@ -523,20 +522,20 @@ int main(int argc, char *argv[])
         printf("  Bad channels (%lld):", info.bads.size());
         for (const QString &bad : info.bads)
             printf(" %s", bad.toUtf8().constData());
-        printf("\n");
+        qInfo("");
     }
 
     //=========================================================================================================
     // Regularize noise covariance
     //=========================================================================================================
 
-    printf("\nRegularizing noise covariance (mag=%.3f, grad=%.3f, eeg=%.3f)...\n",
+    qInfo("\nRegularizing noise covariance (mag=%.3f, grad=%.3f, eeg=%.3f)..." ,
            magReg, gradReg, eegReg);
     noiseCov = noiseCov.regularize(info, magReg, gradReg, eegReg, true);
 
     // If --diagnoise, zero out off-diagonal elements
     if (diagNoise) {
-        printf("Using only diagonal noise covariance.\n");
+        qInfo("Using only diagonal noise covariance.");
         MatrixXd diagCov = MatrixXd::Zero(noiseCov.data.rows(), noiseCov.data.cols());
         diagCov.diagonal() = noiseCov.data.diagonal();
         noiseCov.data = diagCov;
@@ -546,16 +545,16 @@ int main(int argc, char *argv[])
     // Assemble the inverse operator
     //=========================================================================================================
 
-    printf("\nAssembling inverse operator...\n");
-    printf("  Fixed orientation: %s\n", useFixed ? "yes" : "no");
+    qInfo("\nAssembling inverse operator...");
+    qInfo("  Fixed orientation: %s" , useFixed ? "yes" : "no");
     if (!useFixed) {
-        printf("  Loose constraint: %.2f\n", loose);
+        qInfo("  Loose constraint: %.2f" , loose);
     }
     printf("  Depth weighting:  %s", depth > 0.0f ? "yes" : "no");
     if (depth > 0.0f) {
         printf(" (%.2f)", depth);
     }
-    printf("\n");
+    qInfo("");
 
     MNEInverseOperator invOp(info, forward, noiseCov, loose, depth, useFixed, true);
 
@@ -564,22 +563,22 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("  Inverse operator: %d sources, %d channels\n",
+    qInfo("  Inverse operator: %d sources, %d channels" ,
            invOp.nsource, invOp.nchan);
 
     //=========================================================================================================
     // Write the inverse operator
     //=========================================================================================================
 
-    printf("\nWriting inverse operator to %s...\n", invName.toUtf8().constData());
+    qInfo("\nWriting inverse operator to %s..." , invName.toUtf8().constData());
 
     QFile invFile(invName);
     invOp.write(invFile);
 
-    printf("Done.\n\n");
-    printf("The inverse operator is ready.\n");
-    printf("You can now use mne_compute_mne or mne_compute_raw_inverse\n");
-    printf("to compute source estimates.\n\n");
+    qInfo("Done.\n");
+    qInfo("The inverse operator is ready.");
+    qInfo("You can now use mne_compute_mne or mne_compute_raw_inverse");
+    qInfo("to compute source estimates.\n");
 
     return 0;
 }

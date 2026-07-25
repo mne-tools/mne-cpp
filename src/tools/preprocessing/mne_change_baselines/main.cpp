@@ -116,15 +116,15 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Read %lld evoked data set(s) from %s\n",
+    qInfo("Read %lld evoked data set(s) from %s" ,
            static_cast<long long>(evokedSet.evoked.size()), qPrintable(measFile));
-    printf("Applying baseline correction [%g, %g] s\n", bmin, bmax);
+    qInfo("Applying baseline correction [%g, %g] s" , bmin, bmax);
 
     // Apply baseline correction to each evoked dataset
     QPair<float,float> baseline(bmin, bmax);
     for (int i = 0; i < evokedSet.evoked.size(); ++i) {
         evokedSet.evoked[i].applyBaselineCorrection(baseline);
-        printf("  Set %d (%s): baseline corrected\n", i, qPrintable(evokedSet.evoked[i].comment));
+        qInfo("  Set %d (%s): baseline corrected" , i, qPrintable(evokedSet.evoked[i].comment));
     }
 
     // Save
@@ -133,6 +133,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Written baseline-corrected evoked data to: %s\n", qPrintable(outFile));
+    qInfo("Written baseline-corrected evoked data to: %s" , qPrintable(outFile));
     return 0;
 }

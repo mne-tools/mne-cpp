@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
             return 1;
         }
         sfreq = rawData.info.sfreq;
-        printf("Measurement: %d channels, sfreq = %.1f Hz\n", rawData.info.nchan, sfreq);
+        qInfo("Measurement: %d channels, sfreq = %.1f Hz" , rawData.info.nchan, sfreq);
 
         // Default events file
         if (eventsFile.isEmpty()) {
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        printf("Found %lld events from stimulus channel '%s'\n",
+        qInfo("Found %lld events from stimulus channel '%s'" ,
                static_cast<long long>(events.size()), qPrintable(stimName));
 
         if (outFile.isEmpty()) outFile = eventsFile;
@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
         }
 
         if (!writeEventFile(outFile, events)) return 1;
-        printf("Written events to: %s\n", qPrintable(outFile));
+        qInfo("Written events to: %s" , qPrintable(outFile));
         return 0;
     }
 
@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
     QList<EventEntry> events;
     if (!eventsFile.isEmpty() && QFile::exists(eventsFile)) {
         events = readEventFile(eventsFile);
-        printf("Loaded %lld existing events from: %s\n", static_cast<long long>(events.size()), qPrintable(eventsFile));
+        qInfo("Loaded %lld existing events from: %s" , static_cast<long long>(events.size()), qPrintable(eventsFile));
     }
 
     //=========================================================================
@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
         ev.comment = (parts.size() > 3) ? parts.mid(3).join(":") : QString();
 
         events.append(ev);
-        printf("Added event: sample=%d, before=%d, after=%d%s\n",
+        qInfo("Added event: sample=%d, before=%d, after=%d%s" ,
                ev.sample, ev.before, ev.after,
                ev.comment.isEmpty() ? "" : qPrintable(QString(", comment=%1").arg(ev.comment)));
 
@@ -316,15 +316,15 @@ int main(int argc, char *argv[])
                 removed++;
             }
         }
-        printf("Removed %d event(s) at sample %d\n", removed, removeSample);
+        qInfo("Removed %d event(s) at sample %d" , removed, removeSample);
     }
 
     //=========================================================================
     // List events
     //=========================================================================
     if (doList) {
-        printf("\n%-10s  %-8s  %-8s  %s\n", "Sample", "Before", "After", "Comment");
-        printf("%-10s  %-8s  %-8s  %s\n", "------", "------", "-----", "-------");
+        qInfo("\n%-10s  %-8s  %-8s  %s" , "Sample", "Before", "After", "Comment");
+        qInfo("%-10s  %-8s  %-8s  %s" , "------", "------", "-----", "-------");
         for (const EventEntry& ev : events) {
             printf("%-10d  %-8d  %-8d", ev.sample, ev.before, ev.after);
             if (sfreq > 0) {
@@ -333,9 +333,9 @@ int main(int argc, char *argv[])
             if (!ev.comment.isEmpty()) {
                 printf("  %s", qPrintable(ev.comment));
             }
-            printf("\n");
+            qInfo("");
         }
-        printf("\nTotal: %lld event(s)\n", static_cast<long long>(events.size()));
+        qInfo("\nTotal: %lld event(s)" , static_cast<long long>(events.size()));
     }
 
     //=========================================================================
@@ -349,7 +349,7 @@ int main(int argc, char *argv[])
         }
 
         if (!writeEventFile(outFile, events)) return 1;
-        printf("Written %lld events to: %s\n", static_cast<long long>(events.size()), qPrintable(outFile));
+        qInfo("Written %lld events to: %s" , static_cast<long long>(events.size()), qPrintable(outFile));
     }
 
     return 0;

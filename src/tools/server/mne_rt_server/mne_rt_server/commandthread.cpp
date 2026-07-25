@@ -46,6 +46,7 @@
 //=============================================================================================================
 
 #include <QtNetwork>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -102,7 +103,7 @@ void CommandThread::run()
     }
     else
     {
-        printf("CommandClient connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
+        qInfo("CommandClient connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n" ,
                QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
                t_qTcpSocket.peerPort());
     }

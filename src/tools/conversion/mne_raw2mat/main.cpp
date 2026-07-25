@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
     int first = (fromSamp >= 0) ? fromSamp : raw.first_samp;
     int last = (toSamp >= 0) ? toSamp : raw.last_samp;
 
-    printf("Raw: %d channels, %.1f Hz, samples %d..%d\n", nChan, sfreq, first, last);
+    qInfo("Raw: %d channels, %.1f Hz, samples %d..%d" , nChan, sfreq, first, last);
 
     // Read data
     MatrixXd data;
@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
 
     const auto rowCount = static_cast<long long>(data.rows());
     const auto sampleCount = static_cast<long long>(data.cols());
-    printf("Read %lld channels x %lld samples\n", rowCount, sampleCount);
+    qInfo("Read %lld channels x %lld samples" , rowCount, sampleCount);
 
     // Build channel names
     QStringList chNames;
@@ -278,8 +278,8 @@ int main(int argc, char *argv[])
     writeMatrixVariable(ds, "times", times);
 
     outF.close();
-    printf("Written MAT file: %s\n", qPrintable(outFile));
-    printf("Variables: data (%d x %lld), sfreq (1x1), times (1 x %lld)\n",
+    qInfo("Written MAT file: %s" , qPrintable(outFile));
+    qInfo("Variables: data (%d x %lld), sfreq (1x1), times (1 x %lld)" ,
            nChan,
            sampleCount,
            static_cast<long long>(times.cols()));

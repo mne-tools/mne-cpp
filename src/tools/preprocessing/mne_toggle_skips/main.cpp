@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
             // Write as big-endian int32
             stream->writeRawData(reinterpret_cast<const char*>(&beVal), sizeof(fiff_int_t));
 
-            printf("  Tag at pos %lld: skip count %d -> %d\n",
+            qInfo("  Tag at pos %lld: skip count %d -> %d" ,
                    static_cast<long long>(dirEntries[i]->pos), skipCount, newSkipCount);
             ++nToggled;
         }
@@ -132,9 +132,9 @@ int main(int argc, char *argv[])
     stream->close();
 
     if (nToggled == 0) {
-        printf("No FIFF_DATA_SKIP tags found in %s\n", qPrintable(rawFile));
+        qInfo("No FIFF_DATA_SKIP tags found in %s" , qPrintable(rawFile));
     } else {
-        printf("Toggled %d skip tag(s) in %s\n", nToggled, qPrintable(rawFile));
+        qInfo("Toggled %d skip tag(s) in %s" , nToggled, qPrintable(rawFile));
     }
 
     return 0;

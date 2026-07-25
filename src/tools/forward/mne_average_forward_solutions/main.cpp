@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < weights.size(); ++i) weights[i] /= wSum;
 
     // Load first forward solution as template
-    printf("Loading %lld forward solutions...\n", static_cast<long long>(fwdFiles.size()));
+    qInfo("Loading %lld forward solutions..." , static_cast<long long>(fwdFiles.size()));
 
     QFile f0(fwdFiles[0]);
     MNEForwardSolution fwd0(f0);
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
         qCritical("Cannot read forward solution: %s", qPrintable(fwdFiles[0]));
         return 1;
     }
-    printf("  [1] %s: %d channels x %d sources (weight=%.4f)\n",
+    qInfo("  [1] %s: %d channels x %d sources (weight=%.4f)" ,
            qPrintable(fwdFiles[0]), (int)fwd0.sol->data.rows(), (int)fwd0.sol->data.cols(), weights[0]);
 
     int nChan = fwd0.sol->data.rows();
@@ -180,13 +180,13 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        printf("  [%d] %s: %d channels x %d sources (weight=%.4f)\n",
+        qInfo("  [%d] %s: %d channels x %d sources (weight=%.4f)" ,
                i + 1, qPrintable(fwdFiles[i]), nChan, nSrc, weights[i]);
 
         avgSol += weights[i] * fwdi.sol->data;
     }
 
-    printf("Averaged forward solution: %d channels x %d sources\n", nChan, nSrc);
+    qInfo("Averaged forward solution: %d channels x %d sources" , nChan, nSrc);
 
     // Write averaged forward solution
     fwd0.sol->data = avgSol;
@@ -194,6 +194,6 @@ int main(int argc, char *argv[])
     QFile outF(outFile);
     fwd0.write(outF);
 
-    printf("Written averaged forward solution to: %s\n", qPrintable(outFile));
+    qInfo("Written averaged forward solution to: %s" , qPrintable(outFile));
     return 0;
 }

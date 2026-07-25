@@ -212,7 +212,7 @@ static bool parseBVMarkers(const QString &vmrkPath, BVHeader &hdr)
 {
     QFile file(vmrkPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        printf("Warning: Cannot open marker file: %s\n", qPrintable(vmrkPath));
+        qInfo("Warning: Cannot open marker file: %s" , qPrintable(vmrkPath));
         return false;
     }
 
@@ -282,7 +282,7 @@ static bool readBVData(const QString &dataPath, const BVHeader &hdr, MatrixXd &d
         nSamples = fileSize / (nChan * bytesPerSample);
     }
 
-    printf("Data: %d channels x %lld samples (%s)\n", nChan, nSamples, qPrintable(hdr.binaryFormat));
+    qInfo("Data: %d channels x %lld samples (%s)" , nChan, nSamples, qPrintable(hdr.binaryFormat));
 
     data.resize(nChan, nSamples);
     QDataStream ds(&file);
@@ -373,7 +373,7 @@ int main(int argc, char *argv[])
     QFileInfo vhdrInfo(vhdrFile);
     QDir baseDir = vhdrInfo.absoluteDir();
 
-    printf("BrainVision header: %d channels, sfreq=%.1f Hz, format=%s\n",
+    qInfo("BrainVision header: %d channels, sfreq=%.1f Hz, format=%s" ,
            hdr.numberOfChannels,
            1e6 / hdr.samplingInterval,
            qPrintable(hdr.binaryFormat));
@@ -382,7 +382,7 @@ int main(int argc, char *argv[])
     if (!hdr.markerFile.isEmpty()) {
         QString vmrkPath = baseDir.filePath(hdr.markerFile);
         parseBVMarkers(vmrkPath, hdr);
-        printf("Markers: %lld events\n", static_cast<long long>(hdr.markers.size()));
+        qInfo("Markers: %lld events" , static_cast<long long>(hdr.markers.size()));
     }
 
     // Read binary data
@@ -465,7 +465,7 @@ int main(int argc, char *argv[])
     }
 
     stream->finish_writing_raw();
-    printf("Written FIFF: %s (%d channels, %d samples, %.1f Hz)\n",
+    qInfo("Written FIFF: %s (%d channels, %d samples, %.1f Hz)" ,
            qPrintable(outFile), nChan, nSamples, sfreq);
 
     return 0;

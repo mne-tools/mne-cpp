@@ -99,7 +99,7 @@ static bool readCorDirectory(const QString& dirPath, std::vector<std::vector<uns
         }
         slices[k].assign(data.constData(), data.constData() + data.size());
     }
-    printf("Read %d COR slices from %s\n", COR_NSLICE, dirPath.toUtf8().constData());
+    qInfo("Read %d COR slices from %s" , COR_NSLICE, dirPath.toUtf8().constData());
     return true;
 }
 
@@ -173,7 +173,7 @@ static bool writeMriDescription(const QString& filename,
     stream->end_block(FIFFB_MRI);
     stream->end_file();
 
-    printf("Wrote MRI description to %s (%dx%dx%d)\n",
+    qInfo("Wrote MRI description to %s (%dx%dx%d)" ,
            filename.toUtf8().constData(), width, height, nslice);
     return true;
 }
@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
         // Skip rest of header (284 bytes total - 24 already read)
         in.skipRawData(284 - 24);
 
-        printf("Read MGH: %dx%dx%d, type=%d\n", width, height, nslice, type);
+        qInfo("Read MGH: %dx%dx%d, type=%d" , width, height, nslice, type);
 
         slices.resize(nslice);
         int sliceSize = width * height;

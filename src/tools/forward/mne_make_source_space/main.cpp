@@ -170,7 +170,7 @@ static bool makeIcosahedron(int grade, MatrixX3f &verts)
         verts.row(i) = icoVerts[i].transpose();
     }
 
-    printf("  Icosahedron grade %d: %d vertices\n", std::abs(grade), (int)verts.rows());
+    qInfo("  Icosahedron grade %d: %d vertices" , std::abs(grade), (int)verts.rows());
     return true;
 }
 
@@ -436,7 +436,7 @@ int main(int argc, char *argv[])
             qCritical() << "Error: --subject option is required (or set $SUBJECT).";
             parser.showHelp(1);
         }
-        printf("Using subject from $SUBJECT: %s\n", envSubject.toUtf8().constData());
+        qInfo("Using subject from $SUBJECT: %s" , envSubject.toUtf8().constData());
     }
 
     QString subject = parser.isSet(subjectOpt) ? parser.value(subjectOpt)
@@ -511,7 +511,7 @@ int main(int argc, char *argv[])
 
     MatrixX3f icoVerts;
     if (decimMethod == ICO) {
-        printf("\nBuilding icosahedron with grade %d for decimation...\n", icoGrade);
+        qInfo("\nBuilding icosahedron with grade %d for decimation..." , icoGrade);
         if (!makeIcosahedron(icoGrade, icoVerts)) {
             qCritical() << "Error: Failed to build icosahedron.";
             return 1;
@@ -528,14 +528,14 @@ int main(int argc, char *argv[])
     QVector<MNEHemisphere> hemispheres;
 
     for (int h = 0; h < 2; ++h) {
-        printf("\n========================================\n");
-        printf("Processing %s hemisphere...\n", hemiNames[h].toUtf8().constData());
+        qInfo("\n========================================");
+        qInfo("Processing %s hemisphere..." , hemiNames[h].toUtf8().constData());
 
         // Read FreeSurfer surface
         QString surfPath = subjectsDir + "/" + subject + "/surf/" +
                            hemiNames[h] + "." + surfName;
 
-        printf("Reading surface from %s...\n", surfPath.toUtf8().constData());
+        qInfo("Reading surface from %s..." , surfPath.toUtf8().constData());
 
         FsSurface surf;
         if (!FsSurface::read(surfPath, surf)) {
@@ -543,7 +543,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        printf("  FsSurface: %d vertices, %d triangles\n",
+        qInfo("  FsSurface: %d vertices, %d triangles" ,
                (int)surf.rr().rows(), (int)surf.tris().rows());
 
         // Select source vertices
@@ -552,21 +552,21 @@ int main(int argc, char *argv[])
         int nuse;
 
         if (decimMethod == ALL) {
-            printf("  Using all vertices.\n");
+            qInfo("  Using all vertices.");
             int np = surf.rr().rows();
             inuse = VectorXi::Ones(np);
             vertno.resize(np);
             for (int i = 0; i < np; ++i) vertno(i) = i;
             nuse = np;
         } else if (decimMethod == ICO) {
-            printf("  Decimating with icosahedron grade %d...\n", icoGrade);
+            qInfo("  Decimating with icosahedron grade %d..." , icoGrade);
             nuse = selectVerticesIco(surf.rr(), icoVerts, inuse, vertno);
         } else {
-            printf("  Decimating with spacing %.1f mm...\n", spacing);
+            qInfo("  Decimating with spacing %.1f mm..." , spacing);
             nuse = selectVerticesSpacing(surf.rr(), spacing, inuse, vertno);
         }
 
-        printf("  Selected %d source locations.\n", nuse);
+        qInfo("  Selected %d source locations." , nuse);
 
         if (nuse == 0) {
             qCritical() << "Error: No vertices selected for" << hemiNames[h];
@@ -582,8 +582,8 @@ int main(int argc, char *argv[])
     // Write source space
     //=========================================================================================================
 
-    printf("\n========================================\n");
-    printf("Writing source space to %s...\n", srcName.toUtf8().constData());
+    qInfo("\n========================================");
+    qInfo("Writing source space to %s..." , srcName.toUtf8().constData());
 
     // Ensure output directory exists
     QFileInfo fi(srcName);
@@ -605,7 +605,7 @@ int main(int argc, char *argv[])
     srcFile.close();
 
     // Summary
-    printf("\nSource space created successfully:\n");
+    qInfo("\nSource space created successfully:");
     for (int h = 0; h < hemispheres.size(); ++h) {
         printf("  %s hemisphere: %d of %d vertices selected",
                h == 0 ? "Left" : "Right",
@@ -613,11 +613,11 @@ int main(int argc, char *argv[])
         if (hemispheres[h].nuse_tri > 0) {
             printf(", %d use triangles", hemispheres[h].nuse_tri);
         }
-        printf("\n");
+        qInfo("");
     }
-    printf("\nOutput: %s\n", srcName.toUtf8().constData());
-    printf("\nYou can now use mne_forward_solution to compute forward solutions\n");
-    printf("using this source space.\n\n");
+    qInfo("\nOutput: %s" , srcName.toUtf8().constData());
+    qInfo("\nYou can now use mne_forward_solution to compute forward solutions");
+    qInfo("using this source space.\n");
 
     return 0;
 }

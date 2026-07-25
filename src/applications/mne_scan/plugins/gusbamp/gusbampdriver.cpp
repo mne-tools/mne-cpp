@@ -220,7 +220,7 @@ bool GUSBAmpDriver::initDevice()
                     throw string("Error on GT_SetGround: Couldn't set common ground for device ").append(*serialNumber);  
                 }
             }
-            printf("\tg.USBamp %s initialized as %s (#%d in the call sequence)!\n", *serialNumber, (isSlave) ? "slave" : "master", m_openedDevicesHandles.size());
+            qInfo("\tg.USBamp %s initialized as %s (#%d in the call sequence)!" , *serialNumber, (isSlave) ? "slave" : "master", m_openedDevicesHandles.size());
         }
 
         //define the buffer variables and start the device:

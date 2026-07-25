@@ -178,11 +178,11 @@ static void collapseData(MatrixXd &data, int mode)
 static void scaleData(MatrixXd &data, double scaleTo, double scaleBy, bool siCurrents)
 {
     if (siCurrents) {
-        printf("  Output: SI-unit currents (no scaling).\n");
+        qInfo("  Output: SI-unit currents (no scaling).");
         return;
     }
     if (scaleBy != 0.0) {
-        printf("  Scaling data by %.6e\n", scaleBy);
+        qInfo("  Scaling data by %.6e" , scaleBy);
         data *= scaleBy;
         return;
     }
@@ -190,7 +190,7 @@ static void scaleData(MatrixXd &data, double scaleTo, double scaleBy, bool siCur
         double maxAbs = data.cwiseAbs().maxCoeff();
         if (maxAbs > 0.0) {
             double factor = scaleTo / maxAbs;
-            printf("  Scaling data so max = %.1f (factor = %.6e)\n", scaleTo, factor);
+            qInfo("  Scaling data so max = %.1f (factor = %.6e)" , scaleTo, factor);
             data *= factor;
         }
     }
@@ -234,7 +234,7 @@ static bool readBaselines(const QString &fileName,
         }
     }
     file.close();
-    printf("  Read %d baseline values from %s\n", nFound, fileName.toUtf8().constData());
+    qInfo("  Read %d baseline values from %s" , nFound, fileName.toUtf8().constData());
     return true;
 }
 
@@ -278,7 +278,7 @@ static bool writeLabelOutput(const FsLabel &label,
     }
 
     if (srcIdx.isEmpty()) {
-        printf("  WARNING: No vertices found in label %s for this hemisphere.\n",
+        qInfo("  WARNING: No vertices found in label %s for this hemisphere." ,
                label.name.toUtf8().constData());
         return false;
     }
@@ -346,7 +346,7 @@ static bool writeLabelOutput(const FsLabel &label,
     }
 
     file.close();
-    printf("  FsLabel output: %d vertices, %d times -> %s\n",
+    qInfo("  FsLabel output: %d vertices, %d times -> %s" ,
            (int)srcIdx.size(), nTimes, outputFile.toUtf8().constData());
     return true;
 }
@@ -414,7 +414,7 @@ static bool writeDipFile(const QString &fileName,
     }
 
     file.close();
-    printf("  InvDipole snapshot: %d sources at %.1f ms -> %s\n",
+    qInfo("  InvDipole snapshot: %d sources at %.1f ms -> %s" ,
            row, time_ms, fileName.toUtf8().constData());
     return true;
 }
@@ -444,7 +444,7 @@ static bool writePredictedData(const QString &fileName,
     // Predicted data = G * J  (nChannels x nSources) * (nSources x nTimes)
     MatrixXd predicted = forward.sol->data * stcData;
 
-    printf("  Predicted data: %d channels, %d time points\n",
+    qInfo("  Predicted data: %d channels, %d time points" ,
            (int)predicted.rows(), (int)predicted.cols());
 
     QFile file(fileName);
@@ -471,7 +471,7 @@ static bool writePredictedData(const QString &fileName,
     }
     file.close();
 
-    printf("  Predicted data written to %s\n", fileName.toUtf8().constData());
+    qInfo("  Predicted data written to %s" , fileName.toUtf8().constData());
     return true;
 }
 
@@ -818,9 +818,9 @@ int main(int argc, char *argv[])
     // Read inverse operator
     //=========================================================================================================
 
-    printf("\n");
-    printf("========================================\n");
-    printf("Reading inverse operator from %s...\n", invName.toUtf8().constData());
+    qInfo("");
+    qInfo("========================================");
+    qInfo("Reading inverse operator from %s..." , invName.toUtf8().constData());
 
     QFile invFile(invName);
     MNEInverseOperator invOp(invFile);
@@ -830,9 +830,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("  Inverse operator: %d sources, %d channels\n",
+    qInfo("  Inverse operator: %d sources, %d channels" ,
            invOp.nsource, invOp.nchan);
-    printf("  Source orientation: %s\n",
+    qInfo("  Source orientation: %s" ,
            invOp.isFixedOrient() ? "fixed" : "free");
 
     //=========================================================================================================
@@ -853,9 +853,9 @@ int main(int argc, char *argv[])
         QString fwdName = parser.value(fwdOpt);
         double fwdAmp = parser.value(fwdampOpt).toDouble() * 1e-9;  // nAm -> Am
 
-        printf("\nUsing forward solution as synthetic data from %s...\n",
+        qInfo("\nUsing forward solution as synthetic data from %s..." ,
                fwdName.toUtf8().constData());
-        printf("  Source amplitude: %.1f nAm\n", fwdAmp * 1e9);
+        qInfo("  Source amplitude: %.1f nAm" , fwdAmp * 1e9);
 
         QFile fwdFile(fwdName);
         MNEForwardSolution fwd(fwdFile);
@@ -873,7 +873,7 @@ int main(int argc, char *argv[])
         tstep = 0.001f;  // 1 ms per source
         nave = 1;
 
-        printf("  Forward synthetic data: %d channels, %d sources (time points)\n",
+        qInfo("  Forward synthetic data: %d channels, %d sources (time points)" ,
                (int)data.rows(), nTimes);
 
         // Time vector for label output
@@ -885,7 +885,7 @@ int main(int argc, char *argv[])
         //---------------------------------------------------------------------
         // Normal evoked data mode
         //---------------------------------------------------------------------
-        printf("\nReading evoked data from %s (set %d)...\n",
+        qInfo("\nReading evoked data from %s (set %d)..." ,
                measName.toUtf8().constData(), setNo + 1);
 
         QFile measFile(measName);
@@ -894,7 +894,7 @@ int main(int argc, char *argv[])
             float bmin = parser.isSet(bminOpt) ? parser.value(bminOpt).toFloat() / 1000.0f : -1.0f;
             float bmax = parser.isSet(bmaxOpt) ? parser.value(bmaxOpt).toFloat() / 1000.0f : -1.0f;
             baseline = QPair<float,float>(bmin, bmax);
-            printf("  Baseline: %.1f - %.1f ms\n",
+            qInfo("  Baseline: %.1f - %.1f ms" ,
                    bmin * 1000.0f, bmax * 1000.0f);
         }
         FiffEvoked evoked(measFile, setNo, baseline);
@@ -905,11 +905,11 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        printf("  Evoked data: %d channels, %d time points\n",
+        qInfo("  Evoked data: %d channels, %d time points" ,
                (int)evoked.data.rows(), (int)evoked.data.cols());
-        printf("  Comment: %s\n", evoked.comment.toUtf8().constData());
-        printf("  Nave: %d\n", evoked.nave);
-        printf("  Time range: %.1f - %.1f ms\n",
+        qInfo("  Comment: %s" , evoked.comment.toUtf8().constData());
+        qInfo("  Nave: %d" , evoked.nave);
+        qInfo("  Time range: %.1f - %.1f ms" ,
                evoked.times(0) * 1000.0f, evoked.times(evoked.times.size()-1) * 1000.0f);
 
         // Measurement ID matching check (SVN MNE-C --nomatch feature)
@@ -919,12 +919,12 @@ int main(int argc, char *argv[])
                 if (invOp.info.meas_id.version != evoked.info.meas_id.version ||
                     invOp.info.meas_id.machid[0] != evoked.info.meas_id.machid[0] ||
                     invOp.info.meas_id.machid[1] != evoked.info.meas_id.machid[1]) {
-                    printf("  WARNING: Measurement IDs differ between inverse operator and data.\n");
-                    printf("           Use --nomatch to suppress this check.\n");
+                    qInfo("  WARNING: Measurement IDs differ between inverse operator and data.");
+                    qInfo("           Use --nomatch to suppress this check.");
                 }
             }
         } else {
-            printf("  Measurement ID matching skipped (--nomatch).\n");
+            qInfo("  Measurement ID matching skipped (--nomatch).");
         }
 
         // Apply per-channel baselines from file if specified
@@ -938,7 +938,7 @@ int main(int argc, char *argv[])
                 for (int c = 0; c < evoked.data.rows(); ++c) {
                     evoked.data.row(c).array() -= baselines(c);
                 }
-                printf("  Applied per-channel baselines from file.\n");
+                qInfo("  Applied per-channel baselines from file.");
             }
         }
 
@@ -946,7 +946,7 @@ int main(int argc, char *argv[])
         nave = evoked.nave;
         if (parser.isSet(naveOpt)) {
             nave = parser.value(naveOpt).toInt();
-            printf("  Overriding nave to %d\n", nave);
+            qInfo("  Overriding nave to %d" , nave);
         }
 
         // Apply time window if specified
@@ -960,7 +960,7 @@ int main(int argc, char *argv[])
                     break;
                 }
             }
-            printf("  Start time restricted to %.1f ms (sample %d)\n",
+            qInfo("  Start time restricted to %.1f ms (sample %d)" ,
                    evoked.times(tminIdx) * 1000.0f, tminIdx);
         }
         if (parser.isSet(tmaxOpt)) {
@@ -971,7 +971,7 @@ int main(int argc, char *argv[])
                     break;
                 }
             }
-            printf("  End time restricted to %.1f ms (sample %d)\n",
+            qInfo("  End time restricted to %.1f ms (sample %d)" ,
                    evoked.times(tmaxIdx) * 1000.0f, tmaxIdx);
         }
 
@@ -992,7 +992,7 @@ int main(int argc, char *argv[])
     // Compute inverse solution
     //=========================================================================================================
 
-    printf("\nComputing %s inverse solution (SNR=%.1f, lambda2=%.4e, nave=%d)...\n",
+    qInfo("\nComputing %s inverse solution (SNR=%.1f, lambda2=%.4e, nave=%d)..." ,
            method.toUtf8().constData(), snr, lambda2, nave);
 
     InvMinimumNorm minimumNorm(invOp, lambda2, method);
@@ -1005,9 +1005,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("  Source estimate: %d sources, %d time points\n",
+    qInfo("  Source estimate: %d sources, %d time points" ,
            (int)stc.data.rows(), (int)stc.data.cols());
-    printf("  Time range: %.1f - %.1f ms\n",
+    qInfo("  Time range: %.1f - %.1f ms" ,
            stc.tmin * 1000.0f,
            (stc.tmin + (stc.data.cols() - 1) * stc.tstep) * 1000.0f);
 
@@ -1017,17 +1017,17 @@ int main(int argc, char *argv[])
 
     // Apply abs/signed transformations
     if (doAbs) {
-        printf("  Applying absolute value transform.\n");
+        qInfo("  Applying absolute value transform.");
         stc.data = stc.data.cwiseAbs();
     } else if (doSigned) {
-        printf("  Preserving signed current direction.\n");
+        qInfo("  Preserving signed current direction.");
         // Signed: keep data as-is (already signed from fixed orientation)
     }
 
     // Collapse time axis to single frame
     if (collapseMode > 0) {
         const char *modeNames[] = {"", "max-abs", "L1 (mean-abs)", "L2 (RMS)"};
-        printf("  Collapsing time axis using %s mode.\n", modeNames[collapseMode]);
+        qInfo("  Collapsing time axis using %s mode." , modeNames[collapseMode]);
         collapseData(stc.data, collapseMode);
     }
 
@@ -1081,7 +1081,7 @@ int main(int argc, char *argv[])
         // Left hemisphere
         if (nLh > 0) {
             QString lhFile = stcBase + "-lh.stc";
-            printf("\nWriting left hemisphere STC to %s...\n", lhFile.toUtf8().constData());
+            qInfo("\nWriting left hemisphere STC to %s..." , lhFile.toUtf8().constData());
 
             MatrixXd lhData = stc.data.topRows(nLh);
             InvSourceEstimate lhStc(lhData, vertno[0], stc.tmin, stc.tstep);
@@ -1090,14 +1090,14 @@ int main(int argc, char *argv[])
             if (!lhStc.write(lhOut)) {
                 qWarning() << "Warning: Failed to write" << lhFile;
             } else {
-                printf("  %d vertices, %d time points\n", nLh, (int)lhData.cols());
+                qInfo("  %d vertices, %d time points" , nLh, (int)lhData.cols());
             }
         }
 
         // Right hemisphere
         if (nRh > 0) {
             QString rhFile = stcBase + "-rh.stc";
-            printf("Writing right hemisphere STC to %s...\n", rhFile.toUtf8().constData());
+            qInfo("Writing right hemisphere STC to %s..." , rhFile.toUtf8().constData());
 
             MatrixXd rhData = stc.data.bottomRows(nRh);
             InvSourceEstimate rhStc(rhData, vertno[1], stc.tmin, stc.tstep);
@@ -1106,7 +1106,7 @@ int main(int argc, char *argv[])
             if (!rhStc.write(rhOut)) {
                 qWarning() << "Warning: Failed to write" << rhFile;
             } else {
-                printf("  %d vertices, %d time points\n", nRh, (int)rhData.cols());
+                qInfo("  %d vertices, %d time points" , nRh, (int)rhData.cols());
             }
         }
 
@@ -1116,7 +1116,7 @@ int main(int argc, char *argv[])
 
         QStringList labelFiles = parser.values(labelOpt);
         if (doLabelTag && !labelFiles.isEmpty()) {
-            printf("\nWriting label-based ASCII output...\n");
+            qInfo("\nWriting label-based ASCII output...");
 
             for (const QString &labelFile : labelFiles) {
                 FsLabel label;
@@ -1124,7 +1124,7 @@ int main(int argc, char *argv[])
                     qWarning() << "  WARNING: Could not read label" << labelFile;
                     continue;
                 }
-                printf("  FsLabel: %s (%d vertices, hemi=%d)\n",
+                qInfo("  FsLabel: %s (%d vertices, hemi=%d)" ,
                        label.name.toUtf8().constData(),
                        (int)label.vertices.size(), label.hemi);
 
@@ -1163,14 +1163,14 @@ int main(int argc, char *argv[])
     } else {
         // Single source space (e.g., volume) — write as single STC
         QString outFile = stcBase + ".stc";
-        printf("\nWriting STC to %s...\n", outFile.toUtf8().constData());
+        qInfo("\nWriting STC to %s..." , outFile.toUtf8().constData());
 
         QFile out(outFile);
         if (!stc.write(out)) {
             qCritical() << "Error: Failed to write" << outFile;
             return 1;
         }
-        printf("  %d vertices, %d time points\n",
+        qInfo("  %d vertices, %d time points" ,
                (int)stc.data.rows(), (int)stc.data.cols());
     }
 
@@ -1193,7 +1193,7 @@ int main(int argc, char *argv[])
                 dipIdx = t;
             }
         }
-        printf("\nWriting dipole snapshot at %.1f ms (nearest: %.1f ms, idx %d)...\n",
+        qInfo("\nWriting dipole snapshot at %.1f ms (nearest: %.1f ms, idx %d)..." ,
                dipTime_ms, timesVec(dipIdx) * 1000.0, dipIdx);
 
         writeDipFile(dipFile, stc.data, invOp.src, vertno, dipIdx, timesVec(dipIdx) * 1000.0);
@@ -1205,7 +1205,7 @@ int main(int argc, char *argv[])
 
     QStringList pickValues = parser.values(pickOpt);
     if (!pickValues.isEmpty()) {
-        printf("\nExtracting source estimates at %d time point(s)...\n", (int)pickValues.size());
+        qInfo("\nExtracting source estimates at %d time point(s)..." , (int)pickValues.size());
 
         for (const QString &pickStr : pickValues) {
             double pickTime_ms = pickStr.toDouble();
@@ -1222,7 +1222,7 @@ int main(int argc, char *argv[])
                 }
             }
 
-            printf("  Pick at %.1f ms (nearest: %.1f ms, idx %d)\n",
+            qInfo("  Pick at %.1f ms (nearest: %.1f ms, idx %d)" ,
                    pickTime_ms, timesVec(pickIdx) * 1000.0, pickIdx);
 
             // Write per-hemisphere w-like text files
@@ -1249,7 +1249,7 @@ int main(int argc, char *argv[])
                         out << vertno[h](v) << "\t" << stc.data(offset + v, pickIdx) << "\n";
                     }
                     pf.close();
-                    printf("    %s: %d vertices -> %s\n", hemiName.toUtf8().constData(),
+                    qInfo("    %s: %d vertices -> %s" , hemiName.toUtf8().constData(),
                            nVert, pickFile.toUtf8().constData());
                 }
             }
@@ -1262,7 +1262,7 @@ int main(int argc, char *argv[])
 
     if (parser.isSet(predOpt)) {
         QString predFile = parser.value(predOpt);
-        printf("\nComputing predicted sensor data...\n");
+        qInfo("\nComputing predicted sensor data...");
 
         // Read forward solution for prediction
         MNEForwardSolution predFwd;
@@ -1273,21 +1273,21 @@ int main(int argc, char *argv[])
             QFile fwdFile(parser.value(fwdOpt));
             predFwd = MNEForwardSolution(fwdFile, false, true);
         } else {
-            printf("  NOTE: --pred requires a forward solution.\n");
-            printf("         Use --predfwd to specify one, or use --fwd mode.\n");
-            printf("         Skipping predicted data output.\n");
+            qInfo("  NOTE: --pred requires a forward solution.");
+            qInfo("         Use --predfwd to specify one, or use --fwd mode.");
+            qInfo("         Skipping predicted data output.");
             goto done;
         }
 
         if (predFwd.sol && predFwd.sol->data.rows() > 0) {
             writePredictedData(predFile, predFwd, stc.data, timesVec);
         } else {
-            printf("  WARNING: Forward solution has no gain matrix.\n");
+            qInfo("  WARNING: Forward solution has no gain matrix.");
         }
     }
 
 done:
-    printf("\nDone.\n");
+    qInfo("\nDone.");
 
     return 0;
 }

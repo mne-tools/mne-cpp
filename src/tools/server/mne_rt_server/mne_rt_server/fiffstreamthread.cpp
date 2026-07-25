@@ -59,6 +59,7 @@
 //=============================================================================================================
 
 #include <QtNetwork>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -144,24 +145,24 @@ void FiffStreamThread::parseCommand(const FiffTag::UPtr& p_pTag)
             // Set Client Alias
             //
             m_sDataClientAlias = QString(p_pTag->mid(4, p_pTag->size()-4));
-            printf("FiffStreamClient (ID %d): new alias = '%s'\r\n\n", m_iDataClientId, m_sDataClientAlias.toUtf8().constData());
+            qInfo("FiffStreamClient (ID %d): new alias = '%s'\r\n" , m_iDataClientId, m_sDataClientAlias.toUtf8().constData());
         }
         else if(t_iCmd == MNE_RT_GET_CLIENT_ID)
         {
             //
             // Send Client ID
             //
-            printf("FiffStreamClient (ID %d): send client ID %d\r\n\n", m_iDataClientId, m_iDataClientId);
+            qInfo("FiffStreamClient (ID %d): send client ID %d\r\n" , m_iDataClientId, m_iDataClientId);
             writeClientId();
         }
         else
         {
-            printf("FiffStreamClient (ID %d): unknown command\r\n\n", m_iDataClientId);
+            qInfo("FiffStreamClient (ID %d): unknown command\r\n" , m_iDataClientId);
         }
     }
     else
     {
-        printf("FiffStreamClient (ID %d): unknown command\r\n\n", m_iDataClientId);
+        qInfo("FiffStreamClient (ID %d): unknown command\r\n" , m_iDataClientId);
     }
 }
 
@@ -300,7 +301,7 @@ void FiffStreamThread::run()
     }
     else
     {
-        printf("FiffStreamClient (assigned ID %d) accepted from\n\tIP:\t%s\n\tPort:\t%d\n\n",
+        qInfo("FiffStreamClient (assigned ID %d) accepted from\n\tIP:\t%s\n\tPort:\t%d\n" ,
                m_iDataClientId,
                QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
                t_qTcpSocket.peerPort());

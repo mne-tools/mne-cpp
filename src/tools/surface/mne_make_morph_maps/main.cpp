@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
     stream->start_block(FIFFB_MNE);
 
     for (const QString& hemi : hemis) {
-        printf("\nProcessing %s hemisphere...\n", qPrintable(hemi));
+        qInfo("\nProcessing %s hemisphere..." , qPrintable(hemi));
 
         // Load sphere-registered surfaces
         QString srcPath = QString("%1/%2/surf/%3.sphere.reg").arg(subjectsDir, fromSubject, hemi);
@@ -206,13 +206,13 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        printf("  Source: %d vertices\n", (int)srcSphere.rr().rows());
-        printf("  Dest:   %d vertices\n", (int)dstSphere.rr().rows());
+        qInfo("  Source: %d vertices" , (int)srcSphere.rr().rows());
+        qInfo("  Dest:   %d vertices" , (int)dstSphere.rr().rows());
 
         // Compute morph map
-        printf("  Computing morph map (nearest=%d)...\n", nNearest);
+        qInfo("  Computing morph map (nearest=%d)..." , nNearest);
         SparseMatrix<double> morphMap = computeMorphMap(srcSphere.rr(), dstSphere.rr(), nNearest);
-        printf("  Morph map: %dx%d, %ld nonzeros\n",
+        qInfo("  Morph map: %dx%d, %ld nonzeros" ,
                (int)morphMap.rows(), (int)morphMap.cols(), (long)morphMap.nonZeros());
 
         // Write morph map as FIFF sparse matrix
@@ -238,6 +238,6 @@ int main(int argc, char *argv[])
     stream->end_block(FIFFB_MNE);
     stream->end_file();
 
-    printf("\nWritten morph maps to: %s\n", qPrintable(outFile));
+    qInfo("\nWritten morph maps to: %s" , qPrintable(outFile));
     return 0;
 }

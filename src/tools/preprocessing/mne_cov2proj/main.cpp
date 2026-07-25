@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
         qCritical("Cannot read covariance from: %s", qPrintable(covFile));
         return 1;
     }
-    printf("Read covariance: %d x %d channels\n", cov.dim, cov.dim);
+    qInfo("Read covariance: %d x %d channels" , cov.dim, cov.dim);
 
     // Get channel names
     QStringList chNames = cov.names;
@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
     VectorXd eigenvalues = eig.eigenvalues();
     MatrixXd eigenvectors = eig.eigenvectors();
 
-    printf("Eigenvalue range: %g .. %g\n",
+    qInfo("Eigenvalue range: %g .. %g" ,
            eigenvalues(0), eigenvalues(eigenvalues.size() - 1));
 
     // Select the top nProj eigenvectors (largest eigenvalues = most noise)
@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
         proj.data = data;
         projs.append(proj);
 
-        printf("  Projector %d: eigenvalue = %g\n", p + 1, eigenvalues(idx));
+        qInfo("  Projector %d: eigenvalue = %g" , p + 1, eigenvalues(idx));
     }
 
     // Write projectors to file
@@ -185,6 +185,6 @@ int main(int argc, char *argv[])
     stream->end_block(FIFFB_MNE);
     stream->end_file();
 
-    printf("Written %d projectors to: %s\n", nProj, qPrintable(outFile));
+    qInfo("Written %d projectors to: %s" , nProj, qPrintable(outFile));
     return 0;
 }

@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     int nSrc = G.cols();
     bool isFixed = fwd.isFixedOrient();
 
-    printf("Forward: %d channels x %d sources (%s orientation)\n",
+    qInfo("Forward: %d channels x %d sources (%s orientation)" ,
            nChan, nSrc, isFixed ? "fixed" : "free");
 
     // Compute sensitivity per source
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
     double maxSens = sensitivity.maxCoeff();
     if (maxSens > 0) sensitivity /= maxSens;
 
-    printf("Sensitivity range: %g .. %g (normalized)\n",
+    qInfo("Sensitivity range: %g .. %g (normalized)" ,
            sensitivity.minCoeff(), sensitivity.maxCoeff());
 
     // Write output
@@ -172,6 +172,6 @@ int main(int argc, char *argv[])
         out << s << " " << QString::number(sensitivity(s), 'g', 10) << "\n";
     outF.close();
 
-    printf("Written sensitivity map to: %s\n", qPrintable(outFile));
+    qInfo("Written sensitivity map to: %s" , qPrintable(outFile));
     return 0;
 }

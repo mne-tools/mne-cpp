@@ -111,9 +111,9 @@ int main(int argc, char *argv[])
     if (solFile.isEmpty())
         solFile = FwdBemModel::fwd_bem_make_bem_sol_name(bemFile);
 
-    printf("BEM model file:    %s\n", qPrintable(bemFile));
-    printf("BEM solution file: %s\n", qPrintable(solFile));
-    printf("BEM method:        %s\n",
+    qInfo("BEM model file:    %s" , qPrintable(bemFile));
+    qInfo("BEM solution file: %s" , qPrintable(solFile));
+    qInfo("BEM method:        %s" ,
            qPrintable(FwdBemModel::fwd_bem_explain_method(bemMethod)));
 
     // Determine how many layers we have
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     FwdBemModel::UPtr bemModel;
     bemModel = FwdBemModel::fwd_bem_load_three_layer_surfaces(bemFile);
     if (!bemModel) {
-        printf("Not a three-layer model, trying single-layer (homogeneous)...\n");
+        qInfo("Not a three-layer model, trying single-layer (homogeneous)...");
         bemModel = FwdBemModel::fwd_bem_load_homog_surface(bemFile);
     }
 
@@ -130,9 +130,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Loaded %d BEM surface(s)\n", bemModel->nsurf);
+    qInfo("Loaded %d BEM surface(s)" , bemModel->nsurf);
     for (int k = 0; k < bemModel->nsurf; ++k) {
-        printf("  Surface %d: %s  (%d vertices, %d triangles)\n",
+        qInfo("  Surface %d: %s  (%d vertices, %d triangles)" ,
                k + 1,
                qPrintable(FwdBemModel::fwd_bem_explain_surface(bemModel->surfs[k]->id)),
                bemModel->surfs[k]->np,
@@ -140,15 +140,15 @@ int main(int argc, char *argv[])
     }
 
     // Compute the BEM solution
-    printf("\nComputing BEM solution...\n");
+    qInfo("\nComputing BEM solution...");
     if (bemModel->fwd_bem_compute_solution(bemMethod) != 0) {
         qCritical("BEM solution computation failed.");
         return 1;
     }
-    printf("BEM solution computed successfully.\n");
+    qInfo("BEM solution computed successfully.");
 
     // Save the solution
-    printf("Writing solution to: %s\n", qPrintable(solFile));
+    qInfo("Writing solution to: %s" , qPrintable(solFile));
 
     QFile file(solFile);
     FiffStream::SPtr stream = FiffStream::start_file(file);
@@ -166,6 +166,6 @@ int main(int argc, char *argv[])
     stream->end_block(FIFFB_BEM);
     stream->end_file();
 
-    printf("BEM solution saved.\n");
+    qInfo("BEM solution saved.");
     return 0;
 }

@@ -112,7 +112,7 @@ static bool createBrainVisionFiles(const QString& nxeFile, const QString& baseNa
     vmrkOut << "Mk1=New Segment,,1,1,0\n";
     vmrk.close();
 
-    printf("Created Brain Vision header: %s\n", vhdrFile.toUtf8().constData());
+    qInfo("Created Brain Vision header: %s" , vhdrFile.toUtf8().constData());
     return true;
 }
 
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
         QStringList digArgs;
         digArgs << "--hpts" << digFile << "--fifout" << digFifFile;
 
-        printf("Converting digitizer data...\n");
+        qInfo("Converting digitizer data...");
         digProc.start("mne_convert_dig_data", digArgs);
         if (!digProc.waitForFinished(30000) || digProc.exitCode() != 0) {
             fprintf(stderr, "Warning: Failed to convert digitizer data. Proceeding without.\n");
@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
         bvArgs << "--dig" << digFifFile;
     }
 
-    printf("Converting to FIFF...\n");
+    qInfo("Converting to FIFF...");
     bvProc.start("mne_brain_vision2fiff", bvArgs);
     if (!bvProc.waitForFinished(60000)) {
         fprintf(stderr, "mne_brain_vision2fiff timed out.\n");
@@ -219,6 +219,6 @@ int main(int argc, char *argv[])
     if (!digFifFile.isEmpty())
         QFile::remove(digFifFile);
 
-    printf("Successfully converted eXimia data to: %s\n", outFile.toUtf8().constData());
+    qInfo("Successfully converted eXimia data to: %s" , outFile.toUtf8().constData());
     return 0;
 }

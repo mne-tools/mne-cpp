@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
             qCritical("Cannot find channel: %s", qPrintable(stiNames[i]));
             return 1;
         }
-        printf("Found %s at index %d\n", qPrintable(stiNames[i]), stiIndices[i]);
+        qInfo("Found %s at index %d" , qPrintable(stiNames[i]), stiIndices[i]);
     }
 
     int sti14Idx = findChannelByName(raw.info, "STI 014");
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
         qCritical("Cannot find STI 014 channel.");
         return 1;
     }
-    printf("Found STI 014 at index %d\n", sti14Idx);
+    qInfo("Found STI 014 at index %d" , sti14Idx);
 
     // Read all data
     MatrixXd data;
@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
             }
         }
     }
-    printf("STI 014 recomputed from STI 001-006.\n");
+    qInfo("STI 014 recomputed from STI 001-006.");
 
     // Write output
     QFile fileOut(outFile);
@@ -180,6 +180,6 @@ int main(int argc, char *argv[])
     }
     outStream->finish_writing_raw();
 
-    printf("Written fixed raw data to: %s\n", qPrintable(outFile));
+    qInfo("Written fixed raw data to: %s" , qPrintable(outFile));
     return 0;
 }

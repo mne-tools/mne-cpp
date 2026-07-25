@@ -170,13 +170,13 @@ int WatershedBem::run()
     //
     // Report parameters
     //
-    printf("\n");
-    printf("Running mri_watershed for BEM segmentation with the following parameters\n");
-    printf("\n");
-    printf("SUBJECTS_DIR = %s\n", qPrintable(m_settings.subjectsDir()));
-    printf("Subject      = %s\n", qPrintable(m_settings.subject()));
-    printf("Result dir   = %s\n", qPrintable(wsDir));
-    printf("\n");
+    qInfo("");
+    qInfo("Running mri_watershed for BEM segmentation with the following parameters");
+    qInfo("");
+    qInfo("SUBJECTS_DIR = %s" , qPrintable(m_settings.subjectsDir()));
+    qInfo("Subject      = %s" , qPrintable(m_settings.subject()));
+    qInfo("Result dir   = %s" , qPrintable(wsDir));
+    qInfo("");
 
     // Create output directory structure
     QString wsSubDir = wsDir + "/ws";
@@ -221,8 +221,8 @@ int WatershedBem::run()
         return 1;
     }
 
-    printf("Created %s\n", qPrintable(headFif));
-    printf("\nComplete.\n\n");
+    qInfo("Created %s" , qPrintable(headFif));
+    qInfo("\nComplete.\n");
     return 0;
 }
 
@@ -273,7 +273,7 @@ bool WatershedBem::runMriWatershed(const QString& mriInput, const QString& wsDir
     for (const QString& arg : args) {
         printf(" %s", qPrintable(arg));
     }
-    printf("\n\n");
+    qInfo("\n");
 
     //
     // Execute mri_watershed
@@ -353,7 +353,7 @@ bool WatershedBem::convertSurfaces(const QString& wsDir, const QString& mgzFile)
         }
 
         if (m_settings.verbose()) {
-            printf("Verifying surface: %s\n", qPrintable(surfPath));
+            qInfo("Verifying surface: %s" , qPrintable(surfPath));
         }
 
         // Read surface to verify it is valid
@@ -362,7 +362,7 @@ bool WatershedBem::convertSurfaces(const QString& wsDir, const QString& mgzFile)
         if (surf.rr().rows() == 0) {
             qWarning() << "FsSurface" << surfPath << "has no vertices.";
         } else if (m_settings.verbose()) {
-            printf("  %d vertices, %d triangles\n", (int)surf.rr().rows(), (int)surf.tris().rows());
+            qInfo("  %d vertices, %d triangles" , (int)surf.rr().rows(), (int)surf.tris().rows());
         }
     }
 
@@ -392,7 +392,7 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
         return false;
     }
 
-    printf("Read surface: %d vertices, %d triangles\n",
+    qInfo("Read surface: %d vertices, %d triangles" ,
            (int)fsSurface.rr().rows(), (int)fsSurface.tris().rows());
 
     //

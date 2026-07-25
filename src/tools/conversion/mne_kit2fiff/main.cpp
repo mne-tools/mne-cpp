@@ -161,7 +161,7 @@ static bool parseSqdHeader(const QString &sqdPath, KitDatasetInfo &info)
     if (info.dataOffset <= 0)
         info.dataOffset = KIT_HEADER_SIZE;
 
-    printf("KIT dataset: system=%d, %d channels, %d samples, %.1f Hz\n",
+    qInfo("KIT dataset: system=%d, %d channels, %d samples, %.1f Hz" ,
            info.systemId, info.nChannels, info.nSamples, info.sfreq);
 
     // Initialize sensors with default info
@@ -219,7 +219,7 @@ static bool readSensorLayout(const QString &snsPath, KitDatasetInfo &info)
     }
 
     file.close();
-    printf("Read %d sensor positions from %s\n", count, qPrintable(snsPath));
+    qInfo("Read %d sensor positions from %s" , count, qPrintable(snsPath));
     return true;
 }
 
@@ -234,7 +234,7 @@ static bool computeDevHeadTransform(const QString &hpiPath, FiffCoordTrans &tran
     // Or alternating lines: device_x device_y device_z head_x head_y head_z
     QFile file(hpiPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        printf("Warning: Cannot open HPI file: %s\n", qPrintable(hpiPath));
+        qInfo("Warning: Cannot open HPI file: %s" , qPrintable(hpiPath));
         return false;
     }
 
@@ -275,7 +275,7 @@ static bool computeDevHeadTransform(const QString &hpiPath, FiffCoordTrans &tran
 
     int nPts = std::min(devicePts.size(), headPts.size());
     if (nPts < 3) {
-        printf("Warning: Need at least 3 HPI points, got %d\n", nPts);
+        qInfo("Warning: Need at least 3 HPI points, got %d" , nPts);
         return false;
     }
 
@@ -341,7 +341,7 @@ static bool computeDevHeadTransform(const QString &hpiPath, FiffCoordTrans &tran
         rms += (fitted - headPts[i]).squaredNorm();
     }
     rms = sqrt(rms / nPts);
-    printf("HPI alignment: %d points, RMS error: %.2f mm\n", nPts, rms * 1000.0);
+    qInfo("HPI alignment: %d points, RMS error: %.2f mm" , nPts, rms * 1000.0);
 
     return true;
 }
@@ -377,7 +377,7 @@ static bool readSqdData(const QString &sqdPath, const KitDatasetInfo &info, Matr
     }
 
     file.close();
-    printf("Read %d channels x %d samples\n", nChan, nSamp);
+    qInfo("Read %d channels x %d samples" , nChan, nSamp);
     return true;
 }
 
@@ -527,7 +527,7 @@ int main(int argc, char *argv[])
     }
 
     stream->finish_writing_raw();
-    printf("Written FIFF: %s (%d channels, %d samples, %.1f Hz)\n",
+    qInfo("Written FIFF: %s (%d channels, %d samples, %.1f Hz)" ,
            qPrintable(outFile), nChan, nSamples, info.sfreq);
 
     return 0;

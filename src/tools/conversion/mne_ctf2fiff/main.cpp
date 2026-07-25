@@ -165,7 +165,7 @@ static bool parseRes4(CtfDatasetInfo &info)
     // Skip header identifier (8 bytes: "MEG41RS" or "MEG42RS")
     char headerTag[9] = {0};
     ds.readRawData(headerTag, 8);
-    printf("Res4 tag: %s\n", headerTag);
+    qInfo("Res4 tag: %s" , headerTag);
 
     // Skip appName (256 bytes), DataOrigin (256 bytes), DataDescription (256 bytes)
     ds.skipRawData(256 + 256 + 256);
@@ -209,7 +209,7 @@ static bool parseRes4(CtfDatasetInfo &info)
             info.nSamples = static_cast<int>(epochTime * info.sfreq);
     }
 
-    printf("Res4: %d channels, %d samples/trial, %d trials, %.1f Hz\n",
+    qInfo("Res4: %d channels, %d samples/trial, %d trials, %.1f Hz" ,
            info.nChannels, info.nSamples, info.nTrials, info.sfreq);
 
     // Seek to sensor records (at fixed offset after general header)
@@ -318,7 +318,7 @@ static bool readMeg4Data(const CtfDatasetInfo &info, MatrixXd &data)
     }
 
     file.close();
-    printf("Read %d channels x %d samples\n", nChan, totalSamples);
+    qInfo("Read %d channels x %d samples" , nChan, totalSamples);
     return true;
 }
 
@@ -442,9 +442,9 @@ int main(int argc, char *argv[])
     }
     info.meg4Path = dsDir.filePath(meg4Files.first());
 
-    printf("CTF dataset: %s\n", qPrintable(dsPath));
-    printf("  res4: %s\n", qPrintable(info.res4Path));
-    printf("  meg4: %s\n", qPrintable(info.meg4Path));
+    qInfo("CTF dataset: %s" , qPrintable(dsPath));
+    qInfo("  res4: %s" , qPrintable(info.res4Path));
+    qInfo("  meg4: %s" , qPrintable(info.meg4Path));
 
     // Parse res4 header
     if (!parseRes4(info))
@@ -497,7 +497,7 @@ int main(int argc, char *argv[])
     }
 
     stream->finish_writing_raw();
-    printf("Written FIFF: %s (%d channels, %d samples, %.1f Hz)\n",
+    qInfo("Written FIFF: %s (%d channels, %d samples, %.1f Hz)" ,
            qPrintable(outFile), nChan, nSamples, info.sfreq);
 
     return 0;

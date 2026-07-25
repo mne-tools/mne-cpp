@@ -75,15 +75,15 @@ using namespace UTILSLIB;
 
 static void printTransform(const FiffCoordTrans &t)
 {
-    printf("%s -> %s transform:\n",
+    qInfo("%s -> %s transform:" ,
            qPrintable(FiffCoordTrans::frame_name(t.from)),
            qPrintable(FiffCoordTrans::frame_name(t.to)));
     for (int i = 0; i < 3; i++) {
-        printf("  %10.6f %10.6f %10.6f  %10.4f mm\n",
+        qInfo("  %10.6f %10.6f %10.6f  %10.4f mm" ,
                t.trans(i, 0), t.trans(i, 1), t.trans(i, 2),
                1000.0f * t.trans(i, 3));
     }
-    printf("\n");
+    qInfo("");
 }
 
 //=============================================================================================================

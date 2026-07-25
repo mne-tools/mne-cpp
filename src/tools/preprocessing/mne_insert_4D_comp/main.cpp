@@ -188,7 +188,7 @@ static bool readRefData(const QString& filename, MatrixXf& refData, int& nChanne
         }
     }
 
-    printf("Read reference data: %d channels x %d samples\n", nChannels, nSamples);
+    qInfo("Read reference data: %d channels x %d samples" , nChannels, nSamples);
     return true;
 }
 
@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
     QFile fIn(inFile);
     FiffRawData raw(fIn);
     if (!raw.info.isEmpty()) {
-        printf("Read input: %d channels at %.1f Hz\n",
+        qInfo("Read input: %d channels at %.1f Hz" ,
                raw.info.nchan, raw.info.sfreq);
     } else {
         fprintf(stderr, "Failed to read input FIFF: %s\n", inFile.toUtf8().constData());
@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
                           static_cast<int>(megPos.rows()));
         if (nMatch >= 3) {
             alignTransform = procrustes(refPos.topRows(nMatch), megPos.topRows(nMatch));
-            printf("Computed Procrustes alignment from %d matching points\n", nMatch);
+            qInfo("Computed Procrustes alignment from %d matching points" , nMatch);
         }
     }
 
@@ -374,7 +374,7 @@ int main(int argc, char *argv[])
     outStream->end_block(FIFFB_MEAS);
     outStream->end_file();
 
-    printf("Wrote merged FIFF: %d channels (%d original + %d reference) to %s\n",
+    qInfo("Wrote merged FIFF: %d channels (%d original + %d reference) to %s" ,
            totalCh, raw.info.nchan, nRefCh, outFile.toUtf8().constData());
 
     return 0;

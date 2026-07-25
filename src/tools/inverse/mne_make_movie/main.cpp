@@ -325,7 +325,7 @@ int main(int argc, char *argv[])
                 qCritical("Cannot read LH STC from: %s", qPrintable(lhFile));
                 return 1;
             }
-            printf("Read LH STC: %d sources x %d time points (tmin=%.3f, tstep=%.6f)\n",
+            qInfo("Read LH STC: %d sources x %d time points (tmin=%.3f, tstep=%.6f)" ,
                    static_cast<int>(stcLH.data.rows()), static_cast<int>(stcLH.data.cols()),
                    stcLH.tmin, stcLH.tstep);
         }
@@ -336,7 +336,7 @@ int main(int argc, char *argv[])
                 qCritical("Cannot read RH STC from: %s", qPrintable(rhFile));
                 return 1;
             }
-            printf("Read RH STC: %d sources x %d time points\n",
+            qInfo("Read RH STC: %d sources x %d time points" ,
                    static_cast<int>(stcRH.data.rows()), static_cast<int>(stcRH.data.cols()));
         }
 
@@ -373,7 +373,7 @@ int main(int argc, char *argv[])
         }
 
         FiffEvoked evoked = evokedSet.evoked[setNo];
-        printf("Computing inverse: %s, SNR=%.1f, lambda2=%.4f\n",
+        qInfo("Computing inverse: %s, SNR=%.1f, lambda2=%.4f" ,
                qPrintable(method), snr, lambda2);
 
         InvMinimumNorm minimumNorm(invOp, lambda2, method);
@@ -388,7 +388,7 @@ int main(int argc, char *argv[])
             subject = "sample";
         }
 
-        printf("Computed STC: %d sources x %d time points\n",
+        qInfo("Computed STC: %d sources x %d time points" ,
                static_cast<int>(stcLH.data.rows()), static_cast<int>(stcLH.data.cols()));
     } else {
         qCritical("Provide either --stcin or both --inv and --meas.");
@@ -432,7 +432,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        printf("Extracting label time course for %lld vertices\n",
+        qInfo("Extracting label time course for %lld vertices" ,
                static_cast<long long>(label.vertices.size()));
 
         QFile outFile(labelOutFile);
@@ -458,7 +458,7 @@ int main(int argc, char *argv[])
         }
 
         outFile.close();
-        printf("Written label time course to: %s\n", qPrintable(labelOutFile));
+        qInfo("Written label time course to: %s" , qPrintable(labelOutFile));
     }
 
     //=========================================================================
@@ -467,8 +467,8 @@ int main(int argc, char *argv[])
     QString pngPrefix = parser.value(pngOpt);
 
     if (pngPrefix.isEmpty()) {
-        printf("No --png specified; skipping frame rendering.\n");
-        printf("Use --png <prefix> to export image frames.\n");
+        qInfo("No --png specified; skipping frame rendering.");
+        qInfo("Use --png <prefix> to export image frames.");
         return 0;
     }
 
@@ -489,14 +489,14 @@ int main(int argc, char *argv[])
             qCritical("Cannot read surface: %s", qPrintable(surfPath));
             return;
         }
-        printf("Loaded surface %s: %d vertices, %d triangles\n",
+        qInfo("Loaded surface %s: %d vertices, %d triangles" ,
                qPrintable(surfPath), static_cast<int>(surf.rr().rows()),
                static_cast<int>(surf.tris().rows()));
 
         // Select the appropriate STC for this hemisphere
         const InvSourceEstimate& hemiStc = (hemi == "lh") ? stcLH : stcRH;
         if (hemiStc.isEmpty()) {
-            printf("No STC data for %s hemisphere, skipping.\n", qPrintable(hemi));
+            qInfo("No STC data for %s hemisphere, skipping." , qPrintable(hemi));
             return;
         }
 
@@ -535,9 +535,9 @@ int main(int argc, char *argv[])
     if (doLH) renderHemi("lh");
     if (doRH) renderHemi("rh");
 
-    printf("Exported %d frame(s) to %s-*.png\n", frameCount, qPrintable(pngPrefix));
-    printf("\nTo create a movie, use:\n");
-    printf("  ffmpeg -framerate 24 -i %s-lh-%%05d.png -c:v libx264 -pix_fmt yuv420p movie.mp4\n",
+    qInfo("Exported %d frame(s) to %s-*.png" , frameCount, qPrintable(pngPrefix));
+    qInfo("\nTo create a movie, use:");
+    qInfo("  ffmpeg -framerate 24 -i %s-lh-%%05d.png -c:v libx264 -pix_fmt yuv420p movie.mp4" ,
            qPrintable(pngPrefix));
 
     return 0;

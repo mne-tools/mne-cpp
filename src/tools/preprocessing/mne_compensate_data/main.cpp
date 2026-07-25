@@ -114,11 +114,11 @@ int main(int argc, char *argv[])
     }
 
     qint32 currentComp = raw.info.get_current_comp();
-    printf("Current compensation grade: %d\n", currentComp);
-    printf("Desired compensation grade: %d\n", grade);
+    qInfo("Current compensation grade: %d" , currentComp);
+    qInfo("Desired compensation grade: %d" , grade);
 
     if (currentComp == grade) {
-        printf("Data already at desired compensation grade. No changes needed.\n");
+        qInfo("Data already at desired compensation grade. No changes needed.");
         // Just copy the file
         QFile::copy(inFile, outFile);
         return 0;
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
         qCritical("Cannot create compensator from grade %d to %d", currentComp, grade);
         return 1;
     }
-    printf("Compensation matrix created (%d -> %d)\n", currentComp, grade);
+    qInfo("Compensation matrix created (%d -> %d)" , currentComp, grade);
 
     // Read all data
     MatrixXd data;
@@ -140,11 +140,11 @@ int main(int argc, char *argv[])
         qCritical("Cannot read raw data segment");
         return 1;
     }
-    printf("Read %d channels x %d samples\n", (int)data.rows(), (int)data.cols());
+    qInfo("Read %d channels x %d samples" , (int)data.rows(), (int)data.cols());
 
     // Apply compensation
     data = comp.data->data.cast<double>() * data;
-    printf("Compensation applied.\n");
+    qInfo("Compensation applied.");
 
     // Update compensation info
     raw.info.set_current_comp(grade);
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
     }
 
     outStream->finish_writing_raw();
-    printf("Written compensated data to: %s\n", qPrintable(outFile));
+    qInfo("Written compensated data to: %s" , qPrintable(outFile));
 
     return 0;
 }

@@ -135,17 +135,17 @@ static bool isCompleteSurface(const MNEBemSurface& surf)
         cm += surf.rr.row(k).transpose();
     cm /= static_cast<float>(surf.np);
 
-    printf("%s CM is %6.2f %6.2f %6.2f mm\n",
+    qInfo("%s CM is %6.2f %6.2f %6.2f mm" ,
            qPrintable(nameOf(surf.id)),
            1000.0f * cm(0), 1000.0f * cm(1), 1000.0f * cm(2));
 
     double totAngle = sumSolids(cm, surf) / (4.0 * M_PI);
     if (fabs(totAngle - 1.0) > 1e-5) {
-        printf("Surface %s is NOT complete (solid angle = %g * 4*PI instead of 1.0)\n",
+        qInfo("Surface %s is NOT complete (solid angle = %g * 4*PI instead of 1.0)" ,
                qPrintable(nameOf(surf.id)), totAngle);
         return false;
     }
-    printf("Surface %s is complete.\n", qPrintable(nameOf(surf.id)));
+    qInfo("Surface %s is complete." , qPrintable(nameOf(surf.id)));
     return true;
 }
 
@@ -162,10 +162,10 @@ static bool checkNesting(const QVector<MNEBemSurface>& surfs)
         Vector3f pt = surfs[j + 1].rr.row(0);
         double totAngle = sumSolids(pt, surfs[j]) / (4.0 * M_PI);
         if (fabs(totAngle - 1.0) > 1e-5) {
-            printf("[FAILED]\n");
+            qInfo("[FAILED]");
             return false;
         }
-        printf("[OK]\n");
+        qInfo("[OK]");
     }
     return true;
 }
@@ -184,7 +184,7 @@ static void reportTriangleAreas(const MNEBemSurface& surf, const QString& name)
         if (area > maxArea) maxArea = area;
         totalArea += area;
     }
-    printf("%s: %d triangles, area %7.1f ... %7.1f mm^2 (total %10.1f mm^2)\n",
+    qInfo("%s: %d triangles, area %7.1f ... %7.1f mm^2 (total %10.1f mm^2)" ,
            qPrintable(name), surf.ntri,
            1e6 * minArea, 1e6 * maxArea, 1e6 * totalArea);
 }
@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
             qCritical("Cannot read BEM from: %s", qPrintable(bemFile));
             return 1;
         }
-        printf("Read %d surfaces from %s\n\n", bem.size(), qPrintable(bemFile));
+        qInfo("Read %d surfaces from %s\n" , bem.size(), qPrintable(bemFile));
         for (int i = 0; i < bem.size(); ++i)
             surfs.append(bem[i]);
     } else {
@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
         bemSurf.nn = surface.nn();
         bemSurf.coord_frame = FIFFV_COORD_MRI;
         surfs.append(bemSurf);
-        printf("Read surface: %s (%d vertices, %d triangles)\n\n",
+        qInfo("Read surface: %s (%d vertices, %d triangles)\n" ,
                qPrintable(surfFile), bemSurf.np, bemSurf.ntri);
     }
 
@@ -283,7 +283,7 @@ int main(int argc, char *argv[])
             allOk = false;
         reportTriangleAreas(surfs[k], nameOf(surfs[k].id));
     }
-    printf("\n");
+    qInfo("");
 
     // Check nesting if multiple surfaces
     if (surfs.size() > 1) {
@@ -293,10 +293,10 @@ int main(int argc, char *argv[])
 
     // Check inter-surface distances
     if (doThickness && surfs.size() > 1) {
-        printf("\n");
+        qInfo("");
         for (int k = 0; k < surfs.size() - 1; ++k) {
             float dist = minSurfaceDist(surfs[k], surfs[k + 1]);
-            printf("Minimum distance between %s and %s: %6.1f mm\n",
+            qInfo("Minimum distance between %s and %s: %6.1f mm" ,
                    qPrintable(nameOf(surfs[k].id)),
                    qPrintable(nameOf(surfs[k + 1].id)),
                    1000.0f * dist);
@@ -304,9 +304,9 @@ int main(int argc, char *argv[])
     }
 
     if (allOk)
-        printf("\nAll surface checks passed.\n");
+        qInfo("\nAll surface checks passed.");
     else
-        printf("\nSome surface checks FAILED.\n");
+        qInfo("\nSome surface checks FAILED.");
 
     return allOk ? 0 : 1;
 }

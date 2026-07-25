@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Read %d source spaces\n", nspace);
+    qInfo("Read %d source spaces" , nspace);
 
     //
     // Read source estimate data
@@ -234,14 +234,14 @@ int main(int argc, char *argv[])
             return 1;
         }
         values = stcData.col(tpoint);
-        printf("Read STC: %ld vertices, %ld time points, using tpoint %d\n",
+        qInfo("Read STC: %ld vertices, %ld time points, using tpoint %d" ,
                static_cast<long>(stcData.rows()), static_cast<long>(stcData.cols()), tpoint);
     } else {
         if (!readWFile(wFile, values, vertices)) {
             fprintf(stderr, "Failed to read w file.\n");
             return 1;
         }
-        printf("Read W: %ld vertices\n", static_cast<long>(values.size()));
+        qInfo("Read W: %ld vertices" , static_cast<long>(values.size()));
     }
 
     //
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
                     << vertValues(i) << "\n";
             }
         }
-        printf("Wrote %d non-zero vertex values to %s\n",
+        qInfo("Wrote %d non-zero vertex values to %s" ,
                nonZero, outFile.toUtf8().constData());
         break;
     }

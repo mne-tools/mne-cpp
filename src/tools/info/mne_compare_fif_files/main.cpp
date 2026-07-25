@@ -153,9 +153,9 @@ int main(int argc, char *argv[])
     const QList<FiffDirEntry::SPtr>& dir1 = stream1->dir();
     const QList<FiffDirEntry::SPtr>& dir2 = stream2->dir();
 
-    printf("File 1: %s (%d directory entries)\n", qPrintable(file1), (int)dir1.size());
-    printf("File 2: %s (%d directory entries)\n", qPrintable(file2), (int)dir2.size());
-    printf("\n");
+    qInfo("File 1: %s (%d directory entries)" , qPrintable(file1), (int)dir1.size());
+    qInfo("File 2: %s (%d directory entries)" , qPrintable(file2), (int)dir2.size());
+    qInfo("");
 
     int nMatch = 0, nDiff = 0, nMissing = 0;
     int minEntries = (int)std::min(dir1.size(), dir2.size());
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
         if (isMatch) {
             nMatch++;
             if (verbose)
-                printf("  [%4d] %s : MATCH (size=%d)\n",
+                qInfo("  [%4d] %s : MATCH (size=%d)" ,
                        i, qPrintable(tagName(dir1[i]->kind)), dir1[i]->size);
         } else {
             nDiff++;
@@ -191,21 +191,21 @@ int main(int argc, char *argv[])
             if (!typeMatch) printf(" type=%d vs %d", dir1[i]->type, dir2[i]->type);
             if (!sizeMatch) printf(" size=%d vs %d", dir1[i]->size, dir2[i]->size);
             if (sizeMatch && !dataMatch) printf(" DATA_DIFFERS");
-            printf("\n");
+            qInfo("");
         }
     }
 
     if (dir1.size() != dir2.size()) {
         nMissing = (int)abs(dir1.size() - dir2.size());
-        printf("\n  File %s has %d extra directory entries.\n",
+        qInfo("\n  File %s has %d extra directory entries." ,
                dir1.size() > dir2.size() ? "1" : "2", nMissing);
     }
 
-    printf("\nSummary: %d matching, %d different, %d extra entries\n",
+    qInfo("\nSummary: %d matching, %d different, %d extra entries" ,
            nMatch, nDiff, nMissing);
 
     bool identical = (nDiff == 0 && nMissing == 0);
-    printf("Files are %s.\n", identical ? "IDENTICAL" : "DIFFERENT");
+    qInfo("Files are %s." , identical ? "IDENTICAL" : "DIFFERENT");
 
     stream1->close();
     stream2->close();
