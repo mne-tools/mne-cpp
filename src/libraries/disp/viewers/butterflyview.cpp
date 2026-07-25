@@ -173,23 +173,25 @@ const QColor& ButterflyView::getBackgroundColor()
 
 void ButterflyView::takeScreenshot(const QString& fileName)
 {
+    //
+    // The curves are drawn by the render pass on the GPU, so QWidget::render()
+    // would produce an empty frame here: it only replays the CPU paint path.
+    // Ask the RHI for the rendered framebuffer instead.
+    //
+    const QImage frame = grabFramebuffer();
+
     if(fileName.contains(".svg", Qt::CaseInsensitive)) {
-        // Generate screenshot
         QSvgGenerator svgGen;
         svgGen.setFileName(fileName);
         svgGen.setSize(this->size());
         svgGen.setViewBox(this->rect());
 
-        QWidget::render(&svgGen);
+        QPainter painter(&svgGen);
+        painter.drawImage(this->rect(), frame);
     }
 
     if(fileName.contains(".png", Qt::CaseInsensitive)) {
-        QImage image(this->size(), QImage::Format_ARGB32);
-        image.fill(Qt::transparent);
-
-        QPainter painter(&image);
-        QWidget::render(&painter);
-        image.save(fileName);
+        frame.save(fileName);
     }
 }
 
