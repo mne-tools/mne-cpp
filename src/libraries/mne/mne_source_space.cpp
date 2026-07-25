@@ -45,7 +45,11 @@
 #include <cstring>
 #include <memory>
 
+// MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
+// so define it here only for the toolchains that do not.
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <math.h>
 
 using FIFFLIB::FiffCoordTrans;
@@ -369,7 +373,7 @@ int read_next_tag(QFile &fp, int &tagp, long long &lenp, unsigned char *&datap)
  * Read the next tag in the file
  */
 {
-    int       ilen,tag;
+    int       ilen = 0, tag = 0;
     long long len;
 
     if (read_int(fp,tag) == FAIL) {
@@ -435,13 +439,13 @@ int read_curvature_file(const QString& fname,
 
 {
     QFile fp(fname);
-    int  magic;
+    int  magic = 0;
 
     float curvmin,curvmax;
     int   ncurv  = 0;
-    int   nface,val_pervert;
-    int   val,k;
-    float fval;
+    int   nface = 0, val_pervert = 0;
+    int   val = 0, k;
+    float fval = 0.0f;
 
     if (!fp.open(QIODevice::ReadOnly)) {
         qCritical() << fname;
@@ -534,15 +538,15 @@ int read_triangle_file(const QString& fname,
       */
 {
     QFile fp(fname);
-    int  magic;
+    int  magic = 0;
     char c;
 
-    qint32  nvert,ntri,nquad;
+    qint32  nvert = 0, ntri = 0, nquad = 0;
     PointsT    vert;
     TrianglesT tri;
     int   k,p;
     int   quad[4];
-    int   val;
+    int   val = 0;
     int   which;
 
     if (!fp.open(QIODevice::ReadOnly)) {

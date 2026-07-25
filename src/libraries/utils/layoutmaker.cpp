@@ -27,7 +27,11 @@
 #include <math/simplex_algorithm.h>
 #include <math/sphere.h>
 
+// MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
+// so define it here only for the toolchains that do not.
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <math.h>
 #include <iostream>
 
@@ -226,7 +230,9 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float> > &inputPoints
     float       rad,th,phi;
 
     float       xmin,xmax,ymin,ymax;
-    int         nchan = inputPoints.size();
+    // std::vector::size() is size_t; the channel count is used as an Eigen
+    // index and compared against int loop counters throughout.
+    int         nchan = static_cast<int>(inputPoints.size());
 
     MatrixXf rrs(nchan,3);
     VectorXf xx(nchan);

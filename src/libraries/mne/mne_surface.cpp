@@ -32,7 +32,11 @@
 #include <QFile>
 #include <QDebug>
 
+// MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
+// so define it here only for the toolchains that do not.
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <math.h>
 
 #include <Eigen/Dense>

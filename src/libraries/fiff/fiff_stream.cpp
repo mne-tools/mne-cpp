@@ -2550,7 +2550,10 @@ fiff_long_t FiffStream::write_cov(const FiffCov &p_FiffCov)
             qint32 dim = p_FiffCov.dim;
             qint32 n = dim*(dim+1)/2;
 
-            VectorXd vals(n);
+            // The loop below writes all n entries, but that is not provable at
+            // compile time, so start from a defined state rather than passing a
+            // possibly-uninitialised buffer to write_double.
+            VectorXd vals = VectorXd::Zero(n);
             qint32 count = 0;
             for(qint32 i = 0; i < dim; ++i)
                 for(qint32 j = 0; j <= i; ++j)
