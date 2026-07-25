@@ -231,7 +231,7 @@ int MNEMshDisplaySurfaceSet::add_bem_surface(const QString&       filepath,
 
 void MNEMshDisplaySurfaceSet::add_replace_surface(std::unique_ptr<MNEMshDisplaySurface> newSurf,
                                                    bool                  replace,
-                                                   bool                  drawable)
+                                                   bool                  isDrawable)
 {
     if (replace) {
         for (int k = 0; k < nsurf; k++) {
@@ -240,7 +240,7 @@ void MNEMshDisplaySurfaceSet::add_replace_surface(std::unique_ptr<MNEMshDisplayS
                 newSurf->transparent   = surf->transparent;
                 newSurf->show_aux_data = surf->show_aux_data;
                 surfs[k] = std::move(newSurf);
-                if (!drawable) {
+                if (!isDrawable) {
                     active[k]   = false;
                     this->drawable[k] = false;
                 }
@@ -254,8 +254,8 @@ void MNEMshDisplaySurfaceSet::add_replace_surface(std::unique_ptr<MNEMshDisplayS
         patch_rot.push_back(0.0f);
         active.conservativeResize(nsurf+1);
         this->drawable.conservativeResize(nsurf+1);
-        active[nsurf]    = drawable;
-        this->drawable[nsurf]  = drawable;
+        active[nsurf]    = isDrawable;
+        this->drawable[nsurf]  = isDrawable;
         nsurf++;
     }
 }

@@ -128,7 +128,7 @@ public:
      */
     void add_replace_surface(std::unique_ptr<MNEMshDisplaySurface> newSurf,
                              bool                  replace,
-                             bool                  drawable);
+                             bool                  isDrawable);
 
 
 

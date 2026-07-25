@@ -173,7 +173,7 @@ public:
      *
      * @return Number of affecting projection vectors (0 if none or nch == 0).
      */
-    int affect_chs(const QList<FIFFLIB::FiffChInfo> &chs, int nch);
+    int affect_chs(const QList<FIFFLIB::FiffChInfo> &chs, int nChan);
 
     /**
      * Apply the compiled projection operator to a data vector in-place.

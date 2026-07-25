@@ -188,7 +188,7 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
                                         Eigen::Vector3f& scales)
 {
     int   k,ndig,nhead;
-    float simplex_size = 2e-2;
+    float simplex_size = 2e-2f;
     Eigen::VectorXf r0(3);
     float Rdig,Rscalp;
 
@@ -279,7 +279,7 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
     if (dig.dist_valid)
         return ;
 
-    PointsT rr(dig.npoint, 3);
+    PointsT digPoints(dig.npoint, 3);
 
     dig.dist.conservativeResize(dig.npoint);
     if (dig.closest.size() == 0) {
@@ -296,8 +296,8 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
     for (k = 0, nactive = 0; k < dig.npoint; k++) {
         if ((dig.active[k] && !dig.discard[k]) || do_all) {
             point = dig.points.at(k);
-            rr.row(nactive) = Eigen::Map<const Eigen::RowVector3f>(point.r);
-            FiffCoordTrans::apply_trans(rr.row(nactive).data(),t,FIFFV_MOVE);
+            digPoints.row(nactive) = Eigen::Map<const Eigen::RowVector3f>(point.r);
+            FiffCoordTrans::apply_trans(digPoints.row(nactive).data(),t,FIFFV_MOVE);
             if (do_approx) {
                 closest[nactive] = dig.closest(k);
                 if (closest[nactive] < 0)
@@ -309,7 +309,7 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
         }
     }
 
-    find_closest_on_surface_approx(rr,nactive,closest,dists,nstep);
+    find_closest_on_surface_approx(digPoints,nactive,closest,dists,nstep);
     /*
      * Project the points on the triangles
      */
@@ -320,7 +320,7 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
             dig.dist(k)    = dists[nactive];
             dig.closest(k) = closest[nactive];
             {
-                Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(rr.row(nactive).data());
+                Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(digPoints.row(nactive).data());
                 Eigen::Vector3f proj = project_to_triangle(dig.closest(k),pt);
                 dig.closest_point.row(k) = proj.transpose();
             }
@@ -329,7 +329,7 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
             * We need to use the solid angle criterion to decide the sign reliably
             */
             if (!do_approx && false) {
-                Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(rr.row(nactive).data());
+                Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(digPoints.row(nactive).data());
                 if (sum_solids(pt)/(4*M_PI) > 0.9)
                     dig.dist(k) = - std::fabs(dig.dist(k));
                 else
@@ -363,7 +363,7 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
     int             k,nactive;
     FiffDigPoint    point;
     FiffCoordTrans t;
-    float           max_diff = 40e-3;
+    float           max_diff = 40e-3f;
 
     if (!dig.head_mri_t_adj) {
         qCritical()<<"Not adjusting the transformation";

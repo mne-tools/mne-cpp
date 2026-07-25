@@ -511,7 +511,7 @@ int MNECovMatrix::decompose_eigen_small(float p_small, int use_rank)
           */
 {
     int   k,p,rank;
-    float rank_threshold = 1e-6;
+    float rank_threshold = 1e-6f;
 
     if (p_small < 0)
         p_small = 1.0;

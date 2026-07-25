@@ -303,7 +303,7 @@ MNECTFCompDataSet::MNECTFCompDataSet(const MNECTFCompDataSet &set)
         for (int k = 0; k < set.ncomp; k++)
             if(set.comps[k])
                 this->comps.push_back(std::make_unique<MNECTFCompData>(*set.comps[k]));
-        this->ncomp = this->comps.size();
+        this->ncomp = static_cast<int>(this->comps.size());
     }
 
     this->chs = set.chs;
@@ -434,15 +434,15 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
 
 //=============================================================================================================
 
-int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
-                                 int nch,
+int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chList,
+                                 int nChan,
                                  QList<FiffChInfo> compchs,
-                                 int ncomp)      /* How many of these */
+                                 int nCompChan)      /* How many of these */
 /*
      * Make compensation data to apply to a set of channels to yield (or uncompensated) compensated data
      */
 {
-    Eigen::VectorXi comps;
+    Eigen::VectorXi compGrades;
     int need_comp;
     int first_comp;
     MNECTFCompData* this_comp;
@@ -458,22 +458,22 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
     QStringList emptyList;
 
     if (compchs.isEmpty()) {
-        compchs = chs;
-        ncomp   = nch;
+        compchs   = chList;
+        nCompChan = nChan;
     }
     qInfo("Setting up compensation data...\n");
-    if (nch == 0)
+    if (nChan == 0)
         return OK;
     current.reset();
-    comps.resize(nch);
-    for (k = 0, need_comp = 0, first_comp = MNE_CTFV_COMP_NONE; k < nch; k++) {
-        if (chs[k].kind == FIFFV_MEG_CH) {
-            comps[k] = chs[k].chpos.coil_type >> 16;
-            if (comps[k] != MNE_CTFV_COMP_NONE) {
+    compGrades.resize(nChan);
+    for (k = 0, need_comp = 0, first_comp = MNE_CTFV_COMP_NONE; k < nChan; k++) {
+        if (chList[k].kind == FIFFV_MEG_CH) {
+            compGrades[k] = chList[k].chpos.coil_type >> 16;
+            if (compGrades[k] != MNE_CTFV_COMP_NONE) {
                 if (first_comp == MNE_CTFV_COMP_NONE)
-                    first_comp = comps[k];
+                    first_comp = compGrades[k];
                 else {
-                    if (comps[k] != first_comp) {
+                    if (compGrades[k] != first_comp) {
                         qCritical("We do not support nonuniform compensation yet.");
                         return FAIL;
                     }
@@ -482,13 +482,13 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
             }
         }
         else
-            comps[k] = MNE_CTFV_COMP_NONE;
+            compGrades[k] = MNE_CTFV_COMP_NONE;
     }
     if (need_comp == 0) {
         qInfo("\tNo compensation set. Nothing more to do.\n");
         return OK;
     }
-    qInfo("\t%d out of %d channels have the compensation set.\n",need_comp,nch);
+    qInfo("\t%d out of %d channels have the compensation set.\n",need_comp,nChan);
     /*
         * Find the desired compensation data matrix
         */
@@ -511,7 +511,7 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
     for (k = 0; k < this_comp->data->ncol; k++) {
         comp_sel[k] = -1;
         name = this_comp->data->collist[k];
-        for (p = 0; p < ncomp; p++)
+        for (p = 0; p < nCompChan; p++)
             if (QString::compare(name,compchs[p].ch_name) == 0) {
                 comp_sel[k] = p;
                 break;
@@ -526,7 +526,7 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
         * Create the preselector
         */
     {
-        Eigen::MatrixXf sel = Eigen::MatrixXf::Zero(this_comp->data->ncol, ncomp);
+        Eigen::MatrixXf sel = Eigen::MatrixXf::Zero(this_comp->data->ncol, nCompChan);
         for (j = 0; j < this_comp->data->ncol; j++)
             sel(j, comp_sel[j]) = 1.0f;
         presel = mne_convert_to_sparse(sel, FIFFTS_MC_RCS, 1e-30f);
@@ -537,9 +537,9 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
     /*
      * Pick the desired channels
      */
-    for (k = 0; k < nch; k++) {
-        if (comps[k] != MNE_CTFV_COMP_NONE)
-            names.append(chs[k].ch_name);
+    for (k = 0; k < nChan; k++) {
+        if (compGrades[k] != MNE_CTFV_COMP_NONE)
+            names.append(chList[k].ch_name);
     }
 
     {
@@ -553,9 +553,9 @@ int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
         * Create the postselector
         */
     {
-        Eigen::MatrixXf sel = Eigen::MatrixXf::Zero(nch, data->nrow);
-        for (j = 0, p = 0; j < nch; j++) {
-            if (comps[j] != MNE_CTFV_COMP_NONE)
+        Eigen::MatrixXf sel = Eigen::MatrixXf::Zero(nChan, data->nrow);
+        for (j = 0, p = 0; j < nChan; j++) {
+            if (compGrades[j] != MNE_CTFV_COMP_NONE)
                 sel(j, p++) = 1.0f;
         }
         postsel = mne_convert_to_sparse(sel, FIFFTS_MC_RCS, 1e-30f);
@@ -826,7 +826,7 @@ QString MNECTFCompDataSet::explain_comp(int kind)
 //=============================================================================================================
 
 int MNECTFCompDataSet::set_compensation(int compensate_to,
-                                        QList<FiffChInfo>& chs,
+                                        QList<FiffChInfo>& chList,
                                         int nchan,
                                         QList<FiffChInfo> comp_chs,
                                         int ncomp_chan)     /* How many */
@@ -839,7 +839,7 @@ int MNECTFCompDataSet::set_compensation(int compensate_to,
     int comp_was = MNE_CTFV_COMP_UNKNOWN;
 
     if (comp_chs.isEmpty()) {
-        comp_chs = chs;
+        comp_chs = chList;
         ncomp_chan = nchan;
     }
     undo.reset();
@@ -854,7 +854,7 @@ int MNECTFCompDataSet::set_compensation(int compensate_to,
     /*
         * Update the 'current' field to reflect the compensation possibly present in the data now
         */
-    if (make_comp(chs,nchan,comp_chs,ncomp_chan) == FAIL)
+    if (make_comp(chList,nchan,comp_chs,ncomp_chan) == FAIL)
         return FAIL;
     /*
         * Are we there already?
@@ -867,17 +867,17 @@ int MNECTFCompDataSet::set_compensation(int compensate_to,
     undo    = std::move(current);
     if (compensate_to == MNE_CTFV_NOGRAD) {
         qInfo("No compensation was requested.\n");
-        set_comp(chs,nchan,compensate_to);
+        set_comp(chList,nchan,compensate_to);
         return OK;
     }
-    if (set_comp(chs,nchan,compensate_to) > 0) {
+    if (set_comp(chList,nchan,compensate_to) > 0) {
         if (undo)
             comp_was = undo->mne_kind;
         else
             comp_was = MNE_CTFV_NOGRAD;
-        if (make_comp(chs,nchan,comp_chs,ncomp_chan) == FAIL) {
+        if (make_comp(chList,nchan,comp_chs,ncomp_chan) == FAIL) {
             if (comp_was != MNE_CTFV_COMP_UNKNOWN)
-                set_comp(chs,nchan,comp_was);
+                set_comp(chList,nchan,comp_was);
             return FAIL;
         }
         qInfo("Compensation set up as requested (%s -> %s).\n",

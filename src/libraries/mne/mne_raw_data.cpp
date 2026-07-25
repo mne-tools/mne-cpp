@@ -248,7 +248,7 @@ std::unique_ptr<FilterData> mne_create_filter_response(const MNEFilterDef&   fil
     int highpass_widths,lowpass_widths;
     float lowpass,highpass,lowpass_width,highpass_width;
     float *freq_resp;
-    float pi4 = M_PI/4.0;
+    float pi4 = static_cast<float>(M_PI/4.0);
     float mult,add,c;
 
     resp_size = (filter.size + 2*filter.taper_size)/2 + 1;
@@ -570,7 +570,6 @@ void MNERawData::setup_filter_bufs()
      * These will hold the filtered data
      */
 {
-    MNEFilterDef* filter = this->filter.get();
     int       nfilt_buf;
     int       k;
     int       firstsamp;

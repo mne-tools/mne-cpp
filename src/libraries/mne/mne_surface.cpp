@@ -97,15 +97,15 @@ void MNESurface::triangle_coords(const Eigen::Vector3f& r, int tri, float &x, fl
 
     this_tri = &tris[tri];
 
-    Eigen::Vector3d rr = (r - this_tri->r1).cast<double>();
-    z = rr.dot(this_tri->nn.cast<double>());
+    Eigen::Vector3d rDiff = (r - this_tri->r1).cast<double>();
+    z = rDiff.dot(this_tri->nn.cast<double>());
 
     a = this_tri->r12.cast<double>().squaredNorm();
     b = this_tri->r13.cast<double>().squaredNorm();
     c = this_tri->r12.cast<double>().dot(this_tri->r13.cast<double>());
 
-    v1 = rr.dot(this_tri->r12.cast<double>());
-    v2 = rr.dot(this_tri->r13.cast<double>());
+    v1 = rDiff.dot(this_tri->r12.cast<double>());
+    v2 = rDiff.dot(this_tri->r13.cast<double>());
 
     det = a * b - c * c;
 
@@ -119,13 +119,13 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
 {
     double p, q, p0, q0, t0;
     double a, b, c, v1, v2, det;
-    double best, dist, dist0;
+    double best, distance, dist0;
     const MNEProjData* pd = user;
     const MNETriangle* this_tri;
 
     this_tri = &tris[tri];
-    Eigen::Vector3d rr = (r - this_tri->r1).cast<double>();
-    dist = rr.dot(this_tri->nn.cast<double>());
+    Eigen::Vector3d rDiff = (r - this_tri->r1).cast<double>();
+    distance = rDiff.dot(this_tri->nn.cast<double>());
 
     if (pd) {
         if (!pd->act[tri])
@@ -140,8 +140,8 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
         c = this_tri->r12.cast<double>().dot(this_tri->r13.cast<double>());
     }
 
-    v1 = rr.dot(this_tri->r12.cast<double>());
-    v2 = rr.dot(this_tri->r13.cast<double>());
+    v1 = rDiff.dot(this_tri->r12.cast<double>());
+    v2 = rDiff.dot(this_tri->r13.cast<double>());
 
     det = a * b - c * c;
 
@@ -153,7 +153,7 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
             q <= 1.0 - p) {
         x = p;
         y = q;
-        z = dist;
+        z = distance;
         return true;
     }
     /*
@@ -166,7 +166,7 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
     dist0 = sqrt((p - p0) * (p - p0) * a +
                  (q - q0) * (q - q0) * b +
                  (p - p0) * (q - q0) * c +
-                 dist * dist);
+                 distance * distance);
     best = dist0;
     x = p0;
     y = q0;
@@ -182,7 +182,7 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
     dist0 = sqrt((p - p0) * (p - p0) * a +
                  (q - q0) * (q - q0) * b +
                  (p - p0) * (q - q0) * c +
-                 dist * dist);
+                 distance * distance);
     if (dist0 < best) {
         best = dist0;
         x = p0;
@@ -199,7 +199,7 @@ int MNESurface::nearest_triangle_point(const Eigen::Vector3f& r, const MNEProjDa
     dist0 = sqrt((p - p0) * (p - p0) * a +
                  (q - q0) * (q - q0) * b +
                  (p - p0) * (q - q0) * c +
-                 dist * dist);
+                 distance * distance);
     if (dist0 < best) {
         best = dist0;
         x = p0;
@@ -231,8 +231,8 @@ Eigen::Vector3f MNESurface::project_to_triangle(int tri, float p, float q) const
 
 Eigen::Vector3f MNESurface::project_to_triangle(int best, const Eigen::Vector3f& r) const
 {
-    float p, q, dist;
-    nearest_triangle_point(r, best, p, q, dist);
+    float p, q, distance;
+    nearest_triangle_point(r, best, p, q, distance);
     return project_to_triangle(best, p, q);
 }
 
@@ -240,7 +240,7 @@ Eigen::Vector3f MNESurface::project_to_triangle(int best, const Eigen::Vector3f&
 
 int MNESurface::project_to_surface(const MNEProjData *proj_data, const Eigen::Vector3f& r, float &distp) const
 {
-    float dist;
+    float distance;
     float p, q;
     float dist0;
     int best;
@@ -248,9 +248,9 @@ int MNESurface::project_to_surface(const MNEProjData *proj_data, const Eigen::Ve
 
     dist0 = 0.0;
     for (best = -1, k = 0; k < ntri; k++) {
-        if (nearest_triangle_point(r, proj_data, k, p, q, dist)) {
-            if (best < 0 || std::fabs(dist) < std::fabs(dist0)) {
-                dist0 = dist;
+        if (nearest_triangle_point(r, proj_data, k, p, q, distance)) {
+            if (best < 0 || std::fabs(distance) < std::fabs(dist0)) {
+                dist0 = distance;
                 best = k;
             }
         }
@@ -263,7 +263,7 @@ int MNESurface::project_to_surface(const MNEProjData *proj_data, const Eigen::Ve
 
 void MNESurface::find_closest_on_surface_approx(const PointsT& r, int np_points,
                                                  Eigen::VectorXi& nearest_tri,
-                                                 Eigen::VectorXf& dist, int nstep) const
+                                                 Eigen::VectorXf& distances, int nstep) const
 {
     auto p = std::make_unique<MNEProjData>(this);
     int k, was;
@@ -274,10 +274,10 @@ void MNESurface::find_closest_on_surface_approx(const PointsT& r, int np_points,
         was = nearest_tri[k];
         Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(r.row(k).data());
         decide_search_restriction(*p, nearest_tri[k], nstep, pt);
-        nearest_tri[k] = project_to_surface(p.get(), pt, dist[k]);
+        nearest_tri[k] = project_to_surface(p.get(), pt, distances[k]);
         if (nearest_tri[k] < 0) {
             decide_search_restriction(*p, -1, nstep, pt);
-            nearest_tri[k] = project_to_surface(p.get(), pt, dist[k]);
+            nearest_tri[k] = project_to_surface(p.get(), pt, distances[k]);
         }
     }
     (void)was;

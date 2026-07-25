@@ -120,10 +120,10 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int make_comp(const QList<FIFFLIB::FiffChInfo>& chs,
-                  int nch,
+    int make_comp(const QList<FIFFLIB::FiffChInfo>& chList,
+                  int nChan,
                   QList<FIFFLIB::FiffChInfo> compchs,
-                  int ncomp);
+                  int nCompChan);
 
     //=========================================================================================================
     /**
@@ -227,7 +227,7 @@ public:
      * @return OK on success, FAIL on error.
      */
     int set_compensation(int compensate_to,
-                         QList<FIFFLIB::FiffChInfo>& chs,
+                         QList<FIFFLIB::FiffChInfo>& chList,
                          int nchan,
                          QList<FIFFLIB::FiffChInfo> comp_chs,
                          int ncomp_chan);

@@ -294,7 +294,7 @@ bool MNEInverseOperator::assemble_kernel(const FsLabel &label,
 
 //=============================================================================================================
 
-bool MNEInverseOperator::check_ch_names(const FiffInfo &info) const
+bool MNEInverseOperator::check_ch_names(const FiffInfo &measInfo) const
 {
     QStringList inv_ch_names = this->eigen_fields->col_names;
 
@@ -319,7 +319,7 @@ bool MNEInverseOperator::check_ch_names(const FiffInfo &info) const
         return false;
     }
 
-    QStringList data_ch_names = info.ch_names;
+    QStringList data_ch_names = measInfo.ch_names;
 
     QStringList missing_ch_names;
     for(qint32 i = 0; i < inv_ch_names.size(); ++i)
@@ -530,9 +530,7 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet &p_AnnotationS
                 // Map the centroids to the closest rr
                 for(qint32 k = 0; k < nClusters; ++k)
                 {
-                    qint32 j = 0;
-
-                    double sqec = sqrt((itIn->matRoiMTOrig.block(0, j*3, itIn->matRoiMTOrig.rows(), 3) - t_MT_partial.block(0, k*3, t_MT_partial.rows(), 3)).array().pow(2).sum());
+                    double sqec = sqrt((itIn->matRoiMTOrig.block(0, 0, itIn->matRoiMTOrig.rows(), 3) - t_MT_partial.block(0, k*3, t_MT_partial.rows(), 3)).array().pow(2).sum());
                     double sqec_min = sqec;
                     qint32 j_min = 0;
                     for(qint32 j = 1; j < itIn->idcs.rows(); ++j)
@@ -869,9 +867,9 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
 
 //=============================================================================================================
 
-MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,float lambda2, bool dSPM, bool sLORETA) const
+MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nAve ,float lambda2, bool dSPM, bool sLORETA) const
 {
-    if(nave <= 0)
+    if(nAve <= 0)
     {
         qCritical("The number of averages should be positive\n");
         return MNEInverseOperator();
@@ -881,7 +879,7 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
     //
     //   Scale some of the stuff
     //
-    float scale     = static_cast<float>(inv.nave)/static_cast<float>(nave);
+    float scale     = static_cast<float>(inv.nave)/static_cast<float>(nAve);
     inv.noise_cov->data  *= scale;
     inv.noise_cov->eig   *= scale;
     inv.source_cov->data *= scale;
@@ -889,8 +887,8 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
     if (inv.eigen_leads_weighted)
         inv.eigen_leads->data *= sqrt(scale);
     //
-    qInfo("\tScaled noise and source covariance from nave = %d to nave = %d\n",inv.nave,nave);
-    inv.nave = nave;
+    qInfo("\tScaled noise and source covariance from nave = %d to nave = %d\n",inv.nave,nAve);
+    inv.nave = nAve;
     //
     //   Create the diagonal matrix for computing the regularized inverse
     //
@@ -957,8 +955,8 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
         else
         {
            qInfo("\tComputing noise-normalization factors (sLORETA)...");
-           VectorXd tmp = (VectorXd::Constant(inv.sing.size(), 1) + inv.sing.cwiseProduct(inv.sing)/lambda2);
-           noise_weight = inv.reginv.cwiseProduct(tmp.cwiseSqrt());
+           VectorXd sLoretaScale = (VectorXd::Constant(inv.sing.size(), 1) + inv.sing.cwiseProduct(inv.sing)/lambda2);
+           noise_weight = inv.reginv.cwiseProduct(sLoretaScale.cwiseSqrt());
         }
         VectorXd one;
         if (inv.eigen_leads_weighted)
@@ -992,13 +990,13 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nave ,flo
             noise_norm_new = t.cwiseSqrt();
         }
         VectorXd vOnes = VectorXd::Ones(noise_norm_new.size());
-        VectorXd tmp = vOnes.cwiseQuotient(noise_norm_new.cwiseAbs());
+        VectorXd noiseNormInv = vOnes.cwiseQuotient(noise_norm_new.cwiseAbs());
 
         typedef Eigen::Triplet<double> T;
         std::vector<T> tripletList;
         tripletList.reserve(noise_norm_new.size());
         for(qint32 i = 0; i < noise_norm_new.size(); ++i)
-            tripletList.push_back(T(i, i, tmp[i]));
+            tripletList.push_back(T(i, i, noiseNormInv[i]));
 
         inv.noisenorm = SparseMatrix<double>(noise_norm_new.size(),noise_norm_new.size());
         inv.noisenorm.setFromTriplets(tripletList.begin(), tripletList.end());

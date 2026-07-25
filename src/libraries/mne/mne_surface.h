@@ -179,7 +179,7 @@ public:
      */
     void find_closest_on_surface_approx(const PointsT& r, int np,
                                         Eigen::VectorXi& nearest_tri,
-                                        Eigen::VectorXf& dist,
+                                        Eigen::VectorXf& distances,
                                         int nstep) const;
 
     /**

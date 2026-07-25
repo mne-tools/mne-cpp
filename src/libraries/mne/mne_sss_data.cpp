@@ -151,7 +151,7 @@ std::unique_ptr<MNESssData> MNESssData::read_from_node(QSharedPointer<FiffStream
             return nullptr;
         }
         {
-            int ncomp = t_pTag->size()/sizeof(fiff_int_t);
+            int ncomp = static_cast<int>(t_pTag->size()/sizeof(fiff_int_t));
             int *raw  = t_pTag->toInt();
             s->comp_info = Eigen::VectorXi::Map(raw, ncomp);
 

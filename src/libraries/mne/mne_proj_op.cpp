@@ -214,15 +214,15 @@ int MNEProjOp::affect(const QStringList& list, int nlist)
 
 //=============================================================================================================
 
-int MNEProjOp::affect_chs(const QList<FiffChInfo>& chs, int nch)
+int MNEProjOp::affect_chs(const QList<FiffChInfo>& chs, int nChan)
 {
-    if (nch == 0)
+    if (nChan == 0)
         return false;
     QStringList list;
-    list.reserve(nch);
-    for (int k = 0; k < nch; k++)
+    list.reserve(nChan);
+    for (int k = 0; k < nChan; k++)
         list.append(chs.at(k).ch_name);
-    return affect(list, nch);
+    return affect(list, nChan);
 }
 
 //=============================================================================================================

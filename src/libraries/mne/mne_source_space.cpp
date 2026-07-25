@@ -194,71 +194,88 @@ std::unique_ptr<MNEVolGeom> read_vol_geom(QFile &fp)
  * This the volume geometry reading code from FreeSurfer
  */
 {
-    char param[64];
-    char eq[2];
-    char buf[256];
     int vgRead = 0;
     int counter = 0;
     qint64 pos = 0;
 
     auto vg = std::make_unique<MNEVolGeom>();
 
+    /*
+     * Every line has the shape "<key> = <value>...". Read the values through
+     * QByteArray tokens rather than sscanf("%s"): the widths are unbounded
+     * there, so a long token in an untrusted file overflows the destination
+     * buffer.
+     */
+    const auto readFloats = [](const QList<QByteArray>& tok, float *dest, int n) {
+        for (int i = 0; i < n; ++i) {
+            if (tok.size() <= 2 + i)
+                return;
+            bool ok = false;
+            const float v = tok.at(2 + i).toFloat(&ok);
+            if (!ok)
+                return;
+            dest[i] = v;
+        }
+    };
+
     while (!fp.atEnd() && counter < 8)
     {
-        QByteArray lineData = fp.readLine(256);
+        const QByteArray lineData = fp.readLine(256);
         if (lineData.isEmpty())
             break;
-        const char *line = lineData.constData();
-        if (strlen(line) == 0)
-            break ;
-        sscanf(line, "%s %s %*s", param, eq);
-        if (!strcmp(param, "valid")) {
-            sscanf(line, "%s %s %d", param, eq, &vg->valid);
+
+        const QList<QByteArray> tok = lineData.simplified().split(' ');
+        if (tok.isEmpty() || tok.first().isEmpty())
+            break;
+
+        const QByteArray& param = tok.first();
+        if (param == "valid") {
+            if (tok.size() > 2)
+                vg->valid = tok.at(2).toInt();
             vgRead = 1;
             counter++;
         }
-        else if (!strcmp(param, "filename")) {
-            if (sscanf(line, "%s %s %s", param, eq, buf) >= 3)
-                vg->filename = QString::fromUtf8(buf);
+        else if (param == "filename") {
+            if (tok.size() > 2)
+                vg->filename = QString::fromUtf8(tok.at(2));
             counter++;
         }
-        else if (!strcmp(param, "volume")) {
-            sscanf(line, "%s %s %d %d %d",
-                   param, eq, &vg->width, &vg->height, &vg->depth);
+        else if (param == "volume") {
+            if (tok.size() > 4) {
+                vg->width  = tok.at(2).toInt();
+                vg->height = tok.at(3).toInt();
+                vg->depth  = tok.at(4).toInt();
+            }
             counter++;
         }
-        else if (!strcmp(param, "voxelsize")) {
-            sscanf(line, "%s %s %f %f %f",
-                   param, eq, &vg->xsize, &vg->ysize, &vg->zsize);
+        else if (param == "voxelsize") {
+            float size[3] = { vg->xsize, vg->ysize, vg->zsize };
+            readFloats(tok, size, 3);
             /*
-       * We like these to be in meters
-       */
-            vg->xsize = vg->xsize/1000.0;
-            vg->ysize = vg->ysize/1000.0;
-            vg->zsize = vg->zsize/1000.0;
+             * We like these to be in meters
+             */
+            vg->xsize = size[0]/1000.0f;
+            vg->ysize = size[1]/1000.0f;
+            vg->zsize = size[2]/1000.0f;
             counter++;
         }
-        else if (!strcmp(param, "xras")) {
-            sscanf(line, "%s %s %f %f %f",
-                   param, eq, vg->x_ras, vg->x_ras+1, vg->x_ras+2);
+        else if (param == "xras") {
+            readFloats(tok, vg->x_ras, 3);
             counter++;
         }
-        else if (!strcmp(param, "yras")) {
-            sscanf(line, "%s %s %f %f %f",
-                   param, eq, vg->y_ras, vg->y_ras+1, vg->y_ras+2);
+        else if (param == "yras") {
+            readFloats(tok, vg->y_ras, 3);
             counter++;
         }
-        else if (!strcmp(param, "zras")) {
-            sscanf(line, "%s %s %f %f %f",
-                   param, eq, vg->z_ras, vg->z_ras+1, vg->z_ras+2);
+        else if (param == "zras") {
+            readFloats(tok, vg->z_ras, 3);
             counter++;
         }
-        else if (!strcmp(param, "cras")) {
-            sscanf(line, "%s %s %f %f %f",
-                   param, eq, vg->c_ras, vg->c_ras+1, vg->c_ras+2);
-            vg->c_ras[0] = vg->c_ras[0]/1000.0;
-            vg->c_ras[1] = vg->c_ras[1]/1000.0;
-            vg->c_ras[2] = vg->c_ras[2]/1000.0;
+        else if (param == "cras") {
+            readFloats(tok, vg->c_ras, 3);
+            vg->c_ras[0] = vg->c_ras[0]/1000.0f;
+            vg->c_ras[1] = vg->c_ras[1]/1000.0f;
+            vg->c_ras[2] = vg->c_ras[2]/1000.0f;
             counter++;
         }
         /* remember the current position */
@@ -1868,11 +1885,11 @@ int MNESourceSpace::read_source_spaces(const QString &name, std::vector<std::uni
             Eigen::VectorXi nneighborsVec;
             ntot = nvert = 0;
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEIGHBORS, t_pTag)) {
-                ntot = t_pTag->size()/sizeof(fiff_int_t);
+                ntot = static_cast<int>(t_pTag->size()/sizeof(fiff_int_t));
                 neighborsVec = Eigen::Map<Eigen::VectorXi>(t_pTag->toInt(), ntot);
             }
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NNEIGHBORS, t_pTag)) {
-                nvert = t_pTag->size()/sizeof(fiff_int_t);
+                nvert = static_cast<int>(t_pTag->size()/sizeof(fiff_int_t));
                 nneighborsVec = Eigen::Map<Eigen::VectorXi>(t_pTag->toInt(), nvert);
             }
             if (neighborsVec.size() > 0 && nneighborsVec.size() > 0) {

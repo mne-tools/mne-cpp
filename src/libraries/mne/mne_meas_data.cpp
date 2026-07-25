@@ -82,9 +82,9 @@ void MNEMeasData::adjust_baselines(float bmin, float bmax)
     if (!current)
         return;
 
-    const float sfreq = 1.0f / current->tstep;
+    const float currentSfreq = 1.0f / current->tstep;
     const float tmin  = current->tmin;
-    const float tmax  = current->tmin + (current->np - 1) / sfreq;
+    const float tmax  = current->tmin + (current->np - 1) / currentSfreq;
 
     int b1, b2;
     if (bmin < tmin)
@@ -92,7 +92,7 @@ void MNEMeasData::adjust_baselines(float bmin, float bmax)
     else if (bmin > tmax)
         b1 = current->np;
     else {
-        for (b1 = 0; b1 / sfreq + tmin < bmin; b1++)
+        for (b1 = 0; b1 / currentSfreq + tmin < bmin; b1++)
             ;
         b1 = qBound(0, b1, current->np);
     }
@@ -101,7 +101,7 @@ void MNEMeasData::adjust_baselines(float bmin, float bmax)
     else if (bmax > tmax)
         b2 = current->np;
     else {
-        for (b2 = current->np; b2 / sfreq + tmin > bmax; b2--)
+        for (b2 = current->np; b2 / currentSfreq + tmin > bmax; b2--)
             ;
         b2 = qBound(0, b2, current->np);
     }

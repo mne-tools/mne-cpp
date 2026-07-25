@@ -52,6 +52,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
+#include <QTextStream>
 #include <QDebug>
 
 //=============================================================================================================
@@ -141,11 +142,12 @@ int main(int argc, char *argv[])
     }
 
     // Open output file
-    FILE *out = fopen(qPrintable(outFile), "w");
-    if (!out) {
+    QFile outputFile(outFile);
+    if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qCritical("Cannot open output file: %s", qPrintable(outFile));
         return 1;
     }
+    QTextStream out(&outputFile);
 
     int nWritten = 0;
     for (int k = 0; k < info.chs.size(); ++k) {
@@ -189,14 +191,20 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        fprintf(out, "%-20s %12.6f %12.6f %12.6f\n",
-                qPrintable(ch.ch_name), x, y, z);
+        out << qSetFieldWidth(20) << Qt::left << ch.ch_name
+            << qSetFieldWidth(0) << Qt::right
+            << Qt::fixed << qSetRealNumberPrecision(6)
+            << ' ' << qSetFieldWidth(12) << x
+            << qSetFieldWidth(0) << ' ' << qSetFieldWidth(12) << y
+            << qSetFieldWidth(0) << ' ' << qSetFieldWidth(12) << z
+            << qSetFieldWidth(0) << '\n';
         ++nWritten;
     }
 
-    fclose(out);
-    fprintf(stderr, "Wrote %d sensor locations to %s (frame: %s)\n",
-            nWritten, qPrintable(outFile), qPrintable(frame));
+    out.flush();
+    outputFile.close();
+    qInfo("Wrote %d sensor locations to %s (frame: %s)",
+          nWritten, qPrintable(outFile), qPrintable(frame));
 
     return 0;
 }
