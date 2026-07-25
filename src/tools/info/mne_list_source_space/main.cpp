@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
     // Print summary
     qInfo("Source space file : %s" , qPrintable(srcName));
     qInfo("Number of spaces  : %d" , sourceSpaces.size());
-    qInfo("");
+    qInfo("%s", "");
 
     int totalActive = 0;
     int totalVerts = 0;
@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
             qInfo("  Extent (mm)     : x [%.1f, %.1f] y [%.1f, %.1f] z [%.1f, %.1f]" ,
                    xmin, xmax, ymin, ymax, zmin, zmax);
         }
-        qInfo("");
+        qInfo("%s", "");
     }
 
     qInfo("Total active vertices : %d / %d" , totalActive, totalVerts);

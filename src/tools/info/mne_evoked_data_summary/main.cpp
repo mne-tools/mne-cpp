@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
         for (auto it = typeCounts.constBegin(); it != typeCounts.constEnd(); ++it) {
             qInfo("    %-12s : %d" , qPrintable(it.key()), it.value());
         }
-        qInfo("");
+        qInfo("%s", "");
     }
 
     return 0;

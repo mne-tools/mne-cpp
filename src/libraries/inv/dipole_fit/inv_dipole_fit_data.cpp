@@ -261,7 +261,6 @@ int InvDipoleFitData::setup_forward_model(InvDipoleFitData *d, MNECTFCompDataSet
         */
     d->funcs = !d->bemname.isEmpty() ? d->bem_funcs.get() : d->sphere_funcs.get();
 
-    qWarning("");
     return OK;
 }
 
@@ -864,7 +863,7 @@ void print_fields(const Eigen::Vector3f& rd,
                 data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_OFFDIAG_REF_GRAD) {
             qInfo("%g ",1e15*oneVec[k]);
         }
-    qInfo("");
+    qInfo("%s", "");
 
     Eigen::MatrixXf fwd = Eigen::MatrixXf::Zero(nch, 3);
     if (InvDipoleFitData::compute_dipole_field(*fit,rd,false,fwd) == FAIL)
@@ -875,7 +874,7 @@ void print_fields(const Eigen::Vector3f& rd,
                 data->chs[k].chpos.coil_type == FIFFV_COIL_CTF_OFFDIAG_REF_GRAD) {
             qInfo("%g ",1e15*(Q[0]*fwd(k,0)+Q[1]*fwd(k,1)+Q[2]*fwd(k,2)));
         }
-    qInfo("");
+    qInfo("%s", "");
 
     return;
 }

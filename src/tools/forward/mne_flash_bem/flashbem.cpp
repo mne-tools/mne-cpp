@@ -125,10 +125,10 @@ int FlashBem::run()
 
     QDateTime startTime = QDateTime::currentDateTime();
 
-    qInfo("");
+    qInfo("%s", "");
     qInfo("Processing the flash MRI data for subject %s to produce" , qPrintable(m_settings.subject()));
     qInfo("BEM meshes under %s" , qPrintable(flashBemDir));
-    qInfo("");
+    qInfo("%s", "");
 
     //
     // Step 1: Convert DICOM images to MGZ format
@@ -281,7 +281,7 @@ bool FlashBem::convertImages(const QString& flashDir, const QString& mriFlashDir
                              int& echosConverted)
 {
     m_step++;
-    qInfo("");
+    qInfo("%s", "");
     qInfo("Step %d : Converting images...\n" , m_step);
 
     //
@@ -401,7 +401,7 @@ bool FlashBem::unwarpImages(const QString& mriFlashDir)
 bool FlashBem::createParameterMaps(const QString& mriFlashDir, const QString& paramDir)
 {
     m_step++;
-    qInfo("");
+    qInfo("%s", "");
     qInfo("Step %d : Creating the parameter maps...\n" , m_step);
 
     //
@@ -449,7 +449,7 @@ bool FlashBem::createFlash5Volume(const QString& mriFlashDir, const QString& par
         //
         // With flash30: synthesize from T1 and PD parameter maps
         //
-        qInfo("");
+        qInfo("%s", "");
         qInfo("Step %d : Synthesizing flash 5...\n" , m_step);
 
         if (QFileInfo::exists(flash5File)) {
@@ -470,7 +470,7 @@ bool FlashBem::createFlash5Volume(const QString& mriFlashDir, const QString& par
         //
         // Without flash30: average all flash-5 echoes
         //
-        qInfo("");
+        qInfo("%s", "");
         qInfo("Step %d : Averaging flash5 echoes...\n" , m_step);
 
         QDir flashDirObj(mriFlashDir);
@@ -501,7 +501,7 @@ bool FlashBem::createFlash5Volume(const QString& mriFlashDir, const QString& par
 bool FlashBem::registerWithMprage(const QString& paramDir, const QString& mriDir)
 {
     m_step++;
-    qInfo("");
+    qInfo("%s", "");
     qInfo("Step %d : Registering flash 5 with MPRAGE...\n" , m_step);
 
     QString flash5Reg = paramDir + "/flash5_reg.mgz";
@@ -538,7 +538,7 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
     //
     // Step 5a: Convert flash5_reg.mgz to COR format
     //
-    qInfo("");
+    qInfo("%s", "");
     qInfo("Step %da: Converting flash5 volume into COR format...\n" , m_step);
 
     QString flash5Dir = mriDir + "/flash5";
@@ -574,7 +574,7 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
     }
 
     if (needT1) {
-        qInfo("");
+        qInfo("%s", "");
         qInfo("Step %db : Converting T1 volume into COR format...\n" , m_step);
 
         QString t1Mgz = mriDir + "/T1.mgz";
@@ -590,7 +590,7 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
         }
         convertedT1 = true;
     } else {
-        qInfo("");
+        qInfo("%s", "");
         qInfo("Step %db : T1 volume is already in COR format\n" , m_step);
     }
 
@@ -612,7 +612,7 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
     }
 
     if (needBrain) {
-        qInfo("");
+        qInfo("%s", "");
         qInfo("Step %dc : Converting brain volume into COR format...\n" , m_step);
 
         QString brainMgz = mriDir + "/brain.mgz";
@@ -628,7 +628,7 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
         }
         convertedBrain = true;
     } else {
-        qInfo("");
+        qInfo("%s", "");
         qInfo("Step %dc : brain volume is already in COR format\n" , m_step);
     }
 
@@ -640,7 +640,7 @@ bool FlashBem::convertToCor(const QString& paramDir, const QString& mriDir,
 bool FlashBem::createBemSurfaces()
 {
     m_step++;
-    qInfo("");
+    qInfo("%s", "");
     qInfo("Step %d : Creating the BEM surfaces...\n" , m_step);
 
     return runCommand(m_settings.freeSurferHome() + "/bin/mri_make_bem_surfaces",
@@ -652,7 +652,7 @@ bool FlashBem::createBemSurfaces()
 bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
 {
     m_step++;
-    qInfo("");
+    qInfo("%s", "");
     qInfo("Step %d : Converting the tri files into surf files..." , m_step);
 
     //
@@ -808,22 +808,9 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
                 return false;
             }
 
-            //
-            // Apply the vox-to-surface-RAS transform
-            //   The .tri file vertices are in voxel coordinates (mm).
-            //   computeVox2Ras() returns the transform in meters.
-            //   After transform, vertices are in surface RAS meters.
-            //
-            Matrix4f vox2ras = volData.computeVox2Ras();
-            Matrix3f rot = vox2ras.block<3,3>(0,0);
-            Vector3f trans = vox2ras.block<3,1>(0,3);
-
-            // Vertices from .tri are in mm; convert to voxels first,
-            // then apply the vox2ras which outputs meters.
-            // However, mri_make_bem_surfaces outputs vertices in mm
-            // in surface RAS coordinates. The mne_convert_surface
-            // tool with --swap --mghmri reads the surface and applies
-            // the voxel geometry. For simplicity we convert mm -> meters.
+            // mri_make_bem_surfaces already writes the .tri vertices in
+            // surface RAS coordinates, in millimetres, so no vox-to-surface-RAS
+            // transform is applied here; only the unit conversion is needed.
             rr /= 1000.0f;
 
             //
@@ -889,7 +876,7 @@ bool FlashBem::convertTriToSurf(const QString& bemDir, const QString& paramDir)
 void FlashBem::cleanup(const QString& bemDir, const QString& mriDir,
                        bool convertedT1, bool convertedBrain)
 {
-    qInfo("");
+    qInfo("%s", "");
     qInfo("Final step : Cleaning up...\n");
 
     // Remove inner_skull_tmp.tri

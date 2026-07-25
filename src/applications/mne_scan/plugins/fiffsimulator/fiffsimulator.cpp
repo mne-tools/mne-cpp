@@ -115,7 +115,7 @@ void FiffSimulator::clear()
 QSharedPointer<AbstractPlugin> FiffSimulator::clone() const
 {
     QSharedPointer<FiffSimulator> pFiffSimulatorClone(new FiffSimulator());
-    return std::move(pFiffSimulatorClone);
+    return pFiffSimulatorClone;
 }
 
 //=============================================================================================================

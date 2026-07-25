@@ -100,7 +100,7 @@ int Surf2Bem::run()
     //
     // Report input summary
     //
-    qInfo("");
+    qInfo("%s", "");
     for (int k = 0; k < inputs.size(); ++k) {
         fprintf(stderr, "input  file # %3d : %s", k + 1, qPrintable(inputs[k].fileName));
         if (inputs[k].id > 0)

@@ -160,9 +160,9 @@ int SetupForwardModel::run()
     //
     // Step 1: Read surfaces and create BEM geometry
     //
-    qInfo("");
+    qInfo("%s", "");
     qInfo("Setting up the BEM with the following parameters:");
-    qInfo("");
+    qInfo("%s", "");
     qInfo("SUBJECTS_DIR       = %s" , qPrintable(m_settings.subjectsDir()));
     qInfo("Subject            = %s" , qPrintable(m_settings.subject()));
 
@@ -328,7 +328,7 @@ int SetupForwardModel::run()
             if (!exportSurfFile(innerSkull, surfFile)) return 1;
         }
     }
-    qInfo("");
+    qInfo("%s", "");
 
     //
     // >> 3. Calculating BEM geometry data (solution)

@@ -61,7 +61,9 @@ private slots:
         QCOMPARE(item.nvec, 0);
         QVERIFY(item.desc.isEmpty());
         QCOMPARE(item.kind, 0);
-        QVERIFY(item.active >= 0);
+        // active is a bool defaulting to true; the previous `>= 0` check was
+        // always satisfied and asserted nothing.
+        QVERIFY(item.active);
     }
 
     void testProjItemCopy()

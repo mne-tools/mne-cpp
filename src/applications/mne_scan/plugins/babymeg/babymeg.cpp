@@ -123,7 +123,7 @@ BabyMEG::~BabyMEG()
 QSharedPointer<AbstractPlugin> BabyMEG::clone() const
 {
     QSharedPointer<BabyMEG> pBabyMEGClone(new BabyMEG());
-    return std::move(pBabyMEGClone);
+    return pBabyMEGClone;
 }
 
 //=============================================================================================================

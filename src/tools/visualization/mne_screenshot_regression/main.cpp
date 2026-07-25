@@ -91,7 +91,8 @@ int main(int argc, char *argv[])
     // ── Load FreeSurfer surfaces (after setModel so rowsInserted fires) ─
     bool anyLoaded = false;
 
-    for (const QString &hemi : {"lh", "rh"}) {
+    const QStringList hemis{QStringLiteral("lh"), QStringLiteral("rh")};
+    for (const QString &hemi : hemis) {
         const int hemiIdx = (hemi == "lh") ? 0 : 1;
         FsSurface surf;
         if (FsSurface::read(subject, hemiIdx, "white", subjectsDir, surf)) {

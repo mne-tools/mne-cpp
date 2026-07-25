@@ -120,7 +120,8 @@ FiffAnonymizer::FiffAnonymizer()
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
-: m_pTag(std::make_unique<FIFFLIB::FiffTag>())
+: QObject()
+, m_pTag(std::make_unique<FIFFLIB::FiffTag>())
 , m_bFileInSet(obj.m_bFileInSet)
 , m_bFileOutSet(obj.m_bFileOutSet)
 , m_bVerboseMode(obj.m_bVerboseMode)

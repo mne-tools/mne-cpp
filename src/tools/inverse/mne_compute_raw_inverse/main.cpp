@@ -535,7 +535,7 @@ int main(int argc, char *argv[])
     // Report configuration
     //=========================================================================================================
 
-    qInfo("");
+    qInfo("%s", "");
     qInfo("mne_compute_raw_inverse v%s" , PROGRAM_VERSION);
     qInfo("========================================");
     qInfo("Input file             : %s" , inName.toUtf8().constData());

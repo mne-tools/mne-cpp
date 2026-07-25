@@ -170,13 +170,13 @@ int WatershedBem::run()
     //
     // Report parameters
     //
-    qInfo("");
+    qInfo("%s", "");
     qInfo("Running mri_watershed for BEM segmentation with the following parameters");
-    qInfo("");
+    qInfo("%s", "");
     qInfo("SUBJECTS_DIR = %s" , qPrintable(m_settings.subjectsDir()));
     qInfo("Subject      = %s" , qPrintable(m_settings.subject()));
     qInfo("Result dir   = %s" , qPrintable(wsDir));
-    qInfo("");
+    qInfo("%s", "");
 
     // Create output directory structure
     QString wsSubDir = wsDir + "/ws";

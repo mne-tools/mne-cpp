@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 
     qInfo("File 1: %s (%d directory entries)" , qPrintable(file1), (int)dir1.size());
     qInfo("File 2: %s (%d directory entries)" , qPrintable(file2), (int)dir2.size());
-    qInfo("");
+    qInfo("%s", "");
 
     int nMatch = 0, nDiff = 0, nMissing = 0;
     int minEntries = (int)std::min(dir1.size(), dir2.size());

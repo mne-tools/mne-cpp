@@ -83,7 +83,7 @@ static void printTransform(const FiffCoordTrans &t)
                t.trans(i, 0), t.trans(i, 1), t.trans(i, 2),
                1000.0f * t.trans(i, 3));
     }
-    qInfo("");
+    qInfo("%s", "");
 }
 
 //=============================================================================================================

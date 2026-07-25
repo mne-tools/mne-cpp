@@ -422,7 +422,7 @@ int main(int argc, char *argv[])
     // Read forward solution
     //=========================================================================================================
 
-    qInfo("");
+    qInfo("%s", "");
     qInfo("========================================");
     qInfo("Reading forward solution from %s..." , fwdName.toUtf8().constData());
 

@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
             allOk = false;
         reportTriangleAreas(surfs[k], nameOf(surfs[k].id));
     }
-    qInfo("");
+    qInfo("%s", "");
 
     // Check nesting if multiple surfaces
     if (surfs.size() > 1) {
@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
 
     // Check inter-surface distances
     if (doThickness && surfs.size() > 1) {
-        qInfo("");
+        qInfo("%s", "");
         for (int k = 0; k < surfs.size() - 1; ++k) {
             float dist = minSurfaceDist(surfs[k], surfs[k + 1]);
             qInfo("Minimum distance between %s and %s: %6.1f mm" ,

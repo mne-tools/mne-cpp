@@ -818,7 +818,7 @@ int main(int argc, char *argv[])
     // Read inverse operator
     //=========================================================================================================
 
-    qInfo("");
+    qInfo("%s", "");
     qInfo("========================================");
     qInfo("Reading inverse operator from %s..." , invName.toUtf8().constData());
 
