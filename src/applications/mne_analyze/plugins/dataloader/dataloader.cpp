@@ -49,6 +49,10 @@
 #include <anShared/Model/covariancemodel.h>
 #include <anShared/Model/mricoordmodel.h>
 
+#include <fiff/fiff_stream.h>
+#include <fiff/fiff_dir_node.h>
+#include <fiff/fiff_constants.h>
+
 #include <disp/viewers/progressview.h>
 
 //=============================================================================================================
@@ -57,6 +61,42 @@
 
 using namespace DATALOADERPLUGIN;
 using namespace ANSHAREDLIB;
+
+//=============================================================================================================
+// DEFINE STATIC HELPERS
+//=============================================================================================================
+
+namespace {
+
+//=============================================================================================================
+/**
+ * Checks whether a fiff file holds boundary-element surfaces.
+ *
+ * Only the directory tree is read, so this stays cheap even for the
+ * high-resolution head surfaces, which carry a few hundred thousand vertices.
+ *
+ * @param[in] sFilePath   Path to the fiff file to inspect.
+ *
+ * @return True if the file contains a BEM or BEM surface block.
+ */
+bool containsBemSurfaces(const QString& sFilePath)
+{
+    QFile file(sFilePath);
+    FIFFLIB::FiffStream::SPtr pStream(new FIFFLIB::FiffStream(&file));
+
+    if(!pStream->open()) {
+        return false;
+    }
+
+    const bool bHasBem = !pStream->dirtree()->dir_tree_find(FIFFB_BEM).isEmpty()
+                      || !pStream->dirtree()->dir_tree_find(FIFFB_BEM_SURF).isEmpty();
+
+    pStream->close();
+
+    return bHasBem;
+}
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -246,6 +286,18 @@ void DataLoader::loadFilePath(const QString& sFilePath)
             m_pAnalyzeData->loadModel<ANSHAREDLIB::CovarianceModel>(sFilePath);
         } else if(fileInfo.completeBaseName().endsWith("trans")){
             m_pAnalyzeData->loadModel<ANSHAREDLIB::MriCoordModel>(sFilePath);
+        } else if(containsBemSurfaces(sFilePath)) {
+            //
+            // The naming conventions above miss perfectly valid files: the
+            // high-resolution head surfaces shipped with the sample data are
+            // called <subject>-head.fif and the solution files end in -sol,
+            // so neither reaches the "bem" branch. Fall back to looking at
+            // what the file actually contains.
+            //
+            m_pAnalyzeData->loadModel<ANSHAREDLIB::BemDataModel>(sFilePath);
+        } else {
+            qWarning() << "[DataLoader::loadFilePath] Cannot determine the type of"
+                       << sFilePath << "- no model was loaded.";
         }
     }
 
