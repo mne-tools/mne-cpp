@@ -473,7 +473,7 @@ void ScalingView::createScaleControls()
         QPointer<ScaleControl> pControlMAG = QPointer<ScaleControl>(new ScaleControl("MAG [pT])"));
         pControlMAG->setRange(0.2f, 20.0f);
         pControlMAG->setMaxSensitivityPoint(1.5);
-        pControlMAG->setValue(1.5f);
+        pControlMAG->setValue(m_qMapChScaling[FIFF_UNIT_T] / m_fScaleMAG);
         pControlMAG->setSensitivity(0.7f);
         pControlMAG->invertSlider(true);
         connect(pControlMAG, &ScaleControl::valueChanged, this, &ScalingView::updateMAGScale);
@@ -486,7 +486,7 @@ void ScalingView::createScaleControls()
         QPointer<ScaleControl> pControlGRAD = QPointer<ScaleControl>(new ScaleControl("GRAD [fT/cm]"));
         pControlGRAD->setRange(30.0f, 5000.0f);
         pControlGRAD->setMaxSensitivityPoint(100.0f);
-        pControlGRAD->setValue(240.0f);
+        pControlGRAD->setValue(m_qMapChScaling[FIFF_UNIT_T_M] / m_fScaleGRAD);
         pControlGRAD->setSensitivity(0.7f);
         pControlGRAD->invertSlider(true);
         connect(pControlGRAD, &ScaleControl::valueChanged, this, &ScalingView::updateGRADScale);
@@ -512,7 +512,7 @@ void ScalingView::createScaleControls()
         QPointer<ScaleControl> pControlEEG = QPointer<ScaleControl>(new ScaleControl("EEG [uV]"));
         pControlEEG->setRange(3.0f, 100.0f);
         pControlEEG->setMaxSensitivityPoint(14.0f);
-        pControlEEG->setValue(14.0f);
+        pControlEEG->setValue(m_qMapChScaling[FIFFV_EEG_CH] / m_fScaleEEG);
         pControlEEG->setSensitivity(0.4f);
         pControlEEG->invertSlider(true);
         connect(pControlEEG, &ScaleControl::valueChanged, this, &ScalingView::updateEEGScale);
@@ -525,7 +525,7 @@ void ScalingView::createScaleControls()
         QPointer<ScaleControl> pControlEOG = QPointer<ScaleControl>(new ScaleControl("EOG [uV]"));
         pControlEOG->setRange(3.0f, 100.0f);
         pControlEOG->setMaxSensitivityPoint(14.0f);
-        pControlEOG->setValue(14.0f);
+        pControlEOG->setValue(m_qMapChScaling[FIFFV_EOG_CH] / m_fScaleEOG);
         pControlEOG->setSensitivity(0.4f);
         pControlEOG->invertSlider(true);
         connect(pControlEOG, &ScaleControl::valueChanged, this, &ScalingView::updateEOGScale);
@@ -538,7 +538,7 @@ void ScalingView::createScaleControls()
         QPointer<ScaleControl> pControlECG = QPointer<ScaleControl>(new ScaleControl("ECG [uV]"));
         pControlECG->setRange(3.0f, 100.0f);
         pControlECG->setMaxSensitivityPoint(14.0f);
-        pControlECG->setValue(14.0f);
+        pControlECG->setValue(m_qMapChScaling[FIFFV_ECG_CH] / m_fScaleECG);
         pControlECG->setSensitivity(0.4f);
         pControlECG->invertSlider(true);
         connect(pControlECG, &ScaleControl::valueChanged, this, &ScalingView::updateECGScale);
@@ -551,7 +551,7 @@ void ScalingView::createScaleControls()
         QPointer<ScaleControl> pControlSTIM = QPointer<ScaleControl>(new ScaleControl("STIM"));
         pControlSTIM->setRange(1.0f, 99999.0f);
         pControlSTIM->setMaxSensitivityPoint(5000.0f);
-        pControlSTIM->setValue(5000.0f);
+        pControlSTIM->setValue(m_qMapChScaling[FIFFV_STIM_CH] / m_fScaleSTIM);
         pControlSTIM->setSensitivity(0.8f);
         pControlSTIM->invertSlider(true);
         connect(pControlSTIM, &ScaleControl::valueChanged, this, &ScalingView::updateSTIMScale);
@@ -564,7 +564,7 @@ void ScalingView::createScaleControls()
         QPointer<ScaleControl> pControlMISC = QPointer<ScaleControl>(new ScaleControl("MISC"));
         pControlMISC->setRange(3.0f, 100.0f);
         pControlMISC->setMaxSensitivityPoint(14.0f);
-        pControlMISC->setValue(14.0f);
+        pControlMISC->setValue(m_qMapChScaling[FIFFV_MISC_CH] / m_fScaleMISC);
         pControlMISC->setSensitivity(0.4f);
         pControlMISC->invertSlider(true);
         connect(pControlMISC, &ScaleControl::valueChanged, this, &ScalingView::updateMISCScale);
