@@ -578,25 +578,31 @@ FiffCoordTrans FiffCoordTrans::readTransformFromNode(FiffStream::SPtr& stream,
                                                      int from, int to)
 {
     FiffTag::UPtr t_pTag;
-    fiff_int_t kind, pos;
-    int k;
 
-    for (k = 0; k < node->nent(); k++)
-        kind = node->dir[k]->kind;
-    pos  = node->dir[k]->pos;
-    if (kind == FIFF_COORD_TRANS) {
-        if (!stream->read_tag(t_pTag, pos))
-            return FiffCoordTrans();
+    // Scan every directory entry of the node for a coordinate transformation
+    // matching the requested frames. The loop previously had no braces, so it
+    // only recorded the last entry's kind and then indexed dir[nent()], which
+    // is one past the end - and left `kind` uninitialised for an empty node.
+    for (int k = 0; k < node->nent(); ++k) {
+        const FiffDirEntry::SPtr& entry = node->dir[k];
+        if (entry->kind != FIFF_COORD_TRANS)
+            continue;
+
+        if (!stream->read_tag(t_pTag, entry->pos))
+            continue;
+
         FiffCoordTrans res = readFromTag(t_pTag);
         if (res.isEmpty())
-            return FiffCoordTrans();
+            continue;
+
         if (res.from == from && res.to == to) {
             return res;
         }
-        else if (res.from == to && res.to == from) {
+        if (res.from == to && res.to == from) {
             return res.inverted();
         }
     }
+
     qWarning("No suitable coordinate transformation found");
     return FiffCoordTrans();
 }

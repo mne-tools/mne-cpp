@@ -110,6 +110,19 @@ public:
 
     //=========================================================================================================
     /**
+     * Copy assignment. All members are values, so the compiler-generated
+     * member-wise assignment is correct. It has to be declared explicitly
+     * because declaring the copy constructor and destructor above deprecates
+     * the implicit one.
+     *
+     * @param[in] p_FiffCoordTrans   Coordinate transformation description which should be assigned.
+     *
+     * @return reference to this object.
+     */
+    FiffCoordTrans& operator=(const FiffCoordTrans &p_FiffCoordTrans) = default;
+
+    //=========================================================================================================
+    /**
      * Constructs a coordinate transformation from a rotation matrix and translation vector.
      *
      * @param[in] from   Source coordinate system.
