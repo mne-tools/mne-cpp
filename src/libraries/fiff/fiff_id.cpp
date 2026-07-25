@@ -204,9 +204,23 @@ FiffId& FiffId::getDefault()
 QString FiffId::toString() const
 {
     time_t secs = time.secs;
-    struct tm *ltime = localtime(&secs);
+
+    // localtime() returns a pointer to a shared static buffer, so two threads
+    // formatting an id at once can corrupt each other's result. Use the
+    // reentrant variant, which writes into a caller-supplied struct. MSVC
+    // spells it localtime_s and reverses the argument order.
+    struct tm ltime {};
+#ifdef _WIN32
+    const bool bTimeValid = (localtime_s(&ltime, &secs) == 0);
+#else
+    const bool bTimeValid = (localtime_r(&secs, &ltime) != nullptr);
+#endif
+
     char timebuf[100];
-    strftime(timebuf, sizeof(timebuf), "%c", ltime);
+    if (!bTimeValid || strftime(timebuf, sizeof(timebuf), "%c", &ltime) == 0) {
+        timebuf[0] = '\0';
+    }
+
     return QString("%1.%2 0x%3%4 %5")
         .arg(version >> 16)
         .arg(version & 0xFFFF)

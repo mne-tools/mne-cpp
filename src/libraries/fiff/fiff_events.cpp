@@ -131,7 +131,10 @@ bool FiffEvents::read_from_fif(QIODevice &p_IODevice,
         return false;
     }
 
-    qint32 k, nelem;
+    // nelem is only assigned when a matching tag is found; the guard below
+    // returns before it is read in that case, but it must not start out
+    // indeterminate.
+    qint32 k, nelem = 0;
     fiff_int_t kind, pos;
     FiffTag::UPtr t_pTag;
     quint32* serial_eventlist_uint = nullptr;

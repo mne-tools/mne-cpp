@@ -488,13 +488,13 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
 //=============================================================================================================
 
 void FiffEvoked::setInfo(const FiffInfo &p_info,
-                         bool proj)
+                         bool applyProj)
 {
     info = p_info;
     //
     // Set up projection
     //
-    if(info.projs.size() == 0 || !proj)
+    if(info.projs.size() == 0 || !applyProj)
     {
         qInfo("\tNo projector specified for these data.\n");
         this->proj = MatrixXd();

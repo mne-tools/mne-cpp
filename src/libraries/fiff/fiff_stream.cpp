@@ -2159,18 +2159,17 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice,
     //   We will always write floats
     //
     fiff_int_t data_type = 4;
-    qint32 k;
 
     if(sel.cols() == 0)
     {
         sel.resize(1,info.nchan);
-        for (k = 0; k < info.nchan; ++k)
+        for (qint32 k = 0; k < info.nchan; ++k)
             sel(0, k) = k; //+1 when MATLAB notation
     }
 
     QList<FiffChInfo> chs;
 
-    for(k = 0; k < sel.cols(); ++k)
+    for(qint32 k = 0; k < sel.cols(); ++k)
         chs << info.chs.at(sel(0,k));
 
     fiff_int_t nchan = chs.size();
@@ -2302,7 +2301,7 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice &p_IODevice,
     //    Channel info
     //
     cals = RowVectorXd(nchan);
-    for(k = 0; k < nchan; ++k)
+    for(qint32 k = 0; k < nchan; ++k)
     {
         //
         //    Scan numbers may have been messed up

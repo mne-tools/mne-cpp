@@ -626,8 +626,10 @@ bool EventManager::isSharedMemoryInit()
 {
 #ifndef NO_IPC
     return m_pSharedMemManager->isInit();
+#else
+    // Without interprocess communication there is no shared memory to init.
+    return false;
 #endif
-    return 0;
 }
 
 void EventManager::createDefaultGroupIfNeeded()

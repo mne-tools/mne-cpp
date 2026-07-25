@@ -178,7 +178,9 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
         clock_t start_subcorr, end_subcorr;
         start_subcorr = clock();
 
-        double t_val_roh_k;
+        // Assigned from the correlation search below; a search that finds no
+        // candidate must compare as "no correlation" rather than read garbage.
+        double t_val_roh_k = 0.0;
 
         //Powell
         int t_iCurrentRow = 2;

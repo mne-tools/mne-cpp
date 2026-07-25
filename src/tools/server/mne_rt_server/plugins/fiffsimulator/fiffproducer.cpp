@@ -140,7 +140,9 @@ void FiffProducer::run()
     //Not good cause production time is not accurate
     //loading and thread sleep is longer than thread sleep time - better to have a extra loading thread
     // ToDo restructure this producer as laoding buffer --> and thread sleep to simulator buffer
-    fiff_int_t t_iDiff;
+    // Only meaningful once the read window has run past the end of the file,
+    // which is also the only path that sets t_bRestart.
+    fiff_int_t t_iDiff = 0;
     bool t_bRestart = false;
 
     while(m_bIsRunning)

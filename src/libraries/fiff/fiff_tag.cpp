@@ -421,6 +421,9 @@ void FiffTag::convert_matrix_to_file_data(const FiffTag::UPtr& tag)
 //ToDo remove this function by swapping -> define little endian big endian, QByteArray
 void FiffTag::convert_tag_data(const FiffTag::UPtr& tag, int from_endian, int to_endian)
 {
+    // Element counts derived from tag->size(), which is a size type. A FIFF tag
+    // never holds more than INT_MAX elements, so narrowing is safe, but it has
+    // to be explicit: on Win64 size_t is 64-bit while int stays 32-bit.
     int            np;
     int            k,r;//,c;
     char           *offset;
@@ -461,14 +464,14 @@ void FiffTag::convert_tag_data(const FiffTag::UPtr& tag, int from_endian, int to
     case FIFFT_INT :
     case FIFFT_UINT :
     case FIFFT_JULIAN :
-        np = tag->size()/sizeof(fiff_int_t);
+        np = static_cast<int>(tag->size()/sizeof(fiff_int_t));
         for (ithis = (fiff_int_t *)tag->data(), k = 0; k < np; k++, ithis++)
             swap_intp(ithis);
         break;
 
     case FIFFT_LONG :
     case FIFFT_ULONG :
-        np = tag->size()/sizeof(fiff_long_t);
+        np = static_cast<int>(tag->size()/sizeof(fiff_long_t));
         for (lthis = (fiff_long_t *)tag->data(), k = 0; k < np; k++, lthis++)
             swap_longp(lthis);
         break;
@@ -476,21 +479,21 @@ void FiffTag::convert_tag_data(const FiffTag::UPtr& tag, int from_endian, int to
     case FIFFT_SHORT :
     case FIFFT_DAU_PACK16 :
     case FIFFT_USHORT :
-        np = tag->size()/sizeof(fiff_short_t);
+        np = static_cast<int>(tag->size()/sizeof(fiff_short_t));
         for (sthis = (fiff_short_t *)tag->data(), k = 0; k < np; k++, sthis++)
             *sthis = swap_short(*sthis);
         break;
 
     case FIFFT_FLOAT :
     case FIFFT_COMPLEX_FLOAT :
-        np = tag->size()/sizeof(fiff_float_t);
+        np = static_cast<int>(tag->size()/sizeof(fiff_float_t));
         for (fthis = (fiff_float_t *)tag->data(), k = 0; k < np; k++, fthis++)
             swap_floatp(fthis);
         break;
 
     case FIFFT_DOUBLE :
     case FIFFT_COMPLEX_DOUBLE :
-        np = tag->size()/sizeof(fiff_double_t);
+        np = static_cast<int>(tag->size()/sizeof(fiff_double_t));
         for (dthis = (fiff_double_t *)tag->data(), k = 0; k < np; k++, dthis++)
             swap_doublep(dthis);
         break;

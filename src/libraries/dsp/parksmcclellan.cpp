@@ -93,7 +93,9 @@ ParksMcClellan::~ParksMcClellan()
 
 void ParksMcClellan::init(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
 {
-    int j, NumBands;
+    // Set per pass type below; an unrecognised type leaves the band table empty
+    // rather than reading an indeterminate count.
+    int j, NumBands = 0;
 
     if(NumTaps > 256) NumTaps = 256;
     if(NumTaps < 9) NumTaps = 9;
@@ -295,10 +297,13 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
 
 int ParksMcClellan::Remez2(int GridIndex)
 {
+    // This routine is a direct port of the original goto-driven Fortran, so the
+    // compiler cannot prove that every path assigns these before use. Give them
+    // defined starting values rather than relying on the control flow.
     int j, JET, K, k, NU, JCHNGE, K1, KNZ, KLOW, NUT, KUP;
-    int NUT1, LUCK, KN, NITER;
+    int NUT1 = 0, LUCK, KN, NITER;
     double Deviation, DNUM, DDEN, TempVar;
-    double DEVL, COMP, YNZ, Y1, ERR;
+    double DEVL, COMP = 0.0, YNZ = 0.0, Y1, ERR;
 
     Y1 = 1;
     LUCK = 0;

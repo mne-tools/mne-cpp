@@ -212,7 +212,7 @@ public:
      * @param[in] proj       Apply SSP projection vectors (optional, default = true).
      */
     void setInfo(const FiffInfo &p_info,
-                 bool proj = true);
+                 bool applyProj = true);
 
     //=========================================================================================================
     /**

@@ -393,12 +393,12 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     //
     fiff_int_t data_type = 4;
     qint32 k;
-    QList<FiffChInfo> chs;
+    QList<FiffChInfo> chsToWrite;
 
     for(k = 0; k < this->nchan; ++k)
-        chs << this->chs[k];
+        chsToWrite << this->chs[k];
 
-    fiff_int_t nchan = chs.size();
+    fiff_int_t nchanToWrite = chsToWrite.size();
 
     //
     // write the essentials
@@ -487,24 +487,24 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     p_pStream->write_string(FIFF_PROJ_NAME,this->proj_name);
     p_pStream->write_int(FIFF_PROJ_ID,&this->proj_id);
     p_pStream->write_int(FIFF_GANTRY_ANGLE,&this->gantry_angle);
-    p_pStream->write_int(FIFF_NCHAN,&nchan);
+    p_pStream->write_int(FIFF_NCHAN,&nchanToWrite);
     p_pStream->write_int(FIFF_DATA_PACK,&data_type);
     if (this->meas_date[0] != -1)
         p_pStream->write_int(FIFF_MEAS_DATE,this->meas_date, 2);
     //
     //    Channel info
     //
-    MatrixXd cals(1,nchan);
+    MatrixXd cals(1,nchanToWrite);
 
-    for(k = 0; k < nchan; ++k)
+    for(k = 0; k < nchanToWrite; ++k)
     {
         //
         //    Scan numbers may have been messed up
         //
-        chs[k].scanNo = k+1;//+1 because
+        chsToWrite[k].scanNo = k+1;//+1 because
 //        chs[k].range  = 1.0f;//Why? -> cause its already calibrated through reading
-        cals(0,k) = static_cast<double>(chs[k].cal); //ToDo whats going on with cals?
-        p_pStream->write_ch_info(chs[k]);
+        cals(0,k) = static_cast<double>(chsToWrite[k].cal); //ToDo whats going on with cals?
+        p_pStream->write_ch_info(chsToWrite[k]);
     }
     //
     //
