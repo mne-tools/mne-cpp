@@ -392,10 +392,9 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     //   We will always write floats
     //
     fiff_int_t data_type = 4;
-    qint32 k;
     QList<FiffChInfo> chsToWrite;
 
-    for(k = 0; k < this->nchan; ++k)
+    for(qint32 k = 0; k < this->nchan; ++k)
         chsToWrite << this->chs[k];
 
     fiff_int_t nchanToWrite = chsToWrite.size();
@@ -496,7 +495,7 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     //
     MatrixXd cals(1,nchanToWrite);
 
-    for(k = 0; k < nchanToWrite; ++k)
+    for(qint32 k = 0; k < nchanToWrite; ++k)
     {
         //
         //    Scan numbers may have been messed up
