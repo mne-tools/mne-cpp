@@ -11,6 +11,42 @@ make start         # local dev server (http://localhost:3000)
 make build         # production build under build/
 ```
 
+## Dependency advisories
+
+Dependabot alerts on this `package-lock.json` are fixed by bumping the
+offending package, except where the fixed release is not API-compatible with
+the dependent that pulls it in. The current standing exception:
+
+**`brace-expansion` / GHSA-mh99-v99m-4gvg (CVE-2026-14257), fixed in 5.0.8.**
+The package reaches us only through
+`@docusaurus/core -> serve-handler -> minimatch@3.1.5`, and `minimatch@3`
+does `const expand = require('brace-expansion')` and then calls `expand(...)`
+directly. From 3.0.0 onwards `brace-expansion` exports an object
+(`{ expand, EXPANSION_MAX, EXPANSION_MAX_LENGTH }`) instead of a callable, so
+forcing 5.0.8 through an npm `override` installs and loads without complaint
+but throws `expand is not a function` for any pattern containing braces.
+
+There is no compatible upgrade path today:
+
+- `serve-handler` pins `minimatch 3.1.5` exactly, in every published version
+  including `latest` (6.1.7).
+- `minimatch` stays callable only up to the 5.x line, which depends on
+  `brace-expansion ^2.0.1`; the 2.x maintenance branch tops out at 2.1.2 and
+  has no backport of this fix.
+- The only `brace-expansion` release carrying the fix is 5.0.8, on the
+  incompatible object-export line.
+
+Exposure is limited: `serve-handler` is reached exclusively from
+`docusaurus serve`, the local preview server. Neither the staging nor the main
+workflow runs it — both only run `npm run build`, which does not load
+`serve-handler` at all. The advisory describes a denial of service against a
+process serving attacker-supplied patterns, so no CI or published-site path is
+affected.
+
+Re-check when `serve-handler` relaxes its `minimatch` pin or a 1.x/2.x
+backport appears; until then the alert should stay dismissed with this
+rationale rather than force-resolved with a broken override.
+
 ## Auto-generated screenshots
 
 Every manual page references images under `/img/manual/auto/...`. Those PNGs
