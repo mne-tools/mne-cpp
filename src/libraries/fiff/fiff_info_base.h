@@ -95,6 +95,19 @@ public:
 
     //=========================================================================================================
     /**
+     * Copy assignment. Every member has value semantics, so the
+     * compiler-generated member-wise assignment is correct. It is declared
+     * explicitly because declaring a copy constructor and/or a destructor
+     * deprecates the implicitly generated one.
+     *
+     * @param[in] other   Object to assign from.
+     *
+     * @return reference to this object.
+     */
+    FiffInfoBase& operator=(const FiffInfoBase& other) = default;
+
+    //=========================================================================================================
+    /**
      * Destroys the light fiff measurement file information.
      */
     virtual ~FiffInfoBase();
