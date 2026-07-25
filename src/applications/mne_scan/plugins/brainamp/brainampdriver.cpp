@@ -240,7 +240,7 @@ bool BrainAMPDriver::getSampleMatrixValue(Eigen::MatrixXd &sampleMatrix)
     //Check if device was initialised and connected correctly
     if(!m_bInitDeviceSuccess)
     {
-        printf("BrainAMPDriver::getSampleMatrixValue - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly");
+        qCritical("[BrainAMPDriver::getSampleMatrixValue] Cannot get samples: device was not initialised correctly.");
         return false;
     }
 

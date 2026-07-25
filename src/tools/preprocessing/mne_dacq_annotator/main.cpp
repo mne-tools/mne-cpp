@@ -326,14 +326,16 @@ int main(int argc, char *argv[])
         qInfo("\n%-10s  %-8s  %-8s  %s" , "Sample", "Before", "After", "Comment");
         qInfo("%-10s  %-8s  %-8s  %s" , "------", "------", "-----", "-------");
         for (const EventEntry& ev : events) {
-            printf("%-10d  %-8d  %-8d", ev.sample, ev.before, ev.after);
+            QString line = QString::asprintf("%-10d  %-8d  %-8d",
+                                             ev.sample, ev.before, ev.after);
             if (sfreq > 0) {
-                printf("  (t=%.3f s)", ev.sample / static_cast<double>(sfreq));
+                line += QString::asprintf("  (t=%.3f s)",
+                                          ev.sample / static_cast<double>(sfreq));
             }
             if (!ev.comment.isEmpty()) {
-                printf("  %s", qPrintable(ev.comment));
+                line += "  " + ev.comment;
             }
-            qInfo("");
+            qInfo("%s", qPrintable(line));
         }
         qInfo("\nTotal: %lld event(s)" , static_cast<long long>(events.size()));
     }

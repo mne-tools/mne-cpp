@@ -183,15 +183,15 @@ int main(int argc, char *argv[])
                        i, qPrintable(tagName(dir1[i]->kind)), dir1[i]->size);
         } else {
             nDiff++;
-            printf("  [%4d] DIFF:", i);
+            QString line = QString::asprintf("  [%4d] DIFF:", i);
             if (!kindMatch)
-                printf(" kind=%d vs %d", dir1[i]->kind, dir2[i]->kind);
+                line += QString::asprintf(" kind=%d vs %d", dir1[i]->kind, dir2[i]->kind);
             else
-                printf(" kind=%s", qPrintable(tagName(dir1[i]->kind)));
-            if (!typeMatch) printf(" type=%d vs %d", dir1[i]->type, dir2[i]->type);
-            if (!sizeMatch) printf(" size=%d vs %d", dir1[i]->size, dir2[i]->size);
-            if (sizeMatch && !dataMatch) printf(" DATA_DIFFERS");
-            qInfo("");
+                line += " kind=" + tagName(dir1[i]->kind);
+            if (!typeMatch) line += QString::asprintf(" type=%d vs %d", dir1[i]->type, dir2[i]->type);
+            if (!sizeMatch) line += QString::asprintf(" size=%d vs %d", dir1[i]->size, dir2[i]->size);
+            if (sizeMatch && !dataMatch) line += " DATA_DIFFERS";
+            qInfo("%s", qPrintable(line));
         }
     }
 

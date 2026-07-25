@@ -643,12 +643,11 @@ QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to)
 {
     QPair<MatrixXd,MatrixXd> datatime;
 
-    m_Mutex.lock();
+    QMutexLocker locker(&m_Mutex);
     if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(datatime.first, datatime.second, from, to)) {
-        printf("RawModel: Error when reading raw data!");
+        qCritical("[RawModel::readSegment] Error when reading raw data.");
         return datatime;
     }
-    m_Mutex.unlock();
 
     return datatime;
 }

@@ -269,11 +269,7 @@ bool WatershedBem::runMriWatershed(const QString& mriInput, const QString& wsDir
     args << mriInput;
     args << (wsDir + "/ws");
 
-    printf("Running: %s", qPrintable(watershedBin));
-    for (const QString& arg : args) {
-        printf(" %s", qPrintable(arg));
-    }
-    qInfo("\n");
+    qInfo("Running: %s %s\n", qPrintable(watershedBin), qPrintable(args.join(' ')));
 
     //
     // Execute mri_watershed

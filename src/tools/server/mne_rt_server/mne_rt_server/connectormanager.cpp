@@ -384,7 +384,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
         this->setFileName(ConnectorsDir.absoluteFilePath(fileName));
         QObject *pConnector = this->instance();
 
-        printf("\tLoading %s... ", fileName.toUtf8().constData() );
+        qInfo("\tLoading %s...", fileName.toUtf8().constData());
 
         // IModule
         if(pConnector)
@@ -419,7 +419,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
     }
     else
     {
-        printf("\tReading %s... ", configFileName.toUtf8().constData());
+        qInfo("\tReading %s...", configFileName.toUtf8().constData());
 
         QTextStream in(&configFile);
         QString line = in.readLine();
@@ -447,13 +447,12 @@ void ConnectorManager::loadConnectors(const QString& dir)
                 if(s_vecConnectors[i]->getConnectorID() == configConnector)
                 {
                     s_vecConnectors[i]->setStatus(true);
-                    printf("activate %s... ", s_vecConnectors[i]->getName());
+                    qInfo("activate %s... [done]", s_vecConnectors[i]->getName());
                     activated = true;
                     break;
                 }
             }
         }
-        qInfo("[done]");
 
         //default
         if(!activated)
@@ -462,7 +461,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
 
     //print
     qInfo("Connector list");
-    printf("%s", getConnectorList().data());
+    qInfo("%s", getConnectorList().data());
 }
 
 //=============================================================================================================

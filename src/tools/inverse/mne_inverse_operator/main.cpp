@@ -519,10 +519,9 @@ int main(int argc, char *argv[])
             info.bads << bad;
     }
     if (!info.bads.isEmpty()) {
-        printf("  Bad channels (%lld):", info.bads.size());
-        for (const QString &bad : info.bads)
-            printf(" %s", bad.toUtf8().constData());
-        qInfo("");
+        qInfo("  Bad channels (%lld): %s",
+              info.bads.size(),
+              info.bads.join(' ').toUtf8().constData());
     }
 
     //=========================================================================================================
@@ -550,11 +549,11 @@ int main(int argc, char *argv[])
     if (!useFixed) {
         qInfo("  Loose constraint: %.2f" , loose);
     }
-    printf("  Depth weighting:  %s", depth > 0.0f ? "yes" : "no");
     if (depth > 0.0f) {
-        printf(" (%.2f)", depth);
+        qInfo("  Depth weighting:  yes (%.2f)", depth);
+    } else {
+        qInfo("  Depth weighting:  no");
     }
-    qInfo("");
 
     MNEInverseOperator invOp(info, forward, noiseCov, loose, depth, useFixed, true);
 

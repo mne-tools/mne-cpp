@@ -53,6 +53,8 @@
 #include <stdlib.h>
 #include <iostream>
 
+#include <QDebug>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -91,7 +93,8 @@ void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
     {
         QByteArray t_blockReply;
         t_blockReply.append("command unknown\r\n");
-        printf("%s", t_blockReply.data());
+        qWarning("[CommandServer::incommingCommand] command unknown: %s",
+                 p_sCommand.toUtf8().constData());
 
         //send reply
         emit replyCommand(t_blockReply, p_iThreadID);

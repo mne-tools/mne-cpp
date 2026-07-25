@@ -239,11 +239,7 @@ bool FlashBem::runCommand(const QString& program, const QStringList& args,
                           const QString& workDir)
 {
     // Print the command being run
-    printf("Running: %s", qPrintable(program));
-    for (const QString& arg : args) {
-        printf(" %s", qPrintable(arg));
-    }
-    qInfo("");
+    qInfo("Running: %s %s", qPrintable(program), qPrintable(args.join(' ')));
 
     QProcess process;
     process.setProcessChannelMode(QProcess::ForwardedChannels);

@@ -64,6 +64,7 @@
 
 #include <QDebug>
 #include <QAbstractTableModel>
+#include <QMutex>
 #include <QMetaEnum>
 #include <QMultiMap>
 #include <QBrush>

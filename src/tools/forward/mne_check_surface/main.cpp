@@ -154,18 +154,19 @@ static bool isCompleteSurface(const MNEBemSurface& surf)
 static bool checkNesting(const QVector<MNEBemSurface>& surfs)
 {
     for (int j = 0; j < surfs.size() - 1; ++j) {
-        printf("Checking that %s is inside %s...",
-               qPrintable(nameOf(surfs[j + 1].id)),
-               qPrintable(nameOf(surfs[j].id)));
+        const QString inner = nameOf(surfs[j + 1].id);
+        const QString outer = nameOf(surfs[j].id);
 
         // Test first vertex of inner surface against outer
         Vector3f pt = surfs[j + 1].rr.row(0);
         double totAngle = sumSolids(pt, surfs[j]) / (4.0 * M_PI);
         if (fabs(totAngle - 1.0) > 1e-5) {
-            qInfo("[FAILED]");
+            qInfo("Checking that %s is inside %s... [FAILED]",
+                  qPrintable(inner), qPrintable(outer));
             return false;
         }
-        qInfo("[OK]");
+        qInfo("Checking that %s is inside %s... [OK]",
+              qPrintable(inner), qPrintable(outer));
     }
     return true;
 }

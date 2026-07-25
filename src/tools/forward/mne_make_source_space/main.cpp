@@ -607,13 +607,15 @@ int main(int argc, char *argv[])
     // Summary
     qInfo("\nSource space created successfully:");
     for (int h = 0; h < hemispheres.size(); ++h) {
-        printf("  %s hemisphere: %d of %d vertices selected",
-               h == 0 ? "Left" : "Right",
-               hemispheres[h].nuse, hemispheres[h].np);
         if (hemispheres[h].nuse_tri > 0) {
-            printf(", %d use triangles", hemispheres[h].nuse_tri);
+            qInfo("  %s hemisphere: %d of %d vertices selected, %d use triangles",
+                  h == 0 ? "Left" : "Right",
+                  hemispheres[h].nuse, hemispheres[h].np, hemispheres[h].nuse_tri);
+        } else {
+            qInfo("  %s hemisphere: %d of %d vertices selected",
+                  h == 0 ? "Left" : "Right",
+                  hemispheres[h].nuse, hemispheres[h].np);
         }
-        qInfo("");
     }
     qInfo("\nOutput: %s" , srcName.toUtf8().constData());
     qInfo("\nYou can now use mne_forward_solution to compute forward solutions");
