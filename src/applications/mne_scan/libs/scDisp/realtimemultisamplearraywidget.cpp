@@ -341,15 +341,23 @@ void RealTimeMultiSampleArrayWidget::onMakeScreenshot(const QString& imageType)
         QDir().mkdir("./Screenshots");
     }
 
-    QString fileName;
-
+    //
+    // Only PNG and SVG can be written; any other value would leave the file
+    // name empty and be passed on to the view regardless.
+    //
+    QString sSuffix;
     if(imageType.contains("SVG")) {
-        fileName = QString("./Screenshots/%1-%2-DataView.svg").arg(sDate).arg(sTime);
+        sSuffix = "svg";
     } else if(imageType.contains("PNG")) {
-        fileName = QString("./Screenshots/%1-%2-DataView.png").arg(sDate).arg(sTime);
+        sSuffix = "png";
+    } else {
+        qWarning() << "[RealTimeMultiSampleArrayWidget::onMakeScreenshot] Unsupported image type"
+                   << imageType << "- no screenshot was taken.";
+        return;
     }
 
-    m_pChannelDataView->takeScreenshot(fileName);
+    m_pChannelDataView->takeScreenshot(QString("./Screenshots/%1-%2-DataView.%3")
+                                           .arg(sDate, sTime, sSuffix));
 }
 
 //=============================================================================================================

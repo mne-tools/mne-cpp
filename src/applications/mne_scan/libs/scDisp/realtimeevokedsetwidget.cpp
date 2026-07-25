@@ -436,26 +436,38 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
         QDir().mkdir("./Screenshots");
     }
 
-    //Handle the butterfly plot and 2D layout plot differently
-    QString fileName;
-
-    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot") {
-        if(imageType.contains("SVG")) {
-            fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.svg").arg(sDate).arg(sTime);
-        } else if(imageType.contains("PNG")) {
-            fileName = QString("./Screenshots/%1-%2-LayoutScreenshot.png").arg(sDate).arg(sTime);
-        }
+    //
+    // Only PNG and SVG can be written. Anything else would leave the file name
+    // empty and be handed on to a view that then writes nothing.
+    //
+    QString sSuffix;
+    if(imageType.contains("SVG")) {
+        sSuffix = "svg";
+    } else if(imageType.contains("PNG")) {
+        sSuffix = "png";
+    } else {
+        qWarning() << "[RealTimeEvokedSetWidget::onMakeScreenshot] Unsupported image type"
+                   << imageType << "- no screenshot was taken.";
+        return;
     }
 
-    if(m_pToolBox->itemText(m_pToolBox->currentIndex()) == "Butterfly plot") {
-        if(imageType.contains("SVG")) {
-            fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.svg").arg(sDate).arg(sTime);
-        } else if(imageType.contains("PNG")) {
-            fileName = QString("./Screenshots/%1-%2-ButterflyScreenshot.png").arg(sDate).arg(sTime);
-        }
-    }
+    //
+    // Capture the plot the user is actually looking at. The 2D layout branch
+    // built a Layout file name but still screenshotted the butterfly view.
+    //
+    const bool bIsLayout = m_pToolBox->itemText(m_pToolBox->currentIndex()) == "2D Layout plot";
 
-    m_pButterflyView->takeScreenshot(fileName);
+    const QString fileName = QString("./Screenshots/%1-%2-%3Screenshot.%4")
+                                 .arg(sDate,
+                                      sTime,
+                                      bIsLayout ? "Layout" : "Butterfly",
+                                      sSuffix);
+
+    if(bIsLayout) {
+        m_pAverageLayoutView->takeScreenshot(fileName);
+    } else {
+        m_pButterflyView->takeScreenshot(fileName);
+    }
 }
 
 //=============================================================================================================
