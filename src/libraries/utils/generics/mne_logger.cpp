@@ -31,6 +31,8 @@
 #include <QtGlobal>
 #include <QDateTime>
 #include <QMutexLocker>
+#include <QFile>
+#include <QTextStream>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -61,10 +63,44 @@ using namespace UTILSLIB;
 #endif
 
 std::mutex MNELogger::m_mutex;
+QString    MNELogger::m_sLogFilePath;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
+
+bool MNELogger::setLogFile(const QString& sFilePath)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    if(sFilePath.isEmpty()) {
+        m_sLogFilePath.clear();
+        return true;
+    }
+
+    //
+    // Make sure the destination is writable now rather than silently dropping
+    // every message later on.
+    //
+    QFile file(sFilePath);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+        return false;
+    }
+    file.close();
+
+    m_sLogFilePath = sFilePath;
+
+    return true;
+}
+
+//=============================================================================================================
+
+QString MNELogger::logFile()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    return m_sLogFilePath;
+}
 
 void MNELogger::customLogWriter(QtMsgType type,
                                         const QMessageLogContext &context,
@@ -92,6 +128,32 @@ void MNELogger::customLogWriter(QtMsgType type,
     std::string text = msg.toStdString();
 
     std::lock_guard<std::mutex> lock(m_mutex);
+
+    //
+    // Mirror the message into the log file when one was configured. This is
+    // kept free of the colour escapes so the file stays readable, and carries
+    // a timestamp because a log that outlives the session needs one.
+    //
+    if(!m_sLogFilePath.isEmpty()) {
+        QFile logFile(m_sLogFilePath);
+        if(logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+            const char* fileLevel = "";
+            switch(type) {
+                case QtDebugMsg:    fileLevel = "DEBUG"; break;
+                case QtInfoMsg:     fileLevel = "INFO";  break;
+                case QtWarningMsg:  fileLevel = "WARN";  break;
+                case QtCriticalMsg: fileLevel = "CRIT";  break;
+                case QtFatalMsg:    fileLevel = "FATAL"; break;
+                default:            fileLevel = "LOG";   break;
+            }
+
+            QTextStream stream(&logFile);
+            stream << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")
+                   << " [" << fileLevel << "] "
+                   << QString::fromStdString(text).trimmed() << '\n';
+            logFile.close();
+        }
+    }
 
 #ifdef MNE_LOG_MODE_FORMATTED
     static bool s_startOfLine = true;

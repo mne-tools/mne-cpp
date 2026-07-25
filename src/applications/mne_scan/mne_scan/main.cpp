@@ -65,6 +65,8 @@
 #include <QtGui>
 #include <QApplication>
 #include <QSharedPointer>
+#include <QStandardPaths>
+#include <QDir>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -165,6 +167,22 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName(CInfo::OrganizationName());
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
     QCoreApplication::setOrganizationDomain("www.mne-cpp.org");
+
+    //
+    // Keep a log next to the other application data. Acquisition sessions are
+    // long and often unattended, so a warning or crash that scrolled out of the
+    // terminal - or happened with no terminal attached at all - would otherwise
+    // be lost.
+    //
+    const QString sLogDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if(!sLogDir.isEmpty() && QDir().mkpath(sLogDir)) {
+        const QString sLogFile = sLogDir + "/mne_scan.log";
+        if(UTILSLIB::MNELogger::setLogFile(sLogFile)) {
+            qInfo() << "Logging to" << sLogFile;
+        } else {
+            qWarning() << "Could not open log file" << sLogFile << "- logging to console only.";
+        }
+    }
 
     SCMEASLIB::MeasurementTypes::registerTypes();
 

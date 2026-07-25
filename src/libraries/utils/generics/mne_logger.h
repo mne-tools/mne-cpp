@@ -66,8 +66,29 @@ public:
      */
     static void customLogWriter(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
+    //=========================================================================================================
+    /**
+     * Additionally writes every message to a log file.
+     *
+     * Console output is unaffected. The file is opened in append mode and each
+     * line is prefixed with a timestamp and the message level, without the
+     * terminal colour codes. Passing an empty path stops file logging.
+     *
+     * @param[in] sFilePath   Path of the log file, or an empty string to disable.
+     *
+     * @return True if the file could be opened for writing.
+     */
+    static bool setLogFile(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
+     * Returns the path of the current log file, empty if file logging is off.
+     */
+    static QString logFile();
+
 private:
     static std::mutex m_mutex;
+    static QString    m_sLogFilePath;
 };
 }
 #endif // MNE_LOGGER_H
