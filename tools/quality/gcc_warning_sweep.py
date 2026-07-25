@@ -23,15 +23,25 @@ workstation can therefore still fail the Ubuntu job, and each discovery costs a
 full CI cycle.
 
 This script closes that gap: it replays the project's own
-``compile_commands.json`` through ``g++ -fsyntax-only`` and prints every
-diagnostic in MNE-CPP's own sources, so the complete list is available in one
-local pass.
+``compile_commands.json`` through ``g++``, discarding the object files, and
+prints every diagnostic raised in MNE-CPP's own sources, so the complete list is
+available in one local pass.
+
+Note that the objects really are compiled rather than syntax-checked. The flow
+analysis behind ``-Wmaybe-uninitialized`` and ``-Wunused-but-set-variable`` only
+runs during code generation, so ``-fsyntax-only`` silently misses exactly the
+diagnostics that are hardest to spot by reading the code.
 
 Usage::
 
     python3 tools/quality/gcc_warning_sweep.py                      # sweep everything
     python3 tools/quality/gcc_warning_sweep.py --filter fiff        # only matching paths
     python3 tools/quality/gcc_warning_sweep.py --check              # exit 1 if anything is reported
+
+Do not run this while a build is in progress. The sweep reads the same generated
+moc/uic headers that the build rewrites, and picking them up mid-write produces
+diagnostics that do not reproduce afterwards. Re-run any finding on its own with
+``--filter`` before acting on it.
 
 Requires a configured build directory (for ``compile_commands.json``) and a GCC
 that understands the project's C++ standard; ``brew install gcc`` provides one
@@ -60,10 +70,15 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # GCC expects.
 SHIM_DIR = Path(os.environ.get('TMPDIR', '/tmp')) / 'mnecpp-qt-include-shim'
 
-# GCC notes an ARM/x86 calling-convention change introduced in GCC 10.1 for
-# by-value aggregates. It reports no defect and is irrelevant to a build that
-# uses a single compiler, but it is emitted for most Eigen and Qt templates.
-BASE_FLAGS = ['-fsyntax-only', '-Wno-psabi']
+# Compile to a discarded object rather than using -fsyntax-only: the flow
+# analysis behind -Wmaybe-uninitialized and -Wunused-but-set-variable only runs
+# once GCC generates code, so a syntax-only pass silently misses them.
+#
+# -Wno-psabi drops GCC's note about an ARM/x86 calling-convention change made in
+# GCC 10.1 for by-value aggregates. It reports no defect and is irrelevant to a
+# single-compiler build, but it is emitted for most Eigen and Qt templates and
+# would otherwise bury real findings.
+BASE_FLAGS = ['-Wno-psabi']
 
 # Flags accepted by clang but not by GCC.
 CLANG_ONLY_PREFIXES = ('-Wno-variadic-macro-arguments-omitted',)
@@ -121,7 +136,7 @@ def locate_qt_lib_dir(build_dir: Path) -> Path | None:
 
 
 def rewrite_command(command: str, compiler: str) -> tuple[list[str], str] | None:
-    """Turn a compile_commands.json entry into a GCC syntax-only invocation."""
+    """Turn a compile_commands.json entry into a GCC diagnostic-only invocation."""
     tokens = shlex.split(command)
     rewritten: list[str] = [compiler]
     source: str | None = None
@@ -131,10 +146,9 @@ def rewrite_command(command: str, compiler: str) -> tuple[list[str], str] | None
         if skip_next:
             skip_next = False
             continue
-        if token == '-o':
-            skip_next = True
-            continue
-        if token == '-c':
+        if token in ('-o', '-c'):
+            if token == '-o':
+                skip_next = True
             continue
         if token == '-iframework':
             skip_next = True
@@ -151,6 +165,8 @@ def rewrite_command(command: str, compiler: str) -> tuple[list[str], str] | None
 
     rewritten += ['-isystem', str(SHIM_DIR)]
     rewritten += BASE_FLAGS
+    # Compile for real, but throw the object away.
+    rewritten += ['-c', '-o', os.devnull]
     rewritten.append(source)
     return rewritten, source
 
