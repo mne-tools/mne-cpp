@@ -239,8 +239,8 @@ bool MNEForwardSolution::write(QIODevice& p_IODevice) const
         else if (kind == FIFFV_EEG_CH)
             eegIdx.push_back(k);
     }
-    int nmeg = megIdx.size();
-    int neeg = eegIdx.size();
+    int nmeg = static_cast<int>(megIdx.size());
+    int neeg = static_cast<int>(eegIdx.size());
 
     //
     //   Compute the total number of active source vertices
@@ -317,7 +317,7 @@ bool MNEForwardSolution::write(QIODevice& p_IODevice) const
     auto extractRows = [](const FiffNamedMatrix& combined,
                           const std::vector<int>& rowIdx) -> FiffNamedMatrix
     {
-        int nRows = rowIdx.size();
+        int nRows = static_cast<int>(rowIdx.size());
         int nCols = combined.ncol;
         MatrixXd data(nRows, nCols);
         QStringList row_names;
@@ -632,8 +632,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
                     {
                         clusterIdcs[nClusterIdcs] = itIn->idcs[k];
 
-                        qint32 offset = h == 0 ? 0 : this->src[0].nuse;
-                        clusterSource_rr.row(nClusterIdcs) = this->source_rr.row(offset + itIn->idcs[k]);
+                        const qint32 hemiOffset = h == 0 ? 0 : this->src[0].nuse;
+                        clusterSource_rr.row(nClusterIdcs) = this->source_rr.row(hemiOffset + itIn->idcs[k]);
                         clusterDistance[nClusterIdcs] = itOut->D(k,j);
                         ++nClusterIdcs;
                     }
@@ -664,9 +664,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
                 // Map the centroids to the closest rr
                 for(qint32 k = 0; k < nClusters; ++k)
                 {
-                    qint32 j = 0;
-
-                    double sqec = sqrt((itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3)).array().pow(2).sum());
+                    double sqec = sqrt((itIn->matRoiGOrig.block(0, 0, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3)).array().pow(2).sum());
                     double sqec_min = sqec;
                     qint32 j_min = 0;
                     for(qint32 j = 1; j < itIn->idcs.rows(); ++j)

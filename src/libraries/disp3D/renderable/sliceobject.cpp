@@ -52,7 +52,12 @@ void SliceObject::setSlice(const QImage& image,
 
     // Build the four corner positions in voxel coordinates, then transform to world.
     // u runs along image columns, v along image rows.
-    Eigen::Vector4d c00, c10, c01, c11;
+    // The switch below assigns all four, but the compiler cannot prove the
+    // enumeration is exhaustive, so start from a defined value.
+    Eigen::Vector4d c00 = Eigen::Vector4d::Zero();
+    Eigen::Vector4d c10 = Eigen::Vector4d::Zero();
+    Eigen::Vector4d c01 = Eigen::Vector4d::Zero();
+    Eigen::Vector4d c11 = Eigen::Vector4d::Zero();
 
     switch (m_orientation) {
     case SliceOrientation::Axial:
