@@ -927,9 +927,9 @@ bool DataWindow::loadFiffFile(const QString &path)
 
 //=============================================================================================================
 
-bool DataWindow::loadFiffBuffer(const QByteArray &data, const QString &displayName)
+bool DataWindow::loadFiffBuffer(const QByteArray &baData, const QString &displayName)
 {
-    if (!m_pFiffReader->openBuffer(data, displayName)) {
+    if (!m_pFiffReader->openBuffer(baData, displayName)) {
         return false;
     }
 
@@ -946,14 +946,14 @@ bool DataWindow::loadFiffBuffer(const QByteArray &data, const QString &displayNa
 
 //=============================================================================================================
 
-void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
+void DataWindow::onBlockLoaded(const Eigen::MatrixXd &matData, int firstSample)
 {
     m_bLoadingBlock = false;
 
-    if (data.rows() == 0 || data.cols() == 0)
+    if (matData.rows() == 0 || matData.cols() == 0)
         return;
 
-    const Eigen::MatrixXd filteredData = applyUserDefinedFilter(data);
+    const Eigen::MatrixXd filteredData = applyUserDefinedFilter(matData);
 
     // Apply raw-trace whitening if enabled and whitener is available
     const Eigen::MatrixXd whitenedData =
@@ -964,7 +964,7 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
     const Eigen::MatrixXd displayData = appendVirtualChannels(whitenedData);
     auto *model = m_pChannelDataView->model();
 
-    // Determine whether this block is contiguous with existing model data.
+    // Determine whether this block is contiguous with existing model matData.
     // If not (e.g. jump happened while the block was in-flight), start fresh
     // at this position so the ring buffer stays coherent.
     bool useSetData = (model->totalSamples() == 0);
@@ -1000,7 +1000,7 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
         // The remaining edge case is block boundaries and revisit loads: if we
         // always assume the previous value is zero, we can invent a false event
         // at the start of a block or duplicate an event when a region is loaded twice.
-        if (m_iStimChannel < data.rows()) {
+        if (m_iStimChannel < matData.rows()) {
             int prevValue = 0;
             if (firstSample > m_pFiffReader->firstSample()) {
                 if (m_iStimLastSample == firstSample - 1) {
@@ -1014,8 +1014,8 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
             }
 
             bool eventsChanged = false;
-            for (int s = 0; s < data.cols(); ++s) {
-                const int currValue = qRound(data(m_iStimChannel, s));
+            for (int s = 0; s < matData.cols(); ++s) {
+                const int currValue = qRound(matData(m_iStimChannel, s));
 
                 if (currValue > 0 && prevValue <= 0) {
                     const int type      = currValue;
@@ -1043,7 +1043,7 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
                 prevValue = currValue;
             }
 
-            m_iStimLastSample = firstSample + data.cols() - 1;
+            m_iStimLastSample = firstSample + matData.cols() - 1;
             m_iStimLastValue  = prevValue;
 
             if (eventsChanged && m_pChannelDataView) {
@@ -1060,7 +1060,7 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd &data, int firstSample)
     // Advance the frontier only if this block moved it forward — never regress.
     // This preserves a jump-redirect written by onChannelViewScrollChanged()
     // that may have been set while this block was in-flight.
-    int newFrontier = firstSample + static_cast<int>(data.cols());
+    int newFrontier = firstSample + static_cast<int>(matData.cols());
     if (m_iNextLoadSample < newFrontier)
         m_iNextLoadSample = newFrontier;
 
@@ -1212,29 +1212,29 @@ void DataWindow::rebuildVirtualChannels()
 
 //=============================================================================================================
 
-Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd &data) const
+Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd &matData) const
 {
     if(m_resolvedVirtualChannels.isEmpty()) {
-        return data;
+        return matData;
     }
 
-    Eigen::MatrixXd displayData(data.rows() + m_resolvedVirtualChannels.size(), data.cols());
-    displayData.topRows(data.rows()) = data;
+    Eigen::MatrixXd displayData(matData.rows() + m_resolvedVirtualChannels.size(), matData.cols());
+    displayData.topRows(matData.rows()) = matData;
 
     for(int row = 0; row < m_resolvedVirtualChannels.size(); ++row) {
         const ResolvedVirtualChannel& virtualChannel = m_resolvedVirtualChannels.at(row);
         if(virtualChannel.primaryChannel < 0
-           || virtualChannel.primaryChannel >= data.rows()
+           || virtualChannel.primaryChannel >= matData.rows()
            || virtualChannel.referenceChannels.isEmpty()) {
-            displayData.row(data.rows() + row).setZero();
+            displayData.row(matData.rows() + row).setZero();
             continue;
         }
 
-        Eigen::RowVectorXd referenceSignal = Eigen::RowVectorXd::Zero(data.cols());
+        Eigen::RowVectorXd referenceSignal = Eigen::RowVectorXd::Zero(matData.cols());
         bool validReferences = true;
         for(int index = 0; index < virtualChannel.referenceChannels.size(); ++index) {
             const int referenceChannel = virtualChannel.referenceChannels.at(index);
-            if(referenceChannel < 0 || referenceChannel >= data.rows()) {
+            if(referenceChannel < 0 || referenceChannel >= matData.rows()) {
                 validReferences = false;
                 break;
             }
@@ -1242,11 +1242,11 @@ Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd &data) c
             const double weight = virtualChannel.kind == VirtualChannelKind::WeightedReference
                 ? virtualChannel.referenceWeights.value(index, 1.0)
                 : 1.0;
-            referenceSignal += weight * data.row(referenceChannel);
+            referenceSignal += weight * matData.row(referenceChannel);
         }
 
         if(!validReferences) {
-            displayData.row(data.rows() + row).setZero();
+            displayData.row(matData.rows() + row).setZero();
             continue;
         }
 
@@ -1254,8 +1254,8 @@ Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd &data) c
             referenceSignal /= static_cast<double>(virtualChannel.referenceChannels.size());
         }
 
-        displayData.row(data.rows() + row) =
-            data.row(virtualChannel.primaryChannel) - referenceSignal;
+        displayData.row(matData.rows() + row) =
+            matData.row(virtualChannel.primaryChannel) - referenceSignal;
     }
 
     return displayData;
@@ -1263,14 +1263,14 @@ Eigen::MatrixXd DataWindow::appendVirtualChannels(const Eigen::MatrixXd &data) c
 
 //=============================================================================================================
 
-Eigen::MatrixXd DataWindow::applyUserDefinedFilter(const Eigen::MatrixXd &data) const
+Eigen::MatrixXd DataWindow::applyUserDefinedFilter(const Eigen::MatrixXd &matData) const
 {
     if (m_pUserDefinedFilter.isNull() || !m_pFiffReader || !m_pFiffReader->fiffInfo()) {
-        return data;
+        return matData;
     }
 
     const auto info = m_pFiffReader->fiffInfo();
-    return m_pUserDefinedFilter->applyToMatrix(data, *info);
+    return m_pUserDefinedFilter->applyToMatrix(matData, *info);
 }
 
 //=============================================================================================================

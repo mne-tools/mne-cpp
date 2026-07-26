@@ -1153,7 +1153,7 @@ void BrainRenderer::prepareSlice(QRhi *rhi,
     // ── Vertex data ─────────────────────────────────────────────────
     slice->generateQuadVertices(sliceSlot.vertices);
     u->updateDynamicBuffer(k.vertexBuffer[slotIndex].get(), 0,
-                           sliceSlot.vertices.size() * sizeof(float),
+                           static_cast<quint32>(sliceSlot.vertices.size() * sizeof(float)),
                            sliceSlot.vertices.constData());
 
     sliceSlot.opacity = slice->opacity();

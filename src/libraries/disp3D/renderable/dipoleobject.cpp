@@ -281,7 +281,7 @@ void DipoleObject::createGeometry()
         indices.push_back(baseStart + next);
     }
     
-    m_indexCount = indices.size();
+    m_indexCount = static_cast<int>(indices.size());
     
     m_vertexData.resize(vertices.size() * sizeof(VertexData));
     memcpy(m_vertexData.data(), vertices.data(), m_vertexData.size());

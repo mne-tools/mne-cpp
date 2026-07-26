@@ -523,8 +523,8 @@ void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
     if (!m_gpu->dirty && !needsCreate) return;
 #endif
 
-    const quint32 vbufSize = m_vertexData.size() * sizeof(VertexData);
-    const quint32 ibufSize = m_indexData.size() * sizeof(uint32_t);
+    const quint32 vbufSize = static_cast<quint32>(m_vertexData.size() * sizeof(VertexData));
+    const quint32 ibufSize = static_cast<quint32>(m_indexData.size() * sizeof(uint32_t));
 
 #ifdef __EMSCRIPTEN__
     if (!m_gpu->vertexBuffer) {

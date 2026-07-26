@@ -734,7 +734,7 @@ public slots:
      *
      * @param[in] data       Source activity vector.
      */
-    void pushRealtimeSourceData(const Eigen::VectorXd &data);
+    void pushRealtimeSourceData(const Eigen::VectorXd &matData);
 
     //=========================================================================================================
     /**
@@ -800,7 +800,7 @@ public slots:
      *
      * @param[in] data       Sensor measurement vector.
      */
-    void pushRealtimeSensorData(const Eigen::VectorXf &data);
+    void pushRealtimeSensorData(const Eigen::VectorXf &vecData);
 
     //=========================================================================================================
     /**

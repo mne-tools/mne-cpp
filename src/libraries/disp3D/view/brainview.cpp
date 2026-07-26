@@ -2269,9 +2269,9 @@ bool BrainView::isRealtimeStreaming() const
 
 //=============================================================================================================
 
-void BrainView::pushRealtimeSourceData(const Eigen::VectorXd &data)
+void BrainView::pushRealtimeSourceData(const Eigen::VectorXd &matData)
 {
-    m_sourceManager.pushData(data);
+    m_sourceManager.pushData(matData);
 }
 
 //=============================================================================================================
@@ -2531,9 +2531,9 @@ bool BrainView::isRealtimeSensorStreaming() const
 
 //=============================================================================================================
 
-void BrainView::pushRealtimeSensorData(const Eigen::VectorXf &data)
+void BrainView::pushRealtimeSensorData(const Eigen::VectorXf &vecData)
 {
-    m_sensorStreamManager.pushData(data);
+    m_sensorStreamManager.pushData(vecData);
 }
 
 //=============================================================================================================
@@ -3395,22 +3395,28 @@ void BrainView::setProbeVisualization(const QVector3D& tip, const QVector3D& dir
 
 void BrainView::clearProbeVisualization()
 {
-    bool removed = false;
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_shaft"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_tip"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_tipglow"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_axis_x"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_axis_y"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_axis_z"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_axis_x_tip"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_axis_y_tip"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_axis_z_tip"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_axis_xn_tip"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_axis_yn_tip"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_axis_zn_tip"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_cross_x"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_cross_y"));
-    removed |= m_surfaces.remove(QLatin1String("dig_probe_cross_z"));
+    // QMap::remove returns the number of entries removed, not a bool, so sum
+    // the counts rather than OR-ing an integer into a bool.
+    qsizetype nRemoved = 0;
+    for (const char *key : {"dig_probe_shaft",
+                            "dig_probe_tip",
+                            "dig_probe_tipglow",
+                            "dig_probe_axis_x",
+                            "dig_probe_axis_y",
+                            "dig_probe_axis_z",
+                            "dig_probe_axis_x_tip",
+                            "dig_probe_axis_y_tip",
+                            "dig_probe_axis_z_tip",
+                            "dig_probe_axis_xn_tip",
+                            "dig_probe_axis_yn_tip",
+                            "dig_probe_axis_zn_tip",
+                            "dig_probe_cross_x",
+                            "dig_probe_cross_y",
+                            "dig_probe_cross_z"}) {
+        nRemoved += m_surfaces.remove(QLatin1String(key));
+    }
+
+    const bool removed = nRemoved > 0;
     if (removed) {
         m_sceneDirty = true;
         update();

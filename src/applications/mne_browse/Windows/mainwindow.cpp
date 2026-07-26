@@ -4327,19 +4327,19 @@ void MainWindow::computeIca()
         return;
 
     // Read all data
-    Eigen::MatrixXd data, times;
+    Eigen::MatrixXd matData, times;
     Eigen::RowVectorXd cals;
     Eigen::SparseMatrix<double> mult;
     Eigen::RowVectorXi sel;
-    raw.read_raw_segment(data, times, mult, raw.first_samp, raw.last_samp, sel);
+    raw.read_raw_segment(matData, times, mult, raw.first_samp, raw.last_samp, sel);
 
-    if(data.rows() == 0 || data.cols() == 0) {
+    if(matData.rows() == 0 || matData.cols() == 0) {
         statusBar()->showMessage(tr("No data could be read from the raw file for ICA."), 5000);
         return;
     }
 
     QSharedPointer<FIFFLIB::FiffInfo> pInfo(new FIFFLIB::FiffInfo(raw.info));
-    m_pIcaWindow->setRawData(data, pInfo, raw.first_samp);
+    m_pIcaWindow->setRawData(matData, pInfo, raw.first_samp);
 
     if(!m_pIcaWindow->isVisible()) {
         m_pIcaWindow->show();

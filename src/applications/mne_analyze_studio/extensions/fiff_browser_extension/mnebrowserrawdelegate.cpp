@@ -63,7 +63,7 @@ void MneBrowseRawDelegate::paint(QPainter* painter,
                                rawModelLabel->channelInfoList().at(index.row()).ch_name);
         QColor labelColor = isBad ? QColor(0xCC, 0x44, 0x44) : colorForChannel(rawModelLabel, index.row());
         if(isBad) {
-            labelColor.setAlphaF(0.7);
+            labelColor.setAlphaF(0.7f);
         }
         QPalette labelPalette = option.palette;
         labelPalette.setColor(QPalette::Text, labelColor);
@@ -117,7 +117,7 @@ void MneBrowseRawDelegate::paint(QPainter* painter,
                                 rawModel->channelInfoList().at(index.row()).ch_name);
     QColor traceColor = traceIsBad ? QColor(0xCC, 0x44, 0x44) : colorForChannel(rawModel, index.row());
     if(traceIsBad) {
-        traceColor.setAlphaF(0.45);
+        traceColor.setAlphaF(0.45f);
     }
     QPen dataPen(traceColor);
     dataPen.setWidthF(1.0);

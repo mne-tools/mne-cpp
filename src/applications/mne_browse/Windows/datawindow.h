@@ -151,7 +151,7 @@ public:
      * @param[in] displayName  Friendly file name shown in the UI.
      * @return true on success.
      */
-    bool loadFiffBuffer(const QByteArray &data, const QString &displayName);
+    bool loadFiffBuffer(const QByteArray &baData, const QString &displayName);
 
     //=========================================================================================================
     /**
@@ -424,13 +424,13 @@ private:
     /**
      * Append the currently active virtual channels to a raw data block.
      */
-    Eigen::MatrixXd appendVirtualChannels(const Eigen::MatrixXd &data) const;
+    Eigen::MatrixXd appendVirtualChannels(const Eigen::MatrixXd &matData) const;
 
     //=========================================================================================================
     /**
      * Apply the currently active session filter to a loaded raw block.
      */
-    Eigen::MatrixXd applyUserDefinedFilter(const Eigen::MatrixXd &data) const;
+    Eigen::MatrixXd applyUserDefinedFilter(const Eigen::MatrixXd &matData) const;
 
     //=========================================================================================================
     /**
@@ -607,7 +607,7 @@ protected slots:
      * @param[in] data         channels × samples matrix.
      * @param[in] firstSample  Absolute sample index of column 0.
      */
-    void onBlockLoaded(const Eigen::MatrixXd &data, int firstSample);
+    void onBlockLoaded(const Eigen::MatrixXd &matData, int firstSample);
 
     //=========================================================================================================
     /**
