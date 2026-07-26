@@ -149,6 +149,16 @@ private:
     void itemInserted(PluginItem *item);
     void newItemSelected();
 
+    //=========================================================================================================
+    /**
+     * Sets an explicit scene rect covering the items plus a margin.
+     *
+     * Without one the scene rect is derived from the item bounding rect and
+     * changes whenever a plugin is added or moved, which rescales the
+     * scrollbars underneath the user.
+     */
+    void updateSceneRect();
+
     void deleteItem();
     void bringToFront();
     void sendToBack();

@@ -102,6 +102,15 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
             this, &PluginGui::newItemSelected);
 
     m_pGraphicsView = new QGraphicsView(m_pPluginScene);
+    //
+    // Without an explicit scene rect QGraphicsScene derives one from
+    // itemsBoundingRect(), which grows as plugins are added and never shrinks.
+    // The scrollbars are then rescaled underneath the user, which is what makes
+    // the scene appear to jump to an unrelated position after an insertion.
+    // Keep the view anchored on what is under the mouse instead.
+    //
+    m_pGraphicsView->setResizeAnchor(QGraphicsView::AnchorViewCenter);
+    m_pGraphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setCentralWidget(m_pGraphicsView);
 
     setWindowTitle(tr("PluginScene"));
@@ -124,7 +133,33 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
     settings.setValue(QString("MNEScan/loadingState"), true);
 
     m_pGraphicsView->setMinimumWidth(200);
+    updateSceneRect();
     m_pGraphicsView->ensureVisible(m_pPluginScene->itemsBoundingRect());
+}
+
+//=============================================================================================================
+
+void PluginGui::updateSceneRect()
+{
+    if(!m_pPluginScene || !m_pGraphicsView) {
+        return;
+    }
+
+    //
+    // Give the scene a rect that covers the items plus a margin, so there is
+    // room to drag a plugin outwards without the scene resizing on every move.
+    // It is never allowed to shrink below the viewport, which would otherwise
+    // make the scrollbars appear and disappear as items are moved around.
+    //
+    const qreal margin = 200.0;
+    QRectF rect = m_pPluginScene->itemsBoundingRect().adjusted(-margin, -margin, margin, margin);
+
+    const QRectF viewRect = m_pGraphicsView->viewport()->rect();
+    if(rect.width() < viewRect.width() || rect.height() < viewRect.height()) {
+        rect.setSize(rect.size().expandedTo(viewRect.size()));
+    }
+
+    m_pPluginScene->setSceneRect(rect);
 }
 
 //=============================================================================================================
@@ -203,8 +238,16 @@ void PluginGui::loadConfigMna(const QString& fullPath)
                 break;
             }
         }
-        if (!pCurrentAction)
+        if (!pCurrentAction) {
+            //
+            // The configuration refers to a plugin this build does not provide.
+            // Skipping it silently leaves the user with a pipeline that is
+            // quietly missing a stage, so say which one was dropped.
+            //
+            qWarning() << "[PluginGui::loadConfigMna] Configuration refers to unknown plugin"
+                       << node.opType << "- skipping it.";
             continue;
+        }
 
         qreal posX = node.attributes.value(QStringLiteral("gui_x"), 0).toReal();
         qreal posY = node.attributes.value(QStringLiteral("gui_y"), 0).toReal();
@@ -217,9 +260,19 @@ void PluginGui::loadConfigMna(const QString& fullPath)
         m_pPluginScene->insertItem(pos);
 
         // Find the just-inserted PluginItem
+        //
+        // insertItem() silently does nothing when the plugin cannot be created,
+        // which is what happens for a configuration that names a plugin this
+        // build no longer ships. The scene then still holds the items inserted
+        // for earlier nodes, so this loop has to tolerate an item without a
+        // plugin rather than dereferencing it.
+        //
         for (QGraphicsItem* item : m_pPluginScene->items()) {
             if (item->type() == PluginItem::Type) {
                 PluginItem* pi = qgraphicsitem_cast<PluginItem*>(item);
+                if (!pi || !pi->plugin()) {
+                    continue;
+                }
                 if (pi->plugin()->getName() == node.opType && !itemMap.contains(node.id)) {
                     itemMap.insert(node.id, pi);
                     // Restore plugin-specific settings from node attributes
@@ -312,8 +365,11 @@ void PluginGui::saveConfigMna(const QString& fullPath)
     // Update GUI positions in the pipeline graph
     for (QGraphicsItem* item : m_pPluginScene->items()) {
         if (item->type() == PluginItem::Type) {
-            SCSHAREDLIB::AbstractPlugin::SPtr pPlugin = qgraphicsitem_cast<PluginItem*>(item)->plugin();
-            m_pPluginSceneManager->updateGraphNodePosition(pPlugin, item->x(), item->y());
+            PluginItem* pItem = qgraphicsitem_cast<PluginItem*>(item);
+            if (!pItem || !pItem->plugin()) {
+                continue;
+            }
+            m_pPluginSceneManager->updateGraphNodePosition(pItem->plugin(), item->x(), item->y());
         }
     }
 
@@ -416,6 +472,12 @@ void PluginGui::itemInserted(PluginItem *item)
         emit selectedPluginChanged(m_pCurrentPlugin);
     }
 
+    //
+    // Grow the scene to take in the new item before the view reacts to it,
+    // otherwise the implicit rect changes and the scroll position jumps.
+    //
+    updateSceneRect();
+
     m_pButtonGroupPointers->button(int(PluginScene::MovePluginItem))->setChecked(true);
     m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 
@@ -483,6 +545,9 @@ void PluginGui::deleteItem()
              }
          }
      }
+
+    //The remaining items occupy less space, so let the scene follow them back in
+    updateSceneRect();
 }
 
 //=============================================================================================================
