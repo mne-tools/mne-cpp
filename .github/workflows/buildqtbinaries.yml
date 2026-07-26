@@ -7,6 +7,10 @@ on:
     # Change this to the branch name which you are developing on to trigger the workflow
     - generateqt
 
+concurrency:
+  group: build-qt-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
   QT_BINARY_RELEASE_TAG: qt_binaries

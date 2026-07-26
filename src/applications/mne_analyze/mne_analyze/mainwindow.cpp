@@ -95,6 +95,7 @@ MainWindow::MainWindow(AnalyzeCore* pAnalyzeCore,
 , m_pActionDarkMode(Q_NULLPTR)
 , m_pMenuFile(Q_NULLPTR)
 , m_pMenuView(Q_NULLPTR)
+, m_pMenuPlugins(Q_NULLPTR)
 , m_pMenuControl(Q_NULLPTR)
 , m_pMenuAppearance(Q_NULLPTR)
 , m_pMenuHelp(Q_NULLPTR)
@@ -331,6 +332,10 @@ void MainWindow::initMenuBar()
     // View menu
     m_pMenuView = menuBar()->addMenu(tr("View"));
 
+    // Plugin views get their own sub menu so that they can be selected and
+    // opened without hunting through the rest of the view actions.
+    m_pMenuPlugins = m_pMenuView->addMenu(tr("Plugins"));
+
     //Appearance QMenu
     // Styles
     QActionGroup* pActionStyleGroup = new QActionGroup(this);
@@ -558,7 +563,11 @@ void MainWindow::createPluginViews()
                 pWindow = m_pMultiView->addWidgetTop(pView, pPlugin->getName());
                 QAction* pAction = pWindow->toggleViewAction();
                 pAction->setText(pPlugin->getName());
-                m_pMenuView->addAction(pAction);
+                if(m_pMenuPlugins) {
+                    m_pMenuPlugins->addAction(pAction);
+                } else {
+                    m_pMenuView->addAction(pAction);
+                }
 
                 qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
             }

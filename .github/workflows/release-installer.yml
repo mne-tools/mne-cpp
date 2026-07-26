@@ -7,6 +7,10 @@ name: Release Installer
 on:
   workflow_call:
 
+concurrency:
+  group: release-installer-${{ github.ref }}
+  cancel-in-progress: false
+
 env:
   QIF_VERSION: "4.11.0"
   MNE_CPP_VERSION: "2.3.0"

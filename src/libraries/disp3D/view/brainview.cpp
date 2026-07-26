@@ -857,6 +857,52 @@ void BrainView::setLightingEnabled(bool enabled)
 
 //=============================================================================================================
 
+void BrainView::setAutomatedRotation(bool enabled)
+{
+    if (!enabled) {
+        if (m_pAutoRotateTimer) {
+            m_pAutoRotateTimer->stop();
+        }
+        return;
+    }
+
+    if (!m_pAutoRotateTimer) {
+        m_pAutoRotateTimer = new QTimer(this);
+        m_pAutoRotateTimer->setInterval(33);
+
+        connect(m_pAutoRotateTimer, &QTimer::timeout, this, [this]() {
+            // Rotate the camera rather than the objects, so that every surface
+            // keeps its own coregistration transform and head and sensors stay
+            // aligned with each other.
+            const QPoint step(2, 0);
+
+            if (m_viewMode == MultiView) {
+                for (int i = 0; i < m_subViews.size(); ++i) {
+                    if (multiViewPresetIsPerspective(std::clamp(m_subViews[i].preset, 0, 6))) {
+                        CameraController::applyMouseRotation(step, m_subViews[i].perspectiveRotation);
+                    }
+                }
+            } else {
+                CameraController::applyMouseRotation(step, m_cameraRotation);
+            }
+
+            m_sceneDirty = true;
+            update();
+        });
+    }
+
+    m_pAutoRotateTimer->start();
+}
+
+//=============================================================================================================
+
+bool BrainView::automatedRotation() const
+{
+    return m_pAutoRotateTimer && m_pAutoRotateTimer->isActive();
+}
+
+//=============================================================================================================
+
 void BrainView::saveSnapshot()
 {
     QImage img = grabFramebuffer();

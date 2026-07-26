@@ -137,11 +137,13 @@ QWidget *View3D::getView()
     m_pView3D->setModel(m_p3DModel.data());
     new3DModel(m_p3DModel);
 
-    // Note: BrainView (QRhiWidget) does not support scene color, camera rotation toggle,
-    // coord axis toggle, light color/intensity, or screenshot via direct slots.
+    // Note: BrainView (QRhiWidget) does not support scene color, coord axis toggle
+    // or light color/intensity via direct slots.
     // Use BrainView::saveSnapshot() for screenshots, setLightingEnabled() for lighting.
     connect(this, &View3D::takeScreenshotChanged,
             m_pView3D, &BrainView::saveSnapshot);
+    connect(this, &View3D::rotationChanged,
+            m_pView3D, &BrainView::setAutomatedRotation);
 
     // BrainView is a QWidget (QRhiWidget), can be embedded directly
     return m_pView3D;

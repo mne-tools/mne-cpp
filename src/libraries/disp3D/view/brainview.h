@@ -58,6 +58,7 @@
 class QLabel;
 class QStandardItem;
 class QFrame;
+class QTimer;
 class BrainTreeModel;
 class BrainRenderer;
 class BrainSurface;
@@ -285,6 +286,26 @@ public slots:
      * @param[in] enabled    True to enable lighting, false to disable.
      */
     void setLightingEnabled(bool enabled);
+
+    //=========================================================================================================
+    /**
+     * Enable or disable continuous automated rotation of the scene.
+     *
+     * The rotation is applied to the camera, not to the individual object
+     * transformation matrices, so head, sensor and all other surfaces keep
+     * their relative alignment and their coregistration transforms.
+     *
+     * @param[in] enabled    True to start rotating, false to stop.
+     */
+    void setAutomatedRotation(bool enabled);
+
+    //=========================================================================================================
+    /**
+     * Whether automated rotation is currently active.
+     *
+     * @return True if the scene is being rotated automatically.
+     */
+    bool automatedRotation() const;
 
     //=========================================================================================================
     /**
@@ -1225,6 +1246,7 @@ private:
     float m_cameraFocusSize = 0.3f;                  /**< Override size   (valid when m_cameraFocusOverride). */
     float m_zoom = 0.0f;                            /**< Zoom level for single-view mode. */
     QPoint m_lastMousePos;                          /**< Previous mouse position for drag deltas. */
+    QTimer *m_pAutoRotateTimer = nullptr;           /**< Drives the automated rotation animation. */
 
     // ── UI overlays ────────────────────────────────────────────────────
     int m_frameCount = 0;                           /**< Frames rendered since last FPS sample. */

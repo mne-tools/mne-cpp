@@ -342,6 +342,19 @@ void Hpi::initPluginControlWidgets()
         setFittingWindowSize(pHpiSettingsView->getFittingWindowSize());
         onContHpiStatusChanged(pHpiSettingsView->continuousHPIChecked());
 
+        // The digitizers may already have been loaded before this view existed,
+        // in which case the newDigitizerList signal was emitted with nobody
+        // connected to it. Push the current list so they show up right away.
+        m_mutex.lock();
+        const bool bHaveDigitizers = !m_pFiffDigitizerData.isNull();
+        const QList<FIFFLIB::FiffDigPoint> lDigPoints =
+                bHaveDigitizers ? m_pFiffDigitizerData->points : QList<FIFFLIB::FiffDigPoint>();
+        m_mutex.unlock();
+
+        if(bHaveDigitizers) {
+            pHpiSettingsView->newDigitizerList(lDigPoints);
+        }
+
         plControlWidgets.append(pHpiSettingsView);
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
