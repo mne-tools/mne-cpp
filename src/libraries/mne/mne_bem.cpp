@@ -367,7 +367,22 @@ void MNEBem::writeToStream(FiffStream* p_pStream)
 
 const MNEBemSurface& MNEBem::operator[] (qint32 idx) const
 {
-    if (idx>=m_qListBemSurface.length())
+    //
+    // Falling back to surface 0 is no help when there are no surfaces at all:
+    // indexing an empty QList asserts in a debug build and is undefined
+    // otherwise. Hand back a default surface instead, which callers can spot
+    // through its empty vertex list.
+    //
+    if (m_qListBemSurface.isEmpty())
+    {
+        qWarning("Warning: No BEM surfaces available! Returning an empty surface.");
+
+        static const MNEBemSurface defaultSurface;
+
+        return defaultSurface;
+    }
+
+    if (idx < 0 || idx >= m_qListBemSurface.length())
     {
         qWarning("Warning: Required surface doesn't exist! Returning surface '0'.");
         idx=0;
@@ -379,7 +394,21 @@ const MNEBemSurface& MNEBem::operator[] (qint32 idx) const
 
 MNEBemSurface& MNEBem::operator[] (qint32 idx)
 {
-    if (idx >= m_qListBemSurface.length())
+    //
+    // See the const overload: an empty list has no surface 0 to fall back to,
+    // so keep one default surface around rather than indexing out of bounds.
+    //
+    if (m_qListBemSurface.isEmpty())
+    {
+        qWarning("Warning: No BEM surfaces available! Returning an empty surface.");
+
+        static MNEBemSurface defaultSurface;
+        defaultSurface = MNEBemSurface();
+
+        return defaultSurface;
+    }
+
+    if (idx < 0 || idx >= m_qListBemSurface.length())
     {
         qWarning("Warning: Required surface doesn't exist! Returning surface '0'.");
         idx = 0;
