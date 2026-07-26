@@ -885,8 +885,8 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractP
                                                               m_pTime,
                                                               m_qListDynamicDisplayActions)) {                     
                     // Connect the view's controls to be added to the QuickControlView once available
-                    for (int i = 0; i < pWidget->layout()->count(); ++i) {
-                        if(MeasurementWidget* pMeasWidget = qobject_cast<MeasurementWidget *>(pWidget->layout()->itemAt(i)->widget())) {
+                    for (int iChild = 0; iChild < pWidget->layout()->count(); ++iChild) {
+                        if(MeasurementWidget* pMeasWidget = qobject_cast<MeasurementWidget *>(pWidget->layout()->itemAt(iChild)->widget())) {
                             connect(pMeasWidget, &MeasurementWidget::displayControlWidgetsChanged,
                                     this, &MainWindow::onDisplayControlWidgetsChanged);
                         }
@@ -938,15 +938,15 @@ void MainWindow::onDockLocationChanged(QWidget* pWidget)
             if(QWidget *widget = pWidget->layout()->itemAt(i)->widget()) {
                 if(RealTimeMultiSampleArrayWidget* pView = qobject_cast<RealTimeMultiSampleArrayWidget*>(widget)) {
                     pView->updateViewport();
-                } else if(RealTimeEvokedSetWidget* pView = qobject_cast<RealTimeEvokedSetWidget*>(widget)) {
-                    pView->updateViewport();
+                } else if(RealTimeEvokedSetWidget* pEvokedView = qobject_cast<RealTimeEvokedSetWidget*>(widget)) {
+                    pEvokedView->updateViewport();
                 }
             }
         }
     } else if(RealTimeMultiSampleArrayWidget* pView = qobject_cast<RealTimeMultiSampleArrayWidget*>(pWidget)) {
         pView->updateViewport();
-    } else if(RealTimeEvokedSetWidget* pView = qobject_cast<RealTimeEvokedSetWidget*>(pWidget)) {
-        pView->updateViewport();
+    } else if(RealTimeEvokedSetWidget* pEvokedView = qobject_cast<RealTimeEvokedSetWidget*>(pWidget)) {
+        pEvokedView->updateViewport();
     }
 }
 

@@ -340,8 +340,8 @@ void CoRegistration::onDigitizersChanged(const QString& sFilePath)
 
     // set transformation if not empty
     if(!m_transHeadMri.isEmpty()) {
-        QVariant data = QVariant::fromValue(m_transHeadMri);
-        m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
+        QVariant transData = QVariant::fromValue(m_transHeadMri);
+        m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, transData);
     }
 
     return;

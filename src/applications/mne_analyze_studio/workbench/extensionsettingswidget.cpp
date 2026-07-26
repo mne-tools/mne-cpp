@@ -149,8 +149,8 @@ void ExtensionSettingsWidget::loadSettings()
             checkBox->setChecked(storedValue.toBool());
         } else if(QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget)) {
             spinBox->setValue(storedValue.toInt());
-        } else if(QDoubleSpinBox* spinBox = qobject_cast<QDoubleSpinBox*>(widget)) {
-            spinBox->setValue(storedValue.toDouble());
+        } else if(QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget)) {
+            doubleSpinBox->setValue(storedValue.toDouble());
         } else if(QComboBox* comboBox = qobject_cast<QComboBox*>(widget)) {
             const int index = comboBox->findText(storedValue.toString(), Qt::MatchFixedString);
             comboBox->setCurrentIndex(index >= 0 ? index : 0);
@@ -177,8 +177,8 @@ void ExtensionSettingsWidget::saveSettings()
             storedValue = checkBox->isChecked();
         } else if(QSpinBox* spinBox = qobject_cast<QSpinBox*>(widget)) {
             storedValue = spinBox->value();
-        } else if(QDoubleSpinBox* spinBox = qobject_cast<QDoubleSpinBox*>(widget)) {
-            storedValue = spinBox->value();
+        } else if(QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget)) {
+            storedValue = doubleSpinBox->value();
         } else if(QComboBox* comboBox = qobject_cast<QComboBox*>(widget)) {
             storedValue = comboBox->currentText();
         } else if(QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget)) {

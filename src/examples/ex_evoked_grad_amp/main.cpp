@@ -205,17 +205,17 @@ int main(int argc, char *argv[])
 
     //Modify the bad channel list
     if(!p_FiffEvokedSet.info.bads.isEmpty()) {
-        QString one,two;
+        QString firstOfPair,secondOfPair;
 
         for(qint32 i=0; i < npair; ++i) {
-            one = p_FiffEvokedSet.info.ch_names.at(pairs(i,0));
-            two = p_FiffEvokedSet.info.ch_names.at(pairs(i,1));
+            firstOfPair = p_FiffEvokedSet.info.ch_names.at(pairs(i,0));
+            secondOfPair = p_FiffEvokedSet.info.ch_names.at(pairs(i,1));
 
             //If one channel of the planar gradiometer is marked bad, add the other to the bad channel list
-            if(!p_FiffEvokedSet.info.bads.contains(one) && p_FiffEvokedSet.info.bads.contains(two))
-                    p_FiffEvokedSet.info.bads.append(two);
-            if(p_FiffEvokedSet.info.bads.contains(one) && !p_FiffEvokedSet.info.bads.contains(two))
-                    p_FiffEvokedSet.info.bads.append(one);
+            if(!p_FiffEvokedSet.info.bads.contains(firstOfPair) && p_FiffEvokedSet.info.bads.contains(secondOfPair))
+                    p_FiffEvokedSet.info.bads.append(secondOfPair);
+            if(p_FiffEvokedSet.info.bads.contains(firstOfPair) && !p_FiffEvokedSet.info.bads.contains(secondOfPair))
+                    p_FiffEvokedSet.info.bads.append(firstOfPair);
         }
     }
 

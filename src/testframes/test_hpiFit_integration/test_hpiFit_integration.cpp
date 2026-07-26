@@ -218,10 +218,10 @@ void TestHpiFitIntegration::initTestCase()
         }
 
         hpiDataUpdater.prepareDataAndProjectors(mData,mProjectors);
-        const auto& matProjectedData = hpiDataUpdater.getProjectedData();
-        const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
-        HPI.fit(matProjectedData,
-                matPreparedProjectors,
+        const auto& matProjectedDataLoop = hpiDataUpdater.getProjectedData();
+        const auto& matPreparedProjectorsLoop = hpiDataUpdater.getProjectors();
+        HPI.fit(matProjectedDataLoop,
+                matPreparedProjectorsLoop,
                 hpiModelParameters,
                 matCoilsHead,
                 hpiFitResult);

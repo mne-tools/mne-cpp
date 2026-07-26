@@ -109,8 +109,8 @@ int main(int argc, char *argv[])
     pBrainView->setModel(pModel);
 
     for (auto it = tSurfSetPial.data().constBegin(); it != tSurfSetPial.data().constEnd(); ++it) {
-        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
-        pModel->addSurface(subject, hemi, "pial", it.value());
+        QString sHemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        pModel->addSurface(subject, sHemi, "pial", it.value());
     }
 
     //
@@ -118,8 +118,8 @@ int main(int argc, char *argv[])
     //
     FsSurfaceSet tSurfSetInflated (subject, hemi, "inflated", subjectPath);
     for (auto it = tSurfSetInflated.data().constBegin(); it != tSurfSetInflated.data().constEnd(); ++it) {
-        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
-        pModel->addSurface(subject, hemi, "inflated", it.value());
+        QString sHemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        pModel->addSurface(subject, sHemi, "inflated", it.value());
     }
 
     //
@@ -127,8 +127,8 @@ int main(int argc, char *argv[])
     //
     FsSurfaceSet tSurfSetOrig (subject, hemi, "orig", subjectPath);
     for (auto it = tSurfSetOrig.data().constBegin(); it != tSurfSetOrig.data().constEnd(); ++it) {
-        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
-        pModel->addSurface(subject, hemi, "orig", it.value());
+        QString sHemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        pModel->addSurface(subject, sHemi, "orig", it.value());
     }
 
     //
@@ -136,8 +136,8 @@ int main(int argc, char *argv[])
     //
     FsSurfaceSet tSurfSetWhite (subject, hemi, "white", subjectPath);
     for (auto it = tSurfSetWhite.data().constBegin(); it != tSurfSetWhite.data().constEnd(); ++it) {
-        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
-        pModel->addSurface(subject, hemi, "white", it.value());
+        QString sHemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        pModel->addSurface(subject, sHemi, "white", it.value());
     }
 
     pBrainView->show();
