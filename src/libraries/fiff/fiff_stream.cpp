@@ -1432,12 +1432,12 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
         QList<FiffDirNode::SPtr> hpi_coils = hpi_meas[0]->dir_tree_find(FIFFB_HPI_COIL);
 
         for(qint32 c = 0; c < hpi_coils.size(); ++c) {
-            for(qint32 k = 0; k < hpi_coils[c]->nent(); ++k) {
-                if(hpi_coils[c]->dir[k]->kind != FIFF_HPI_COIL_FREQ) {
+            for(qint32 e = 0; e < hpi_coils[c]->nent(); ++e) {
+                if(hpi_coils[c]->dir[e]->kind != FIFF_HPI_COIL_FREQ) {
                     continue;
                 }
 
-                this->read_tag(t_pTag, hpi_coils[c]->dir[k]->pos);
+                this->read_tag(t_pTag, hpi_coils[c]->dir[e]->pos);
                 info.hpi_coil_freqs.append(*t_pTag->toFloat());
                 break;
             }

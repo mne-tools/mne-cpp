@@ -102,11 +102,15 @@ private slots:
     {
         KMeans kmeans("cosine", "sample", 1, "error", true, 50);
         // For cosine distance, use non-zero data
-        MatrixXd X(30, 3);
+        // Assign coefficient wise rather than from a fixed size RowVector3d.
+        // Assigning a Matrix<double,1,3> into a dynamically sized row block
+        // makes GCC unable to prove the destination has three columns and it
+        // reports a false -Warray-bounds inside Eigen.
+        MatrixXd X = MatrixXd::Zero(30, 3);
         for (int i = 0; i < 10; ++i) {
-            X.row(i) = RowVector3d(1.0 + 0.1*i, 0.0, 0.0);
-            X.row(10+i) = RowVector3d(0.0, 1.0 + 0.1*i, 0.0);
-            X.row(20+i) = RowVector3d(0.0, 0.0, 1.0 + 0.1*i);
+            X(i, 0)      = 1.0 + 0.1*i;
+            X(10+i, 1)   = 1.0 + 0.1*i;
+            X(20+i, 2)   = 1.0 + 0.1*i;
         }
 
         VectorXi idx;

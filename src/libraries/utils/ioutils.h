@@ -289,8 +289,8 @@ bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
             }
         }
 
-        int rows = help.size();
-        int cols = rows <= 0 ? 0 : help.at(0).rows();
+        int rows = static_cast<int>(help.size());
+        int cols = rows <= 0 ? 0 : static_cast<int>(help.at(0).rows());
 
         out.resize(rows, cols);
 
@@ -372,13 +372,13 @@ bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
             }
         }
 
-        int rows = help.size();
-        int cols = rows <= 0 ? 0 : help.at(0).rows();
+        int rows = static_cast<int>(help.size());
+        int cols = rows <= 0 ? 0 : static_cast<int>(help.at(0).rows());
 
         out.resize(rows, cols);
 
         for (size_t i = 0; i < help.size(); i++) {
-            out.row(i) = help[i].transpose();
+            out.row(static_cast<Eigen::Index>(i)) = help[i].transpose();
         }
     } else {
         qWarning()<<"IOUtils::read_eigen_matrix - Could not read Eigen element from file! Path does not exist!";
