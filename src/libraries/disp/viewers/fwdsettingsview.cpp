@@ -125,7 +125,6 @@ void FwdSettingsView::saveSettings()
     }
 
     QSettings settings("MNECPP");
-    QVariant data;
 }
 
 //=============================================================================================================

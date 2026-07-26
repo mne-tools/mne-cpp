@@ -113,7 +113,7 @@ public:
      *
      * @param[in] data          The new data.
      */
-    void addData(const Eigen::MatrixXd &data);
+    void addData(const Eigen::MatrixXd &matData);
 
     //=========================================================================================================
     /**

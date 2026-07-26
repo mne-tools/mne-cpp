@@ -600,13 +600,13 @@ void HpiSettingsView::populatePresetGUI(const QJsonArray& presetData)
 
     for(const auto& entry : presetData){
         QString name = entry.toObject()["name"].toString();
-        QVector<int> data;
+        QVector<int> vecCoils;
 
         for (const auto& coil : entry.toObject()["coils"].toArray()){
-            data.append(coil.toInt());
+            vecCoils.append(coil.toInt());
         }
 
-        m_pUi->comboBox_coilPreset->addItem(name, QVariant::fromValue(data));
+        m_pUi->comboBox_coilPreset->addItem(name, QVariant::fromValue(vecCoils));
     }
 }
 

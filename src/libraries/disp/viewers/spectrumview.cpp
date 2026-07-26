@@ -120,9 +120,9 @@ void SpectrumView::init(FiffInfo::SPtr &info,
 
 //=============================================================================================================
 
-void SpectrumView::addData(const MatrixXd &data)
+void SpectrumView::addData(const MatrixXd &matData)
 {
-    m_pFSModel->addData(data);
+    m_pFSModel->addData(matData);
 }
 
 //=============================================================================================================

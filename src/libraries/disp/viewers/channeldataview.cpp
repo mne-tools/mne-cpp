@@ -422,17 +422,17 @@ void ChannelDataView::setFileBounds(int first, int last)
 
 //=============================================================================================================
 
-void ChannelDataView::setData(const MatrixXd &data, int firstSample)
+void ChannelDataView::setData(const MatrixXd &matData, int firstSample)
 {
-    m_pModel->setData(data, firstSample);
+    m_pModel->setData(matData, firstSample);
     updateScrollBarRange();
 }
 
 //=============================================================================================================
 
-void ChannelDataView::addData(const MatrixXd &data)
+void ChannelDataView::addData(const MatrixXd &matData)
 {
-    m_pModel->appendData(data);
+    m_pModel->appendData(matData);
     updateScrollBarRange();
 }
 

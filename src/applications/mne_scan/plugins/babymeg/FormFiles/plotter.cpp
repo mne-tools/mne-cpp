@@ -264,11 +264,11 @@ void Plotter::drawCurve(QPainter *painter)
     while (i.hasNext()) {
        i.next();
        int id = i.key();
-       QVector<QPointF> data = i.value();
-       QPolygonF polyline(data.count());
-       for(int j=0; j<data.count(); ++j){
-           double dx = data[j].x() - settings.minX;
-           double dy = data[j].y() - settings.minY;
+       QVector<QPointF> curveData = i.value();
+       QPolygonF polyline(curveData.count());
+       for(int j=0; j<curveData.count(); ++j){
+           double dx = curveData[j].x() - settings.minX;
+           double dy = curveData[j].y() - settings.minY;
            double x = rect.left() + (dx*(rect.width()-1)/settings.spanX());
            double y = rect.bottom() - (dy *(rect.height()-1)/settings.spanY());
            polyline[j] = QPointF(x,y);

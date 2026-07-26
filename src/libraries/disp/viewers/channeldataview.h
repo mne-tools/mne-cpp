@@ -126,7 +126,7 @@ public:
      * @param[in] data         Channels × samples matrix.
      * @param[in] firstSample  Absolute sample index of column 0.
      */
-    void setData(const Eigen::MatrixXd &data, int firstSample = 0);
+    void setData(const Eigen::MatrixXd &matData, int firstSample = 0);
 
     //=========================================================================================================
     /**
@@ -134,7 +134,7 @@ public:
      *
      * @param[in] data  Channels × new-samples matrix.
      */
-    void addData(const Eigen::MatrixXd &data);
+    void addData(const Eigen::MatrixXd &matData);
 
     // ── Scroll / zoom API ─────────────────────────────────────────────
 

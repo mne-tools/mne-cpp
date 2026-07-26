@@ -223,7 +223,7 @@ public:
      *
      * @param[in] data     QVariant containing a SelectionItem object with selected channel information.
      */
-    void channelSelectionChanged(const QVariant &data);
+    void channelSelectionChanged(const QVariant &selectionData);
 
     //=========================================================================================================
     /**

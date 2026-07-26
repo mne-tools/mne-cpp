@@ -140,7 +140,7 @@ public:
      *
      * @param[in] data    The new data.
      */
-    void addData(const QList<Eigen::MatrixXd>& data);
+    void addData(const QList<Eigen::MatrixXd>& lMatData);
 
     //=========================================================================================================
     /**

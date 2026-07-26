@@ -188,10 +188,10 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
 
 //=============================================================================================================
 
-void RtFiffRawView::addData(const QList<Eigen::MatrixXd> &data)
+void RtFiffRawView::addData(const QList<Eigen::MatrixXd> &lMatData)
 {
-    if(!data.isEmpty()) {
-        m_pModel->addData(data);
+    if(!lMatData.isEmpty()) {
+        m_pModel->addData(lMatData);
 
         if(m_qListBadChannels.size() != m_pFiffInfo->bads.size()) {
             m_qListBadChannels.clear();
@@ -201,7 +201,7 @@ void RtFiffRawView::addData(const QList<Eigen::MatrixXd> &data)
                 }
             }
 
-            //Hide non selected channels/rows in the data views
+            //Hide non selected channels/rows in the lMatData views
             for(int i = 0; i<m_qListBadChannels.size(); i++) {
                 if(m_bHideBadChannels) {
                     m_pTableView->hideRow(m_qListBadChannels.at(i));
@@ -214,7 +214,7 @@ void RtFiffRawView::addData(const QList<Eigen::MatrixXd> &data)
             updateRowHeight();
         }
     } else {
-        qWarning() << "[RtFiffRawView::addData] Received data list is empty.";
+        qWarning() << "[RtFiffRawView::addData] Received lMatData list is empty.";
     }
 }
 
