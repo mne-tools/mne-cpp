@@ -254,6 +254,18 @@ void Hpi::initFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> info)
     m_mutex.lock();
     m_pFiffInfo = info;
     m_pHpiOutput->measurementData()->setFiffInfo(m_pFiffInfo);
+
+    // Take the HPI coil excitation frequencies from the file when it provides
+    // them, so the user does not have to type them in by hand. Frequencies the
+    // user enters in the GUI still override these.
+    if(m_vCoilFreqs.isEmpty() && m_pFiffInfo && !m_pFiffInfo->hpi_coil_freqs.isEmpty()) {
+        for(float fFreq : m_pFiffInfo->hpi_coil_freqs) {
+            m_vCoilFreqs.append(static_cast<int>(qRound(fFreq)));
+        }
+
+        qInfo() << "[Hpi::initFiffInfo] Read" << m_vCoilFreqs.size()
+                << "HPI coil frequencies from the file:" << m_vCoilFreqs;
+    }
     m_mutex.unlock();
     updateProjections();
 }

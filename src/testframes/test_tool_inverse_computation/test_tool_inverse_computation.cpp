@@ -190,13 +190,19 @@ void TestToolInverseComputation::testCollapseSingleTime()
     // Single time point → collapse is no-op
     MatrixXd data(3, 1);
     data << 5, 10, 15;
-    MatrixXd orig = data;
+
+    // Keep the reference values as plain scalars. Copy constructing another
+    // MatrixXd from a comma initialized one makes GCC lose track of the
+    // initialization and report a false -Wmaybe-uninitialized inside Eigen.
+    const double dExpected0 = data(0, 0);
+    const double dExpected1 = data(1, 0);
+    const double dExpected2 = data(2, 0);
 
     collapseData(data, COLLAPSE_MAX);
 
-    QCOMPARE(data(0, 0), orig(0, 0));
-    QCOMPARE(data(1, 0), orig(1, 0));
-    QCOMPARE(data(2, 0), orig(2, 0));
+    QCOMPARE(data(0, 0), dExpected0);
+    QCOMPARE(data(1, 0), dExpected1);
+    QCOMPARE(data(2, 0), dExpected2);
 }
 
 void TestToolInverseComputation::testCollapseReplication()
@@ -245,12 +251,16 @@ void TestToolInverseComputation::testScaleDataSiCurrents()
 {
     MatrixXd data(1, 2);
     data << 1e-9, 2e-9;
-    MatrixXd orig = data;
+
+    // See testCollapseSingleTime: hold the reference values as scalars to
+    // avoid a GCC false positive on the Eigen copy constructor.
+    const double dExpected0 = data(0, 0);
+    const double dExpected1 = data(0, 1);
 
     scaleData(data, 100.0, 2.0, true);  // siCurrents → no change
 
-    QCOMPARE(data(0, 0), orig(0, 0));
-    QCOMPARE(data(0, 1), orig(0, 1));
+    QCOMPARE(data(0, 0), dExpected0);
+    QCOMPARE(data(0, 1), dExpected1);
 }
 
 void TestToolInverseComputation::testScaleDataZeroMax()

@@ -291,6 +291,7 @@ public: //Public because it's a mne struct
     QList<FiffCtfComp> comps;       /**< List of available CTF software compensators. */
     QString acq_pars;               /**< Acquisition parameters. */
     QString acq_stim;               /**< Acquisition stimulus information. */
+    QList<float> hpi_coil_freqs;    /**< Excitation frequencies of the HPI coils in Hz, in coil order. Empty when the file contains no HPI measurement block. */
 };
 
 //=============================================================================================================

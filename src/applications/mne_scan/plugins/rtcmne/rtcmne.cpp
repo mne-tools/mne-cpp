@@ -373,21 +373,28 @@ QWidget* RtcMne::setupWidget()
 void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if(QSharedPointer<RealTimeFwdSolution> pRTFS = pMeasurement.dynamicCast<RealTimeFwdSolution>()) {
-        if(pRTFS->isClustered()) {
-            m_pFwd = pRTFS->getValue();
-            m_pRTSEOutput->measurementData()->setFwdSolution(m_pFwd);
+        //
+        // Both clustered and full source spaces are accepted. Neither RtInvOp
+        // nor MinimumNorm depends on the clustering, they only operate on the
+        // gain matrix and the covariances. A full source space simply means
+        // more sources and therefore a higher computational load.
+        //
+        if(!pRTFS->isClustered()) {
+            qInfo() << "[RtcMne::updateRTFS] Using a full (unclustered) source space."
+                    << "Source localization will be slower than with a clustered one.";
+        }
 
-            m_qMutex.lock();
-            m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pFwd->info));
-            m_qMutex.unlock();
+        m_pFwd = pRTFS->getValue();
+        m_pRTSEOutput->measurementData()->setFwdSolution(m_pFwd);
 
-            // update inverse operator
-            if(this->isRunning() && m_pRtInvOp) {
-                m_pRtInvOp->setFwdSolution(m_pFwd);
-                m_pRtInvOp->append(*m_pNoiseCov);
-            }
-        } else if(!pRTFS->isClustered()) {
-            qWarning() << "[RtcMne::updateRTFS] The forward solution has not been clustered yet.";
+        m_qMutex.lock();
+        m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pFwd->info));
+        m_qMutex.unlock();
+
+        // update inverse operator
+        if(this->isRunning() && m_pRtInvOp) {
+            m_pRtInvOp->setFwdSolution(m_pFwd);
+            m_pRtInvOp->append(*m_pNoiseCov);
         }
     }
 }

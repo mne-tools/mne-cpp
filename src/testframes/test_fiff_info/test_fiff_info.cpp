@@ -434,6 +434,42 @@ private slots:
         QCOMPARE(raw.info.get_current_comp(), comp);
     }
 
+    //=========================================================================
+    // HPI coil excitation frequencies
+    //=========================================================================
+    void hpiCoilFreqs_readFromFile()
+    {
+        if (m_sDataPath.isEmpty())
+            QSKIP("Test data not available");
+
+        QFile file(m_sDataPath + "/MEG/sample/test_hpiFit_raw.fif");
+        if (!file.exists())
+            QSKIP("test_hpiFit_raw.fif not available");
+
+        FiffRawData raw(file);
+
+        // This file carries a FIFFB_HPI_MEAS block with one FIFFB_HPI_COIL
+        // sub block per coil, each holding a FIFF_HPI_COIL_FREQ tag.
+        QCOMPARE(raw.info.hpi_coil_freqs.size(), 4);
+        QCOMPARE(qRound(raw.info.hpi_coil_freqs.at(0)), 154);
+        QCOMPARE(qRound(raw.info.hpi_coil_freqs.at(1)), 158);
+        QCOMPARE(qRound(raw.info.hpi_coil_freqs.at(2)), 161);
+        QCOMPARE(qRound(raw.info.hpi_coil_freqs.at(3)), 166);
+    }
+
+    void hpiCoilFreqs_emptyWithoutHpiBlock()
+    {
+        if (m_sDataPath.isEmpty())
+            QSKIP("Test data not available");
+
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        FiffRawData raw(file);
+
+        // No HPI measurement block in this file, so the list stays empty
+        // rather than being filled with garbage.
+        QVERIFY(raw.info.hpi_coil_freqs.isEmpty());
+    }
+
     void cleanupTestCase() {}
 };
 

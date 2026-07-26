@@ -1420,6 +1420,30 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
     info.acq_pars = acq_pars;
     info.acq_stim = acq_stim;
 
+    //
+    //   Locate the HPI coil excitation frequencies
+    //
+    //   They live in one FIFFB_HPI_COIL block per coil inside the
+    //   FIFFB_HPI_MEAS block. Each coil block carries a FIFF_HPI_COIL_FREQ tag.
+    //   Files without an HPI measurement simply leave the list empty.
+    //
+    QList<FiffDirNode::SPtr> hpi_meas = meas_info[0]->dir_tree_find(FIFFB_HPI_MEAS);
+    if(!hpi_meas.isEmpty()) {
+        QList<FiffDirNode::SPtr> hpi_coils = hpi_meas[0]->dir_tree_find(FIFFB_HPI_COIL);
+
+        for(qint32 c = 0; c < hpi_coils.size(); ++c) {
+            for(qint32 k = 0; k < hpi_coils[c]->nent(); ++k) {
+                if(hpi_coils[c]->dir[k]->kind != FIFF_HPI_COIL_FREQ) {
+                    continue;
+                }
+
+                this->read_tag(t_pTag, hpi_coils[c]->dir[k]->pos);
+                info.hpi_coil_freqs.append(*t_pTag->toFloat());
+                break;
+            }
+        }
+    }
+
     p_NodeInfo = meas[0];
 
     return true;

@@ -79,6 +79,7 @@ FiffInfo::FiffInfo(const FiffInfo& p_FiffInfo)
 , comps(p_FiffInfo.comps)
 , acq_pars(p_FiffInfo.acq_pars)
 , acq_stim(p_FiffInfo.acq_stim)
+, hpi_coil_freqs(p_FiffInfo.hpi_coil_freqs)
 {
     meas_date[0] = p_FiffInfo.meas_date[0];
     meas_date[1] = p_FiffInfo.meas_date[1];
@@ -115,6 +116,7 @@ void FiffInfo::clear()
     comps.clear();
     acq_pars = "";
     acq_stim = "";
+    hpi_coil_freqs.clear();
 }
 
 //=============================================================================================================
