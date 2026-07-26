@@ -422,6 +422,15 @@ float RtFiffRawView::getSamplingFreq() const
 
 void RtFiffRawView::takeScreenshot(const QString& fileName)
 {
+    // m_pTableView is a QPointer and is only created once a model has been set.
+    // Taking a screenshot before that, or after the view was destroyed, would
+    // otherwise dereference a null pointer.
+    if(m_pTableView.isNull()) {
+        qWarning() << "[RtFiffRawView::takeScreenshot] No data view available yet"
+                   << "- no screenshot was taken.";
+        return;
+    }
+
     if(fileName.contains(".svg", Qt::CaseInsensitive)) {
         // Generate screenshot
         QSvgGenerator svgGen;

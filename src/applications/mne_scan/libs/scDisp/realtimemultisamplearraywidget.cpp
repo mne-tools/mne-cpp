@@ -356,6 +356,12 @@ void RealTimeMultiSampleArrayWidget::onMakeScreenshot(const QString& imageType)
         return;
     }
 
+    if(m_pChannelDataView.isNull()) {
+        qWarning() << "[RealTimeMultiSampleArrayWidget::onMakeScreenshot] No data view"
+                   << "- no screenshot was taken.";
+        return;
+    }
+
     m_pChannelDataView->takeScreenshot(QString("./Screenshots/%1-%2-DataView.%3")
                                            .arg(sDate, sTime, sSuffix));
 }
