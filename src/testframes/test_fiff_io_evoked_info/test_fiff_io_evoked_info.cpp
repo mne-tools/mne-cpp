@@ -343,9 +343,9 @@ void TestFiffIoEvokedInfo::evokedSet_checkArtifacts()
     info.nchan = nChan;
 
     RejectionParams rej;
-    rej.megGradReject = 4000e-13;
-    rej.megMagReject = 4e-12;
-    rej.eegReject = 150e-6;
+    rej.megGradReject = 4000e-13f;
+    rej.megMagReject = 4e-12f;
+    rej.eegReject = 150e-6f;
 
     QString reason;
     bool epochOk = FiffEvokedSet::checkArtifacts(epoch, info, QStringList(), rej, reason);

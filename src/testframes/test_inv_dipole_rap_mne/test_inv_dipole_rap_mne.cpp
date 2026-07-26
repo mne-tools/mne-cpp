@@ -892,8 +892,8 @@ void TestInvDipoleRapMne::ecd_copyCtor()
     InvEcd ecd;
     ecd.rd = Eigen::Vector3f(0.01f, 0.02f, 0.03f);
     ecd.Q = Eigen::Vector3f(1.0f, 2.0f, 3.0f);
-    ecd.good = 0.95;
-    ecd.khi2 = 1.5;
+    ecd.good = 0.95f;
+    ecd.khi2 = 1.5f;
     ecd.valid = true;
 
     InvEcd copy(ecd);

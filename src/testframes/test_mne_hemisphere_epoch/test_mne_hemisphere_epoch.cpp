@@ -74,8 +74,11 @@ private slots:
         h.type = 1;
         h.rr = MatrixX3f::Random(4, 3);
         h.nn = MatrixX3f::Random(4, 3);
-        h.itris = MatrixX3i(2, 3);
-        h.itris << 0, 1, 2,  1, 2, 3;
+        // Assign coefficient wise. GCC loses track of a comma initializer here
+        // and reports a false -Wmaybe-uninitialized from inside Eigen.
+        h.itris = MatrixX3i::Zero(2, 3);
+        h.itris(0, 0) = 0; h.itris(0, 1) = 1; h.itris(0, 2) = 2;
+        h.itris(1, 0) = 1; h.itris(1, 1) = 2; h.itris(1, 2) = 3;
 
         MNEHemisphere h2(h);
         QCOMPARE(h2.np, 4);

@@ -126,14 +126,23 @@ endif()
 if(MSVC)
   add_compile_options(/W4)
   # MSVC applies /W4 to third party headers as well, so warnings from Qt and
-  # Eigen would fail the build under /WX even though we cannot fix them. Mark
-  # dependency headers as external and silence them. CMake already passes
-  # /external:I for include directories it knows are SYSTEM (which is how the
-  # imported Qt and Eigen targets expose theirs), so we only need to set the
-  # external warning level. Requires VS 2019 16.10 (19.29.30036) or newer.
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.29.30036)
-    add_compile_options(/external:W0)
-  endif()
+  # Eigen would fail the build under /WX even though we cannot fix them.
+  #
+  # /external:W0 alone is not enough: it only lowers the level for includes the
+  # compiler already considers external, and MSVC only treats an include as
+  # external when it arrives via /external:I. By default CMake emits SYSTEM
+  # include directories as plain /I, so nothing was ever marked external and
+  # Qt's qnumeric.h still failed the build with C4702 under /WX.
+  #
+  # Switching the system include flag to /external:I makes the Qt and Eigen
+  # imported targets (whose interface includes CMake already treats as SYSTEM)
+  # arrive as external, so /external:W0 applies to them. Our own headers are
+  # added with target_include_directories without SYSTEM, so they stay at /W4.
+  #
+  # /external:anglebrackets is deliberately not used: our own headers are also
+  # included with angle brackets, so it would silence warnings in our code too.
+  set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "/external:I ")
+  add_compile_options(/external:W0)
   if(MNE_WARNINGS_AS_ERRORS)
     add_compile_options(/WX)
   endif()

@@ -1682,10 +1682,12 @@ private slots:
         MNEMshDisplaySurface surf;
         // Setup minimal vertex data so decide_surface_extent can work
         surf.np = 3;
-        surf.rr = MatrixXf(3, 3);
-        surf.rr << 0, 0, 0,
-                   1, 2, 3,
-                   -1, -2, -3;
+        // Assign coefficient wise. GCC loses track of a comma initializer feeding
+        // a dynamically sized matrix and reports a false -Wmaybe-uninitialized
+        // from inside Eigen.
+        surf.rr = MatrixXf::Zero(3, 3);
+        surf.rr(1, 0) =  1.0f; surf.rr(1, 1) =  2.0f; surf.rr(1, 2) =  3.0f;
+        surf.rr(2, 0) = -1.0f; surf.rr(2, 1) = -2.0f; surf.rr(2, 2) = -3.0f;
         surf.decide_surface_extent("test");
         // After deciding extent, minv/maxv should be set
         QVERIFY(surf.minv(0) <= surf.maxv(0));
@@ -1721,9 +1723,10 @@ private slots:
     {
         MNEMshDisplaySurface surf;
         surf.np = 2;
-        surf.rr = MatrixXf(2, 3);
-        surf.rr << 1.0f, 2.0f, 3.0f,
-                   4.0f, 5.0f, 6.0f;
+        // See mshDisplaySurface_decideExtent for why this is not a comma initializer.
+        surf.rr = MatrixXf::Zero(2, 3);
+        surf.rr(0, 0) = 1.0f; surf.rr(0, 1) = 2.0f; surf.rr(0, 2) = 3.0f;
+        surf.rr(1, 0) = 4.0f; surf.rr(1, 1) = 5.0f; surf.rr(1, 2) = 6.0f;
         surf.minv = Eigen::Vector3f(0.0f, 1.0f, 2.0f);
         surf.maxv = Eigen::Vector3f(4.0f, 5.0f, 6.0f);
 
