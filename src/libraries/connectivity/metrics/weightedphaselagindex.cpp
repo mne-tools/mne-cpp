@@ -183,7 +183,7 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
         return;
     }
 
-    int i,j;
+    int i;
 
     // Calculate tapered spectra if not available already
     // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
@@ -203,7 +203,7 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
             rowData.array() = inputData.matData.row(i).array() - inputData.matData.row(i).mean();
 
             // Calculate tapered spectra if not available already
-            for(j = 0; j < tapers.first.rows(); j++) {
+            for(int j = 0; j < tapers.first.rows(); j++) {
                 // Zero padd if necessary. The zero padding in Eigen's FFT is only working for column vectors.
                 if (rowData.cols() < iNfft) {
                     vecInputFFT.setZero(iNfft);
@@ -236,7 +236,7 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
         MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBinAmount);
 
         for (i = 0; i < iNRows; ++i) {
-            for (j = i; j < iNRows; ++j) {
+            for (int j = i; j < iNRows; ++j) {
                 // Compute CSD (average over tapers if necessary)
                 matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(i).rows(),m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0,m_iNumberBinStart,inputData.vecTapSpectra.at(j).rows(),m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
 

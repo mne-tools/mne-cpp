@@ -68,7 +68,7 @@ InvGuessData::InvGuessData(const QString &guessname, const QString &guess_surfna
 {
 //    InvGuessData*      res = new InvGuessData();
     int            k,p;
-    float          guessrad = 0.080;
+    float          guessrad = 0.080f;
     std::unique_ptr<MNESourceSpace> guesses;
     dipoleFitFuncs orig;
 

@@ -146,6 +146,12 @@ QString qtPluginsPath()
 #endif
 }
 
+#ifdef Q_OS_MACOS
+//
+// Only the macOS branch below needs this: the DYLD_* variables it feeds have no
+// equivalent on the other platforms, so defining it unconditionally leaves a
+// dead function there.
+//
 QString qtLibrariesPath()
 {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -154,6 +160,7 @@ QString qtLibrariesPath()
     return QLibraryInfo::location(QLibraryInfo::LibrariesPath);
 #endif
 }
+#endif
 
 QProcessEnvironment studioBackendProcessEnvironment(const QString& executablePath)
 {

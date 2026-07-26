@@ -151,7 +151,7 @@ int InvDipoleFitData::setup_forward_model(InvDipoleFitData *d, MNECTFCompDataSet
          */
         if (fit_sphere_to_bem) {
             MNESurface* inner_skull;
-            float      simplex_size = 2e-2;
+            float      simplex_size = 2e-2f;
             float      R;
             VectorXf   r0_vec;
 
@@ -522,7 +522,6 @@ InvDipoleFitData *InvDipoleFitData::setup_dipole_fit_data(const QString &mriname
                                                     int include_eeg)
 {
     auto res = std::make_unique<InvDipoleFitData>();
-    int             k;
     QStringList     badlist;
     int             nbad      = 0;
     QStringList     file_bads;
@@ -584,7 +583,7 @@ InvDipoleFitData *InvDipoleFitData::setup_dipole_fit_data(const QString &mriname
     if (file_nbad > 0) {
         if (badlist.isEmpty())
             nbad = 0;
-        for (k = 0; k < file_nbad; k++) {
+        for (int k = 0; k < file_nbad; k++) {
             badlist.append(file_bads[k]);
             nbad++;
         }
@@ -801,7 +800,8 @@ InvDipoleFitData *InvDipoleFitData::setup_dipole_fit_data(const QString &mriname
         /*
          * Do we need to do anything?
          */
-        for (k = 0, do_it = 0; k < res->noise->ncov; k++) {
+        do_it = 0;
+        for (int k = 0; k < res->noise->ncov; k++) {
             if (res->noise->ch_class[k] != MNE_COV_CH_UNKNOWN &&
                     regs[res->noise->ch_class[k]] > 0.0)
                 do_it++;
@@ -823,7 +823,7 @@ InvDipoleFitData *InvDipoleFitData::setup_dipole_fit_data(const QString &mriname
         if (res->noise->decompose_eigen() == FAIL)
             return nullptr;
         qInfo("Eigenvalue decomposition done.");
-        for (k = 0; k < res->noise->ncov; k++) {
+        for (int k = 0; k < res->noise->ncov; k++) {
             if (res->noise->lambda[k] < 0.0)
                 res->noise->lambda[k] = 0.0;
         }
@@ -891,7 +891,7 @@ InvDipoleForward* dipole_forward(InvDipoleFitData* d,
 {
     InvDipoleForward* res;
     float         S[3];
-    int           k,p;
+    int           k;
     /*
    * Allocate data if necessary
    */
@@ -932,10 +932,10 @@ InvDipoleForward* dipole_forward(InvDipoleFitData* d,
      * (componentwise normalization is not recommended)
      */
         if (d->column_norm == COLUMN_NORM_LOC || d->column_norm == COLUMN_NORM_COMP) {
-            for (p = 0; p < 3; p++)
+            for (int p = 0; p < 3; p++)
                 S[p] = res->fwd.row(3*k+p).squaredNorm();
             if (d->column_norm == COLUMN_NORM_COMP) {
-                for (p = 0; p < 3; p++)
+                for (int p = 0; p < 3; p++)
                     res->scales[3*k+p] = sqrt(S[p]);
             }
             else {
@@ -944,7 +944,7 @@ InvDipoleForward* dipole_forward(InvDipoleFitData* d,
      */
                 res->scales[3*k+0] = res->scales[3*k+1] = res->scales[3*k+2] = sqrt(S[0]+S[1]+S[2])/3.0;
             }
-            for (p = 0; p < 3; p++) {
+            for (int p = 0; p < 3; p++) {
                 if (res->scales[3*k+p] > 0.0) {
                     res->scales[3*k+p] = 1.0/res->scales[3*k+p];
                     res->fwd.row(3*k+p) *= res->scales[3*k+p];

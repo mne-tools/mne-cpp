@@ -30,6 +30,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QTextStream>
 #include <QString>
 #include <QRegularExpression>
 #include <QDebug>
@@ -191,7 +192,7 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
    * Save dipoles in the bdip format employed by xfit
    */
 {
-    FILE        *out = nullptr;
+    QFile       out(fileName);
     bdipEcdRec  one_out;
     InvEcd         one;
     int         k,p;
@@ -200,7 +201,7 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
     if (fileName.isEmpty() || this->size() == 0)
         return true;
 
-    if ((out = fopen(fileName.toUtf8().data(),"w")) == nullptr) {
+    if (!out.open(QIODevice::WriteOnly)) {
         qInfo("%s", fileName.toUtf8().constData());
         return false;
     }
@@ -218,20 +219,20 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
             one_out.goodness = swap_float(one.good);
             one_out.errors_computed = swap_int(0);
             one_out.khi2            = swap_float(one.khi2);
-            if (fwrite(&one_out,sizeof(bdipEcdRec),1,out) != 1) {
+            if (out.write(reinterpret_cast<const char*>(&one_out),sizeof(bdipEcdRec)) != sizeof(bdipEcdRec)) {
                 qCritical("Failed to write a dipole");
-                fclose(out);
+                out.close();
                 QFile::remove(fileName);
                 return false;
             }
             nsave++;
         }
     }
-    if (fclose(out) != 0) {
-        out = nullptr;
+    if (!out.flush()) {
         qInfo("%s", fileName.toUtf8().constData());
         return false;
     }
+    out.close();
     qInfo("Save %d dipoles in bdip format to %s\n",nsave,fileName.toUtf8().data());
     return true;
 }
@@ -240,35 +241,41 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
 
 bool InvEcdSet::save_dipoles_dip(const QString& fileName) const
 {
-    FILE *out = nullptr;
+    QFile out(fileName);
     int  k,nsave;
     InvEcd  one;
 
     if (fileName.isEmpty() || this->size() == 0)
         return true;
-    if ((out = fopen(fileName.toUtf8().data(),"w")) == nullptr) {
+    if (!out.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qInfo("%s", fileName.toUtf8().constData());
         return false;
     }
-    fprintf(out,"# CoordinateSystem \"Head\"\n");
-    fprintf (out,"# %7s %7s %8s %8s %8s %8s %8s %8s %8s %6s\n",
-             "begin","end","X (mm)","Y (mm)","Z (mm)","Q(nAm)","Qx(nAm)","Qy(nAm)","Qz(nAm)","g/%");
+    //
+    // The column layout is read back by other tools, so keep printf style
+    // formatting rather than rebuilding the widths with stream manipulators.
+    //
+    QTextStream stream(&out);
+    stream << "# CoordinateSystem \"Head\"\n";
+    stream << QString::asprintf("# %7s %7s %8s %8s %8s %8s %8s %8s %8s %6s\n",
+                                "begin","end","X (mm)","Y (mm)","Z (mm)","Q(nAm)","Qx(nAm)","Qy(nAm)","Qz(nAm)","g/%");
     for (k = 0, nsave = 0; k < this->size(); k++) {
         one = this->m_qListDips[k];
         if (one.valid) {
-            fprintf(out,"  %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n",
-                    1000*one.time,1000*one.time,
-                    1000*one.rd[X],1000*one.rd[Y],1000*one.rd[Z],
-                    1e9*one.Q.norm(),1e9*one.Q[X],1e9*one.Q[Y],1e9*one.Q[Z],100.0*one.good);
+            stream << QString::asprintf("  %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n",
+                                        1000*one.time,1000*one.time,
+                                        1000*one.rd[X],1000*one.rd[Y],1000*one.rd[Z],
+                                        1e9*one.Q.norm(),1e9*one.Q[X],1e9*one.Q[Y],1e9*one.Q[Z],100.0*one.good);
             nsave++;
         }
     }
-    fprintf(out,"## Name \"%s dipoles\" Style \"Dipoles\"\n","ALL");
-    if (fclose(out) != 0) {
-        out = nullptr;
+    stream << QString::asprintf("## Name \"%s dipoles\" Style \"Dipoles\"\n","ALL");
+    stream.flush();
+    if (!out.flush()) {
         qInfo("%s", fileName.toUtf8().constData());
         return false;
     }
+    out.close();
     qInfo("Save %d dipoles in dip format to %s\n",nsave,fileName.toUtf8().data());
     return true;
 }

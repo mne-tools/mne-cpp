@@ -358,7 +358,7 @@ double InvHpiFit::objectTrans(const MatrixXd& matHeadCoil,
 Eigen::MatrixXd InvHpiFit::order(const std::vector<int>& vecOrder,
                               const Eigen::MatrixXd& matToOrder)
 {
-    const int iNumCoils = vecOrder.size();
+    const int iNumCoils = static_cast<int>(vecOrder.size());
     MatrixXd matToOrderTemp = matToOrder;
 
     for(int i = 0; i < iNumCoils; i++) {
@@ -372,7 +372,7 @@ Eigen::MatrixXd InvHpiFit::order(const std::vector<int>& vecOrder,
 QVector<int> InvHpiFit::order(const std::vector<int>& vecOrder,
                            const QVector<int>& vecToOrder)
 {
-    const int iNumCoils = vecOrder.size();
+    const int iNumCoils = static_cast<int>(vecOrder.size());
     QVector<int> vecToOrderTemp = vecToOrder;
 
     for(int i = 0; i < iNumCoils; i++) {
