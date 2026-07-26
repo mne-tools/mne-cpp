@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include <inv/inv_convenience.h>
+#include <inv/inv_source_estimate.h>
 #include <inv/beamformer/inv_lcmv.h>
 #include <inv/beamformer/inv_dics.h>
 #include <mne/mne_inverse_operator.h>
@@ -48,6 +49,8 @@
 
 #include <QtTest>
 #include <QObject>
+#include <QFile>
+#include <QTemporaryDir>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -413,6 +416,96 @@ private slots:
 
         auto result = computeSourceBandPower(stc, 256.0f, bands);
         QVERIFY(result.isEmpty());
+    }
+
+    //=========================================================================
+    // MNE-Python compatible hemisphere pair writing
+    //=========================================================================
+    void testWriteHemispherePair()
+    {
+        QTemporaryDir tmpDir;
+        QVERIFY(tmpDir.isValid());
+
+        const int nLh = 3;
+        const int nRh = 2;
+        const int nTimes = 4;
+
+        MatrixXd data(nLh + nRh, nTimes);
+        for (int r = 0; r < nLh + nRh; ++r) {
+            for (int c = 0; c < nTimes; ++c) {
+                data(r, c) = r * 10.0 + c;
+            }
+        }
+
+        VectorXi verts(nLh + nRh);
+        verts << 10, 11, 12, 20, 21;
+
+        InvSourceEstimate stc(data, verts, 0.0f, 1.0f / 256.0f);
+        stc.nVerticesLh = nLh;
+
+        const QString sBase = tmpDir.path() + "/estimate";
+        QVERIFY(stc.writeHemispherePair(sBase));
+
+        QVERIFY(QFile::exists(sBase + "-lh.stc"));
+        QVERIFY(QFile::exists(sBase + "-rh.stc"));
+
+        // Each file must contain only its own hemisphere.
+        QFile fileLh(sBase + "-lh.stc");
+        InvSourceEstimate stcLh;
+        QVERIFY(InvSourceEstimate::read(fileLh, stcLh));
+        QCOMPARE(static_cast<int>(stcLh.vertices.size()), nLh);
+        QCOMPARE(stcLh.vertices(0), 10);
+        QCOMPARE(stcLh.vertices(2), 12);
+        QCOMPARE(static_cast<int>(stcLh.data.rows()), nLh);
+
+        QFile fileRh(sBase + "-rh.stc");
+        InvSourceEstimate stcRh;
+        QVERIFY(InvSourceEstimate::read(fileRh, stcRh));
+        QCOMPARE(static_cast<int>(stcRh.vertices.size()), nRh);
+        QCOMPARE(stcRh.vertices(0), 20);
+        QCOMPARE(stcRh.vertices(1), 21);
+        QCOMPARE(static_cast<int>(stcRh.data.rows()), nRh);
+
+        // The right hemisphere rows must be the tail of the original data,
+        // not a copy of the left hemisphere.
+        QVERIFY(qAbs(stcRh.data(0, 0) - data(nLh, 0)) < 1e-4);
+    }
+
+    void testWriteHemispherePairStripsSuffix()
+    {
+        QTemporaryDir tmpDir;
+        QVERIFY(tmpDir.isValid());
+
+        MatrixXd data = MatrixXd::Random(4, 3);
+        VectorXi verts(4);
+        verts << 1, 2, 3, 4;
+
+        InvSourceEstimate stc(data, verts, 0.0f, 1.0f / 256.0f);
+        stc.nVerticesLh = 2;
+
+        // A caller passing a name that already ends in -lh.stc must not end up
+        // with "estimate-lh-lh.stc".
+        const QString sBase = tmpDir.path() + "/estimate";
+        QVERIFY(stc.writeHemispherePair(sBase + "-lh.stc"));
+
+        QVERIFY(QFile::exists(sBase + "-lh.stc"));
+        QVERIFY(QFile::exists(sBase + "-rh.stc"));
+        QVERIFY(!QFile::exists(sBase + "-lh-lh.stc"));
+    }
+
+    void testWriteHemispherePairRejectsUnknownSplit()
+    {
+        QTemporaryDir tmpDir;
+        QVERIFY(tmpDir.isValid());
+
+        MatrixXd data = MatrixXd::Random(4, 3);
+        VectorXi verts(4);
+        verts << 1, 2, 3, 4;
+
+        // nVerticesLh defaults to -1, meaning the split point is unknown.
+        InvSourceEstimate stc(data, verts, 0.0f, 1.0f / 256.0f);
+        QCOMPARE(stc.nVerticesLh, -1);
+        QVERIFY(!stc.writeHemispherePair(tmpDir.path() + "/estimate"));
     }
 
     void cleanupTestCase() {}

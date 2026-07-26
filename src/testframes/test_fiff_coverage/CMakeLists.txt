@@ -25,3 +25,7 @@ if(WITH_CODE_COV)
 endif()
 
 qt_finalize_target(${PROJECT_NAME})
+
+# Register with CTest
+enable_testing()
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

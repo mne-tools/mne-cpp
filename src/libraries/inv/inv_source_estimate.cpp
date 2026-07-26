@@ -50,6 +50,7 @@ using namespace Eigen;
 InvSourceEstimate::InvSourceEstimate()
 : tmin(0)
 , tstep(-1)
+, nVerticesLh(-1)
 , method(InvEstimateMethod::Unknown)
 , sourceSpaceType(InvSourceSpaceType::Unknown)
 , orientationType(InvOrientationType::Unknown)
@@ -63,6 +64,7 @@ InvSourceEstimate::InvSourceEstimate(const MatrixXd &p_sol, const VectorXi &p_ve
 , vertices(p_vertices)
 , tmin(p_tmin)
 , tstep(p_tstep)
+, nVerticesLh(-1)
 , method(InvEstimateMethod::Unknown)
 , sourceSpaceType(InvSourceSpaceType::Unknown)
 , orientationType(InvOrientationType::Unknown)
@@ -78,6 +80,7 @@ InvSourceEstimate::InvSourceEstimate(const InvSourceEstimate& p_SourceEstimate)
 , times(p_SourceEstimate.times)
 , tmin(p_SourceEstimate.tmin)
 , tstep(p_SourceEstimate.tstep)
+, nVerticesLh(p_SourceEstimate.nVerticesLh)
 , method(p_SourceEstimate.method)
 , sourceSpaceType(p_SourceEstimate.sourceSpaceType)
 , orientationType(p_SourceEstimate.orientationType)
@@ -93,6 +96,7 @@ InvSourceEstimate::InvSourceEstimate(const InvSourceEstimate& p_SourceEstimate)
 InvSourceEstimate::InvSourceEstimate(QIODevice &p_IODevice)
 : tmin(0)
 , tstep(-1)
+, nVerticesLh(-1)
 , method(InvEstimateMethod::Unknown)
 , sourceSpaceType(InvSourceSpaceType::Unknown)
 , orientationType(InvOrientationType::Unknown)
@@ -112,6 +116,7 @@ void InvSourceEstimate::clear()
     times = RowVectorXf();
     tmin = 0;
     tstep = 0;
+    nVerticesLh = -1;
     method = InvEstimateMethod::Unknown;
     sourceSpaceType = InvSourceSpaceType::Unknown;
     orientationType = InvOrientationType::Unknown;
@@ -253,6 +258,68 @@ bool InvSourceEstimate::write(QIODevice &p_IODevice)
 
 //=============================================================================================================
 
+bool InvSourceEstimate::writeHemispherePair(const QString& sBasePath)
+{
+    if(nVerticesLh < 0 || nVerticesLh > vertices.size()) {
+        qWarning("InvSourceEstimate::writeHemispherePair - nVerticesLh is %d for %lld vertices."
+                 " The hemisphere split point is unknown, cannot write an MNE compatible pair.",
+                 nVerticesLh, static_cast<long long>(vertices.size()));
+        return false;
+    }
+
+    if(data.rows() != vertices.size()) {
+        qWarning("InvSourceEstimate::writeHemispherePair - data has %lld rows but there are"
+                 " %lld vertices.",
+                 static_cast<long long>(data.rows()), static_cast<long long>(vertices.size()));
+        return false;
+    }
+
+    // Accept a path that already carries one of the usual suffixes so callers
+    // can pass back a name they got from a file dialog.
+    QString sBase = sBasePath;
+    for(const QString& sSuffix : {QStringLiteral("-lh.stc"),
+                                  QStringLiteral("-rh.stc"),
+                                  QStringLiteral(".stc")}) {
+        if(sBase.endsWith(sSuffix, Qt::CaseInsensitive)) {
+            sBase.chop(sSuffix.size());
+            break;
+        }
+    }
+
+    const int iNumRh = static_cast<int>(vertices.size()) - nVerticesLh;
+
+    struct Hemisphere {
+        QString sPath;
+        int iOffset;
+        int iCount;
+    };
+
+    const Hemisphere hemispheres[2] = {
+        { sBase + QStringLiteral("-lh.stc"), 0,           nVerticesLh },
+        { sBase + QStringLiteral("-rh.stc"), nVerticesLh, iNumRh      }
+    };
+
+    for(const Hemisphere& hemi : hemispheres) {
+        InvSourceEstimate stcHemi;
+        stcHemi.tmin  = this->tmin;
+        stcHemi.tstep = this->tstep;
+        stcHemi.times = this->times;
+        stcHemi.vertices = this->vertices.segment(hemi.iOffset, hemi.iCount);
+        stcHemi.data     = this->data.block(hemi.iOffset, 0, hemi.iCount, this->data.cols());
+
+        QFile file(hemi.sPath);
+        if(!stcHemi.write(file)) {
+            qWarning("InvSourceEstimate::writeHemispherePair - Failed to write %s",
+                     hemi.sPath.toUtf8().constData());
+            return false;
+        }
+    }
+
+    return true;
+}
+
+//=============================================================================================================
+
 InvSourceEstimate InvSourceEstimate::read_w(const QString& path)
 {
     QFile file(path);
@@ -365,6 +432,7 @@ InvSourceEstimate& InvSourceEstimate::operator= (const InvSourceEstimate &rhs)
         times = rhs.times;
         tmin = rhs.tmin;
         tstep = rhs.tstep;
+        nVerticesLh = rhs.nVerticesLh;
         method = rhs.method;
         sourceSpaceType = rhs.sourceSpaceType;
         orientationType = rhs.orientationType;

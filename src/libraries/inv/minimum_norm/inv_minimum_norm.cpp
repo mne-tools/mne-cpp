@@ -166,7 +166,13 @@ InvSourceEstimate InvMinimumNorm::calculateInverse(const MatrixXd &data, float t
 //    for(qint32 h = 0; h < inv.src.size(); ++h)
 //        t_qListVertices.push_back(inv.src[h].vertno);
 
-    return InvSourceEstimate(sol, p_vecVertices, tmin, tstep);
+    InvSourceEstimate stc(sol, p_vecVertices, tmin, tstep);
+
+    // Record where the left hemisphere ends so the estimate can be written as
+    // an MNE-C / MNE-Python compatible -lh.stc / -rh.stc pair.
+    stc.nVerticesLh = static_cast<int>(inv.src[0].vertno.size());
+
+    return stc;
 }
 
 //=============================================================================================================

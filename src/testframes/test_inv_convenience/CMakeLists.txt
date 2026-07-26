@@ -37,10 +37,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/${CMAKE_BUILD_TYPE}/tests"
     FOLDER "tests"
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
+
+# Register with CTest
+enable_testing()
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

@@ -164,6 +164,25 @@ public:
 
     //=========================================================================================================
     /**
+     * Write the estimate as an MNE-C / MNE-Python compatible hemisphere pair.
+     *
+     * MNE-Python expects a surface source estimate to be stored as two files,
+     * "<base>-lh.stc" and "<base>-rh.stc", each containing only the vertices
+     * of its own hemisphere. This writes exactly that, splitting at
+     * @ref nVerticesLh.
+     *
+     * @param[in] sBasePath   Path without the "-lh.stc"/"-rh.stc" suffix. A
+     *                        trailing "-lh.stc", "-rh.stc" or ".stc" is
+     *                        stripped if present.
+     *
+     * @return true when both files were written, false otherwise. Fails when
+     *         nVerticesLh is unknown (-1) or out of range, since the split
+     *         point cannot then be determined.
+     */
+    bool writeHemispherePair(const QString& sBasePath);
+
+    //=========================================================================================================
+    /**
      * Read a .w file (single time-point source estimate).
      *
      * The .w format stores vertex indices (3-byte big-endian) and float
@@ -230,6 +249,7 @@ public:
     Eigen::RowVectorXf times;       /**< The time vector with n_times steps. */
     float tmin;                     /**< Time starting point. */
     float tstep;                    /**< Time steps within the times vector. */
+    int nVerticesLh;                /**< Number of leading entries in vertices/data that belong to the left hemisphere. -1 when unknown, which is the case for non surface source spaces. */
 
     // --- Metadata ---
     InvEstimateMethod   method;         /**< The inverse method that produced this estimate. */
