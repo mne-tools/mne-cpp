@@ -130,11 +130,11 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
 
     //Draw vertical axis texts - db magnitude
     for(int i = 0; i <= m_iNumberHorizontalLines+1; i++) {
-        QGraphicsTextItem * text = addText(QString("-%1 db").arg(QString().number(i * m_iMaxMagnitude/(m_iScalingFactor*(m_iNumberHorizontalLines+1)),'g',3)),
+        QGraphicsTextItem * dbText = addText(QString("-%1 db").arg(QString().number(i * m_iMaxMagnitude/(m_iScalingFactor*(m_iNumberHorizontalLines+1)),'g',3)),
                                            QFont("Times", m_iAxisTextSize));
-        text->setPos(-text->boundingRect().width() - m_iAxisTextSize/2,
-                     (i * (m_iMaxMagnitude/(m_iNumberHorizontalLines+1))) - (text->boundingRect().height()/2) - m_iDiagramMarginsVert);
-        text->setDefaultTextColor(m_cPenColor);
+        dbText->setPos(-dbText->boundingRect().width() - m_iAxisTextSize/2,
+                     (i * (m_iMaxMagnitude/(m_iNumberHorizontalLines+1))) - (dbText->boundingRect().height()/2) - m_iDiagramMarginsVert);
+        dbText->setDefaultTextColor(m_cPenColor);
     }
 
     //VERTICAL
@@ -149,11 +149,11 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
 
     //Draw horizontal axis texts - Hz frequency
     for(int i = 0; i <= m_iNumberVerticalLines+1; i++) {
-        QGraphicsTextItem * text = addText(QString("%1 Hz").arg(i*(fMax/(m_iNumberVerticalLines+1))),
+        QGraphicsTextItem * hzText = addText(QString("%1 Hz").arg(i*(fMax/(m_iNumberVerticalLines+1))),
                                            QFont("Times", m_iAxisTextSize));
-        text->setPos(i * length - m_iDiagramMarginsHoriz - (text->boundingRect().width()/2),
-                     m_iMaxMagnitude + (text->boundingRect().height()/2));
-        text->setDefaultTextColor(m_cPenColor);
+        hzText->setPos(i * length - m_iDiagramMarginsHoriz - (hzText->boundingRect().width()/2),
+                     m_iMaxMagnitude + (hzText->boundingRect().height()/2));
+        hzText->setDefaultTextColor(m_cPenColor);
     }
 
     //Plot lower higher cut off frequency

@@ -110,7 +110,11 @@ void Plot::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
 
-    QPainter painter(this);
+    //
+    // The painter used for the drawing below is constructed inside the block.
+    // A second one was also being constructed here and never used, which means
+    // two QPainters were active on this widget at once - Qt only allows one.
+    //
     if (m_qListVecPointFPaths.size() > 0)
     {
         QPoint t_qPointTopLeft(m_iBorderLeftRight,m_iBorderTopBottom);

@@ -542,7 +542,7 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter *painter,
 
     //Newly detected triggers
     for(int u = 0; u < detectedTriggers.size(); ++u) {
-        QPainterPath path;
+        QPainterPath markerPath;
 
         int triggerPos = detectedTriggers[u].first;
 
@@ -552,17 +552,17 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter *painter,
         }
 
         if(triggerPos <= currentSampleIndex + t_pModel->getCurrentOverlapAddDelay()) {
-            path.moveTo(static_cast<qreal>(triggerPos)*dDx,yStart);
-            path.lineTo(static_cast<qreal>(triggerPos)*dDx,yEnd);
+            markerPath.moveTo(static_cast<qreal>(triggerPos)*dDx,yStart);
+            markerPath.lineTo(static_cast<qreal>(triggerPos)*dDx,yEnd);
         }
 
-        painter->drawPath(path);
+        painter->drawPath(markerPath);
         painter->restore();
     }
 
     //Old detected triggers
     for(int u = 0; u < detectedTriggersOld.size(); ++u) {
-        QPainterPath path;
+        QPainterPath markerPath;
 
         int triggerPos = detectedTriggersOld[u].first;
 
@@ -573,10 +573,10 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter *painter,
                 painter->setPen(QPen(mapTriggerTypeColors[detectedTriggersOld[u].second], 1.5, Qt::SolidLine));
             }
 
-            path.moveTo(static_cast<qreal>(triggerPos)*dDx,yStart);
-            path.lineTo(static_cast<qreal>(triggerPos)*dDx,yEnd);
+            markerPath.moveTo(static_cast<qreal>(triggerPos)*dDx,yStart);
+            markerPath.lineTo(static_cast<qreal>(triggerPos)*dDx,yEnd);
 
-            painter->drawPath(path);
+            painter->drawPath(markerPath);
             painter->restore();
         }
     }

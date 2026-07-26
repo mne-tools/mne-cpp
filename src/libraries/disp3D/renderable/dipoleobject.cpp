@@ -123,10 +123,10 @@ void DipoleObject::load(const INVLIB::InvEcdSet &ecdSet)
     }
     
     if (m_instanceCount > 0) {
-         InstanceData *data = reinterpret_cast<InstanceData*>(m_instanceData.data());
-         float x = data[0].model[12];
-         float y = data[0].model[13];
-         float z = data[0].model[14];
+         InstanceData *firstData = reinterpret_cast<InstanceData*>(m_instanceData.data());
+         float x = firstData[0].model[12];
+         float y = firstData[0].model[13];
+         float z = firstData[0].model[14];
          qDebug() << "DipoleObject: First dipole initial pos (Scaled):" << x << y << z;
     }
     
@@ -162,12 +162,12 @@ void DipoleObject::applyTransform(const QMatrix4x4 &trans)
     
     if (m_instanceCount > 0) {
         // Log first instance pos
-        InstanceData *data = reinterpret_cast<InstanceData*>(m_instanceData.data());
+        InstanceData *firstData = reinterpret_cast<InstanceData*>(m_instanceData.data());
         // Matrix is column major? No, we stored it as we got it from QMatrix4x4.constData(), which is Column-Major.
         // Translation is in the last column (indices 12, 13, 14).
-        float x = data[0].model[12];
-        float y = data[0].model[13];
-        float z = data[0].model[14];
+        float x = firstData[0].model[12];
+        float y = firstData[0].model[13];
+        float z = firstData[0].model[14];
         qDebug() << "DipoleObject: First dipole transformed pos (Meters):" << x << y << z;
     }
     

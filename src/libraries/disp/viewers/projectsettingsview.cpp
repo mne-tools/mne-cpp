@@ -246,14 +246,14 @@ void ProjectSettingsView::deleteSubject()
         return;
 
     if(msgBox.clickedButton() == deleteData) {
-        QMessageBox msgBox;
-        msgBox.setText(QString("Deleting subject data '%1'.").arg(m_pUi->m_qComboBox_SubjectSelection->currentText()));
-        msgBox.setInformativeText("Do really want to delete the data permantley? The deleted data cannot be recovered!");
-        msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
-        msgBox.setDefaultButton(QMessageBox::No);
-        msgBox.setWindowModality(Qt::ApplicationModal);
-        msgBox.setIcon(QMessageBox::Critical);
-        int ret = msgBox.exec();
+        QMessageBox confirmBox;
+        confirmBox.setText(QString("Deleting subject data '%1'.").arg(m_pUi->m_qComboBox_SubjectSelection->currentText()));
+        confirmBox.setInformativeText("Do really want to delete the data permantley? The deleted data cannot be recovered!");
+        confirmBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+        confirmBox.setDefaultButton(QMessageBox::No);
+        confirmBox.setWindowModality(Qt::ApplicationModal);
+        confirmBox.setIcon(QMessageBox::Critical);
+        int ret = confirmBox.exec();
 
         if(ret == QMessageBox::No)
             return;
@@ -288,14 +288,14 @@ void ProjectSettingsView::deleteProject()
         return;
 
     if(msgBox.clickedButton() == deleteData) {
-        QMessageBox msgBox;
-        msgBox.setText(QString("Deleting project data '%1'.").arg(m_pUi->m_qComboBox_ProjectSelection->currentText()));
-        msgBox.setInformativeText("Do really want to delete the data permantley? All subject data in this project will be lost! The deleted data cannot be recovered!");
-        msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
-        msgBox.setDefaultButton(QMessageBox::No);
-        msgBox.setWindowModality(Qt::ApplicationModal);
-        msgBox.setIcon(QMessageBox::Critical);
-        int ret = msgBox.exec();
+        QMessageBox confirmBox;
+        confirmBox.setText(QString("Deleting project data '%1'.").arg(m_pUi->m_qComboBox_ProjectSelection->currentText()));
+        confirmBox.setInformativeText("Do really want to delete the data permantley? All subject data in this project will be lost! The deleted data cannot be recovered!");
+        confirmBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+        confirmBox.setDefaultButton(QMessageBox::No);
+        confirmBox.setWindowModality(Qt::ApplicationModal);
+        confirmBox.setIcon(QMessageBox::Critical);
+        int ret = confirmBox.exec();
 
         if(ret == QMessageBox::No)
             return;

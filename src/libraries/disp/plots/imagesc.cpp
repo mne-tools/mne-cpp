@@ -164,10 +164,9 @@ void ImageSc::updateMaps()
         // --Data--
         qint32 x = m_matCentNormData.cols();
         qint32 y = m_matCentNormData.rows();
-        qint32 i, j;
         QImage t_qImageData(x, y, QImage::Format_RGB32);
-        for(i = 0; i < x; ++i)
-            for(j = 0; j < y; ++j)
+        for(qint32 i = 0; i < x; ++i)
+            for(qint32 j = 0; j < y; ++j)
                 t_qImageData.setPixel(i, j, pColorMapper(m_matCentNormData(j,i), m_sColorMap));
 
         m_pPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
@@ -176,7 +175,7 @@ void ImageSc::updateMaps()
         QImage t_qImageColorbar(1, m_iColorbarGradSteps, QImage::Format_RGB32);
 
         double t_dQuantile = 1.0/((double)m_iColorbarGradSteps-1);
-        for(j = 0; j < m_iColorbarGradSteps; ++j)
+        for(qint32 j = 0; j < m_iColorbarGradSteps; ++j)
         {
             QRgb t_qRgb = pColorMapper(t_dQuantile*((double)(m_iColorbarGradSteps-1-j))*1.0, m_sColorMap);
             t_qImageColorbar.setPixel(0, j, t_qRgb);
