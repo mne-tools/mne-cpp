@@ -34,7 +34,14 @@ void handleUnixSignal(int signalValue)
 {
     const char signalByte = static_cast<char>(signalValue);
     if(g_signalPipe[1] >= 0) {
-        ::write(g_signalPipe[1], &signalByte, sizeof(signalByte));
+        //
+        // Only async-signal-safe calls are allowed here, so there is nothing
+        // useful to do if the pipe is full or the write is interrupted: the
+        // notifier will still see whichever byte arrived. Consume the result
+        // explicitly rather than discarding it.
+        //
+        const ssize_t written = ::write(g_signalPipe[1], &signalByte, sizeof(signalByte));
+        static_cast<void>(written);
     }
 }
 
@@ -48,8 +55,15 @@ void installUnixSignalHandlers(QApplication& application)
     QObject::connect(notifier, &QSocketNotifier::activated, &application, [&application, notifier](int) {
         notifier->setEnabled(false);
         char signalByte = 0;
-        ::read(g_signalPipe[0], &signalByte, sizeof(signalByte));
-        application.quit();
+        //
+        // Drain the byte the handler wrote. If the read fails there is no
+        // signal to act on, so leave the application running rather than
+        // quitting on a spurious wakeup.
+        //
+        const ssize_t bytesRead = ::read(g_signalPipe[0], &signalByte, sizeof(signalByte));
+        if(bytesRead > 0) {
+            application.quit();
+        }
         notifier->setEnabled(true);
     });
 

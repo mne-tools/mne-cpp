@@ -813,9 +813,9 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const E
 
 //=============================================================================================================
 // fwd_eeg_sphere_models.c
-bool FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, bool fit_berg_scherg, int nfit)
+bool FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, bool fit_berg_scherg, int nFit)
 {
-    int nterms = 200;
+    int nTerms = 200;
     float  rv;
 
     /*
@@ -825,9 +825,9 @@ bool FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, bool fit_berg_sche
         this->layers[k].rad = rad*this->layers[k].rel_rad;
 
     if (fit_berg_scherg) {
-        if (this->fwd_eeg_fit_berg_scherg(nterms,nfit,rv)) {
+        if (this->fwd_eeg_fit_berg_scherg(nTerms,nFit,rv)) {
             qInfo("Equiv. model fitting -> RV = %g %%",100*rv);
-            for (int k = 0; k < nfit; k++)
+            for (int k = 0; k < nFit; k++)
                 qInfo("mu%d = %g\tlambda%d = %g", k+1,this->mu[k],k+1,this->layers[this->nlayer()-1].sigma*this->lambda[k]);
         }
         else

@@ -371,7 +371,7 @@ public:
      *
      * @return True when setup was successful, false otherwise.
      */
-    bool fwd_setup_eeg_sphere_model(float rad, bool fit_berg_scherg, int nfit);
+    bool fwd_setup_eeg_sphere_model(float rad, bool fit_berg_scherg, int nFit);
 
     //=========================================================================================================
     /**

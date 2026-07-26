@@ -30,6 +30,84 @@ using namespace Eigen;
 using namespace INVLIB;
 
 //=============================================================================================================
+// DEFINE STATIC HELPERS
+//=============================================================================================================
+
+namespace {
+
+//=============================================================================================================
+/**
+ * Parses a floating point command line argument.
+ *
+ * @param[in]  arg     The argument text.
+ * @param[out] value   Receives the parsed value; untouched on failure.
+ *
+ * @return True if the whole argument was a number.
+ */
+bool parseFloat(const char* arg, float& value)
+{
+    bool bOk = false;
+    const float parsed = QString::fromUtf8(arg).toFloat(&bOk);
+    if(bOk) {
+        value = parsed;
+    }
+
+    return bOk;
+}
+
+//=============================================================================================================
+/**
+ * Parses an integer command line argument.
+ *
+ * @param[in]  arg     The argument text.
+ * @param[out] value   Receives the parsed value; untouched on failure.
+ *
+ * @return True if the whole argument was a number.
+ */
+bool parseInt(const char* arg, int& value)
+{
+    bool bOk = false;
+    const int parsed = QString::fromUtf8(arg).toInt(&bOk);
+    if(bOk) {
+        value = parsed;
+    }
+
+    return bOk;
+}
+
+//=============================================================================================================
+/**
+ * Parses a colon separated triplet such as "1.0:2.0:3.0".
+ *
+ * @param[in]  arg      The argument text.
+ * @param[out] values   Receives the three parsed values; untouched on failure.
+ *
+ * @return True if exactly three numbers were given.
+ */
+bool parseTriplet(const char* arg, Eigen::Vector3f& values)
+{
+    const QStringList parts = QString::fromUtf8(arg).split(':');
+    if(parts.size() != 3) {
+        return false;
+    }
+
+    Eigen::Vector3f parsed;
+    for(int i = 0; i < 3; ++i) {
+        bool bOk = false;
+        parsed[i] = parts.at(i).toFloat(&bOk);
+        if(!bOk) {
+            return false;
+        }
+    }
+
+    values = parsed;
+
+    return true;
+}
+
+} // namespace
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -333,7 +411,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--guessrad: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%f",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical ("Could not interpret the radius.");
                 return false;
             }
@@ -349,7 +427,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--mindist: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%f",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical ("Could not interpret the distance.");
                 return false;
             }
@@ -363,7 +441,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--exclude: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%f",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical ("Could not interpret the distance.");
                 return false;
             }
@@ -377,7 +455,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--grid: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%f",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical ("Could not interpret the distance.");
                 return false;
             }
@@ -421,7 +499,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--origin: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%f:%f:%f",&r0[0],&r0[1],&r0[2]) != 3) {
+            if (!parseTriplet(argv[k+1], r0)) {
                 qCritical ("Could not interpret the origin.");
                 return false;
             }
@@ -435,7 +513,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--eegrad: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&eeg_sphere_rad) != 1) {
+            if (!parseFloat(argv[k+1], eeg_sphere_rad)) {
                 qCritical () << "Incomprehensible radius:" << argv[k+1];
                 return false;
             }
@@ -517,7 +595,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--gradnoise: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical() << "Incomprehensible value:" << argv[k+1];
                 return false;
             }
@@ -533,7 +611,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--magnoise: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical() << "Incomprehensible value:" << argv[k+1];
                 return false;
             }
@@ -549,7 +627,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--eegnoise: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical () << "Incomprehensible value:" << argv[k+1];
                 return false;
             }
@@ -569,7 +647,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--eegreg: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical () << "Incomprehensible value:" << argv[k+1];
                 return false;
             }
@@ -585,7 +663,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--magreg: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical () << "Incomprehensible value:" << argv[k+1];
                 return false;
             }
@@ -601,7 +679,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--gradreg: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical () << "Incomprehensible value:" << argv[k+1] ;
                 return false;
             }
@@ -617,7 +695,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--reg: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical () << "Incomprehensible value:" << argv[k+1];
                 return false;
             }
@@ -635,7 +713,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--tstep: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical() << "Incomprehensible tstep:" << argv[k+1];
                 return false;
             }
@@ -651,7 +729,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--integ: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical() << "Incomprehensible integration time:" << argv[k+1];
                 return false;
             }
@@ -667,7 +745,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--tmin: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical() << "Incomprehensible tmin:" << argv[k+1];
                 return false;
             }
@@ -679,7 +757,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--tmax: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical() << "Incomprehensible tmax:" << argv[k+1];
                 return false;
             }
@@ -691,7 +769,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--bmin: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical() << "Incomprehensible bmin:" << argv[k+1];
                 return false;
             }
@@ -703,7 +781,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--bmax: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical() << "Incomprehensible bmax:" << argv[k+1];
                 return false;
             }
@@ -715,7 +793,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--set: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%d",&setno) != 1) {
+            if (!parseInt(argv[k+1], setno)) {
                 qCritical() << "Incomprehensible data set number:" << argv[k+1];
                 return false;
             }
@@ -734,7 +812,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--lowpass: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical() << "Illegal number:" << argv[k+1];
                 return false;
             }
@@ -750,7 +828,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--lowpassw: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical() << "Illegal number:" << argv[k+1];
                 return false;
             }
@@ -766,7 +844,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--highpass: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%g",&fval) != 1) {
+            if (!parseFloat(argv[k+1], fval)) {
                 qCritical() << "Illegal number:" << argv[k+1];
                 return false;
             }
@@ -782,7 +860,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
                 qCritical ("--filtersize: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%d",&ival) != 1) {
+            if (!parseInt(argv[k+1], ival)) {
                 qCritical() << "Illegal number:" << argv[k+1];
                 return false;
             }
