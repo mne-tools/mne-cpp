@@ -125,24 +125,21 @@ endif()
 # (moc/uic/rcc) sources compiled by their own targets are unaffected.
 if(MSVC)
   add_compile_options(/W4)
-  # MSVC applies /W4 to third party headers as well, so warnings from Qt and
-  # Eigen would fail the build under /WX even though we cannot fix them.
+  # C4702 (unreachable code) is raised inside Qt's own qnumeric.h, not in our
+  # sources, and MSVC applies /W4 to third party headers too. Under /WX that
+  # failed the build over code we do not own and cannot fix.
   #
-  # /external:W0 alone is not enough: it only lowers the level for includes the
-  # compiler already considers external, and MSVC only treats an include as
-  # external when it arrives via /external:I. By default CMake emits SYSTEM
-  # include directories as plain /I, so nothing was ever marked external and
-  # Qt's qnumeric.h still failed the build with C4702 under /WX.
+  # The usual remedy, marking dependency headers external, does not work here:
+  # /external:W0 only affects includes that arrive via /external:I, and neither
+  # add_compile_options(/external:W0) nor overriding
+  # CMAKE_INCLUDE_SYSTEM_FLAG_CXX got Qt's include directory emitted that way
+  # (both were tried and the build failed identically). Rather than keep
+  # guessing at the include plumbing, disable this one diagnostic.
   #
-  # Switching the system include flag to /external:I makes the Qt and Eigen
-  # imported targets (whose interface includes CMake already treats as SYSTEM)
-  # arrive as external, so /external:W0 applies to them. Our own headers are
-  # added with target_include_directories without SYSTEM, so they stay at /W4.
-  #
-  # /external:anglebrackets is deliberately not used: our own headers are also
-  # included with angle brackets, so it would silence warnings in our code too.
-  set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "/external:I ")
-  add_compile_options(/external:W0)
+  # This is the only warning suppressed project wide. C4702 is also the least
+  # valuable of the /W4 set for us: it fires on code the optimiser proves
+  # unreachable, which is routine in heavily templated headers.
+  add_compile_options(/wd4702)
   if(MNE_WARNINGS_AS_ERRORS)
     add_compile_options(/WX)
   endif()
