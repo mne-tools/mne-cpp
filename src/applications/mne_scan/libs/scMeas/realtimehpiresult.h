@@ -56,6 +56,8 @@
 #include <QMutex>
 #include <QMutexLocker>
 
+#include <Eigen/Core>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -155,6 +157,36 @@ public:
      */
     void setDigitizerData(QSharedPointer<FIFFLIB::FiffDigitizerData> digData);
 
+    //=========================================================================================================
+    /**
+     * Head positions of all fits seen so far, oldest first.
+     *
+     * Each entry is the head origin in device coordinates, taken from the
+     * translation of the device-to-head transform of one fit. Plotting the
+     * entries as a connected line gives the path the subject's head travelled
+     * over the course of the measurement.
+     *
+     * @return the recorded head positions in metres.
+     */
+    QVector<Eigen::Vector3f> headPositionHistory() const;
+
+    //=========================================================================================================
+    /**
+     * Discard the recorded head positions, for example when starting a new run.
+     */
+    void clearHeadPositionHistory();
+
+    //=========================================================================================================
+    /**
+     * Set how many head positions are kept.
+     *
+     * The history is a ring: once it is full the oldest entry is dropped. A
+     * value of zero disables recording entirely.
+     *
+     * @param[in] iMaxPositions   maximum number of positions to keep.
+     */
+    void setHeadPositionHistorySize(int iMaxPositions);
+
 private:
     mutable QMutex          m_qMutex;                               /**< Mutex to ensure thread safety. */
     bool                    m_bInitialized;                         /**< If values are stored.*/
@@ -162,6 +194,9 @@ private:
     QSharedPointer<INVLIB::HpiFitResult>    m_pHpiFitResult;    /**< The HPI fit result. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The Fiff Info. */
     QSharedPointer<FIFFLIB::FiffDigitizerData>  m_pFiffDigData;     /**< The Fiff Digigtizer Data */
+
+    QVector<Eigen::Vector3f>    m_vecHeadPositions;         /**< Head origin in device coordinates for every fit so far, oldest first. */
+    int                         m_iMaxHeadPositions;        /**< Ring size of m_vecHeadPositions. Zero disables recording. */
 };
 
 //=============================================================================================================
