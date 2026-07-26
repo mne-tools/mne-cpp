@@ -125,6 +125,15 @@ endif()
 # (moc/uic/rcc) sources compiled by their own targets are unaffected.
 if(MSVC)
   add_compile_options(/W4)
+  # MSVC applies /W4 to third party headers as well, so warnings from Qt and
+  # Eigen would fail the build under /WX even though we cannot fix them. Mark
+  # dependency headers as external and silence them. CMake already passes
+  # /external:I for include directories it knows are SYSTEM (which is how the
+  # imported Qt and Eigen targets expose theirs), so we only need to set the
+  # external warning level. Requires VS 2019 16.10 (19.29.30036) or newer.
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.29.30036)
+    add_compile_options(/external:W0)
+  endif()
   if(MNE_WARNINGS_AS_ERRORS)
     add_compile_options(/WX)
   endif()
