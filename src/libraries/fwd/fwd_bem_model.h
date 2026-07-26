@@ -77,7 +77,7 @@ constexpr int    FWD_BEM_UNKNOWN           = -1;
 constexpr int    FWD_BEM_CONSTANT_COLL     =  1;
 constexpr int    FWD_BEM_LINEAR_COLL       =  2;
 
-constexpr double FWD_BEM_IP_APPROACH_LIMIT = 0.1;
+constexpr float FWD_BEM_IP_APPROACH_LIMIT = 0.1f;
 
 constexpr int    FWD_BEM_LIN_FIELD_SIMPLE    = 1;
 constexpr int    FWD_BEM_LIN_FIELD_FERGUSON  = 2;
@@ -239,10 +239,10 @@ public:
      * The solution must match the requested BEM method.
      *
      * @param[in] name        Path to the solution FIFF file.
-     * @param[in] bem_method  Required BEM method (FWD_BEM_CONSTANT_COLL or FWD_BEM_LINEAR_COLL).
+     * @param[in] bemMethod  Required BEM method (FWD_BEM_CONSTANT_COLL or FWD_BEM_LINEAR_COLL).
      * @return true if loaded, false if not found, FAIL on error.
      */
-    int fwd_bem_load_solution(const QString& name, int bem_method);
+    int fwd_bem_load_solution(const QString& name, int bemMethod);
 
     //=========================================================================================================
     /**
@@ -422,10 +422,10 @@ public:
     /**
      * @brief Compute the BEM solution matrix using the specified method.
      *
-     * @param[in] bem_method  BEM method (FWD_BEM_CONSTANT_COLL or FWD_BEM_LINEAR_COLL).
+     * @param[in] bemMethod  BEM method (FWD_BEM_CONSTANT_COLL or FWD_BEM_LINEAR_COLL).
      * @return OK on success, FAIL on error.
      */
-    int fwd_bem_compute_solution(int bem_method);
+    int fwd_bem_compute_solution(int bemMethod);
 
     //=========================================================================================================
     /**
@@ -435,12 +435,12 @@ public:
      * force_recompute is set, computes a fresh solution.
      *
      * @param[in] name             Path to the BEM model file.
-     * @param[in] bem_method       Required BEM method.
+     * @param[in] bemMethod       Required BEM method.
      * @param[in] force_recompute  If non-zero, always recompute the solution.
      * @return OK on success, FAIL on error.
      */
     int fwd_bem_load_recompute_solution(const QString& name,
-                                        int bem_method,
+                                        int bemMethod,
                                         int force_recompute);
 
     //============================= fwd_bem_pot.c =============================

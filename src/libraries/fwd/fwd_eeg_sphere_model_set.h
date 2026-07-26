@@ -145,7 +145,7 @@ public:
     /** Number of models in this set. */
     int nmodel() const
     {
-        return models.size();
+        return static_cast<int>(models.size());
     }
 
 public:

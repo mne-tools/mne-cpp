@@ -422,14 +422,14 @@ public:
      *
      * @return true if fitting succeeded, false otherwise.
      */
-    bool fwd_eeg_fit_berg_scherg(int   nterms,
-                                int   nfit,
+    bool fwd_eeg_fit_berg_scherg(int   nTerms,
+                                int   nFit,
                                 float &rv);
 
 /**< Number of layers. */
     int   nlayer() const
     {
-        return layers.size();
+        return static_cast<int>(layers.size());
     }
 
 public:

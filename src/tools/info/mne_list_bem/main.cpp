@@ -50,6 +50,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
+#include <QTextStream>
 #include <QDebug>
 
 //=============================================================================================================
@@ -184,54 +185,61 @@ int main(int argc, char *argv[])
     const MNEBemSurface &surf = bem[surfIdx];
 
     // Write output
-    FILE *out = fopen(qPrintable(outName), "w");
-    if (!out) {
+    QFile outFile(outName);
+    if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qCritical("Cannot open output file: %s", qPrintable(outName));
         return 1;
     }
 
+    //
+    // The layout is fixed-width and consumed by other tools, so keep printf
+    // style formatting rather than reproducing the column widths by hand.
+    //
+    QTextStream out(&outFile);
+
     if (oldOutput) {
-        fprintf(out, "%5d\n", surf.np);
+        out << QString::asprintf("%5d\n", surf.np);
         for (int k = 0; k < surf.np; k++)
-            fprintf(out, "%5d %9.4f %9.4f %9.4f\n",
-                    k + 1,
-                    lengthMult * surf.rr(k, 0),
-                    lengthMult * surf.rr(k, 1),
-                    lengthMult * surf.rr(k, 2));
-        fprintf(out, "%5d\n", surf.ntri);
+            out << QString::asprintf("%5d %9.4f %9.4f %9.4f\n",
+                                     k + 1,
+                                     lengthMult * surf.rr(k, 0),
+                                     lengthMult * surf.rr(k, 1),
+                                     lengthMult * surf.rr(k, 2));
+        out << QString::asprintf("%5d\n", surf.ntri);
         for (int k = 0; k < surf.ntri; k++) {
-            fprintf(out, "%5d %4d %4d %4d\n",
-                    k + 1,
-                    surf.itris(k, 0) + 1,
-                    surf.itris(k, 2) + 1,
-                    surf.itris(k, 1) + 1);
+            out << QString::asprintf("%5d %4d %4d %4d\n",
+                                     k + 1,
+                                     surf.itris(k, 0) + 1,
+                                     surf.itris(k, 2) + 1,
+                                     surf.itris(k, 1) + 1);
         }
     } else if (thomOutput) {
-        fprintf(out, "%5d\n", surf.np);
+        out << QString::asprintf("%5d\n", surf.np);
         for (int k = 0; k < surf.np; k++)
-            fprintf(out, "%5d %9.4f %9.4f %9.4f\n",
-                    k + 1,
-                    lengthMult * surf.rr(k, 0),
-                    lengthMult * surf.rr(k, 1),
-                    lengthMult * surf.rr(k, 2));
-        fprintf(out, "%5d\n", surf.ntri);
+            out << QString::asprintf("%5d %9.4f %9.4f %9.4f\n",
+                                     k + 1,
+                                     lengthMult * surf.rr(k, 0),
+                                     lengthMult * surf.rr(k, 1),
+                                     lengthMult * surf.rr(k, 2));
+        out << QString::asprintf("%5d\n", surf.ntri);
         for (int k = 0; k < surf.ntri; k++) {
-            fprintf(out, "%5d %4d %4d %4d\n",
-                    k + 1,
-                    surf.itris(k, 0) + 1,
-                    surf.itris(k, 1) + 1,
-                    surf.itris(k, 2) + 1);
+            out << QString::asprintf("%5d %4d %4d %4d\n",
+                                     k + 1,
+                                     surf.itris(k, 0) + 1,
+                                     surf.itris(k, 1) + 1,
+                                     surf.itris(k, 2) + 1);
         }
     } else {
         for (int k = 0; k < surf.np; k++)
-            fprintf(out, "%10.3f %10.3f %10.3f\n",
-                    lengthMult * surf.rr(k, 0),
-                    lengthMult * surf.rr(k, 1),
-                    lengthMult * surf.rr(k, 2));
+            out << QString::asprintf("%10.3f %10.3f %10.3f\n",
+                                     lengthMult * surf.rr(k, 0),
+                                     lengthMult * surf.rr(k, 1),
+                                     lengthMult * surf.rr(k, 2));
     }
 
-    fclose(out);
-    fprintf(stderr, "done.\n");
+    out.flush();
+    outFile.close();
+    qInfo("done.");
 
     return 0;
 }

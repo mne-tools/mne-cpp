@@ -188,7 +188,9 @@ bool MNEShowFiffSettings::check_args (int *argc,char **argv)
                 qCritical("--tag: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%d",&val) != 1) {
+            bool bOk = false;
+            val = QString::fromUtf8(argv[k+1]).toInt(&bOk);
+            if (!bOk) {
                 qCritical("Incomprehensible tag number : %s",argv[k+1]);
                 return false;
             }
@@ -200,7 +202,9 @@ bool MNEShowFiffSettings::check_args (int *argc,char **argv)
                 qCritical("--indent: argument required.");
                 return false;
             }
-            if (sscanf(argv[k+1],"%d",&val) != 1) {
+            bool bOk = false;
+            val = QString::fromUtf8(argv[k+1]).toInt(&bOk);
+            if (!bOk) {
                 qCritical("Incomprehensible number : %s",argv[k+1]);
                 return false;
             }

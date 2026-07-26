@@ -257,8 +257,22 @@ void MNEFiffExpSet::print_file_id (FILE *out, const FiffTag::UPtr& tag)
     fprintf(out,"0x%x%x ",id.machid[0],id.machid[1]);
 
     time_val = id.time.secs;
-    ltime = localtime(&time_val);
-    (void)strftime(buf,100,"%c",ltime);
+    //
+    // localtime() returns a pointer into a shared static buffer. Use the
+    // reentrant variant so a concurrent caller cannot overwrite the result
+    // between this call and strftime below.
+    //
+    struct tm timeBuf;
+#ifdef _WIN32
+    ltime = (localtime_s(&timeBuf, &time_val) == 0) ? &timeBuf : nullptr;
+#else
+    ltime = localtime_r(&time_val, &timeBuf);
+#endif
+    if(ltime) {
+        (void)strftime(buf,100,"%c",ltime);
+    } else {
+        buf[0] = '\0';
+    }
 
     fprintf(out,"%s",buf);
 }

@@ -381,7 +381,7 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot(const Eigen::Vector3f& rd_in, con
     Eigen::Vector3f vec1, vec2;
     float  v1,v2;
     float  cos_beta,Qr,Qt,Q2,c;
-    float  pi4_inv = 0.25/M_PI;
+    float  pi4_inv = static_cast<float>(0.25/M_PI);
     float  sigmaM_inv;
     /*
        * Precompute the coefficients
@@ -652,7 +652,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_grad_coil(const Eigen::Vector3f& rd, co
           */
 {
     Eigen::Vector3f my_rd;
-    float step  = 0.0005;
+    float step  = 0.0005f;
     float step2 = 2*step;
     int   p,q;
 
@@ -691,7 +691,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot(   const Eigen::Vector3f& rd_in,
       */
 {
     auto* m = static_cast<FwdEegSphereModel*>(client);
-    float fact = 0.25f/M_PI;
+    float fact = static_cast<float>(0.25/M_PI);
     Eigen::Vector3f a_vec;
     float a,a2,a3;
     float rrd,rd2,rd2_inv,r,r2,ra,rda;
@@ -1024,9 +1024,9 @@ double FwdEegSphereModel::one_step (const VectorXd& mu, const void *user_data)
 }
 
 // fwd_fit_berg_scherg.c
-bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Number of terms to use in the series expansion
+bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nTerms,              /* Number of terms to use in the series expansion
                                                                                     * when fitting the parameters */
-                            int   nfit,	               /* Number of equivalent dipoles to fit */
+                            int   nFit,	               /* Number of equivalent dipoles to fit */
                             float &rv)
 /*
       * This routine fits the Berg-Scherg equivalent spherical model
@@ -1041,14 +1041,14 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
     MatrixXd simplex;
     VectorXd func_val;
     double ftol = 1e-9;
-    VectorXd lambda;
-    VectorXd mu;
+    VectorXd lambdaFit;
+    VectorXd muFit;
     int   neval;
     int   max_eval = 1000;
     int   report   = 1;
-    fitUser u = new_fit_user(nfit,nterms);
+    fitUser u = new_fit_user(nFit,nTerms);
 
-    if (nfit < 2) {
+    if (nFit < 2) {
         qWarning("fwd_fit_berg_scherg does not work with less than two equivalent sources.");
         return false;
     }
@@ -1056,7 +1056,7 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
     /*
    * (1) Calculate the coefficients of the true expansion
    */
-    for (k = 0; k < nterms; k++)
+    for (k = 0; k < nTerms; k++)
         u->fn[k] = this->fwd_eeg_get_multi_sphere_model_coeff(k+1);
 
     /*
@@ -1075,37 +1075,37 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
     /*
    * This is the Zhang weighting
    */
-    for (k = 1; k < nterms; k++)
+    for (k = 1; k < nTerms; k++)
         u->w[k-1] = pow(f,k);
 #else
     /*
    * This is the correct weighting
    */
-    for (k = 1; k < nterms; k++)
+    for (k = 1; k < nTerms; k++)
         u->w[k-1] = sqrt((2.0*k+1)*(3.0*k+1.0)/k)*pow(f,(k-1.0));
 #endif
 
     /*
    * (3) Prepare for simplex minimization
    */
-    func_val = VectorXd(nfit+1);
-    lambda   = VectorXd(nfit);
-    mu       = VectorXd(nfit);
+    func_val = VectorXd(nFit+1);
+    lambdaFit   = VectorXd(nFit);
+    muFit       = VectorXd(nFit);
     /*
    * (4) Rather arbitrary initial guess
    */
-    for (k = 0; k < nfit; k++) {
+    for (k = 0; k < nFit; k++) {
         /*
-    mu[k] = (k+1)*0.1*f;
+    muFit[k] = (k+1)*0.1*f;
      */
-        mu[k] = (rand() / (RAND_MAX + 1.0))*f;//replacement for: mu[k] = drand48()*f;
+        muFit[k] = (rand() / (RAND_MAX + 1.0))*f;//replacement for: muFit[k] = drand48()*f;
     }
 
-    simplex = get_initial_simplex(mu,simplex_size);
-    for (k = 0; k < nfit+1; k++)
+    simplex = get_initial_simplex(muFit,simplex_size);
+    for (k = 0; k < nFit+1; k++)
         func_val[k] = one_step(VectorXd(simplex.row(k).transpose()),u);
 
-    // Capture user data in type-safe lambda — no void* needed
+    // Capture user data in type-safe lambdaFit — no void* needed
     auto cost = [u](const VectorXd& x) -> double { return one_step(x, u); };
 
     /*
@@ -1122,29 +1122,29 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
                                                       report_fit);
 
     if (res) {
-        for (k = 0; k < nfit; k++)
-            mu[k] = simplex(0,k);
+        for (k = 0; k < nFit; k++)
+            muFit[k] = simplex(0,k);
 
         /*
        * (6) Do the final step: calculation of the linear parameters
        */
-        rv = compute_linear_parameters(mu,lambda,u);
+        rv = compute_linear_parameters(muFit,lambdaFit,u);
 
-        sort_parameters(mu,lambda,nfit);
+        sort_parameters(muFit,lambdaFit,nFit);
 #ifdef LOG_FIT
         qInfo("RV = %g %%",100*rv);
 #endif
-        this->mu.resize(nfit);
-        this->lambda.resize(nfit);
-        this->nfit   = nfit;
-        for (k = 0; k < nfit; k++) {
-            this->mu[k] = mu[k];
+        this->mu.resize(nFit);
+        this->lambda.resize(nFit);
+        this->nfit   = nFit;
+        for (k = 0; k < nFit; k++) {
+            this->mu[k] = muFit[k];
             /*
          * This division takes into account the actual conductivities
          */
-            this->lambda[k] = lambda[k]/this->layers[this->nlayer()-1].sigma;
+            this->lambda[k] = lambdaFit[k]/this->layers[this->nlayer()-1].sigma;
 #ifdef LOG_FIT
-            qInfo("lambda%d = %g\tmu%d = %g",k+1,lambda[k],k+1,mu[k]);
+            qInfo("lambdaFit%d = %g\tmu%d = %g",k+1,lambdaFit[k],k+1,muFit[k]);
 #endif
         }
     }

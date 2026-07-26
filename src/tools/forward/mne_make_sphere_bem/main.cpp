@@ -107,7 +107,7 @@ static void makeIcosphere(int nSubdiv, MatrixX3f& verts, MatrixX3i& tris)
             auto key = std::make_pair(std::min(a, b), std::max(a, b));
             auto it = edgeMidpoint.find(key);
             if (it != edgeMidpoint.end()) return it->second;
-            int idx = v.size();
+            int idx = static_cast<int>(v.size());
             v.push_back(((v[a] + v[b]) * 0.5f).normalized());
             edgeMidpoint[key] = idx;
             return idx;
