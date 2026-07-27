@@ -190,22 +190,23 @@ void TestEvents::testAddRangedEvent()
 
 void TestEvents::testEventDurationClamping()
 {
-    EVENTSINTERNAL::EventINT e(1, 500, 0);
+    // EventINT is internal to the library and deliberately not exported, so
+    // exercise the clamping through the public EventManager API instead.
+    EventManager mgr;
+    EventGroup g = mgr.addGroup("Clamp");
 
-    QCOMPARE(e.getDuration(), 0);
-    QVERIFY(!e.isRanged());
-    QCOMPARE(e.getEndSample(), 500);
+    Event e = mgr.addRangedEvent(500, 120, g.id);
+    QCOMPARE(mgr.getEvent(e.id).duration, 120);
 
-    e.setDuration(120);
-    QCOMPARE(e.getDuration(), 120);
-    QVERIFY(e.isRanged());
-    QCOMPARE(e.getEndSample(), 620);
+    // An event cannot end before it starts, so a negative duration clamps to
+    // zero rather than producing a backwards range.
+    QVERIFY(mgr.setEventDuration(e.id, -5));
+    QCOMPARE(mgr.getEvent(e.id).duration, 0);
 
-    // An event cannot end before it starts.
-    e.setDuration(-5);
-    QCOMPARE(e.getDuration(), 0);
-    QVERIFY(!e.isRanged());
-    QCOMPARE(e.getEndSample(), 500);
+    // Creating one with a negative duration is clamped the same way.
+    Event e2 = mgr.addRangedEvent(700, -30, g.id);
+    QCOMPARE(mgr.getEvent(e2.id).duration, 0);
+    QCOMPARE(mgr.getEvent(e2.id).sample, 700);
 }
 
 //=============================================================================================================
