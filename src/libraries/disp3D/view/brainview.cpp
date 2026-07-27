@@ -20,6 +20,7 @@
 #include "renderable/brainsurface.h"
 #include "renderable/dipoleobject.h"
 #include "renderable/networkobject.h"
+#include "renderable/polylineobject.h"
 #include "renderable/videooverlay.h"
 #include "renderable/sliceobject.h"
 #include "core/surfacekeys.h"
@@ -913,32 +914,12 @@ void BrainView::setHeadMovementPath(const QVector<Eigen::Vector3f>& vecPositions
         return;
     }
 
-    // Reuse the connectivity network renderer: a head movement path is just a
-    // chain of nodes joined by consecutive edges. The weight carries the step
-    // index so the colormap grades the line over time and the direction of
-    // drift is visible.
-    CONNECTIVITYLIB::Network network(QStringLiteral("HeadMovementPath"));
-
-    for(int i = 0; i < vecPositions.size(); ++i) {
-        Eigen::RowVectorXf vecVert(3);
-        vecVert << vecPositions.at(i).x(), vecPositions.at(i).y(), vecPositions.at(i).z();
-
-        network.append(QSharedPointer<CONNECTIVITYLIB::NetworkNode>::create(static_cast<qint16>(i),
-                                                                           vecVert));
+    if(!m_headPath) {
+        m_headPath = std::make_unique<PolylineObject>();
     }
 
-    const double dLastStep = static_cast<double>(vecPositions.size() - 1);
-
-    for(int i = 0; i < vecPositions.size() - 1; ++i) {
-        Eigen::MatrixXd matWeight(1, 1);
-        matWeight(0, 0) = (dLastStep > 0.0) ? (static_cast<double>(i) / dLastStep) : 0.0;
-
-        network.append(QSharedPointer<CONNECTIVITYLIB::NetworkEdge>::create(i, i + 1, matWeight));
-    }
-
-    m_network = std::make_unique<NetworkObject>();
-    m_network->load(network);
-    m_network->setVisible(true);
+    m_headPath->setPoints(vecPositions);
+    m_headPath->setVisible(true);
 
     m_sceneDirty = true; update();
 }
@@ -947,11 +928,11 @@ void BrainView::setHeadMovementPath(const QVector<Eigen::Vector3f>& vecPositions
 
 void BrainView::clearHeadMovementPath()
 {
-    if(!m_network) {
+    if(!m_headPath) {
         return;
     }
 
-    m_network.reset();
+    m_headPath.reset();
     m_sceneDirty = true; update();
 }
 
@@ -2048,6 +2029,12 @@ void BrainView::render(QRhiCommandBuffer *cb)
     // Render Connectivity Network
     if (sv.visibility.network && m_network) {
         m_renderer->renderNetwork(cb, rhi(), sceneData, m_network.get());
+    }
+
+    // Render the head movement path. It is not connectivity data, so it is not
+    // tied to the network visibility flag.
+    if (m_headPath) {
+        m_renderer->renderPolyline(cb, rhi(), sceneData, m_headPath.get());
     }
 
     // Intersection Pointer

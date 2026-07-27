@@ -64,6 +64,7 @@ class BrainRenderer;
 class BrainSurface;
 class DipoleObject;
 class NetworkObject;
+class PolylineObject;
 namespace DISP3DLIB { class VideoOverlay; class SliceObject; }
 namespace CONNECTIVITYLIB { class Network; }
 
@@ -1283,6 +1284,7 @@ private:
     // ── Scene objects ──────────────────────────────────────────────────
     std::unique_ptr<DipoleObject> m_dipoles;        /**< Standalone dipole set (loaded via file). */
     std::unique_ptr<NetworkObject> m_network;       /**< Connectivity network visualization. */
+    std::unique_ptr<PolylineObject> m_headPath;     /**< Head movement path over the course of a measurement. */
     std::unique_ptr<DISP3DLIB::VideoOverlay> m_videoOverlay; /**< Live RGB video overlay decal. */
 
     // ── MRI slices ─────────────────────────────────────────────────────

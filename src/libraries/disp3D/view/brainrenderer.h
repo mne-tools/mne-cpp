@@ -58,6 +58,7 @@ class QRhiTextureRenderTarget;
 class BrainSurface;
 class DipoleObject;
 class NetworkObject;
+class PolylineObject;
 namespace DISP3DLIB { class VideoOverlay; class SliceObject; }
 
 //=============================================================================================================
@@ -298,6 +299,17 @@ public:
      * @param[in] network    Pointer to NetworkObject.
      */
     void renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, NetworkObject *network);
+
+    //=========================================================================================================
+    /**
+     * Render a polyline as connected segments.
+     *
+     * @param[in] cb         Command buffer.
+     * @param[in] rhi        QRhi pointer.
+     * @param[in] data       Scene uniforms.
+     * @param[in] polyline   Pointer to PolylineObject.
+     */
+    void renderPolyline(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, PolylineObject *polyline);
 
     //=========================================================================================================
     /**

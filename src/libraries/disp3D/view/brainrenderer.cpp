@@ -20,6 +20,7 @@
 #include "renderable/brainsurface.h"
 #include "renderable/dipoleobject.h"
 #include "renderable/networkobject.h"
+#include "renderable/polylineobject.h"
 #include "renderable/videooverlay.h"
 #include "renderable/sliceobject.h"
 
@@ -1526,6 +1527,52 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
         cb->setVertexInput(0, 2, edgeBindings, network->edgeIndexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
         cb->drawIndexed(network->edgeIndexCount(), network->edgeInstanceCount());
     }
+}
+
+//=============================================================================================================
+
+void BrainRenderer::renderPolyline(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, PolylineObject *polyline)
+{
+    if (!polyline || !polyline->isVisible() || !polyline->hasData()) return;
+
+    // The segments use the same instance layout as dipoles and network edges,
+    // so the Dipole pipeline draws them without a shader of their own.
+    auto *pipeline = d->pipelines[Dipole].get();
+    if (!pipeline) return;
+
+    QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
+    polyline->updateBuffers(rhi, u);
+
+    int offset = d->currentUniformOffset;
+    d->currentUniformOffset += d->uniformBufferOffsetAlignment;
+    if (static_cast<quint32>(d->currentUniformOffset) >= d->uniformBuffer->size()) {
+        qWarning("BrainRenderer: uniform buffer overflow in renderPolyline");
+        return;
+    }
+
+    struct { float mvp[16]; float cp[3]; float _p0; float ld[3]; float _p1; float le; } ub;
+    memcpy(ub.mvp, data.mvp.constData(), 64);
+    memcpy(ub.cp, &data.cameraPos, 12); ub._p0 = 0.0f;
+    memcpy(ub.ld, &data.lightDir, 12);  ub._p1 = 0.0f;
+    ub.le = data.lightingEnabled ? 1.0f : 0.0f;
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(ub), &ub);
+
+    cb->resourceUpdate(u);
+    cb->setViewport(toViewport(data));
+    cb->setScissor(toScissor(data));
+
+    cb->setGraphicsPipeline(pipeline);
+
+    const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(offset) };
+    cb->setShaderResources(d->srb.get(), 1, &srbOffset);
+
+    const QRhiCommandBuffer::VertexInput bindings[2] = {
+        QRhiCommandBuffer::VertexInput(polyline->vertexBuffer(), 0),
+        QRhiCommandBuffer::VertexInput(polyline->instanceBuffer(), 0)
+    };
+
+    cb->setVertexInput(0, 2, bindings, polyline->indexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
+    cb->drawIndexed(polyline->indexCount(), polyline->instanceCount());
 }
 
 //=============================================================================================================
