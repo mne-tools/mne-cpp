@@ -84,6 +84,7 @@ private slots:
     void testSetEventDuration();
     void testEventCode();
     void testMaxEventDuration();
+    void testEventUpdateCarriesRange();
     void testGetEvent();
     void testGetAllEvents();
     void testGetEventsInSample();
@@ -303,6 +304,35 @@ void TestEvents::testMaxEventDuration()
     auto widened = mgr.getEventsBetween(4500 - mgr.getMaxEventDuration(), 4600);
     QCOMPARE(static_cast<int>(widened->size()), 1);
     QCOMPARE(widened->at(0).sample, 4000);
+}
+
+//=============================================================================================================
+
+void TestEvents::testEventUpdateCarriesRange()
+{
+    // EventUpdate itself is internal and not exported, so it is exercised
+    // through the manager rather than constructed here. Building it directly
+    // links on macOS and Linux but not on Windows, where only the exported
+    // symbols are visible.
+    EventManager mgr;
+    EventGroup g = mgr.addGroup("group");
+
+    // A ranged event with a trigger code has to survive being stored and read
+    // back with both fields intact. These are the two values the shared memory
+    // protocol used to drop, leaving every annotation an instant of the same
+    // condition on the receiving side.
+    Event ranged = mgr.addRangedEvent(1234, 250, g.id);
+    QVERIFY(mgr.setEventCode(ranged.id, 7));
+
+    Event stored = mgr.getEvent(ranged.id);
+    QCOMPARE(stored.sample, 1234);
+    QCOMPARE(stored.duration, 250);
+    QCOMPARE(stored.eventCode, 7);
+
+    // An instantaneous event keeps a zero duration and the default code.
+    Event instant = mgr.addEvent(99, g.id);
+    QCOMPARE(mgr.getEvent(instant.id).duration, 0);
+    QCOMPARE(mgr.getEvent(instant.id).eventCode, 1);
 }
 
 //=============================================================================================================

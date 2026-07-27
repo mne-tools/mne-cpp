@@ -64,7 +64,11 @@ using namespace EVENTSLIB;
 // LOCAL DEFINITIONS
 //=============================================================================================================
 
-static const std::string defaultSharedMemoryBufferKey("MNE_EVENTS_SHAREDMEMORY_BUFFER");
+// The buffer holds raw EventUpdate structs, so the key is versioned. Adding a
+// field changes the layout, and two builds that disagree about it must not end
+// up attached to the same segment reading each other's bytes as the wrong
+// members. Bump the suffix whenever EventUpdate changes.
+static const std::string defaultSharedMemoryBufferKey("MNE_EVENTS_SHAREDMEMORY_BUFFER_V2");
 static const std::string defaultGroupName("external");
 
 int EVENTSINTERNAL::EventSharedMemManager::m_iLastUpdateIndex(0);
@@ -85,11 +89,33 @@ EVENTSINTERNAL::EventUpdate::EventUpdate()
 //=============================================================================================================
 
 EVENTSINTERNAL::EventUpdate::EventUpdate(int sample, int creator,EventUpdateType t)
+: EventUpdate(sample, 0, 1, creator, t)
+{ }
+
+//=============================================================================================================
+
+EVENTSINTERNAL::EventUpdate::EventUpdate(int sample, int duration, int eventCode, int creator, EventUpdateType t)
 : m_EventSample(sample)
+, m_EventDuration(duration < 0 ? 0 : duration)
+, m_EventCode(eventCode)
 , m_CreatorId(creator)
 , m_TypeOfUpdate(t)
 {
     m_CreationTime = EventSharedMemManager::getTimeNow();
+}
+
+//=============================================================================================================
+
+int EVENTSINTERNAL::EventUpdate::getDuration() const
+{
+    return m_EventDuration;
+}
+
+//=============================================================================================================
+
+int EVENTSINTERNAL::EventUpdate::getEventCode() const
+{
+    return m_EventCode;
 }
 
 //=============================================================================================================
@@ -278,11 +304,18 @@ bool EVENTSINTERNAL::EventSharedMemManager::isInit() const
 
 void EVENTSINTERNAL::EventSharedMemManager::addEvent(int sample)
 {
+    addEvent(sample, 0, 1);
+}
+
+//=============================================================================================================
+
+void EVENTSINTERNAL::EventSharedMemManager::addEvent(int sample, int duration, int eventCode)
+{
     if(m_IsInit &&
       (m_Mode == EVENTSLIB::SharedMemoryMode::WRITE  ||
        m_Mode == EVENTSLIB::SharedMemoryMode::READWRITE  )  )
     {
-        EventUpdate newUpdate(sample, m_Id, EventUpdateType::NEW_EVENT);
+        EventUpdate newUpdate(sample, duration, eventCode, m_Id, EventUpdateType::NEW_EVENT);
         copyNewUpdateToSharedMemory(newUpdate);
     }
 }
@@ -419,6 +452,13 @@ void EVENTSINTERNAL::EventSharedMemManager::processNewEvent(const EventUpdate& n
 {
     EVENTSINTERNAL::EventINT newEvent(
                 m_pEventManager->generateNewEventId(), ne.getSample(), m_GroupId);
+
+    // Carry the range and the condition across as well, otherwise an
+    // annotation arriving from another process collapses to an instant and
+    // every event looks like the same trigger.
+    newEvent.setDuration(ne.getDuration());
+    newEvent.setEventCode(ne.getEventCode());
+
     m_pEventManager->insertEvent(newEvent);
 }
 

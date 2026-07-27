@@ -310,9 +310,9 @@ Event EventManager::addRangedEvent(int sample, int duration, idNum groupId)
 #ifndef NO_IPC
     if(m_pSharedMemManager->isInit())
     {
-        // The shared memory protocol only carries a sample, so other MNE
-        // Analyze instances see the onset of the event but not its length.
-        m_pSharedMemManager->addEvent(newEvent.getSample());
+        m_pSharedMemManager->addEvent(newEvent.getSample(),
+                                      newEvent.getDuration(),
+                                      newEvent.getEventCode());
     }
 #endif
     return Event(newEvent);

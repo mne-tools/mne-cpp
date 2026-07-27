@@ -110,6 +110,19 @@ public:
 
     //=========================================================================================================
     /**
+     * Constructor for an event that covers a range of samples and carries a
+     * trigger code.
+     *
+     * @param[in] sample        First sample of the event.
+     * @param[in] duration      Length in samples, zero for an instant.
+     * @param[in] eventCode     Trigger code the event marks.
+     * @param[in] creator       Id of the creator.
+     * @param[in] t             Type of update.
+     */
+    EventUpdate(int sample, int duration, int eventCode, int creator, enum EventUpdateType t);
+
+    //=========================================================================================================
+    /**
      * Retrieve the creation time.
      * @return A long integer with the creation time.
      */
@@ -121,6 +134,20 @@ public:
      * @return Sample.
      */
     int getSample() const;
+
+    //=========================================================================================================
+    /**
+     * Retrieve the length of the event in samples.
+     * @return Duration, zero for an instantaneous event.
+     */
+    int getDuration() const;
+
+    //=========================================================================================================
+    /**
+     * Retrieve the trigger code the event marks.
+     * @return Event code.
+     */
+    int getEventCode() const;
 
     //=========================================================================================================
     /**
@@ -151,7 +178,14 @@ public:
     std::string eventTypeToText();
 
 protected:
-    int                     m_EventSample;  /**< Sample for the event. */
+    // This struct is memcpy'd into a shared memory segment, so its layout is
+    // the wire format between processes. Anything added here changes that
+    // format, which is why defaultSharedMemoryBufferKey carries a version
+    // suffix: a build with a different layout gets a different segment rather
+    // than silently misreading this one.
+    int                     m_EventSample;  /**< First sample of the event. */
+    int                     m_EventDuration;/**< Length in samples. Zero for an instantaneous event. */
+    int                     m_EventCode;    /**< Trigger code the event marks. */
     int                     m_CreatorId;    /**< Id of the creator. */
     long long               m_CreationTime; /**< Creation time point. */
     enum EventUpdateType    m_TypeOfUpdate; /**< Type of update. */
@@ -204,6 +238,17 @@ public:
      * @param[in] sample
      */
     void addEvent(int sample);
+
+    //=========================================================================================================
+    /**
+     * Broadcast a new event that covers a range of samples and carries a
+     * trigger code.
+     *
+     * @param[in] sample        First sample of the event.
+     * @param[in] duration      Length in samples, zero for an instant.
+     * @param[in] eventCode     Trigger code the event marks.
+     */
+    void addEvent(int sample, int duration, int eventCode);
 
     //=========================================================================================================
     /**
