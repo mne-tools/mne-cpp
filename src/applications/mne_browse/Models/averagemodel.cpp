@@ -139,27 +139,21 @@ QVariant AverageModel::headerData(int section, Qt::Orientation orientation, int 
         switch(section) {
             case 0:
                 return QString("%1").arg("Comment");
-                break;
 
             case 1:
                 return QString("%1").arg("Epochs");
-                break;
 
             case 2:
                 return QString("%1").arg("Baseline");
-                break;
 
             case 3:
                 return QString("%1").arg("First sample");
-                break;
 
             case 4:
                 return QString("%1").arg("Last sample");
-                break;
 
             case 5:
                 return QString("%1").arg("Data types");
-                break;
         }
     }
 

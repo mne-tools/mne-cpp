@@ -125,20 +125,28 @@ endif()
 # (moc/uic/rcc) sources compiled by their own targets are unaffected.
 if(MSVC)
   add_compile_options(/W4)
-  # C4702 (unreachable code) is raised inside Qt's own qnumeric.h, not in our
-  # sources, and MSVC applies /W4 to third party headers too. Under /WX that
-  # failed the build over code we do not own and cannot fix.
+  # C4702, unreachable code, is reported inside Qt's own qnumeric.h as well as
+  # in our sources, and MSVC applies /W4 to third party headers too. Under /WX
+  # that failed the build over code we do not own and cannot fix.
   #
-  # The usual remedy, marking dependency headers external, does not work here:
-  # /external:W0 only affects includes that arrive via /external:I, and neither
+  # Marking the dependency headers external does not help here: /external:W0
+  # only affects includes that arrive via /external:I, and neither
   # add_compile_options(/external:W0) nor overriding
-  # CMAKE_INCLUDE_SYSTEM_FLAG_CXX got Qt's include directory emitted that way
-  # (both were tried and the build failed identically). Rather than keep
-  # guessing at the include plumbing, disable this one diagnostic.
+  # CMAKE_INCLUDE_SYSTEM_FLAG_CXX got Qt's include directory emitted that way,
+  # because the Windows CI uses the Visual Studio generator, which writes
+  # project files rather than command lines and ignores that variable.
   #
-  # This is the only warning suppressed project wide. C4702 is also the least
-  # valuable of the /W4 set for us: it fires on code the optimiser proves
-  # unreachable, which is routine in heavily templated headers.
+  # MSVC has no way to keep a single warning as a warning under /WX: the only
+  # per-warning controls are /wd (off), /we (error), /wo (report once) and
+  # /wN (level), and none of them exempt a warning from /WX. So C4702 has to be
+  # disabled outright here. /WX below still applies to every other warning.
+  #
+  # Losing the diagnostic on Windows is acceptable because the same code is
+  # checked on the Clang side below, where a warning can be kept non fatal, and
+  # every developer build and the macOS CI leg compile with Clang. The thirteen
+  # C4702 sites our sources used to have (a dead break after a return or an
+  # abort inside a switch case) were removed rather than suppressed, so the
+  # tree starts from zero.
   add_compile_options(/wd4702)
   if(MNE_WARNINGS_AS_ERRORS)
     add_compile_options(/WX)
@@ -155,8 +163,27 @@ else()
   if(HAVE_WNO_VARIADIC_MACRO_OMITTED)
     add_compile_options(-Wno-variadic-macro-arguments-omitted)
   endif()
+
+  # Unreachable code, the Clang counterpart of MSVC's C4702. It has to be asked
+  # for explicitly, since -Wall -Wextra do not include it, and the plain
+  # -Wunreachable-code spelling covers neither the dead-return nor the
+  # dead-break case, so the aggressive variant is the one that actually reports
+  # anything.
+  #
+  # Kept deliberately non fatal via -Wno-error=, so that new dead code is
+  # pointed out on every build without a diagnostic we cannot fix in Qt's
+  # headers being able to stop it. This is the only warning treated that way;
+  # -Werror below still applies to everything else.
+  check_cxx_compiler_flag("-Wunreachable-code-aggressive" HAVE_WUNREACHABLE_AGGRESSIVE)
+  if(HAVE_WUNREACHABLE_AGGRESSIVE)
+    add_compile_options(-Wunreachable-code-aggressive)
+  endif()
+
   if(MNE_WARNINGS_AS_ERRORS)
     add_compile_options(-Werror)
+    if(HAVE_WUNREACHABLE_AGGRESSIVE)
+      add_compile_options(-Wno-error=unreachable-code-aggressive)
+    endif()
   endif()
 endif()
 if(MNE_WARNINGS_AS_ERRORS)

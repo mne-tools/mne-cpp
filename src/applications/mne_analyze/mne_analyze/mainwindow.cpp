@@ -194,7 +194,6 @@ void MainWindow::writeToLog(QtMsgType type,
         case QtFatalMsg:
             m_pTextBrowser_Log->insertHtml("<font color=purple><b>[FATAL]</b> "+msg+"</font>");
             abort();
-            break;
         default:
             m_pTextBrowser_Log->insertHtml("<font color=black><b>[UNKOWN]</b> "+msg+"</font>");
             break;

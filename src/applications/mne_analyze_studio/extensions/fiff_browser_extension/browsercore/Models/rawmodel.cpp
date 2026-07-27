@@ -217,7 +217,6 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
 
                 v.setValue(listRowVectorPair);
                 return v;
-                break;
             }
 
             case Qt::BackgroundRole: { //plot channel red if marked as red
@@ -230,7 +229,6 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
                 else
                     return QVariant();
 
-                break;
             }
             }
         }
@@ -260,7 +258,6 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
                 }
 
                 return v;
-                break;
             }
             } // end role switch
         } // end column check
