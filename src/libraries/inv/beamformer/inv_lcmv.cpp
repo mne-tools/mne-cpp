@@ -175,6 +175,10 @@ InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo &info,
     if(forward.src.size() >= 2) {
         verts.resize(forward.src[0].vertno.size() + forward.src[1].vertno.size());
         verts << forward.src[0].vertno, forward.src[1].vertno;
+        // Keep where the left hemisphere ends. The concatenation above is the
+        // only place that knows it, and without it the result cannot be
+        // written as the -lh/-rh pair mne-python expects.
+        result.nVerticesLh = static_cast<int>(forward.src[0].vertno.size());
     } else if(forward.src.size() == 1) {
         verts = forward.src[0].vertno;
     }
@@ -258,6 +262,7 @@ InvSourceEstimate InvLCMV::applyLCMV(const FiffEvoked &evoked, const InvBeamform
     InvSourceEstimate stc(sol, filters.vertices, tmin, tstep);
     stc.method = InvEstimateMethod::LCMV;
     stc.sourceSpaceType = InvSourceSpaceType::Surface;
+    stc.nVerticesLh = filters.nVerticesLh;
     stc.orientationType = filters.isFreOri ? InvOrientationType::Free : InvOrientationType::Fixed;
 
     return stc;
@@ -291,6 +296,7 @@ InvSourceEstimate InvLCMV::applyLCMVRaw(const MatrixXd &data,
     InvSourceEstimate stc(sol, filters.vertices, tmin, tstep);
     stc.method = InvEstimateMethod::LCMV;
     stc.sourceSpaceType = InvSourceSpaceType::Surface;
+    stc.nVerticesLh = filters.nVerticesLh;
     stc.orientationType = filters.isFreOri ? InvOrientationType::Free : InvOrientationType::Fixed;
 
     return stc;
@@ -321,6 +327,7 @@ InvSourceEstimate InvLCMV::applyLCMVCov(const FiffCov &dataCov,
     InvSourceEstimate stc(powerMat, filters.vertices, 0.0f, 1.0f);
     stc.method = InvEstimateMethod::LCMV;
     stc.sourceSpaceType = InvSourceSpaceType::Surface;
+    stc.nVerticesLh = filters.nVerticesLh;
     stc.orientationType = filters.isFreOri ? InvOrientationType::Free : InvOrientationType::Fixed;
 
     return stc;

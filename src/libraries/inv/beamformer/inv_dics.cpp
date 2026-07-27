@@ -182,6 +182,10 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo &info,
     if(forward.src.size() >= 2) {
         verts.resize(forward.src[0].vertno.size() + forward.src[1].vertno.size());
         verts << forward.src[0].vertno, forward.src[1].vertno;
+        // Keep where the left hemisphere ends. The concatenation above is the
+        // only place that knows it, and without it the result cannot be
+        // written as the -lh/-rh pair mne-python expects.
+        result.nVerticesLh = static_cast<int>(forward.src[0].vertno.size());
     } else if(forward.src.size() == 1) {
         verts = forward.src[0].vertno;
     }
@@ -240,6 +244,7 @@ InvSourceEstimate InvDICS::applyDICSCsd(const std::vector<MatrixXd> &csdMatrices
     InvSourceEstimate stc(powerMat, filters.vertices, fmin, fstep);
     stc.method = InvEstimateMethod::DICS;
     stc.sourceSpaceType = InvSourceSpaceType::Surface;
+    stc.nVerticesLh = filters.nVerticesLh;
     stc.orientationType = filters.isFreOri ? InvOrientationType::Free : InvOrientationType::Fixed;
 
     return stc;
@@ -289,6 +294,7 @@ InvSourceEstimate InvDICS::applyDICS(const MatrixXd &data,
     InvSourceEstimate stc(sol, filters.vertices, tmin, tstep);
     stc.method = InvEstimateMethod::DICS;
     stc.sourceSpaceType = InvSourceSpaceType::Surface;
+    stc.nVerticesLh = filters.nVerticesLh;
     stc.orientationType = filters.isFreOri ? InvOrientationType::Free : InvOrientationType::Fixed;
 
     return stc;

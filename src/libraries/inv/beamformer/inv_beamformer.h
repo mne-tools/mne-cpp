@@ -123,6 +123,7 @@ public:
 
     // --- Source space info ---
     Eigen::VectorXi vertices;           /**< Source vertex indices. */
+    int nVerticesLh = -1;               /**< Leading entries of vertices belonging to the left hemisphere. -1 when unknown, as for a volume source space. */
     Eigen::MatrixX3f sourceNn;          /**< Source normals (n_sources, 3). */
     bool isFreOri;                      /**< True if free orientation (n_orient = 3). */
     int nSourcesTotal;                  /**< Total number of source points. */

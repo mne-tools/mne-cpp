@@ -421,6 +421,33 @@ private slots:
     //=========================================================================
     // MNE-Python compatible hemisphere pair writing
     //=========================================================================
+    void testBeamformerFiltersCarryHemisphereSplit()
+    {
+        // The split is only knowable where the two hemispheres are
+        // concatenated into one vertex list. If the beamformer filters do not
+        // record it there, everything they produce has nVerticesLh == -1 and
+        // cannot be written as the -lh/-rh pair mne-python expects, however
+        // correct the writer itself is.
+        InvBeamformer filters;
+        QCOMPARE(filters.nVerticesLh, -1);
+
+        // Two hemispheres: the split is the size of the first.
+        filters.nVerticesLh = 3;
+
+        InvSourceEstimate stc(MatrixXd::Zero(5, 2), VectorXi::Zero(5), 0.0f, 1.0f);
+        stc.nVerticesLh = filters.nVerticesLh;
+        QCOMPARE(stc.nVerticesLh, 3);
+
+        // A volume source space has no hemispheres, so the split stays unknown
+        // and writing a pair must fail rather than invent a boundary.
+        InvSourceEstimate volumeStc(MatrixXd::Zero(5, 2), VectorXi::Zero(5), 0.0f, 1.0f);
+        QCOMPARE(volumeStc.nVerticesLh, -1);
+
+        QTemporaryDir tmpDir;
+        QVERIFY(tmpDir.isValid());
+        QVERIFY(!volumeStc.writeHemispherePair(tmpDir.path() + "/volume"));
+    }
+
     void testWriteHemispherePair()
     {
         QTemporaryDir tmpDir;
