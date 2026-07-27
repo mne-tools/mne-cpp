@@ -350,6 +350,22 @@ bool EventManager::setEventDuration(idNum eventId, int newDuration)
 
 //=============================================================================================================
 
+bool EventManager::setEventCode(idNum eventId, int newEventCode)
+{
+    auto event = findEventINT(eventId);
+    if(event == m_EventsListBySample.end()) {
+        return false;
+    }
+
+    EVENTSINTERNAL::EventINT newEvent(event->second);
+    newEvent.setEventCode(newEventCode);
+    deleteEvent(eventId);
+    insertEvent(newEvent);
+    return true;
+}
+
+//=============================================================================================================
+
 bool EventManager::deleteEvent(idNum eventId) noexcept
 {
 #ifndef NO_IPC

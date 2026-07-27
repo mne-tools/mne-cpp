@@ -236,6 +236,20 @@ public:
 
     //=========================================================================================================
     /**
+     * Change the trigger code of an event.
+     *
+     * This is the value written to the third column of a FIFF event matrix,
+     * and is what distinguishes one stimulus condition from another.
+     *
+     * @param[in] eventId      Id of the event to change.
+     * @param[in] newEventCode New trigger code.
+     *
+     * @return True when the event was found and updated.
+     */
+    bool setEventCode(idNum eventId, int newEventCode);
+
+    //=========================================================================================================
+    /**
      * Delete an event.
      * @param eventId The id of the event to be deleted from the event system.
      * @return The deletion operation was successful.

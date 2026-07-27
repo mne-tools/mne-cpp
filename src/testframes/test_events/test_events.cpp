@@ -82,6 +82,7 @@ private slots:
     void testAddRangedEvent();
     void testEventDurationClamping();
     void testSetEventDuration();
+    void testEventCode();
     void testGetEvent();
     void testGetAllEvents();
     void testGetEventsInSample();
@@ -234,6 +235,39 @@ void TestEvents::testSetEventDuration()
 
     // Unknown id is reported rather than silently ignored.
     QVERIFY(!mgr.setEventDuration(e.id + 12345, 10));
+}
+
+//=============================================================================================================
+
+void TestEvents::testEventCode()
+{
+    EventManager mgr;
+    EventGroup g = mgr.addGroup("Stim");
+
+    Event e = mgr.addEvent(1000, g.id);
+
+    // Events default to trigger code 1, which is what the old hardcoded
+    // export always wrote.
+    QCOMPARE(mgr.getEvent(e.id).eventCode, 1);
+
+    // Two events of different conditions must stay distinguishable, which is
+    // the whole point of the trigger code.
+    Event e2 = mgr.addEvent(2000, g.id);
+    QVERIFY(mgr.setEventCode(e.id, 3));
+    QVERIFY(mgr.setEventCode(e2.id, 5));
+
+    QCOMPARE(mgr.getEvent(e.id).eventCode, 3);
+    QCOMPARE(mgr.getEvent(e2.id).eventCode, 5);
+
+    // The code must not disturb the sample or the duration.
+    QCOMPARE(mgr.getEvent(e.id).sample, 1000);
+    QCOMPARE(mgr.getEvent(e.id).duration, 0);
+
+    // The event code is independent of the event's unique key.
+    QVERIFY(mgr.getEvent(e.id).id != static_cast<idNum>(3));
+
+    // Unknown id is reported rather than silently ignored.
+    QVERIFY(!mgr.setEventCode(e.id + 12345, 7));
 }
 
 //=============================================================================================================

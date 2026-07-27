@@ -73,6 +73,7 @@ Event::Event(const idNum id,const  int sample, const idNum groupId)
 : id(id)
 , sample(sample)
 , duration(0)
+, eventCode(1)
 , groupId(groupId)
 { }
 
@@ -81,7 +82,8 @@ Event::Event(const idNum id,const  int sample, const idNum groupId)
 Event::Event(const EVENTSINTERNAL::EventINT& e)
 : Event(e.getId(), e.getSample(), e.getGroupId())
 {
-    duration = e.getDuration();
+    duration  = e.getDuration();
+    eventCode = e.getEventCode();
 }
 
 //=============================================================================================================
@@ -96,6 +98,7 @@ EVENTSINTERNAL::EventINT::EventINT(idNum id, int iSample, idNum groupId)
 : m_iId(id)
 , m_iSample(iSample)
 , m_iDuration(0)
+, m_iEventCode(1)
 , m_iGroup(groupId)
 , m_sDescription("")
 { }
@@ -106,6 +109,7 @@ EVENTSINTERNAL::EventINT::EventINT(const EventINT& rhs)
 : m_iId(rhs.getId())
 , m_iSample(rhs.getSample())
 , m_iDuration(rhs.getDuration())
+, m_iEventCode(rhs.getEventCode())
 , m_iGroup(rhs.getGroupId())
 , m_sDescription(rhs.getDescription())
 { }
@@ -116,6 +120,7 @@ EVENTSINTERNAL::EventINT::EventINT(EventINT&& other)
 : m_iId(other.getId())
 , m_iSample(other.getSample())
 , m_iDuration(other.getDuration())
+, m_iEventCode(other.getEventCode())
 , m_iGroup(other.getGroupId())
 , m_sDescription(other.getDescription())
 { }
@@ -161,6 +166,20 @@ int EVENTSINTERNAL::EventINT::getEndSample() const
 bool EVENTSINTERNAL::EventINT::isRanged() const
 {
     return m_iDuration > 0;
+}
+
+//=============================================================================================================
+
+int EVENTSINTERNAL::EventINT::getEventCode() const
+{
+    return m_iEventCode;
+}
+
+//=============================================================================================================
+
+void EVENTSINTERNAL::EventINT::setEventCode(int iEventCode)
+{
+    m_iEventCode = iEventCode;
 }
 
 //=============================================================================================================

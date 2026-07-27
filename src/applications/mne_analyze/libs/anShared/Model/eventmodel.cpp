@@ -184,8 +184,8 @@ int EventModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
 
-    // Sample, time and duration.
-    return 3;
+    // Sample, onset time, event type and duration.
+    return 4;
 }
 
 //=============================================================================================================
@@ -258,8 +258,30 @@ QVariant EventModel::data(const QModelIndex &index,
             }
         }
 
-        //******** third column (event duration) ********
+        //******** third column (event type) ********
         if(index.column()==2) {
+            switch(role) {
+                case Qt::DisplayRole:
+                    // The FIFF trigger code, i.e. which stimulus condition
+                    // this event marks. Not the event's unique key.
+                    return QVariant((*events)[index.row()].eventCode);
+
+                case Qt::BackgroundRole: {
+                    auto groupColor = m_EventManager.getGroup(events->at(index.row()).groupId).color;
+                    QBrush brush;
+                    brush.setStyle(Qt::SolidPattern);
+                    brush.setColor(QColor(groupColor.r, groupColor.g, groupColor.b));
+
+                    QColor colorTemp = brush.color();
+                    colorTemp.setAlpha(110);
+                    brush.setColor(colorTemp);
+                    return QVariant(brush);
+                }
+            }
+        }
+
+        //******** fourth column (event duration) ********
+        if(index.column()==3) {
             switch(role) {
                 case Qt::DisplayRole:
                     // Length of the event in seconds. Zero for an
@@ -306,7 +328,11 @@ bool EventModel::setData(const QModelIndex &index,
                 m_EventManager.moveEvent(events->at(index.row()).id, value.toDouble() * m_fFreq + m_iFirstSample);
                 break;
 
-            case 2: //duration in seconds
+            case 2: //event type, i.e. the FIFF trigger code
+                m_EventManager.setEventCode(events->at(index.row()).id, value.toInt());
+                break;
+
+            case 3: //duration in seconds
                 m_EventManager.setEventDuration(events->at(index.row()).id,
                                                 static_cast<int>(value.toDouble() * m_fFreq));
                 break;
@@ -345,9 +371,11 @@ QVariant EventModel::headerData(int section,
         switch(section) {
             case 0: //sample column
                 return QVariant("Sample");
-            case 1: //time value column
+            case 1: //onset time column
                 return QVariant("Time (s)");
-            case 2: //duration column
+            case 2: //event type column
+                return QVariant("Type");
+            case 3: //duration column
                 return QVariant("Duration (s)");
             }
     }
@@ -517,11 +545,15 @@ MatrixXi EventModel::getEventMatrix()
 
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
 
+    // FIFF event matrix layout is [sample, before, after], where the third
+    // column is the trigger code identifying the kind of event. It used to be
+    // hardcoded to 1, which meant every event was exported as the same
+    // condition and downstream averaging could not tell them apart.
     matEventDataMatrix.resize(events->size(), 3);
     for (int i = 0; i < static_cast<int>(events->size()); i++){
         matEventDataMatrix(i,0) = events->at(i).sample;
         matEventDataMatrix(i,1) = 0;
-        matEventDataMatrix(i,2) = 1;
+        matEventDataMatrix(i,2) = events->at(i).eventCode;
     }
 
     return matEventDataMatrix;

@@ -97,9 +97,10 @@ struct EVENTS_EXPORT Event
      */
     Event(const EVENTSINTERNAL::EventINT& e);
 
-    idNum  id;      /**< Event id. */
+    idNum  id;      /**< Unique key of this event object. Not the trigger code, see eventCode. */
     int  sample;    /**< First sample covered by the event. */
     int  duration;  /**< Length in samples. Zero for an instantaneous event. */
+    int  eventCode; /**< FIFF trigger code identifying the kind of event. */
     idNum  groupId; /**< GroupId of this event. */
 };
 
@@ -178,6 +179,27 @@ public:
      * @param iSample sample.
      */
     void setSample(int iSample);
+
+    //=========================================================================================================
+    /**
+     * Returns the event code, which identifies what kind of event this is.
+     *
+     * This is the value FIFF calls the event id and stores in the third
+     * column of an event matrix, i.e. the trigger code. It is what
+     * distinguishes one stimulus condition from another, and is not related
+     * to getId(), which is only a unique key for this event object.
+     *
+     * @return The event code. One by default.
+     */
+    int getEventCode() const;
+
+    //=========================================================================================================
+    /**
+     * Set the event code.
+     *
+     * @param iEventCode The trigger code identifying the kind of event.
+     */
+    void setEventCode(int iEventCode);
 
     //=========================================================================================================
     /**
@@ -302,6 +324,7 @@ private:
     idNum       m_iId;                      /**< Placeholder for sample Id */
     int         m_iSample;                  /**< First sample covered by the event */
     int         m_iDuration;                /**< Length in samples. Zero for an instantaneous event. */
+    int         m_iEventCode;               /**< FIFF trigger code identifying the kind of event. */
     idNum       m_iGroup;                   /**< Group this event belongs to */
     std::string m_sDescription;             /**< Short string describing info */
 };
