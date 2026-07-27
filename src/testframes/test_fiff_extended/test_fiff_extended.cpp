@@ -252,6 +252,35 @@ private slots:
         bool ok = FiffEvents::read_from_ascii(buffer, eventsRead);
         QVERIFY(ok);
         QCOMPARE(eventsRead.num_events(), 3);
+
+        // Counting the events is not enough. The writer emits four fields per
+        // line, the fourth being the trigger code that says which condition
+        // the event marks, so the values have to survive the round trip too.
+        QCOMPARE(eventsRead.events.rows(), 3);
+        QCOMPARE(eventsRead.events.cols(), 3);
+        for(int k = 0; k < eventData.rows(); ++k){
+            QCOMPARE(eventsRead.events(k,0), eventData(k,0));
+            QCOMPARE(eventsRead.events(k,1), eventData(k,1));
+            QCOMPARE(eventsRead.events(k,2), eventData(k,2));
+        }
+    }
+
+    void testFiffEventsReadAsciiThreeFieldLines()
+    {
+        // Files written by other tools may omit the redundant onset column.
+        // Those lines carry three integers and must still be understood.
+        QBuffer buffer;
+        buffer.open(QIODevice::ReadWrite);
+        buffer.write("  100   0   1\n  200   0   2\n");
+        buffer.close();
+
+        FiffEvents eventsRead;
+        QVERIFY(FiffEvents::read_from_ascii(buffer, eventsRead));
+        QCOMPARE(eventsRead.num_events(), 2);
+        QCOMPARE(eventsRead.events(0,0), 100);
+        QCOMPARE(eventsRead.events(0,2), 1);
+        QCOMPARE(eventsRead.events(1,0), 200);
+        QCOMPARE(eventsRead.events(1,2), 2);
     }
 
     void testFiffEventsWriteReadFifRoundTrip()

@@ -33,6 +33,7 @@
 
 #include <QFile>
 #include <QDebug>
+#include <QRegularExpression>
 #include <QTextStream>
 
 //=============================================================================================================
@@ -211,17 +212,28 @@ bool FiffEvents::read_from_ascii(QIODevice &p_IODevice,
         QString line = textStream.readLine().trimmed();
         if (line.isEmpty())
             continue;
-        QTextStream lineStream(&line);
-        int iSample = 0, iBefore = 0, iAfter = 0;
-        lineStream >> iSample;
-        if (!lineStream.atEnd())
-            lineStream >> iBefore;
-        if (!lineStream.atEnd())
-            lineStream >> iAfter;
+
+        // A standard .eve line has four fields: sample, onset in seconds,
+        // value before and value after the transition. The onset is redundant
+        // with the sample and is skipped, which is what write_to_ascii emits.
+        // Reading it as an integer used to shift every later field along by
+        // one, so the trigger code was lost and the event looked like it had
+        // a code of zero. Files carrying only the three integer fields are
+        // still accepted.
+        const QStringList fields = line.split(QRegularExpression("\\s+"),
+                                              Qt::SkipEmptyParts);
+        if (fields.isEmpty())
+            continue;
+
+        const int iOffset = (fields.size() >= 4) ? 1 : 0;
+
+        int iSample = fields.at(0).toInt();
+        int iBefore = (fields.size() > 1 + iOffset) ? fields.at(1 + iOffset).toInt() : 0;
+        int iAfter  = (fields.size() > 2 + iOffset) ? fields.at(2 + iOffset).toInt() : 0;
+
         sampleList.append(iSample);
         beforeList.append(iBefore);
         afterList.append(iAfter);
-        qDebug() << "Added event:" << iSample << iBefore << iAfter;
     }
 
     p_Events.events.resize(sampleList.size(), 3);
