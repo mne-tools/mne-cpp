@@ -523,7 +523,7 @@ private slots:
     void testFiffCoordTransIdentity()
     {
         FiffCoordTrans trans;
-        QVERIFY(trans.trans.isIdentity(1e-10));
+        QVERIFY(trans.trans.isIdentity(1e-10f));
     }
 };
 

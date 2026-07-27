@@ -122,9 +122,9 @@ void Plotter::setPlotSettings(const PlotSettings &settings)
 
 //=============================================================================================================
 
-void Plotter::setCurveData(int id, const QVector<QPointF> &data)
+void Plotter::setCurveData(int id, const QVector<QPointF> &curveData)
 {
-    curveMap[id] = data;
+    curveMap[id] = curveData;
     refreshPixmap();
 }
 

@@ -650,7 +650,8 @@ private slots:
     {
         QVector<int> coils;
         coils << 293 << 307 << 314 << 321;
-        InvHpiModelParameters params(coils, 600, 200, 4);
+        // The last parameter is bool bBasic, not a coil count (MSVC C4305).
+        InvHpiModelParameters params(coils, 600, 200, true);
         QVERIFY(true);
     }
 

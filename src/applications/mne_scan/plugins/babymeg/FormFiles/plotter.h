@@ -110,7 +110,7 @@ public:
     Plotter(QWidget *parent=0);
 
     void setPlotSettings(const PlotSettings &settings);
-    void setCurveData(int id, const QVector <QPointF>  &data);
+    void setCurveData(int id, const QVector <QPointF>  &curveData);
     void clearCurve(int id);
 
     QSize minimumSizeHint() const;

@@ -245,7 +245,7 @@ private slots:
         MNEForwardSolution fwd(file);
         if (fwd.isEmpty()) QSKIP("Fwd load failed");
 
-        FiffCov orientPrior = fwd.compute_orient_prior(0.2);
+        FiffCov orientPrior = fwd.compute_orient_prior(0.2f);
         QVERIFY(orientPrior.data.rows() > 0);
     }
 

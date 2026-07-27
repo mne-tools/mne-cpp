@@ -101,8 +101,9 @@ MatrixXd loadNpy(const QString& path)
     f.close();
 
     const char* d = data.constData();
-    // Magic: \x93NUMPY
-    if (data.size() < 10 || d[0] != char(0x93) || d[1] != 'N') {
+    // Magic: \x93NUMPY. 0x93 does not fit in a signed char, so compare the byte
+    // as unsigned rather than casting a value that overflows (MSVC C4310).
+    if (data.size() < 10 || static_cast<unsigned char>(d[0]) != 0x93u || d[1] != 'N') {
         qWarning() << "loadNpy: Bad magic" << path;
         return MatrixXd();
     }

@@ -730,7 +730,7 @@ private slots:
 
         MNEForwardSolution fwd(file);
         if (!fwd.isEmpty()) {
-            FiffCov orientPrior = fwd.compute_orient_prior(0.2);
+            FiffCov orientPrior = fwd.compute_orient_prior(0.2f);
             QVERIFY(orientPrior.data.rows() > 0);
         }
     }

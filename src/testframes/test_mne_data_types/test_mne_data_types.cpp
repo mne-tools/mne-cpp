@@ -544,7 +544,7 @@ private slots:
         MNEEpochData::SPtr epoch(new MNEEpochData());
         epoch->epoch = MatrixXd::Random(5, 10);
         epoch->tmin = 0.0;
-        epoch->tmax = 0.01;
+        epoch->tmax = 0.01f;
         epoch->bReject = false;
 
         list.append(epoch);
