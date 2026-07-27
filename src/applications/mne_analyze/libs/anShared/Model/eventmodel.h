@@ -409,6 +409,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Adds an event with a given trigger code to the currently selected group.
+     *
+     * @param[in] iSample       Sample of new event.
+     * @param[in] iEventCode    Trigger code carried by the event.
+     */
+    void addEventWithCode(int iSample, int iEventCode);
+
+    //=========================================================================================================
+    /**
      * Adds event group with given parameters.
      *
      * @param[in] sName     Group name.

@@ -372,7 +372,7 @@ QVariant EventModel::headerData(int section,
             case 0: //sample column
                 return QVariant("Sample");
             case 1: //onset time column
-                return QVariant("Time (s)");
+                return QVariant("Onset (s)");
             case 2: //event type column
                 return QVariant("Type");
             case 3: //duration column
@@ -494,7 +494,12 @@ bool EventModel::saveToFile(const QString& sPath)
     QTextStream out(bufferOut, QIODevice::ReadWrite);
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
     for (const auto& event : *events){
-        out << "  " << event.sample << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
+        // .eve columns are sample, onset in seconds, before and after. The
+        // last one is the trigger code and used to be hardcoded to 1, which
+        // exported every event as the same condition.
+        out << "  " << event.sample
+            << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4)
+            << "          0         " << event.eventCode << endl;
     }
 
     // Wee need to call the QFileDialog here instead of the data load plugin since we need access to the QByteArray
@@ -515,8 +520,12 @@ bool EventModel::saveToFile(const QString& sPath)
     QTextStream out(&file);
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
     for (const auto& event : *events){
-        out << "  " << event.sample << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << "\n";
-//        out << "  " << iEvent << "   " << QString::number(static_cast<float>(iEvent - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          1         0" << endl;
+        // .eve columns are sample, onset in seconds, before and after. The
+        // last one is the trigger code and used to be hardcoded to 1, which
+        // exported every event as the same condition.
+        out << "  " << event.sample
+            << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4)
+            << "          0         " << event.eventCode << "\n";
     }
 
     return true;
@@ -633,8 +642,12 @@ void EventModel::initFromFile(const QString& sFilePath)
     addGroup(fileInfo.baseName(),
              QColor("red"));
 
-    for(int i = 0; i < eventList.size(); i++){
-        addEvent(eventList(i,0));
+    // The reader hands back [sample, before, after]. The third column is the
+    // trigger code, which used to be dropped so every loaded event became
+    // the same condition. Iterate rows, not size(), which counts every
+    // element of the matrix rather than the number of events.
+    for(int i = 0; i < eventList.rows(); i++){
+        addEventWithCode(eventList(i,0), eventList(i,2));
     }
 }
 
@@ -644,6 +657,27 @@ void EventModel::addEvent(int iSample)
 {
     setSamplePos(iSample);
     insertRow(0, QModelIndex());
+}
+
+//=============================================================================================================
+
+void EventModel::addEventWithCode(int iSample, int iEventCode)
+{
+    if(m_selectedEventGroups.empty()){
+        return;
+    }
+
+    // Go through the manager directly rather than addEvent(), which inserts a
+    // row and then leaves no handle on the new event. The container is a
+    // multimap keyed by sample, so the most recently inserted event is not
+    // necessarily the last one in it.
+    EVENTSLIB::Event newEvent = m_EventManager.addEvent(iSample, m_selectedEventGroups.front());
+    m_EventManager.setEventCode(newEvent.id, iEventCode);
+
+    beginInsertRows(QModelIndex(), 0, 0);
+    endInsertRows();
+
+    eventsUpdated();
 }
 
 //=============================================================================================================
