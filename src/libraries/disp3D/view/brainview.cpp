@@ -59,6 +59,8 @@
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_constants.h>
 #include <connectivity/network/network.h>
+#include <connectivity/network/networknode.h>
+#include <connectivity/network/networkedge.h>
 
 using namespace FIFFLIB;
 
@@ -899,6 +901,58 @@ void BrainView::setAutomatedRotation(bool enabled)
 bool BrainView::automatedRotation() const
 {
     return m_pAutoRotateTimer && m_pAutoRotateTimer->isActive();
+}
+
+//=============================================================================================================
+
+void BrainView::setHeadMovementPath(const QVector<Eigen::Vector3f>& vecPositions)
+{
+    // A path needs at least one segment to be meaningful.
+    if(vecPositions.size() < 2) {
+        clearHeadMovementPath();
+        return;
+    }
+
+    // Reuse the connectivity network renderer: a head movement path is just a
+    // chain of nodes joined by consecutive edges. The weight carries the step
+    // index so the colormap grades the line over time and the direction of
+    // drift is visible.
+    CONNECTIVITYLIB::Network network(QStringLiteral("HeadMovementPath"));
+
+    for(int i = 0; i < vecPositions.size(); ++i) {
+        Eigen::RowVectorXf vecVert(3);
+        vecVert << vecPositions.at(i).x(), vecPositions.at(i).y(), vecPositions.at(i).z();
+
+        network.append(QSharedPointer<CONNECTIVITYLIB::NetworkNode>::create(static_cast<qint16>(i),
+                                                                           vecVert));
+    }
+
+    const double dLastStep = static_cast<double>(vecPositions.size() - 1);
+
+    for(int i = 0; i < vecPositions.size() - 1; ++i) {
+        Eigen::MatrixXd matWeight(1, 1);
+        matWeight(0, 0) = (dLastStep > 0.0) ? (static_cast<double>(i) / dLastStep) : 0.0;
+
+        network.append(QSharedPointer<CONNECTIVITYLIB::NetworkEdge>::create(i, i + 1, matWeight));
+    }
+
+    m_network = std::make_unique<NetworkObject>();
+    m_network->load(network);
+    m_network->setVisible(true);
+
+    m_sceneDirty = true; update();
+}
+
+//=============================================================================================================
+
+void BrainView::clearHeadMovementPath()
+{
+    if(!m_network) {
+        return;
+    }
+
+    m_network.reset();
+    m_sceneDirty = true; update();
 }
 
 //=============================================================================================================

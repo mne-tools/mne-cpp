@@ -125,6 +125,13 @@ private slots:
 
     //=========================================================================================================
     /**
+     * Verifies that the HPI head movement path accepts a position list, ignores
+     * degenerate input and can be cleared, without requiring a GPU.
+     */
+    void brainView_headMovementPath();
+
+    //=========================================================================================================
+    /**
      * Verifies that BrainView multi-view API (setViewCount, setViewportEnabled,
      * resetMultiViewLayout, showSingleView, showMultiView, setViewCount) does not crash.
      */
@@ -1291,6 +1298,34 @@ void TestDisp3dBrainView::dipoleObject_extended()
     obj.setSelected(0, false);
     obj.setSelected(-1, true);  // invalid index — safe
     obj.setSelected(99, false); // out-of-range — safe
+
+    QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainView::brainView_headMovementPath()
+{
+    BrainView view;
+
+    // A path needs at least one segment, so these must be treated as "clear"
+    // rather than building a degenerate network.
+    view.setHeadMovementPath({});
+    view.setHeadMovementPath({Eigen::Vector3f(0.0f, 0.0f, 0.0f)});
+
+    // A realistic short drift: a few centimetres over several fits.
+    QVector<Eigen::Vector3f> vecPositions;
+    for(int i = 0; i < 8; ++i) {
+        vecPositions.append(Eigen::Vector3f(0.001f * i, 0.002f * i, 0.05f + 0.001f * i));
+    }
+    view.setHeadMovementPath(vecPositions);
+
+    // Replacing an existing path must not leak or crash.
+    view.setHeadMovementPath(vecPositions);
+
+    view.clearHeadMovementPath();
+    // Clearing twice is a no-op, not a double free.
+    view.clearHeadMovementPath();
 
     QApplication::processEvents();
 }

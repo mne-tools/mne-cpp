@@ -309,6 +309,27 @@ public slots:
 
     //=========================================================================================================
     /**
+     * Show the path the subject's head travelled as a connected line.
+     *
+     * Intended for HPI fitting: pass the head positions recorded over the
+     * course of a measurement (see RealTimeHpiResult::headPositionHistory)
+     * and they are drawn as a polyline, oldest to newest, so the study
+     * conductor can judge how much the subject moved.
+     *
+     * Passing fewer than two positions clears the path.
+     *
+     * @param[in] vecPositions   Head positions in metres, oldest first.
+     */
+    void setHeadMovementPath(const QVector<Eigen::Vector3f>& vecPositions);
+
+    //=========================================================================================================
+    /**
+     * Remove the head movement path from the scene.
+     */
+    void clearHeadMovementPath();
+
+    //=========================================================================================================
+    /**
      * Save a snapshot of the current view to a file.
      */
     void saveSnapshot();
