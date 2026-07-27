@@ -146,11 +146,11 @@ QWidget *DataManager::getView()
 
 void DataManager::handleEvent(QSharedPointer<Event> e)
 {
-    switch (e->getType()) {
-    default:
-        qWarning() << "[DataManager::handleEvent] received an Event that is not handled by switch-cases";
-        break;
-    }
+    // This plugin subscribes to no events, so anything arriving here is
+    // unexpected. A switch with only a default label is what MSVC reports as
+    // C4065, so warn directly instead.
+    qWarning() << "[DataManager::handleEvent] received an Event that is not handled:"
+               << e->getType();
 }
 
 //=============================================================================================================

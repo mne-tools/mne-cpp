@@ -125,15 +125,15 @@ void RealTimeCovWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             initDisplayControllWidgets();
         }
 
-        MatrixXd data(m_qListSelChannel.size(), m_qListSelChannel.size());
+        MatrixXd matData(m_qListSelChannel.size(), m_qListSelChannel.size());
 
         for(int i = 0; i < m_qListSelChannel.size(); i++) {
             for(int j = 0; j < m_qListSelChannel.size(); j++) {
-                data(i,j) = m_pRTC->getValue()->data(m_qListSelChannel.at(i),m_qListSelChannel.at(j));
+                matData(i,j) = m_pRTC->getValue()->data(m_qListSelChannel.at(i),m_qListSelChannel.at(j));
             }
         }
 
-        m_pImageSc->updateData(data);
+        m_pImageSc->updateData(matData);
     }
 }
 

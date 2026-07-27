@@ -125,10 +125,10 @@ QDockWidget* SourceLocalization::getControl()
 
 void SourceLocalization::handleEvent(QSharedPointer<Event> e)
 {
-    switch (e->getType()) {
-        default:
-            qWarning() << "[SourceLocalization::handleEvent] Received an Event that is not handled by switch cases.";
-    }
+    // See DataManager::handleEvent: a switch with only a default label is
+    // MSVC C4065, and this plugin subscribes to no events anyway.
+    qWarning() << "[SourceLocalization::handleEvent] Received an Event that is not handled:"
+               << e->getType();
 }
 
 //=============================================================================================================
