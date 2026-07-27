@@ -98,7 +98,8 @@ struct EVENTS_EXPORT Event
     Event(const EVENTSINTERNAL::EventINT& e);
 
     idNum  id;      /**< Event id. */
-    int  sample;    /**< Sample number of the event. */
+    int  sample;    /**< First sample covered by the event. */
+    int  duration;  /**< Length in samples. Zero for an instantaneous event. */
     idNum  groupId; /**< GroupId of this event. */
 };
 
@@ -180,6 +181,47 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns the length of the event in samples.
+     *
+     * Zero means an instantaneous event, which is the default. A positive
+     * value makes the event span [sample, sample + duration), which is how a
+     * FIFF annotation with a non zero duration is represented.
+     *
+     * @return Event duration in samples.
+     */
+    int getDuration() const;
+
+    //=========================================================================================================
+    /**
+     * Set the length of the event in samples.
+     *
+     * Negative values are clamped to zero, since an event cannot end before
+     * it starts.
+     *
+     * @param iDuration Duration in samples.
+     */
+    void setDuration(int iDuration);
+
+    //=========================================================================================================
+    /**
+     * Sample one past the last sample covered by this event.
+     *
+     * For an instantaneous event this equals getSample().
+     *
+     * @return End sample of the event.
+     */
+    int getEndSample() const;
+
+    //=========================================================================================================
+    /**
+     * Whether this event covers a range of samples rather than a single one.
+     *
+     * @return True when the duration is greater than zero.
+     */
+    bool isRanged() const;
+
+    //=========================================================================================================
+    /**
      * Returns event group
      *
      * @return Event group.
@@ -258,7 +300,8 @@ public:
 
 private:
     idNum       m_iId;                      /**< Placeholder for sample Id */
-    int         m_iSample;                  /**< Sample coorespodning to the instantaneous event */
+    int         m_iSample;                  /**< First sample covered by the event */
+    int         m_iDuration;                /**< Length in samples. Zero for an instantaneous event. */
     idNum       m_iGroup;                   /**< Group this event belongs to */
     std::string m_sDescription;             /**< Short string describing info */
 };

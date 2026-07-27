@@ -79,6 +79,8 @@ private slots:
     // Event CRUD
     void testAddEventDefaultGroup();
     void testAddEventWithGroup();
+    void testAddRangedEvent();
+    void testEventDurationClamping();
     void testGetEvent();
     void testGetAllEvents();
     void testGetEventsInSample();
@@ -156,6 +158,53 @@ void TestEvents::testAddEventWithGroup()
     QCOMPARE((int)mgr.getNumEvents(), 1);
     QCOMPARE(e.sample, 200);
     QCOMPARE(e.groupId, g.id);
+
+    // An ordinary event is instantaneous.
+    QCOMPARE(e.duration, 0);
+}
+
+//=============================================================================================================
+
+void TestEvents::testAddRangedEvent()
+{
+    EventManager mgr;
+    EventGroup g = mgr.addGroup("BAD");
+
+    // This is what a FIFF annotation with a non zero duration maps to.
+    Event e = mgr.addRangedEvent(1000, 250, g.id);
+
+    QCOMPARE((int)mgr.getNumEvents(), 1);
+    QCOMPARE(e.sample, 1000);
+    QCOMPARE(e.duration, 250);
+    QCOMPARE(e.groupId, g.id);
+
+    // The duration must survive the round trip back out of the manager,
+    // which is where it was previously being dropped.
+    Event stored = mgr.getEvent(e.id);
+    QCOMPARE(stored.sample, 1000);
+    QCOMPARE(stored.duration, 250);
+}
+
+//=============================================================================================================
+
+void TestEvents::testEventDurationClamping()
+{
+    EVENTSINTERNAL::EventINT e(1, 500, 0);
+
+    QCOMPARE(e.getDuration(), 0);
+    QVERIFY(!e.isRanged());
+    QCOMPARE(e.getEndSample(), 500);
+
+    e.setDuration(120);
+    QCOMPARE(e.getDuration(), 120);
+    QVERIFY(e.isRanged());
+    QCOMPARE(e.getEndSample(), 620);
+
+    // An event cannot end before it starts.
+    e.setDuration(-5);
+    QCOMPARE(e.getDuration(), 0);
+    QVERIFY(!e.isRanged());
+    QCOMPARE(e.getEndSample(), 500);
 }
 
 //=============================================================================================================

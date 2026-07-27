@@ -198,6 +198,22 @@ public:
 
     //=========================================================================================================
     /**
+     * Add an event that spans a range of samples.
+     *
+     * This is what a FIFF annotation with a non zero duration maps to, for
+     * example a BAD segment. A duration of zero produces an ordinary
+     * instantaneous event.
+     *
+     * @param[in] sample    First sample covered by the event.
+     * @param[in] duration  Length of the event in samples.
+     * @param[in] groupId   Group the event belongs to.
+     *
+     * @return The newly created event.
+     */
+    Event addRangedEvent(int sample, int duration, idNum groupId);
+
+    //=========================================================================================================
+    /**
      * Move an event to a new sample. All other fields of the event will remain unaltered.
      * @param[in] eventId The id of the event to be moved.
      * @param[in] newSample The new sample to which the event will be moved to.

@@ -288,6 +288,25 @@ Event EventManager::addEvent(int sample, idNum groupId)
 
 //=============================================================================================================
 
+Event EventManager::addRangedEvent(int sample, int duration, idNum groupId)
+{
+    EVENTSINTERNAL::EventINT newEvent(generateNewEventId(), sample, groupId);
+    newEvent.setDuration(duration);
+    insertEvent(newEvent);
+
+#ifndef NO_IPC
+    if(m_pSharedMemManager->isInit())
+    {
+        // The shared memory protocol only carries a sample, so other MNE
+        // Analyze instances see the onset of the event but not its length.
+        m_pSharedMemManager->addEvent(newEvent.getSample());
+    }
+#endif
+    return Event(newEvent);
+}
+
+//=============================================================================================================
+
 Event EventManager::addEvent(int sample)
 {
     createDefaultGroupIfNeeded();
