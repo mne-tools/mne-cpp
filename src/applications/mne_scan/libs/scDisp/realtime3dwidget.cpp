@@ -240,6 +240,11 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pData3DModel->addDigitizerData(
                                              pHpiFitResult->fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG).getList());
 
+            // Draw where the subject's head has been over the course of the
+            // measurement, so drift is visible rather than just the current
+            // position.
+            m_p3DView->setHeadMovementPath(pRTHR->headPositionHistory());
+
             // Note: Per-item transforms for HPI tracking are not yet supported in disp3D.
             // The BrainSurface renderable supports applyTransform() but tree items do not
             // expose this directly yet.
