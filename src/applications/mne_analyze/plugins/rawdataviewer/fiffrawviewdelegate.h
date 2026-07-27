@@ -62,6 +62,11 @@
 
 namespace ANSHAREDLIB {
     class ChannelData;
+    class EventModel;
+}
+
+namespace EVENTSLIB {
+    struct Event;
 }
 
 //=============================================================================================================
@@ -184,6 +189,29 @@ private:
                                QPainterPath& path,
                                ANSHAREDLIB::ChannelData &data,
                                QPainter* painter) const;
+
+    //=========================================================================================================
+    /**
+     * Draws a single event, as a line at its onset and, when it covers a range
+     * of samples, as a shaded band over that range.
+     *
+     * @param[in] event             The event to draw.
+     * @param[in] pEventModel       Model the group colour is taken from.
+     * @param[in, out] painter      Used for drawing the event.
+     * @param[in] fInitX            X position the plot starts at.
+     * @param[in] fTop              Top of the drawing area.
+     * @param[in] fBottom           Bottom of the drawing area.
+     * @param[in] iStart            First sample currently drawn.
+     * @param[in] dDx               Horizontal pixels per sample.
+     */
+    void paintEvent(const EVENTSLIB::Event& event,
+                    ANSHAREDLIB::EventModel* pEventModel,
+                    QPainter* painter,
+                    float fInitX,
+                    float fTop,
+                    float fBottom,
+                    int iStart,
+                    double dDx) const;
 
     //=========================================================================================================
     void createScroller(const QModelIndex &index,

@@ -702,7 +702,15 @@ void EventModel::addGroup(QString sName,
 std::unique_ptr<std::vector<EVENTSLIB::Event> > EventModel::getEventsToDisplay(int iBegin,
                                                                                int iEnd) const
 {
-    return m_EventManager.getEventsBetween(iBegin, iEnd, m_selectedEventGroups);
+    // Events are keyed by their first sample, so asking for exactly the
+    // visible range would miss one that starts earlier and reaches into it.
+    // Scrolling into the middle of a long annotation would then show nothing.
+    // Start the search a whole maximum duration earlier and let the caller
+    // clip; the events that do not actually overlap are simply drawn off the
+    // left edge.
+    const int iLookBehind = m_EventManager.getMaxEventDuration();
+
+    return m_EventManager.getEventsBetween(iBegin - iLookBehind, iEnd, m_selectedEventGroups);
 }
 
 //=============================================================================================================

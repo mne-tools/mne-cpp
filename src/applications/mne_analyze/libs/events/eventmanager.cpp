@@ -250,6 +250,19 @@ std::unique_ptr<std::vector<Event> > EventManager::getEventsInGroups(const std::
 
 //=============================================================================================================
 
+int EventManager::getMaxEventDuration() const
+{
+    int iMaxDuration = 0;
+
+    for(const auto& e : m_EventsListBySample) {
+        iMaxDuration = std::max(iMaxDuration, e.second.getDuration());
+    }
+
+    return iMaxDuration;
+}
+
+//=============================================================================================================
+
 idNum EventManager::generateNewEventId()
 {
     return ++m_iEventIdCounter;

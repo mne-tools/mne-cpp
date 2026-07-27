@@ -250,6 +250,18 @@ public:
 
     //=========================================================================================================
     /**
+     * Longest duration of any stored event, in samples.
+     *
+     * Events are looked up by their first sample, so a caller that wants every
+     * event overlapping a range has to start looking this far before it to
+     * catch the ones that begin earlier and reach into the range.
+     *
+     * @return Longest event duration in samples, zero if there are none.
+     */
+    int getMaxEventDuration() const;
+
+    //=========================================================================================================
+    /**
      * Delete an event.
      * @param eventId The id of the event to be deleted from the event system.
      * @return The deletion operation was successful.

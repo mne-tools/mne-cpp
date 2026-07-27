@@ -83,6 +83,7 @@ private slots:
     void testEventDurationClamping();
     void testSetEventDuration();
     void testEventCode();
+    void testMaxEventDuration();
     void testGetEvent();
     void testGetAllEvents();
     void testGetEventsInSample();
@@ -268,6 +269,40 @@ void TestEvents::testEventCode()
 
     // Unknown id is reported rather than silently ignored.
     QVERIFY(!mgr.setEventCode(e.id + 12345, 7));
+}
+
+//=============================================================================================================
+
+void TestEvents::testMaxEventDuration()
+{
+    EventManager mgr;
+    EventGroup g = mgr.addGroup("group");
+
+    QCOMPARE(mgr.getMaxEventDuration(), 0);
+
+    // Instantaneous events leave the maximum at zero.
+    mgr.addEvent(1000, g.id);
+    QCOMPARE(mgr.getMaxEventDuration(), 0);
+
+    mgr.addRangedEvent(2000, 500, g.id);
+    QCOMPARE(mgr.getMaxEventDuration(), 500);
+
+    // A shorter event must not lower the maximum.
+    mgr.addRangedEvent(3000, 50, g.id);
+    QCOMPARE(mgr.getMaxEventDuration(), 500);
+
+    mgr.addRangedEvent(4000, 900, g.id);
+    QCOMPARE(mgr.getMaxEventDuration(), 900);
+
+    // The viewer relies on this to know how far back to look for an event that
+    // starts before the visible range and reaches into it. Asking for exactly
+    // the visible range misses it, widening by the maximum duration finds it.
+    auto exact = mgr.getEventsBetween(4500, 4600);
+    QCOMPARE(static_cast<int>(exact->size()), 0);
+
+    auto widened = mgr.getEventsBetween(4500 - mgr.getMaxEventDuration(), 4600);
+    QCOMPARE(static_cast<int>(widened->size()), 1);
+    QCOMPARE(widened->at(0).sample, 4000);
 }
 
 //=============================================================================================================

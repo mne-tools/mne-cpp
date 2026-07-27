@@ -324,27 +324,53 @@ void FiffRawViewDelegate::createEventsPath(const QModelIndex &index,
     if (!t_pEventModel->getShowSelected()){
         // Paint all events
         for(const auto& event : *events){
-            painter->setPen(QPen(t_pEventModel->getGroupColor(event.groupId), 1, Qt::SolidLine));
-            int eventSample = event.sample;
-            painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
-                              fTop,
-                              fInitX + static_cast<float>(eventSample - iStart) * dDx,
-                              fBottom);
+            paintEvent(event, t_pEventModel.data(), painter, fInitX, fTop, fBottom, iStart, dDx);
         }
     } else {
         // Paint selected events
         auto selection = t_pEventModel->getEventSelection();
         for(const auto& item : selection){
             if (item < events->size()){
-                painter->setPen(QPen(t_pEventModel->getGroupColor(events->at(item).groupId), 1, Qt::SolidLine));
-                int eventSample = events->at(item).sample;
-                painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
-                                  fTop,
-                                  fInitX + static_cast<float>(eventSample - iStart) * dDx,
-                                  fBottom);
-                }
+                paintEvent(events->at(item), t_pEventModel.data(), painter, fInitX, fTop, fBottom, iStart, dDx);
+            }
         }
     }
+}
+
+//=============================================================================================================
+
+void FiffRawViewDelegate::paintEvent(const EVENTSLIB::Event& event,
+                                     ANSHAREDLIB::EventModel* pEventModel,
+                                     QPainter* painter,
+                                     float fInitX,
+                                     float fTop,
+                                     float fBottom,
+                                     int iStart,
+                                     double dDx) const
+{
+    const QColor groupColor = pEventModel->getGroupColor(event.groupId);
+
+    const float fOnsetX = fInitX + static_cast<float>(event.sample - iStart) * dDx;
+
+    // An event that covers a range of samples is drawn as a shaded band over
+    // that range rather than as a single line, so an annotation with a
+    // duration does not look like an instant. Zero duration events, which are
+    // the common case for a trigger, still get just the line.
+    if(event.duration > 0) {
+        const float fEndX = fInitX + static_cast<float>(event.sample + event.duration - iStart) * dDx;
+
+        QColor fillColor = groupColor;
+        fillColor.setAlpha(60);
+        painter->fillRect(QRectF(QPointF(fOnsetX, fTop), QPointF(fEndX, fBottom)), fillColor);
+
+        // Mark the end as well as the onset, so the extent stays readable when
+        // the band is only a few pixels wide or overlaps a neighbour.
+        painter->setPen(QPen(groupColor, 1, Qt::DashLine));
+        painter->drawLine(fEndX, fTop, fEndX, fBottom);
+    }
+
+    painter->setPen(QPen(groupColor, 1, Qt::SolidLine));
+    painter->drawLine(fOnsetX, fTop, fOnsetX, fBottom);
 }
 
 //=============================================================================================================
