@@ -425,7 +425,6 @@ void DataLoader::onSaveFilePressed(FileType type)
         case AVERAGE_FILE: {
             qDebug() << "[DataLoader::onSaveFilePressed] Not yet implemented";
             return;
-            break;
         }
         default: {
             qWarning() << "[DataLoader::onSaveFilePressed] Saving operation not supported.";

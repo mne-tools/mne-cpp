@@ -103,55 +103,42 @@ QVariant ChannelInfoModel::headerData(int section, Qt::Orientation orientation, 
                 switch(section) {
                     case 0:
                         return QString("%1").arg("Data number");
-                        break;
 
                     case 1:
                         return QString("%1").arg("Original name");
-                        break;
 
                     case 2:
                         return QString("%1").arg("Alias");
-                        break;
 
                     case 3:
                         return QString("%1").arg("Mapped layout name");
-                        break;
 
                     case 4:
                         return QString("%1").arg("Channel kind");
-                        break;
 
                     case 5:
                         return QString("%1").arg("MEG type");
-                        break;
 
                     case 6:
                         return QString("%1").arg("Unit");
-                        break;
 
                     case 7:
                         return QString("%1").arg("Position");
-                        break;
 
                     case 8:
                         return QString("%1").arg("Digitizer (cm)");
-                        break;
 
                     case 9:
                         return QString("%1").arg("Active filter");
-                        break;
 
                     case 10:
                         return QString("%1").arg("Coil Type");
-                        break;
 
                     case 11:
                         return QString("%1").arg("Bad channel");
-                        break;
 
                     case 12:
                         return QString("%1").arg("# of Compensators");
-                        break;
                 }
             }
         }
