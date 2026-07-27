@@ -81,6 +81,7 @@ private slots:
     void testAddEventWithGroup();
     void testAddRangedEvent();
     void testEventDurationClamping();
+    void testSetEventDuration();
     void testGetEvent();
     void testGetAllEvents();
     void testGetEventsInSample();
@@ -205,6 +206,33 @@ void TestEvents::testEventDurationClamping()
     QCOMPARE(e.getDuration(), 0);
     QVERIFY(!e.isRanged());
     QCOMPARE(e.getEndSample(), 500);
+}
+
+//=============================================================================================================
+
+void TestEvents::testSetEventDuration()
+{
+    EventManager mgr;
+    EventGroup g = mgr.addGroup("Grp");
+
+    Event e = mgr.addEvent(400, g.id);
+    QCOMPARE(e.duration, 0);
+
+    // Turning an instantaneous event into a ranged one, which is what editing
+    // the duration column in the events table does.
+    QVERIFY(mgr.setEventDuration(e.id, 75));
+    QCOMPARE(mgr.getEvent(e.id).duration, 75);
+
+    // The sample must not move as a side effect of the replace-in-place.
+    QCOMPARE(mgr.getEvent(e.id).sample, 400);
+    QCOMPARE((int)mgr.getNumEvents(), 1);
+
+    // And back to instantaneous.
+    QVERIFY(mgr.setEventDuration(e.id, 0));
+    QCOMPARE(mgr.getEvent(e.id).duration, 0);
+
+    // Unknown id is reported rather than silently ignored.
+    QVERIFY(!mgr.setEventDuration(e.id + 12345, 10));
 }
 
 //=============================================================================================================

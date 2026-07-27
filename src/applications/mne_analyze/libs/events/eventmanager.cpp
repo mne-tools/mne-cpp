@@ -332,6 +332,24 @@ bool EventManager::moveEvent(idNum eventId, int newSample)
 
 //=============================================================================================================
 
+bool EventManager::setEventDuration(idNum eventId, int newDuration)
+{
+    auto event = findEventINT(eventId);
+    if(event == m_EventsListBySample.end()) {
+        return false;
+    }
+
+    // The stored event is const because the container is keyed by sample, so
+    // replace it the same way moveEvent does.
+    EVENTSINTERNAL::EventINT newEvent(event->second);
+    newEvent.setDuration(newDuration);
+    deleteEvent(eventId);
+    insertEvent(newEvent);
+    return true;
+}
+
+//=============================================================================================================
+
 bool EventManager::deleteEvent(idNum eventId) noexcept
 {
 #ifndef NO_IPC

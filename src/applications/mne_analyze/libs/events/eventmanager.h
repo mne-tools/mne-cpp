@@ -223,6 +223,19 @@ public:
 
     //=========================================================================================================
     /**
+     * Change the length of an event.
+     *
+     * A duration of zero turns a ranged event back into an instantaneous one.
+     *
+     * @param[in] eventId     Id of the event to change.
+     * @param[in] newDuration New duration in samples.
+     *
+     * @return True when the event was found and updated.
+     */
+    bool setEventDuration(idNum eventId, int newDuration);
+
+    //=========================================================================================================
+    /**
      * Delete an event.
      * @param eventId The id of the event to be deleted from the event system.
      * @return The deletion operation was successful.

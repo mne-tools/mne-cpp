@@ -184,7 +184,8 @@ int EventModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
 
-    return 2;
+    // Sample, time and duration.
+    return 3;
 }
 
 //=============================================================================================================
@@ -257,11 +258,14 @@ QVariant EventModel::data(const QModelIndex &index,
             }
         }
 
-        //******** third column (event type plot) ********
+        //******** third column (event duration) ********
         if(index.column()==2) {
             switch(role) {
                 case Qt::DisplayRole:
-                    return QVariant(/*(*events)[index.row()].id*/);
+                    // Length of the event in seconds. Zero for an
+                    // instantaneous event, non zero for a range such as a
+                    // BAD segment read from a FIFF annotation.
+                    return QVariant(static_cast<float>((*events)[index.row()].duration) / m_fFreq);
 
                 case Qt::BackgroundRole: {
                     auto groupColor = m_EventManager.getGroup(events->at(index.row()).groupId).color;
@@ -301,6 +305,11 @@ bool EventModel::setData(const QModelIndex &index,
             case 1: //time values
                 m_EventManager.moveEvent(events->at(index.row()).id, value.toDouble() * m_fFreq + m_iFirstSample);
                 break;
+
+            case 2: //duration in seconds
+                m_EventManager.setEventDuration(events->at(index.row()).id,
+                                                static_cast<int>(value.toDouble() * m_fFreq));
+                break;
         }
     }
 
@@ -338,6 +347,8 @@ QVariant EventModel::headerData(int section,
                 return QVariant("Sample");
             case 1: //time value column
                 return QVariant("Time (s)");
+            case 2: //duration column
+                return QVariant("Duration (s)");
             }
     }
     else if(orientation == Qt::Vertical) {
