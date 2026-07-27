@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include <disp3D/view/brainview.h>
+#include <disp3D/renderable/polylineobject.h>
 #include <disp3D/view/multiviewlayout.h>
 #include <disp3D/model/braintreemodel.h>
 #include <disp3D/model/items/abstracttreeitem.h>
@@ -129,6 +130,7 @@ private slots:
      * degenerate input and can be cleared, without requiring a GPU.
      */
     void brainView_headMovementPath();
+    void polylineObject_segments();
 
     //=========================================================================================================
     /**
@@ -1328,6 +1330,59 @@ void TestDisp3dBrainView::brainView_headMovementPath()
     view.clearHeadMovementPath();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainView::polylineObject_segments()
+{
+    // The geometry and instance maths need no GPU, so they can be checked
+    // directly. Driving this through BrainView only proves it does not crash.
+    PolylineObject polyline;
+
+    // Too few points to form a segment means nothing to draw.
+    QVERIFY(!polyline.hasData());
+    QCOMPARE(polyline.instanceCount(), 0);
+
+    polyline.setPoints({Eigen::Vector3f(0.0f, 0.0f, 0.0f)});
+    QCOMPARE(polyline.instanceCount(), 0);
+
+    // N points must give exactly N-1 segments.
+    QVector<Eigen::Vector3f> vecPoints;
+    for(int i = 0; i < 8; ++i) {
+        vecPoints.append(Eigen::Vector3f(0.001f * i, 0.0f, 0.0f));
+    }
+    polyline.setPoints(vecPoints);
+    QCOMPARE(polyline.instanceCount(), 7);
+    QVERIFY(polyline.hasData());
+
+    // A stationary subject produces repeated positions. Those segments have no
+    // direction to orient by and must be dropped rather than turned into a NaN
+    // rotation.
+    polyline.setPoints({Eigen::Vector3f(0.0f, 0.0f, 0.0f),
+                        Eigen::Vector3f(0.0f, 0.0f, 0.0f),
+                        Eigen::Vector3f(0.0f, 0.0f, 0.01f)});
+    QCOMPARE(polyline.instanceCount(), 1);
+
+    // A path made only of repeated positions collapses to nothing drawable.
+    polyline.setPoints({Eigen::Vector3f(0.02f, 0.0f, 0.0f),
+                        Eigen::Vector3f(0.02f, 0.0f, 0.0f)});
+    QCOMPARE(polyline.instanceCount(), 0);
+    QVERIFY(!polyline.hasData());
+
+    // Well past the qint16 range that the previous network based
+    // implementation keyed nodes by, to show the index type no longer caps the
+    // path length.
+    QVector<Eigen::Vector3f> vecLong;
+    for(int i = 0; i < 40000; ++i) {
+        vecLong.append(Eigen::Vector3f(0.0f, 0.0f, 1.0e-6f * i));
+    }
+    polyline.setPoints(vecLong);
+    QCOMPARE(polyline.instanceCount(), 39999);
+
+    polyline.clear();
+    QCOMPARE(polyline.instanceCount(), 0);
+    QVERIFY(!polyline.hasData());
 }
 
 //=============================================================================================================

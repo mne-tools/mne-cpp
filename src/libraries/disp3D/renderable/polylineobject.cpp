@@ -201,7 +201,15 @@ void PolylineObject::buildInstances()
         // Two consecutive fits can land on the same position when the subject
         // does not move. Such a segment has no direction to orient a cylinder
         // by, so it is skipped instead of producing a NaN rotation.
-        if(qFuzzyIsNull(fLength)) {
+        //
+        // The threshold has to be far below anything physical rather than
+        // qFuzzyIsNull, whose tolerance for float is 1e-5. Positions are in
+        // metres, so that would discard every step under ten micrometres and
+        // punch gaps into the path of a slowly drifting subject. A picometre
+        // is small enough that only genuinely coincident points are dropped,
+        // and large enough to keep the division below well conditioned.
+        constexpr float fMinSegmentLength = 1.0e-12f;
+        if(fLength < fMinSegmentLength) {
             continue;
         }
 
