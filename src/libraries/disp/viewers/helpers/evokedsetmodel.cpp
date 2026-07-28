@@ -137,7 +137,6 @@ QVariant EvokedSetModel::data(const QModelIndex &index, int role) const
                     v.setValue(lRowDataPerTrigType);
 
                     return v;
-                    break;
                 }
                 case Qt::BackgroundRole: {
 //                    if(m_fiffInfo.bads.contains(m_chInfolist[row].ch_name)) {
@@ -150,7 +149,6 @@ QVariant EvokedSetModel::data(const QModelIndex &index, int role) const
 //                    else
                         return QVariant();
 
-                    break;
                 }
             } // end role switch
         } // end column check

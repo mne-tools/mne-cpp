@@ -2564,6 +2564,13 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
  * Use either the sphere model or BEM in the calculations
  */
 {
+    // r0 is the sphere model origin. It was only used by the sphere model
+    // branch, which became unreachable when this was made a member function:
+    // the old free function branched on its bem_model argument being null, and
+    // that argument is now this. The parameter is kept because it is part of
+    // the public signature and a sphere model path may return.
+    Q_UNUSED(r0)
+
     Eigen::MatrixXf res_mat;                /* The forward solution matrix (ncoil x nsources) */
     Eigen::MatrixXf res_grad_mat;           /* The gradient (ncoil x 3*nsources) */
     MatrixXd            matRes;
@@ -2586,76 +2593,48 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
 
     auto cleanup_fail = [&]() { one_arg.reset(); delete comp; return FAIL; };
 
-    if (true) {
-        /*
-         * Use the new compensated field computation
-         * It works the same way independent of whether or not the compensation is in effect
-         */
+    /*
+     * Use the new compensated field computation
+     * It works the same way independent of whether or not the compensation is in effect
+     */
 #ifdef TEST
-        qInfo("Using differences.");
-        comp = FwdCompData::fwd_make_comp_data(comp_data,
-                                               coils,comp_coils,
-                                               FwdBemModel::fwd_bem_field,
-                                               nullptr,
-                                               my_bem_field_grad,
-                                               this);
+    qInfo("Using differences.");
+    comp = FwdCompData::fwd_make_comp_data(comp_data,
+                                           coils,comp_coils,
+                                           FwdBemModel::fwd_bem_field,
+                                           nullptr,
+                                           my_bem_field_grad,
+                                           this);
 #else
-        comp = FwdCompData::fwd_make_comp_data(comp_data,
-                                               coils,
-                                               comp_coils,
-                                               FwdBemModel::fwd_bem_field,
-                                               nullptr,
-                                               FwdBemModel::fwd_bem_field_grad,
-                                               this);
+    comp = FwdCompData::fwd_make_comp_data(comp_data,
+                                           coils,
+                                           comp_coils,
+                                           FwdBemModel::fwd_bem_field,
+                                           nullptr,
+                                           FwdBemModel::fwd_bem_field_grad,
+                                           this);
 #endif
-        if (!comp)
-            return cleanup_fail();
-        /*
-        * Field computation matrices...
-        */
-        qInfo("Composing the field computation matrix...");
-        if (fwd_bem_specify_coils(coils) == FAIL)
+    if (!comp)
+        return cleanup_fail();
+    /*
+    * Field computation matrices...
+    */
+    qInfo("Composing the field computation matrix...");
+    if (fwd_bem_specify_coils(coils) == FAIL)
+        return cleanup_fail();
+    qInfo("[done]");
+
+    if (comp->set && comp->set->current) { /* Test just to specify confusing output */
+        qInfo("Composing the field computation matrix (compensation coils)...");
+        if (fwd_bem_specify_coils(comp->comp_coils) == FAIL)
             return cleanup_fail();
         qInfo("[done]");
-
-        if (comp->set && comp->set->current) { /* Test just to specify confusing output */
-            qInfo("Composing the field computation matrix (compensation coils)...");
-            if (fwd_bem_specify_coils(comp->comp_coils) == FAIL)
-                return cleanup_fail();
-            qInfo("[done]");
-        }
-        field      = FwdCompData::fwd_comp_field;
-        vec_field  = nullptr;
-        field_grad = FwdCompData::fwd_comp_field_grad;
-        client     = comp;
     }
-    else {
-        /*
-         * Use the new compensated field computation
-         * It works the same way independent of whether or not the compensation is in effect
-         */
-#ifdef TEST
-        qInfo("Using differences.");
-        comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
-                                               fwd_sphere_field,
-                                               fwd_sphere_field_vec,
-                                               my_sphere_field_grad,
-                                               const_cast<Vector3f*>(&r0));
-#else
-        comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
-                                               fwd_sphere_field,
-                                               fwd_sphere_field_vec,
-                                               fwd_sphere_field_grad,
-                                               const_cast<Vector3f*>(&r0));
-#endif
-        if (!comp)
-            return cleanup_fail();
-        field       = FwdCompData::fwd_comp_field;
-        vec_field   = FwdCompData::fwd_comp_field_vec;
-        field_grad  = FwdCompData::fwd_comp_field_grad;
-        client      = comp;
-    }
-    /*
+    field      = FwdCompData::fwd_comp_field;
+    vec_field  = nullptr;
+    field_grad = FwdCompData::fwd_comp_field_grad;
+    client     = comp;
+/*
        * Count the sources
        */
     for (k = 0, nsource = 0; k < nspace; k++)
@@ -2799,6 +2778,11 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
      * Use either the sphere model or BEM in the calculations
      */
 {
+    // Same as in compute_forward_meg: eeg_model drove the sphere model branch,
+    // which became unreachable once this turned into a member function. Kept
+    // as part of the public signature.
+    Q_UNUSED(eeg_model)
+
     Eigen::MatrixXf res_mat;                /* The forward solution matrix (neeg x nsources) */
     Eigen::MatrixXf res_grad_mat;           /* The gradient (neeg x 3*nsources) */
     MatrixXd matRes;
@@ -2823,35 +2807,18 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
     for (k = 0, nsource = 0; k < nspace; k++)
         nsource += spaces[k]->nuse;
 
-    if (true) {
-        if (fwd_bem_specify_els(els) == FAIL)
-            return FAIL;
-        client   = this;
-        pot      = fwd_bem_pot_els;
-        vec_pot  = nullptr;
+    if (fwd_bem_specify_els(els) == FAIL)
+        return FAIL;
+    client   = this;
+    pot      = fwd_bem_pot_els;
+    vec_pot  = nullptr;
 #ifdef TEST
-        qInfo("Using differences.");
-        pot_grad = my_bem_pot_grad;
+    qInfo("Using differences.");
+    pot_grad = my_bem_pot_grad;
 #else
-        pot_grad = fwd_bem_pot_grad_els;
+    pot_grad = fwd_bem_pot_grad_els;
 #endif
-    }
-    else {
-        if (eeg_model->nfit == 0) {
-            qInfo("Using the standard series expansion for a multilayer sphere model for EEG");
-            pot      = FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1;
-            vec_pot  = nullptr;
-            pot_grad = nullptr;
-        }
-        else {
-            qInfo("Using the equivalent source approach in the homogeneous sphere for EEG");
-            pot      = FwdEegSphereModel::fwd_eeg_spherepot_coil;
-            vec_pot  = FwdEegSphereModel::fwd_eeg_spherepot_coil_vec;
-            pot_grad = FwdEegSphereModel::fwd_eeg_spherepot_grad_coil;
-        }
-        client   = eeg_model;
-    }
-    /*
+/*
      * Allocate space for the solution
      */
     {

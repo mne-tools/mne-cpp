@@ -328,7 +328,14 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
             * The above distance is with respect to the closest triangle only
             * We need to use the solid angle criterion to decide the sign reliably
             */
-            if (!do_approx && false) {
+            // Deliberately disabled, carried over from MNE-C where the same
+            // branch is switched off. Kept rather than deleted because the
+            // comment above describes the intended behaviour and the sign of
+            // the distance is currently taken from the closest triangle alone.
+            // Written as a constant so the reason is visible rather than
+            // hidden in an "&& false" that reads like a typo.
+            constexpr bool bUseSolidAngleSign = false;
+            if (bUseSolidAngleSign && !do_approx) {
                 Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(digPoints.row(nactive).data());
                 if (sum_solids(pt)/(4*M_PI) > 0.9)
                     dig.dist(k) = - std::fabs(dig.dist(k));
