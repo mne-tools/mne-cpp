@@ -247,6 +247,14 @@ fi
 testColumnWidth=60
 printf "%${testColumnWidth}s %s\n" " Test Name " " Result "
 
+# QTest aborts any single test function that runs longer than five minutes, and
+# does it with SIGABRT, so the run looks like a crash rather than a timeout.
+# The forward solution tests are already close to that: the BEM pipeline takes
+# about 45 seconds here in Release but several minutes in a debug or coverage
+# build, and it has aborted at exactly 300 s on a loaded runner. Raise the
+# limit so a slow machine reports a slow test instead of a failing one.
+export QTEST_FUNCTION_TIMEOUT=${QTEST_FUNCTION_TIMEOUT:-1800000}
+
 CompoundOutput=0
 FailedTestNames=""
 for test in $BasePath/out/${BuildName}/tests/test_*;

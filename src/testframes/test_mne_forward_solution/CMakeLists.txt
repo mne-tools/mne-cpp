@@ -57,7 +57,11 @@ endif()
 # Register with CTest
 enable_testing()
 add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
-set_tests_properties(${PROJECT_NAME} PROPERTIES TIMEOUT 600 RUN_SERIAL TRUE)
+# See test_fwd_bem_field_computation: this one takes over five minutes in a
+# coverage build. Note the ctest timeout is not the only limit, QTest aborts a
+# single test function after five minutes regardless, which scripts/test/
+# test_all.bat raises through QTEST_FUNCTION_TIMEOUT.
+set_tests_properties(${PROJECT_NAME} PROPERTIES TIMEOUT 1800 RUN_SERIAL TRUE)
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
