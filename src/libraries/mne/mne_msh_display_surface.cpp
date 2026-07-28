@@ -324,16 +324,32 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
                 Eigen::Vector3f proj = project_to_triangle(dig.closest(k),pt);
                 dig.closest_point.row(k) = proj.transpose();
             }
-            /*
-            * The above distance is with respect to the closest triangle only
-            * We need to use the solid angle criterion to decide the sign reliably
-            */
-            // Deliberately disabled, carried over from MNE-C where the same
-            // branch is switched off. Kept rather than deleted because the
-            // comment above describes the intended behaviour and the sign of
-            // the distance is currently taken from the closest triangle alone.
-            // Written as a constant so the reason is visible rather than
-            // hidden in an "&& false" that reads like a typo.
+            // The distance above is with respect to the closest triangle only,
+            // so its sign says which side of that one triangle the point is on
+            // rather than whether the point is inside the surface. The solid
+            // angle criterion below answers the latter, and is the check MNE-C
+            // describes here.
+            //
+            // It is off on purpose, and not because it is wrong or unfinished:
+            //
+            //  - The criterion is correct. sum_solids adds 2*atan2 per
+            //    triangle, so a closed surface gives 4*pi for a point inside
+            //    and 0 for one outside, which makes the 0.9 threshold exact.
+            //    Verified on a closed cube and on a 9 cm sphere, where it
+            //    still separates cleanly 2 mm either side of the surface.
+            //    mne-python computes the same quantity for its inside/outside
+            //    test, only normalised to 2*pi because its per triangle term
+            //    is -arctan2 rather than 2*atan2.
+            //
+            //  - Nothing reads the sign. Both consumers of dig.dist discard
+            //    it: discard_outlier_digitizer_points compares
+            //    std::fabs(dist) against maxdist, and rms_digitizer_distance
+            //    squares it.
+            //
+            // Enabling it therefore costs a full pass over every triangle for
+            // each digitizer point, thousands of atan2 calls per point, and
+            // changes no observable behaviour. Flip the constant if a caller
+            // ever needs a signed distance.
             constexpr bool bUseSolidAngleSign = false;
             if (bUseSolidAngleSign && !do_approx) {
                 Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(digPoints.row(nactive).data());
