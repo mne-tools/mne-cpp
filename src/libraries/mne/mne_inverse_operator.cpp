@@ -65,6 +65,7 @@ MNEInverseOperator::MNEInverseOperator()
 , nsource(-1)
 , nchan(-1)
 , coord_frame(-1)
+, units(-1)
 , eigen_leads_weighted(false)
 , eigen_leads(new FiffNamedMatrix)
 , eigen_fields(new FiffNamedMatrix)
@@ -112,6 +113,7 @@ MNEInverseOperator::MNEInverseOperator(const MNEInverseOperator &other)
 , nsource(other.nsource)
 , nchan(other.nchan)
 , coord_frame(other.coord_frame)
+, units(other.units)
 , source_nn(other.source_nn)
 , sing(other.sing)
 , eigen_leads_weighted(other.eigen_leads_weighted)
@@ -1080,6 +1082,14 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     }
     inv.coord_frame = *t_pTag->toInt();
     //
+    //   Units of the source estimates. Optional: files written before this was
+    //   recorded simply do not carry it, so a missing tag is not an error.
+    //
+    if (invs->find_tag(t_pStream, FIFF_MNE_INVERSE_SOURCE_UNIT, t_pTag))
+        inv.units = *t_pTag->toInt();
+    else
+        inv.units = -1;
+    //
     //   The actual source orientation vectors
     //
     if (!invs->find_tag(t_pStream, FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, t_pTag))
@@ -1271,6 +1281,12 @@ void MNEInverseOperator::writeToStream(FiffStream* p_pStream)
     p_pStream->write_int(FIFF_MNE_SOURCE_ORIENTATION, &this->source_ori);
     p_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS, &this->nsource);
     p_pStream->write_int(FIFF_MNE_COORD_FRAME, &this->coord_frame);
+
+    // mne-python reads this to label the source estimates. It is optional
+    // there, but omitting it leaves inv["units"] as None, so an operator that
+    // travelled through MNE-CPP lost information the original file carried.
+    if(this->units > 0)
+        p_pStream->write_int(FIFF_MNE_INVERSE_SOURCE_UNIT, &this->units);
     p_pStream->write_float_matrix(FIFF_MNE_INVERSE_SOURCE_ORIENTATIONS, this->source_nn);
     VectorXf tmp_sing = this->sing.cast<float>();
     p_pStream->write_float(FIFF_MNE_INVERSE_SING, tmp_sing.data(), tmp_sing.size());

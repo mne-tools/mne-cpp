@@ -397,6 +397,7 @@ namespace FIFFLIB
 #define FIFF_MNE_INVERSE_LEADS_WEIGHTED     3546     /**< The eigenleads (already weighted with R^0.5)*/
 #define FIFF_MNE_INVERSE_FIELDS             3541     /**< The eigenfields*/
 #define FIFF_MNE_INVERSE_SING               3542     /**< The singular values*/
+#define FIFF_MNE_INVERSE_SOURCE_UNIT        3547     /**< Unit of the source estimates the operator produces, one of FIFF_UNIT_AM, FIFF_UNIT_AM_M2 or FIFF_UNIT_AM_M3*/
 #define FIFF_MNE_PRIORS_USED                3543     /**< Which kind of priors have been used for the source covariance matrix*/
 #define FIFF_MNE_INVERSE_FULL               3544     /**< Inverse operator as one matrix*/
                                    // This matrix includes the whitening operator as well

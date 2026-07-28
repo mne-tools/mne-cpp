@@ -951,7 +951,25 @@ private slots:
         MNEInverseOperator invRead;
         bool ok = MNEInverseOperator::read_inverse_operator(buf, invRead);
         QVERIFY(ok);
+
+        // Comparing only nsource would pass even if every other field were
+        // lost. The unit in particular used to be dropped, because the writer
+        // never emitted FIFF_MNE_INVERSE_SOURCE_UNIT, so an operator that
+        // passed through MNE-CPP came out of mne-python with units of None.
         QCOMPARE(invRead.nsource, invOp.nsource);
+        QCOMPARE(invRead.nchan, invOp.nchan);
+        QCOMPARE(invRead.coord_frame, invOp.coord_frame);
+        QCOMPARE(invRead.source_ori, invOp.source_ori);
+        QCOMPARE(invRead.methods, invOp.methods);
+        QCOMPARE(invRead.units, invOp.units);
+        QCOMPARE(invRead.src.size(), invOp.src.size());
+        QCOMPARE(invRead.projs.size(), invOp.projs.size());
+
+        QCOMPARE(invRead.sing.size(), invOp.sing.size());
+        QVERIFY(invRead.sing.isApprox(invOp.sing, 1e-5f));
+        QVERIFY(invRead.source_nn.isApprox(invOp.source_nn, 1e-5f));
+        QVERIFY(invRead.eigen_fields->data.isApprox(invOp.eigen_fields->data, 1e-5f));
+        QVERIFY(invRead.eigen_leads->data.isApprox(invOp.eigen_leads->data, 1e-5f));
     }
 
     //=========================================================================

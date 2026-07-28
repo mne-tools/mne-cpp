@@ -355,6 +355,7 @@ public:
     FIFFLIB::fiff_int_t nsource;                    /**< Number of source-space points. */
     FIFFLIB::fiff_int_t nchan;                      /**< Number of channels (= number of singular values). */
     FIFFLIB::fiff_int_t coord_frame;                /**< Coordinate frame of the inverse (MRI or head). */
+    FIFFLIB::fiff_int_t units;                      /**< Unit of the source estimates, FIFF_UNIT_AM, FIFF_UNIT_AM_M2 or FIFF_UNIT_AM_M3. -1 when the file did not state one. */
     Eigen::MatrixXf  source_nn;                     /**< Source-normal vectors (nsource x 3, or nsource*3 x 3 for free). */
     Eigen::VectorXd  sing;                          /**< Singular values of the whitened lead field. */
     bool    eigen_leads_weighted;                   /**< True if eigenleads already include R^{0.5} weighting. */
