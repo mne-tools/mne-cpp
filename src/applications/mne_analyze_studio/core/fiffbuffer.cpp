@@ -43,19 +43,33 @@ bool FiffBuffer::open()
         return true;
     }
 
-    if(!m_file.open(QIODevice::ReadOnly)) {
+    // This used to open m_file, then hand it to Fiff::open, then hand it to
+    // FiffRawData, and each of those opens the device itself. The second open
+    // failed on an already open QFile, so no file ever loaded through here and
+    // the third attempt threw. Only FiffRawData is needed: setup_read_raw opens
+    // the device and leaves the stream on the object.
+    if(!m_file.exists()) {
         return false;
     }
 
-    FIFFLIB::FiffStream::SPtr stream;
-    if(!FIFFLIB::Fiff::open(m_file, stream)) {
+    if(m_file.isOpen()) {
         m_file.close();
+    }
+
+    try {
+        m_rawData = FIFFLIB::FiffRawData(m_file);
+    } catch(const std::exception& e) {
+        // FiffRawData reports a bad file by throwing. A buffer that cannot be
+        // read is an ordinary outcome for a caller handed an arbitrary path,
+        // so it is turned back into a false rather than unwinding into the UI.
+        qWarning() << "[FiffBuffer::open] could not read" << m_filePath << ":" << e.what();
+        if(m_file.isOpen()) {
+            m_file.close();
+        }
         return false;
     }
 
-    m_stream = stream;
-    m_file.seek(0);
-    m_rawData = FIFFLIB::FiffRawData(m_file);
+    m_stream = m_rawData.file;
     loadHeaderMetadata();
     emit metadataChanged(m_metadata);
 
