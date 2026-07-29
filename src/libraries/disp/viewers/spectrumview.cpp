@@ -122,6 +122,14 @@ void SpectrumView::init(FiffInfo::SPtr &info,
 
 void SpectrumView::addData(const MatrixXd &matData)
 {
+    // The model is only created by init, and mne_scan pushes data through here
+    // as soon as a measurement arrives, which can be before init has run. There
+    // is nowhere to put the data in that case, so it is dropped rather than
+    // dereferencing a model that does not exist yet.
+    if(!m_pFSModel) {
+        return;
+    }
+
     m_pFSModel->addData(matData);
 }
 
@@ -130,6 +138,12 @@ void SpectrumView::addData(const MatrixXd &matData)
 void SpectrumView::setBoundaries(int iLower,
                                  int iUpper)
 {
+    // Same ordering as addData: the bounds can be set from a settings widget
+    // before the model exists.
+    if(!m_pFSModel) {
+        return;
+    }
+
     m_pFSModel->setBoundaries(iLower, iUpper);
 }
 

@@ -152,7 +152,10 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
 RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 {
     // Save Settings
-    if(!m_pRTESet->getName().isEmpty())
+    // m_pRTESet is only assigned once a measurement arrives through update, so
+    // a widget destroyed before its plugin produced anything still has it null.
+    // That happens whenever a scene is torn down shortly after being built.
+    if(m_pRTESet && !m_pRTESet->getName().isEmpty())
     {
         QSettings settings("MNECPP");
 

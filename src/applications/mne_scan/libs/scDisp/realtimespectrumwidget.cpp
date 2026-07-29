@@ -108,7 +108,9 @@ RealTimeSpectrumWidget::RealTimeSpectrumWidget(QSharedPointer<RealTimeSpectrum> 
 RealTimeSpectrumWidget::~RealTimeSpectrumWidget()
 {
     // Save Settings
-    if(!m_pFS->getName().isEmpty())  {
+    // Same as RealTimeEvokedSetWidget: m_pFS is only set once a measurement
+    // arrives, so it is still null if the widget is destroyed before that.
+    if(m_pFS && !m_pFS->getName().isEmpty())  {
         QString t_sFSName = m_pFS->getName();
 
         QSettings settings("MNECPP");
