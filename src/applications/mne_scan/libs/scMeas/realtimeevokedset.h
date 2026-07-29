@@ -127,7 +127,11 @@ public:
     /**
      * Returns the number of channels.
      *
-     * @return the number of values which are gathered before a notify() is called.
+     * Returns zero until channel info has been attached. FiffInfo starts with
+     * nchan at -1, which would wrap to 4294967295 through this unsigned return
+     * type and hand a caller a four billion channel count during startup.
+     *
+     * @return the number of channels, or zero if none are known yet.
      */
     inline unsigned int getNumChannels() const;
 
@@ -277,7 +281,10 @@ inline void RealTimeEvokedSet::setXMLLayoutFile(const QString& layout)
 inline unsigned int RealTimeEvokedSet::getNumChannels() const
 {
     QMutexLocker locker(&m_qMutex);
-    return m_pFiffEvokedSet->info.nchan;
+    // nchan is -1 before any channel info is set, so it is clamped here rather
+    // than wrapping to a huge value through the unsigned return type.
+    const FIFFLIB::fiff_int_t nchan = m_pFiffEvokedSet->info.nchan;
+    return nchan > 0 ? static_cast<unsigned int>(nchan) : 0u;
 }
 
 //=============================================================================================================
