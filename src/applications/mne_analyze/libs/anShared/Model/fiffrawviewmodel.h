@@ -688,7 +688,10 @@ inline qint32 FiffRawViewModel::currentFirstSample() const {
 //=============================================================================================================
 
 inline qint32 FiffRawViewModel::absoluteFirstSample() const {
-    if(m_pFiffIO->m_qlistRaw.empty() == false)
+    // The default constructor leaves m_pFiffIO null, which is the state the
+    // model is in before a file is opened. Checking the raw list without
+    // checking the pointer first dereferences null and crashes.
+    if(m_pFiffIO && m_pFiffIO->m_qlistRaw.empty() == false)
         return m_pFiffIO->m_qlistRaw[0]->first_samp;
     else
     {
@@ -706,7 +709,8 @@ inline qint32 FiffRawViewModel::currentLastSample() const {
 //=============================================================================================================
 
 inline qint32 FiffRawViewModel::absoluteLastSample() const {
-    if(m_pFiffIO->m_qlistRaw.empty() == false)
+    // Same null pointer case as absoluteFirstSample above.
+    if(m_pFiffIO && m_pFiffIO->m_qlistRaw.empty() == false)
         return m_pFiffIO->m_qlistRaw[0]->last_samp;
     else
     {
