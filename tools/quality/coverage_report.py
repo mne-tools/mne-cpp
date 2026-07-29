@@ -1,4 +1,17 @@
 #!/usr/bin/env python3
+# =============================================================================================================
+#
+# @file     coverage_report.py
+# @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+# @since    2.4.0
+# @date     July, 2026
+#
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#
+# @brief    Report line coverage over the same file scope Codecov measures.
+#
+# =============================================================================================================
 """Report line coverage using the same scope Codecov does.
 
 Codecov's number comes from the Linux CI job, which runs gcov via fastcov with
