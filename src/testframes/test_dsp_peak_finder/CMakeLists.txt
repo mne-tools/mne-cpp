@@ -35,7 +35,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/${CMAKE_BUILD_TYPE}/tests"
     FOLDER "tests"
 )
 

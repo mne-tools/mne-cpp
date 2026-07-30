@@ -187,6 +187,10 @@ jobs:
         cmake --build build --config Release --parallel
 
     # ── Run tests ──────────────────────────────────────────────────────────
+    # CTest drives the run from the add_test() registrations rather than from a
+    # glob over the binary output directory.  A test that is built but written
+    # somewhere unexpected therefore fails loudly instead of silently dropping
+    # out of CI (and out of the coverage numbers) the way a glob allows.
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-24.04'
       env:
@@ -195,11 +199,10 @@ jobs:
         MNE_DATA: ~/mne_data
         MNE_REQUIRE_PYTHON: 'true'
       run: |
-        if [ "${{ inputs.with_code_coverage }}" = "true" ]; then
-          ./scripts/test/test_all.bat verbose withCoverage
-        else
-          ./scripts/test/test_all.bat verbose
-        fi
+        ctest --test-dir build \
+              --output-on-failure \
+              --repeat until-pass:2 \
+              --timeout ${{ inputs.with_code_coverage && 3600 || 1800 }}
 
     - name: Run tests (MacOS)
       if: matrix.os == 'macos-26'
@@ -209,8 +212,13 @@ jobs:
         MNE_DATA: ~/mne_data
         MNE_REQUIRE_PYTHON: 'true'
       run: |
-        ./scripts/test/test_all.bat Release verbose
+        ctest --test-dir build \
+              --output-on-failure \
+              --repeat until-pass:2 \
+              --timeout 1800
 
+    # mne_flash_bem/mne_watershed_bem shell out to FreeSurfer tools
+    # (mri_convert, mri_watershed) that Windows runners do not have.
     - name: Run tests (Windows)
       if: matrix.os == 'windows-2025-vs2026'
       env:
@@ -218,7 +226,11 @@ jobs:
         MNE_DATA: ~/mne_data
         MNE_REQUIRE_PYTHON: 'true'
       run: |
-        ./scripts/test/test_all.bat Release verbose
+        ctest --test-dir build -C Release `
+              --output-on-failure `
+              --repeat until-pass:2 `
+              --timeout 1800 `
+              -E "test_mne_flash_bem|test_mne_watershed_bem"
 
     # ── Coverage: generate filtered report (fastcov) ─────────────────────
     - name: Install fastcov

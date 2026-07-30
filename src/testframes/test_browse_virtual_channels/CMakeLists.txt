@@ -50,10 +50,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${MNE_BROWSE_DIR}
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../../out/$<CONFIG>/tests
-)
-
 add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
