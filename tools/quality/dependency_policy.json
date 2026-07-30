@@ -1,0 +1,124 @@
+{
+  "$comment": "Dependency architecture policy for tools/quality/audit_dependencies.py. See doc/dev-notes/v2.4.0-requirements.md TASK 6 (gate G5). The rule is simple and deliberately strict: a library may depend only on libraries in a strictly lower layer. Same-layer edges are refused too, because they are how cycles start.",
+  "layers": [
+    {
+      "name": "core",
+      "description": "Numerics and transport primitives with no MNE-CPP dependencies of their own.",
+      "libraries": [
+        "mne_math",
+        "mne_lsl"
+      ]
+    },
+    {
+      "name": "support",
+      "description": "Cross-cutting helpers used by everything above.",
+      "libraries": [
+        "mne_utils"
+      ]
+    },
+    {
+      "name": "io",
+      "description": "File formats, machine learning back-ends and self-contained toolkits built directly on the primitives.",
+      "libraries": [
+        "mne_fiff",
+        "mne_fs",
+        "mne_ml",
+        "mne_mna",
+        "mne_decoding"
+      ]
+    },
+    {
+      "name": "model",
+      "description": "Domain models and format bridges assembled from the I/O layer.",
+      "libraries": [
+        "mne_mne",
+        "mne_mri",
+        "mne_sts",
+        "mne_com",
+        "mne_bids"
+      ]
+    },
+    {
+      "name": "forward",
+      "description": "Forward modelling.",
+      "libraries": [
+        "mne_fwd"
+      ]
+    },
+    {
+      "name": "analysis",
+      "description": "Estimators that consume the forward solution.",
+      "libraries": [
+        "mne_inv",
+        "mne_connectivity"
+      ]
+    },
+    {
+      "name": "processing",
+      "description": "Signal processing pipelines that orchestrate the analysis layer.",
+      "libraries": [
+        "mne_dsp"
+      ]
+    },
+    {
+      "name": "visualization",
+      "description": "Two-dimensional display widgets.",
+      "libraries": [
+        "mne_disp"
+      ]
+    },
+    {
+      "name": "visualization3d",
+      "description": "Three-dimensional display, the top of the stack.",
+      "libraries": [
+        "mne_disp3D"
+      ]
+    }
+  ],
+  "forbidden_edges": [],
+  "$variable_prefixes_comment": "Variables that hold bare Qt module names; the namespace is prepended at the point of use with list(TRANSFORM), which the audit does not evaluate.",
+  "variable_prefixes": {
+    "QT_REQUIRED_COMPONENTS": "Qt::",
+    "QT_REQUIRED_COMPONENT_LIBS": "Qt::"
+  },
+  "$allowed_external_comment": "Third-party targets the libraries are permitted to link. Qt targets are normalised to a version-independent Qt:: spelling. Adding an entry here is an architectural decision and should be reviewed as one.",
+  "allowed_external": [
+    "Qt::Core",
+    "Qt::Concurrent",
+    "Qt::Gui",
+    "Qt::GuiPrivate",
+    "Qt::Network",
+    "Qt::SerialPort",
+    "Qt::Svg",
+    "Qt::Widgets",
+    "Qt::Multimedia",
+    "Qt::ShaderTools",
+    "Qt::OpenGL",
+    "Qt::OpenGLWidgets",
+    "Qt::ZlibPrivate",
+    "Qt::3DCore",
+    "Qt::3DRender",
+    "Qt::3DInput",
+    "Qt::3DExtras",
+    "Eigen3::Eigen",
+    "Skigen::Skigen",
+    "onnxruntime::onnxruntime",
+    "ZLIB::ZLIB",
+    "zlibstatic",
+    "z"
+  ],
+  "ignored_variables": [
+    "FFTW_LIBS",
+    "FFTW_DIR_LIBS",
+    "CMAKE_DL_LIBS"
+  ],
+  "$exception_schema": {
+    "$comment": "Required shape of every entry in 'exceptions'. An exception is a dated promise: it must name the edge, an owner, a rationale, and an expiry date. Expired exceptions fail the audit, and exceptions for edges that no longer exist are reported as stale so they cannot accumulate.",
+    "from": "mne_example",
+    "to": "mne_other",
+    "owner": "name <email>",
+    "rationale": "why the layering cannot be honoured yet",
+    "expires": "YYYY-MM-DD"
+  },
+  "exceptions": []
+}

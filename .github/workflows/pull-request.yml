@@ -91,6 +91,11 @@ jobs:
         python3 -m unittest discover -s tools/quality/tests
         python3 tools/quality/validate_test_inventory.py
 
+    # Gate G5: layering violations and dependency cycles are cheap to prevent
+    # and expensive to unpick once they have been built on.
+    - name: Audit dependency architecture
+      run: python3 tools/quality/audit_dependencies.py --check
+
     - name: Generate placeholder screenshots
       run: |
         cd doc/website
