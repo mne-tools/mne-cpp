@@ -1,0 +1,284 @@
+//=============================================================================================================
+/**
+ * @file     test_tool_exit_codes.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.4.0
+ * @date     July, 2026
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2026, MNE-CPP Authors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * @brief    Assert that command line tools report failure through their exit status.
+ *
+ * A tool that prints an error and then exits zero is worse than one that says
+ * nothing at all: every script built on it treats the run as a success. This
+ * test drives a handful of tools into their most ordinary failure - a required
+ * argument that is missing, or an input file that does not exist - and checks
+ * only the exit status.
+ *
+ * It deliberately does not assert on message text. Wording changes for good
+ * reasons and a test that pins it down turns every improvement to an error
+ * message into a test failure. The exit status is the part other programs
+ * depend on, so the exit status is what is fixed here.
+ *
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <utils/mnelogger.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
+#include <QProcess>
+#include <QProcessEnvironment>
+#include <QtTest>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace UTILSLIB;
+
+//=============================================================================================================
+/**
+ * DECLARE CLASS TestToolExitCodes
+ *
+ * @brief The TestToolExitCodes class provides observable-failure tests for the command line tools.
+ *
+ */
+class TestToolExitCodes : public QObject
+{
+    Q_OBJECT
+
+public:
+    TestToolExitCodes();
+
+private slots:
+    void initTestCase();
+    void missingRequiredArguments_data();
+    void missingRequiredArguments();
+    void unreadableInputFile_data();
+    void unreadableInputFile();
+    void helpSucceeds_data();
+    void helpSucceeds();
+
+private:
+    /** Locate a tool next to the test binary, or an empty string when it was not built. */
+    QString findTool(const QString& name) const;
+
+    /** Give the child process a chance of finding the Qt and MNE-CPP libraries on Windows. */
+    void setupProcess(QProcess& proc) const;
+
+    /** Run a tool and return its exit code, or -1 when it could not be run at all. */
+    int runTool(const QString& path, const QStringList& arguments) const;
+
+    QString m_sMissingFile;
+};
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+TestToolExitCodes::TestToolExitCodes()
+{
+}
+
+//=============================================================================================================
+
+void TestToolExitCodes::initTestCase()
+{
+    qInstallMessageHandler(MNELogger::customLogWriter);
+
+    // A path that is guaranteed not to exist, so the tools must fail to open it.
+    m_sMissingFile = QDir::tempPath() + "/mne_cpp_no_such_file_2c8f1d.fif";
+    QVERIFY(!QFileInfo::exists(m_sMissingFile));
+}
+
+//=============================================================================================================
+
+QString TestToolExitCodes::findTool(const QString& name) const
+{
+    const QString appDir = QCoreApplication::applicationDirPath();
+
+#ifdef Q_OS_WIN
+    const QString suffix = ".exe";
+#else
+    const QString suffix = QString();
+#endif
+
+    const QStringList candidates = {
+        appDir + "/" + name + suffix,
+        appDir + "/../apps/" + name + suffix,
+        appDir + "/../bin/" + name + suffix
+    };
+
+    for (const QString& path : candidates) {
+        const QFileInfo info(path);
+        if (info.exists() && info.isExecutable()) {
+            return info.canonicalFilePath();
+        }
+    }
+
+    return QString();
+}
+
+//=============================================================================================================
+
+void TestToolExitCodes::setupProcess(QProcess& proc) const
+{
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+
+    // The Windows loader does not resolve ".." inside PATH entries, so these
+    // have to be cleaned into absolute paths before they are of any use.
+    const QString qtBinDir = QDir::cleanPath(
+        QCoreApplication::applicationDirPath() + "/../../../src/external/qt/dynamic/bin");
+    const QString appDir = QDir::cleanPath(QCoreApplication::applicationDirPath());
+
+#ifdef Q_OS_WIN
+    const QChar separator = ';';
+#else
+    const QChar separator = ':';
+#endif
+
+    env.insert("PATH", appDir + separator + qtBinDir + separator + env.value("PATH"));
+    proc.setProcessEnvironment(env);
+}
+
+//=============================================================================================================
+
+int TestToolExitCodes::runTool(const QString& path, const QStringList& arguments) const
+{
+    QProcess proc;
+    setupProcess(proc);
+    proc.start(path, arguments);
+
+    if (!proc.waitForStarted(30000)) {
+        return -1;
+    }
+    if (!proc.waitForFinished(120000)) {
+        proc.kill();
+        proc.waitForFinished(5000);
+        return -1;
+    }
+    if (proc.exitStatus() != QProcess::NormalExit) {
+        return -1;
+    }
+
+    return proc.exitCode();
+}
+
+//=============================================================================================================
+
+void TestToolExitCodes::missingRequiredArguments_data()
+{
+    QTest::addColumn<QString>("tool");
+
+    // Each of these refuses to run without arguments. None of them needs test
+    // data to reach that decision, so the case is available on every platform.
+    QTest::newRow("mne_fix_mag_coil_types") << "mne_fix_mag_coil_types";
+    QTest::newRow("mne_add_triggers")       << "mne_add_triggers";
+    QTest::newRow("mne_change_nave")        << "mne_change_nave";
+    QTest::newRow("mne_mark_bad_channels")  << "mne_mark_bad_channels";
+    QTest::newRow("mne_toggle_skips")       << "mne_toggle_skips";
+}
+
+//=============================================================================================================
+
+void TestToolExitCodes::missingRequiredArguments()
+{
+    QFETCH(QString, tool);
+
+    const QString path = findTool(tool);
+    if (path.isEmpty()) {
+        QSKIP("tool was not built in this configuration");
+    }
+
+    const int code = runTool(path, QStringList());
+    QVERIFY2(code != -1, "the tool could not be started at all");
+    QVERIFY2(code != 0,
+             qPrintable(tool + " exited successfully although its required arguments were missing"));
+}
+
+//=============================================================================================================
+
+void TestToolExitCodes::unreadableInputFile_data()
+{
+    QTest::addColumn<QString>("tool");
+    QTest::addColumn<QStringList>("arguments");
+
+    // mne_fix_mag_coil_types used to report every file as failed and still exit
+    // zero, which made it impossible to use from a script.
+    QTest::newRow("mne_fix_mag_coil_types")
+        << "mne_fix_mag_coil_types" << QStringList{"__MISSING__"};
+
+    QTest::newRow("mne_change_nave")
+        << "mne_change_nave"
+        << QStringList{"--meas", "__MISSING__", "--nave", "1", "--out", "__MISSING_OUT__"};
+}
+
+//=============================================================================================================
+
+void TestToolExitCodes::unreadableInputFile()
+{
+    QFETCH(QString, tool);
+    QFETCH(QStringList, arguments);
+
+    const QString path = findTool(tool);
+    if (path.isEmpty()) {
+        QSKIP("tool was not built in this configuration");
+    }
+
+    arguments.replaceInStrings("__MISSING__", m_sMissingFile);
+    arguments.replaceInStrings("__MISSING_OUT__", m_sMissingFile + ".out");
+
+    const int code = runTool(path, arguments);
+    QVERIFY2(code != -1, "the tool could not be started at all");
+    QVERIFY2(code != 0,
+             qPrintable(tool + " exited successfully although its input file does not exist"));
+}
+
+//=============================================================================================================
+
+void TestToolExitCodes::helpSucceeds_data()
+{
+    QTest::addColumn<QString>("tool");
+
+    // The counterpart to the cases above: asking for help is not an error, and
+    // a tool that fails here would make the failure cases meaningless.
+    QTest::newRow("mne_fix_mag_coil_types") << "mne_fix_mag_coil_types";
+    QTest::newRow("mne_mark_bad_channels")  << "mne_mark_bad_channels";
+    QTest::newRow("mne_change_nave")        << "mne_change_nave";
+}
+
+//=============================================================================================================
+
+void TestToolExitCodes::helpSucceeds()
+{
+    QFETCH(QString, tool);
+
+    const QString path = findTool(tool);
+    if (path.isEmpty()) {
+        QSKIP("tool was not built in this configuration");
+    }
+
+    const int code = runTool(path, QStringList{"--help"});
+    QVERIFY2(code != -1, "the tool could not be started at all");
+    QCOMPARE(code, 0);
+}
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+QTEST_GUILESS_MAIN(TestToolExitCodes)
+#include "test_tool_exit_codes.moc"

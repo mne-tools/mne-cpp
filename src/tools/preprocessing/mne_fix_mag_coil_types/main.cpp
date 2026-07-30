@@ -171,13 +171,24 @@ int main(int argc, char *argv[])
         parser.showHelp(1);
     }
 
+    int failed = 0;
     for (const QString &fname : files) {
         fprintf(stderr, "%s ... ", qPrintable(fname));
         if (processFile(fname, doMagnes) != 0) {
             fprintf(stderr, "[failed]\n");
+            ++failed;
         } else {
             fprintf(stderr, "[ok]\n");
         }
+    }
+
+    // A file that could not be updated is a failure of the run, not a remark in
+    // passing. Reporting success here made the tool unusable from a script: a
+    // batch in which every single file failed still exited zero.
+    if (failed) {
+        qCritical("%d of %lld file(s) could not be updated.",
+                  failed, static_cast<long long>(files.size()));
+        return 1;
     }
 
     return 0;
