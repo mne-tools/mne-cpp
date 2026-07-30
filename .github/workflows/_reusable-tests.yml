@@ -191,6 +191,11 @@ jobs:
     # glob over the binary output directory.  A test that is built but written
     # somewhere unexpected therefore fails loudly instead of silently dropping
     # out of CI (and out of the coverage numbers) the way a glob allows.
+    #
+    # There is deliberately no retry: gate G1 forbids an automatic re-run from
+    # turning a failure into a pass.  A flaky test must be fixed or quarantined
+    # by name.  --no-tests=error makes an empty suite a failure rather than a
+    # silent success.
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-24.04'
       env:
@@ -201,7 +206,8 @@ jobs:
       run: |
         ctest --test-dir build \
               --output-on-failure \
-              --repeat until-pass:2 \
+              --no-tests=error \
+              --output-junit test-results.xml \
               --timeout ${{ inputs.with_code_coverage && 3600 || 1800 }}
 
     - name: Run tests (MacOS)
@@ -214,7 +220,8 @@ jobs:
       run: |
         ctest --test-dir build \
               --output-on-failure \
-              --repeat until-pass:2 \
+              --no-tests=error \
+              --output-junit test-results.xml \
               --timeout 1800
 
     # mne_flash_bem/mne_watershed_bem shell out to FreeSurfer tools
@@ -228,9 +235,19 @@ jobs:
       run: |
         ctest --test-dir build -C Release `
               --output-on-failure `
-              --repeat until-pass:2 `
+              --no-tests=error `
+              --output-junit test-results.xml `
               --timeout 1800 `
               -E "test_mne_flash_bem|test_mne_watershed_bem"
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: test-results-${{ matrix.os }}
+        path: build/test-results.xml
+        retention-days: 30
+        if-no-files-found: warn
 
     # ── Coverage: generate filtered report (fastcov) ─────────────────────
     - name: Install fastcov

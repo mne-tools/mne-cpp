@@ -84,6 +84,13 @@ jobs:
     - name: Validate API registry
       run: python3 tools/validate_api_registry.py --repo-root "$GITHUB_WORKSPACE"
 
+    # Gate G1: a test that is built but not registered runs nowhere and is
+    # counted nowhere. This catches that statically, before a build exists.
+    - name: Validate test inventory
+      run: |
+        python3 -m unittest discover -s tools/quality/tests
+        python3 tools/quality/validate_test_inventory.py
+
     - name: Generate placeholder screenshots
       run: |
         cd doc/website

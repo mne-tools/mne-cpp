@@ -1,0 +1,35 @@
+{
+  "$comment": "Policy for tools/quality/validate_test_inventory.py. See doc/dev-notes/v2.4.0-requirements.md TASK 1 (gate G1).",
+  "allowed_labels": [
+    "unit",
+    "integration",
+    "parity",
+    "example",
+    "gui",
+    "slow",
+    "requires-data"
+  ],
+  "timeout_seconds": {
+    "min": 5,
+    "max": 3600
+  },
+  "unregistered": {
+    "test_mna_coverage": "Placeholder directory; its CMakeLists.txt names a test_mna_coverage.cpp that was never written. Kept out of the build until the MNA coverage test is authored.",
+    "test_wasm_multi_draw": "Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case.",
+    "test_wasm_multi_pass": "Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case."
+  },
+  "ratchet": {
+    "$comment": "Counts of registered tests still missing metadata. These numbers may only decrease. Labels and timeouts become mandatory once the CTest registration helper (T1.1) lands and the leaf tests are migrated (T1.2/T1.3).",
+    "max_tests_without_labels": 223,
+    "max_tests_without_timeout": 214
+  },
+  "$quarantine_schema": {
+    "$comment": "Required shape of every entry in 'quarantine'. A quarantined test must name an owner, an issue, an expiry date, and a reason; an expired entry fails validation. Quarantine is the only sanctioned way to keep a failing test in the tree, because CI does not retry.",
+    "test": "test_example",
+    "owner": "name <email>",
+    "issue": "https://github.com/mne-tools/mne-cpp/issues/0000",
+    "expires": "YYYY-MM-DD",
+    "reason": "why the test cannot simply be fixed now"
+  },
+  "quarantine": []
+}
