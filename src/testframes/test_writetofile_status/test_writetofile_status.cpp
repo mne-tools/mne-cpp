@@ -22,7 +22,6 @@
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
-#include <QTimer>
 
 using namespace WRITETOFILEPLUGIN;
 
@@ -32,7 +31,7 @@ class TestWriteToFileStatus : public QObject
 
 private slots:
     void formatHelpers_produceExpectedStrings();
-    void emitRecordingStatus_isPeriodicAndMonotonic();
+    void emitRecordingStatus_isRepeatableAndMonotonic();
     void statusWidget_reflectsLatestSummary();
 };
 
@@ -53,7 +52,7 @@ void TestWriteToFileStatus::formatHelpers_produceExpectedStrings()
 
 //=============================================================================================================
 
-void TestWriteToFileStatus::emitRecordingStatus_isPeriodicAndMonotonic()
+void TestWriteToFileStatus::emitRecordingStatus_isRepeatableAndMonotonic()
 {
     QTemporaryDir tmpDir;
     QVERIFY(tmpDir.isValid());
@@ -70,33 +69,22 @@ void TestWriteToFileStatus::emitRecordingStatus_isPeriodicAndMonotonic()
 
     QSignalSpy spy(&plugin, &WriteToFile::recordingStatus);
 
-    // Drive a synthetic file growth + periodic status emission for ~3.2s.
-    QTimer growTimer;
-    growTimer.setInterval(250);
-    qint64 written = 0;
-    QObject::connect(&growTimer, &QTimer::timeout, [&]() {
+    // Emissions are driven directly rather than from a repeating timer. Asking a 1 s
+    // timer to fire three times inside a 3.2 s wait left 200 ms of slack, which a
+    // loaded macOS runner spent, delivering two ticks and failing the count.
+    const int iExpectedEmissions = 4;
+    for (int i = 0; i < iExpectedEmissions; ++i) {
         const QByteArray chunk(1024, 'x');
         plugin.m_qFileOut.write(chunk);
         plugin.m_qFileOut.flush();
-        written += chunk.size();
-    });
-    growTimer.start();
+        QTest::qWait(600);
+        plugin.emitRecordingStatus();
+    }
 
-    QTimer emitTimer;
-    emitTimer.setInterval(1000);
-    QObject::connect(&emitTimer, &QTimer::timeout,
-                     &plugin, &WriteToFile::emitRecordingStatus);
-    emitTimer.start();
-
-    QTest::qWait(3200);
-
-    growTimer.stop();
-    emitTimer.stop();
     plugin.m_bWriteToFile = false;
     plugin.m_qFileOut.close();
 
-    QVERIFY2(spy.count() >= 3,
-             qPrintable(QStringLiteral("Expected >=3 recordingStatus emissions, got %1").arg(spy.count())));
+    QCOMPARE(spy.count(), iExpectedEmissions);
 
     // Each emitted summary must match "HH:MM:SS  <num><unit>" and have non-decreasing size.
     static const QRegularExpression re(
@@ -133,7 +121,8 @@ void TestWriteToFileStatus::emitRecordingStatus_isPeriodicAndMonotonic()
     const int lastSecs = lastMatch.captured(1).toInt() * 3600
                        + lastMatch.captured(2).toInt() * 60
                        + lastMatch.captured(3).toInt();
-    // We waited ~3.2s — expect at least 2s elapsed in the final summary.
+    // qWait() guarantees a lower bound, so the four 600 ms waits put at least 2 s on
+    // the recording clock however slow the machine is.
     QVERIFY2(lastSecs >= 2,
              qPrintable(QStringLiteral("Last elapsed=%1s too small").arg(lastSecs)));
 }
