@@ -23,6 +23,20 @@
     "max_tests_without_labels": 223,
     "max_tests_without_timeout": 214
   },
+  "$conditional_comment": "Tests whose add_test() sits behind an early return(), so they vanish from CTest whenever the guard fires. Each needs a reason naming the guard. This list is a defect inventory, not an approved pattern: T1.1 is expected to replace these guards with a declarative registration helper so the skip is visible in the run instead of silent.",
+  "conditional": {
+    "test_cortical_surface_inverse": "Skipped when the analyze_cortical_surface target is not built.",
+    "test_cortical_surface_labels": "Skipped when the analyze_cortical_surface target is not built.",
+    "test_cortical_surface_picking": "Skipped when the analyze_cortical_surface target is not built.",
+    "test_cortical_surface_stc": "Skipped when the analyze_cortical_surface target is not built.",
+    "test_doc_shots": "Skipped when the mne_doc_shots target is not built. Currently skipped in the default developer configure.",
+    "test_electrodes_plugin": "Skipped when the inspect_electrodes target is not built.",
+    "test_mne_inspect_multimodal": "Skipped unless inspect_electrodes, inspect_mri_slices, mne_disp3D and mne_inspect_app_core are all built.",
+    "test_mri_slices_plugin": "Skipped when the inspect_mri_slices target is not built.",
+    "test_multimodal_scene": "Skipped when the mne_disp3D target is not built.",
+    "test_scmeas_measurements": "Skipped when the scan_writetofile target is not built.",
+    "test_writetofile_status": "Skipped when the scan_writetofile target is not built."
+  },
   "$quarantine_schema": {
     "$comment": "Required shape of every entry in 'quarantine'. A quarantined test must name an owner, an issue, an expiry date, and a reason; an expired entry fails validation. Quarantine is the only sanctioned way to keep a failing test in the tree, because CI does not retry.",
     "test": "test_example",

@@ -102,6 +102,7 @@ _SET_TESTS_PROPERTIES_RE = re.compile(r"set_tests_properties\s*\((.*?)\)", re.IG
 _LABELS_RE = re.compile(r"\bLABELS\s+(\"[^\"]*\"|[^\s)]+)", re.IGNORECASE)
 _TIMEOUT_RE = re.compile(r"\bTIMEOUT\s+([0-9]+)", re.IGNORECASE)
 _OUTPUT_DIR_RE = re.compile(r"\bRUNTIME_OUTPUT_DIRECTORY(?:_[A-Z]+)?\b")
+_BARE_RETURN_RE = re.compile(r"^[ \t]*return[ \t]*\([ \t]*\)", re.MULTILINE | re.IGNORECASE)
 
 
 def strip_cmake_comments(text: str) -> str:
@@ -138,6 +139,7 @@ class TestEntry:
     labels: list[str] = field(default_factory=list)
     timeout: int | None = None
     overrides_output_dir: bool = False
+    guarded_registration: bool = False
 
     @property
     def cmake_path(self) -> str:
@@ -162,8 +164,15 @@ def parse_leaf(directory: Path) -> TestEntry:
         entry.name = project_match.group(1)
 
     entry.add_test_names = [n.strip('"') for n in _ADD_TEST_NAME_RE.findall(text)]
-    entry.has_add_test = bool(_ADD_TEST_CALL_RE.search(text))
+    add_test_call = _ADD_TEST_CALL_RE.search(text)
+    entry.has_add_test = bool(add_test_call)
     entry.overrides_output_dir = bool(_OUTPUT_DIR_RE.search(text))
+
+    # A bare return() before the add_test() call means CMake may leave this file
+    # early and register nothing at all, which no amount of reading the call itself
+    # will reveal.
+    if add_test_call:
+        entry.guarded_registration = bool(_BARE_RETURN_RE.search(text, 0, add_test_call.start()))
 
     labels: list[str] = []
     timeout: int | None = None
@@ -315,6 +324,47 @@ def check_add_test(entries: dict[str, TestEntry]) -> list[Finding]:
                     "and never executed.",
                 )
             )
+    return findings
+
+
+def check_conditional_registration(entries: dict[str, TestEntry], policy: dict[str, Any]) -> list[Finding]:
+    """A test whose add_test() sits behind an early return() registers nothing in some configurations."""
+    findings: list[Finding] = []
+    declared = policy.get("conditional", {})
+    if not isinstance(declared, dict):
+        return [error("TI012", POLICY_FILE.name, "'conditional' must be an object mapping test name to reason.")]
+
+    for name, entry in sorted(entries.items()):
+        if not entry.registered or not entry.guarded_registration:
+            continue
+        reason = declared.get(name)
+        if not isinstance(reason, str) or not reason.strip():
+            findings.append(
+                error(
+                    "TI012",
+                    entry.cmake_path,
+                    f"'{name}' calls add_test() after an early return(), so it disappears from CTest "
+                    "in any configuration where the guard fires — silently, and without failing the "
+                    "build. Declare it in the policy 'conditional' map with the reason, or make the "
+                    "registration unconditional.",
+                )
+            )
+
+    for name in sorted(declared):
+        entry = entries.get(name)
+        if entry is None:
+            findings.append(
+                error("TI013", POLICY_FILE.name, f"'{name}' is declared conditional but no such test directory exists.")
+            )
+        elif not entry.guarded_registration:
+            findings.append(
+                warning(
+                    "TI013",
+                    POLICY_FILE.name,
+                    f"'{name}' is declared conditional but registers unconditionally; drop the entry.",
+                )
+            )
+
     return findings
 
 
@@ -655,6 +705,7 @@ def run(args: argparse.Namespace) -> int:
     findings: list[Finding] = []
     findings += check_registration(entries, missing_directories, policy)
     findings += check_add_test(entries)
+    findings += check_conditional_registration(entries, policy)
     findings += check_output_directory_overrides(entries)
     findings += check_names(entries)
     findings += check_labels(entries, policy)

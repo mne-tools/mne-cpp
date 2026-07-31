@@ -2114,6 +2114,17 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
     QString t_sFileName = t_pStream->streamName();
 
     /*
+     * ReadWrite creates the file, so a path that is not there would be turned into
+     * an empty file that then fails to parse, leaving the caller's directory dirty.
+     * Updating a file that does not exist is never the intent.
+     */
+    QFile *t_pFile = qobject_cast<QFile *>(&p_IODevice);
+    if (t_pFile != nullptr && !t_pFile->exists()) {
+        qCritical("Cannot open %s for update: no such file", t_sFileName.toUtf8().constData());
+        return FiffStream::SPtr();
+    }
+
+    /*
      * Try to open...
      */
     if(!t_pStream->open(QIODevice::ReadWrite)) {

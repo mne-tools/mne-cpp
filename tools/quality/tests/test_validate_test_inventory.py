@@ -462,6 +462,70 @@ class TestCTestCrossCheck(ValidatorTestCase):
         ctest.write_text(json.dumps({"tests": [{"name": "test_alpha"}]}), encoding="utf-8")
         self.assertEqual([], vti.check_ctest_json(entries, ctest))
 
+class TestConditionalRegistration(ValidatorTestCase):
+    GUARDED = "\n".join(
+        [
+            "if(NOT TARGET some_tool)",
+            "    message(STATUS \"skipping\")",
+            "    return()",
+            "endif()",
+            "",
+            ADD_TEST,
+        ]
+    )
+
+    def test_add_test_behind_an_early_return_is_reported(self) -> None:
+        self.fixture.add_test_dir("test_guarded", extra=self.GUARDED)
+        entries, _ = self.fixture.collect()
+        self.assertTrue(entries["test_guarded"].guarded_registration)
+        findings = vti.check_conditional_registration(entries, self.policy)
+        self.assertIn("TI012", self.codes(findings))
+
+    def test_declared_conditional_test_is_accepted(self) -> None:
+        self.fixture.add_test_dir("test_guarded", extra=self.GUARDED)
+        entries, _ = self.fixture.collect()
+        self.policy["conditional"] = {"test_guarded": "Skipped when some_tool is not built."}
+        self.assertEqual(vti.check_conditional_registration(entries, self.policy), [])
+
+    def test_declaration_without_a_reason_is_refused(self) -> None:
+        self.fixture.add_test_dir("test_guarded", extra=self.GUARDED)
+        entries, _ = self.fixture.collect()
+        self.policy["conditional"] = {"test_guarded": "   "}
+        findings = vti.check_conditional_registration(entries, self.policy)
+        self.assertIn("TI012", self.codes(findings))
+
+    def test_unconditional_registration_is_not_reported(self) -> None:
+        self.fixture.add_test_dir("test_plain")
+        entries, _ = self.fixture.collect()
+        self.assertFalse(entries["test_plain"].guarded_registration)
+        self.assertEqual(vti.check_conditional_registration(entries, self.policy), [])
+
+    def test_return_after_add_test_is_not_a_guard(self) -> None:
+        self.fixture.add_test_dir("test_late_return", extra=ADD_TEST + "\n\nif(APPLE)\n    return()\nendif()")
+        entries, _ = self.fixture.collect()
+        self.assertFalse(entries["test_late_return"].guarded_registration)
+        self.assertEqual(vti.check_conditional_registration(entries, self.policy), [])
+
+    def test_commented_out_return_is_not_a_guard(self) -> None:
+        self.fixture.add_test_dir("test_commented", extra="# return()\n" + ADD_TEST)
+        entries, _ = self.fixture.collect()
+        self.assertFalse(entries["test_commented"].guarded_registration)
+
+    def test_declaration_for_an_unknown_test_is_refused(self) -> None:
+        self.fixture.add_test_dir("test_plain")
+        entries, _ = self.fixture.collect()
+        self.policy["conditional"] = {"test_gone": "stale"}
+        findings = vti.check_conditional_registration(entries, self.policy)
+        self.assertIn("TI013", self.codes(findings))
+
+    def test_stale_declaration_is_reported_as_a_warning(self) -> None:
+        self.fixture.add_test_dir("test_plain")
+        entries, _ = self.fixture.collect()
+        self.policy["conditional"] = {"test_plain": "no longer guarded"}
+        findings = vti.check_conditional_registration(entries, self.policy)
+        self.assertEqual(self.codes(findings), ["TI013"])
+        self.assertEqual(findings[0].severity, "warning")
+
 
 # --------------------------------------------------------------------------------------------------------
 # The shipped policy must itself be valid
@@ -482,6 +546,18 @@ class TestShippedPolicy(unittest.TestCase):
         policy = json.loads(vti.POLICY_FILE.read_text(encoding="utf-8"))
         for name, reason in policy["unregistered"].items():
             self.assertTrue(str(reason).strip(), f"{name} is excused without a reason")
+
+    def test_every_conditional_entry_states_a_reason(self) -> None:
+        policy = json.loads(vti.POLICY_FILE.read_text(encoding="utf-8"))
+        for name, reason in policy["conditional"].items():
+            self.assertTrue(str(reason).strip(), f"{name} is declared conditional without a reason")
+
+    def test_conditional_list_matches_the_real_tree(self) -> None:
+        """The declared list is a defect inventory; it must not drift from what is actually guarded."""
+        entries, _ = vti.collect_inventory(vti.TESTFRAMES_DIR, vti.ROOT_TEST_CMAKE)
+        policy = json.loads(vti.POLICY_FILE.read_text(encoding="utf-8"))
+        guarded = {name for name, entry in entries.items() if entry.registered and entry.guarded_registration}
+        self.assertEqual(guarded, set(policy["conditional"]))
 
 
 if __name__ == "__main__":

@@ -267,6 +267,8 @@ void TestToolExitCodes::unreadableInputFile()
     QVERIFY2(code != -1, "the tool could not be started at all");
     QVERIFY2(code != 0,
              qPrintable(tool + " exited successfully although its input file does not exist"));
+    QVERIFY2(!QFileInfo::exists(m_sMissingFile),
+             qPrintable(tool + " created the input file it was supposed to be unable to read"));
 }
 
 //=============================================================================================================
