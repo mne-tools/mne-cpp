@@ -30,7 +30,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/mnelogger.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -38,9 +38,11 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QProcess>
 #include <QProcessEnvironment>
+#include <QTemporaryDir>
 #include <QtTest>
 
 //=============================================================================================================
@@ -82,7 +84,12 @@ private:
     /** Run a tool and return its exit code, or -1 when it could not be run at all. */
     int runTool(const QString& path, const QStringList& arguments) const;
 
+    /** Delete anything a previous case left behind at the missing-input paths. */
+    void clearMissingPaths() const;
+
+    QTemporaryDir m_tempDir;
     QString m_sMissingFile;
+    QString m_sMissingOutFile;
 };
 
 //=============================================================================================================
@@ -99,9 +106,21 @@ void TestToolExitCodes::initTestCase()
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
 
-    // A path that is guaranteed not to exist, so the tools must fail to open it.
-    m_sMissingFile = QDir::tempPath() + "/mne_cpp_no_such_file_2c8f1d.fif";
-    QVERIFY(!QFileInfo::exists(m_sMissingFile));
+    // Scoped to a directory that is created and removed per run. Some tools open
+    // their input read-write and so leave an empty file behind on failure, which
+    // would make a fixed path in the system temp directory exist on the second
+    // run and quietly turn these into different tests.
+    QVERIFY(m_tempDir.isValid());
+    m_sMissingFile = m_tempDir.path() + "/no_such_file.fif";
+    m_sMissingOutFile = m_tempDir.path() + "/no_such_output.fif";
+}
+
+//=============================================================================================================
+
+void TestToolExitCodes::clearMissingPaths() const
+{
+    QFile::remove(m_sMissingFile);
+    QFile::remove(m_sMissingOutFile);
 }
 
 //=============================================================================================================
@@ -238,8 +257,11 @@ void TestToolExitCodes::unreadableInputFile()
         QSKIP("tool was not built in this configuration");
     }
 
+    clearMissingPaths();
+    QVERIFY(!QFileInfo::exists(m_sMissingFile));
+
     arguments.replaceInStrings("__MISSING__", m_sMissingFile);
-    arguments.replaceInStrings("__MISSING_OUT__", m_sMissingFile + ".out");
+    arguments.replaceInStrings("__MISSING_OUT__", m_sMissingOutFile);
 
     const int code = runTool(path, arguments);
     QVERIFY2(code != -1, "the tool could not be started at all");
