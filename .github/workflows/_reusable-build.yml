@@ -8,7 +8,7 @@ on:
   workflow_call:
     inputs:
       qt_version:
-        description: "Qt version to build with"
+        description: "Qt compatibility endpoint to build (min or max)"
         required: true
         type: string
 
@@ -41,7 +41,7 @@ jobs:
 
     - name: Load external dependency versions
       shell: bash
-      run: ./scripts/ci/load_external_deps.sh
+      run: ./scripts/ci/load_external_deps.sh "${{ inputs.qt_version }}"
 
     - name: Download Qt toolchain (Linux|MacOS)
       if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'
@@ -50,7 +50,7 @@ jobs:
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind qt \
-          --version "${{ inputs.qt_version }}" \
+          --version "$QT_BUILD_VERSION" \
           --linkage dynamic \
           --output-dir "$RUNNER_TEMP/qt"
 
@@ -84,7 +84,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind qt --version "${{ inputs.qt_version }}" --linkage dynamic --output-dir "%RUNNER_TEMP%\qt"
+        call scripts\ci\download_toolchain.bat --kind qt --version "%QT_BUILD_VERSION%" --linkage dynamic --output-dir "%RUNNER_TEMP%\qt"
 
     - name: Download Eigen package (Windows)
       if: matrix.os == 'windows-2025-vs2026'

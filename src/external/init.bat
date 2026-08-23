@@ -5,8 +5,8 @@ set "SCRIPT_DIR=%~dp0"
 if "%SCRIPT_DIR:~-1%"=="\" set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
 for %%I in ("%SCRIPT_DIR%\..\..") do set "REPO_ROOT=%%~fI"
 
-rem Central source of truth for external dependency versions (Eigen, ONNX,
-rem Skigen). The env file owns the version data; this script owns the policy
+rem Central source of truth for external dependency versions. The env file
+rem owns the version data; this script owns the policy
 rem (e.g. ONNX is opt-in locally). CLI flags below still override the versions.
 set "EXTERNAL_DEPS_ENV=%SCRIPT_DIR%\external_deps.env"
 set "EIGEN_VERSION="
@@ -28,7 +28,10 @@ if defined ONNXRUNTIME_VERSION (
     set "ONNXRUNTIME_DEFAULT_VERSION=1.21.0"
 )
 
-set "QT_VERSION=6.11.2"
+if not defined QT_VERSION (
+    echo QT_VERSION must be set in "%EXTERNAL_DEPS_ENV%".
+    exit /b 1
+)
 if not defined EIGEN_VERSION set "EIGEN_VERSION=5.0.1"
 set "LINKAGE=dynamic"
 set "QT_DIR="
@@ -268,7 +271,7 @@ echo.
 echo Downloads the MNE-CPP-maintained Qt and Eigen dependency bundles into src\external.
 echo.
 echo Options:
-echo   --qt-version ^<version^>        Qt version to download ^(default: 6.11.2^)
+echo   --qt-version ^<version^>        Qt version to download ^(default: %QT_VERSION%^)
 echo   --eigen-version ^<version^>     Eigen version to download ^(default: 5.0.1^)
 echo   --linkage ^<dynamic^|static^>   Qt linkage to prepare ^(default: dynamic^)
 echo   --qt-dir ^<path^>               Target directory for the Qt bundle

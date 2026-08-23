@@ -36,13 +36,17 @@ jobs:
       with:
         python-version: '3.10'
 
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
+
     - name: Download Qt toolchain
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind qt \
-          --version "6.11.2" \
+          --version "$QT_VERSION" \
           --linkage dynamic \
           --output-dir "$RUNNER_TEMP/qt"
 
@@ -98,13 +102,17 @@ jobs:
       with:
         python-version: '3.10'
 
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
+
     - name: Download Qt toolchain
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind qt \
-          --version "6.11.2" \
+          --version "$QT_VERSION" \
           --linkage dynamic \
           --output-dir "$RUNNER_TEMP/qt"
 
@@ -160,6 +168,10 @@ jobs:
       with:
         python-version: '3.10'
 
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
+
     - name: Download Qt toolchain
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -167,7 +179,7 @@ jobs:
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind qt \
-          --version "6.11.2" \
+          --version "$QT_VERSION" \
           --linkage dynamic \
           --output-dir "$RUNNER_TEMP/qt"
 

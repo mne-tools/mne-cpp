@@ -16,8 +16,6 @@ env:
   QT_BINARY_RELEASE_TAG: qt_binaries
   QT_BINARY_RELEASE_TITLE: Qt Toolchain Artifacts
   QT_BINARY_RELEASE_NOTES: Reusable Qt runtime, static, WASM and Installer Framework assets for CI.
-  QT_MIN_VERSION: '6.10.0'
-  QT_MAX_VERSION: '6.11.2'
   QIF_VERSION: '4.11.0'
   QIF_VERSION_TOKEN: '4110'
   QIF_QT_VERSION: '6.9.1'
@@ -26,19 +24,16 @@ jobs:
   PrepareQtVersions:
     runs-on: ubuntu-24.04
     outputs:
-      dynamic_matrix: ${{ steps.versions.outputs.dynamic_matrix }}
-      max_version: ${{ steps.versions.outputs.max_version }}
-      max_version_token: ${{ steps.versions.outputs.max_version_token }}
+      dynamic_matrix: ${{ steps.versions.outputs.QT_VERSION_MATRIX }}
+      max_version: ${{ steps.versions.outputs.QT_VERSION }}
+      max_version_token: ${{ steps.versions.outputs.QT_VERSION_TOKEN }}
     steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
     - name: Prepare Qt versions
       id: versions
       shell: bash
-      run: |
-        min_version_token="${QT_MIN_VERSION//./}"
-        max_version_token="${QT_MAX_VERSION//./}"
-        echo "dynamic_matrix={\"include\":[{\"qt_version\":\"${QT_MIN_VERSION}\",\"version_token\":\"${min_version_token}\"},{\"qt_version\":\"${QT_MAX_VERSION}\",\"version_token\":\"${max_version_token}\"}]}" >> "$GITHUB_OUTPUT"
-        echo "max_version=${QT_MAX_VERSION}" >> "$GITHUB_OUTPUT"
-        echo "max_version_token=${max_version_token}" >> "$GITHUB_OUTPUT"
+      run: ./scripts/ci/load_external_deps.sh
 
   GenerateLinuxDynamicBinaries:
     needs: PrepareQtVersions

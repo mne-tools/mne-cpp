@@ -47,6 +47,7 @@ jobs:
         python-version: '3.10'
         architecture: 'arm64'
     - name: Load external dependency versions
+      id: deps
       shell: bash
       run: ./scripts/ci/load_external_deps.sh
     - name: Download Qt toolchain
@@ -55,7 +56,7 @@ jobs:
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind qt \
-          --version "6.11.2" \
+          --version "$QT_VERSION" \
           --linkage dynamic \
           --output-dir "$RUNNER_TEMP/qt"
     - name: Download Eigen package
@@ -175,6 +176,7 @@ jobs:
       run: |
         brew list ninja >/dev/null 2>&1 || brew install ninja
     - name: Load external dependency versions
+      id: deps
       shell: bash
       run: ./scripts/ci/load_external_deps.sh
     - name: Download Eigen package
@@ -200,7 +202,7 @@ jobs:
       uses: actions/cache@v5
       with:
         path: Qt6_static
-        key: qt-6.11.2-static-macos-arm64-v3
+        key: qt-${{ steps.deps.outputs.QT_VERSION }}-static-macos-arm64-v3
     - name: Download pre-built static Qt
       id: download-qt-static
       if: steps.cache-qt-static.outputs.cache-hit != 'true'
@@ -208,14 +210,14 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release download qt_binaries -p "qt6_6112_static_binaries_macos.tar.gz" -D /tmp
+        gh release download qt_binaries -p "qt6_${QT_VERSION_TOKEN}_static_binaries_macos.tar.gz" -D /tmp
         mkdir -p Qt6_static
-        tar xfz /tmp/qt6_6112_static_binaries_macos.tar.gz -C Qt6_static
+        tar xfz "/tmp/qt6_${QT_VERSION_TOKEN}_static_binaries_macos.tar.gz" -C Qt6_static
     - name: Build static Qt from source
       if: steps.cache-qt-static.outputs.cache-hit != 'true' && steps.download-qt-static.outcome != 'success'
       run: |
         cd ..
-        git clone https://code.qt.io/qt/qt5.git -b v6.11.2
+        git clone https://code.qt.io/qt/qt5.git -b "v${QT_VERSION}"
         cd qt5
         ./init-repository -f --module-subset=qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport
         cd ..

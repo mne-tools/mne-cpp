@@ -46,6 +46,7 @@ jobs:
         python-version: '3.10'
         architecture: 'x64'
     - name: Load external dependency versions
+      id: deps
       shell: bash
       run: ./scripts/ci/load_external_deps.sh
     - name: Download Qt toolchain
@@ -53,7 +54,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind qt --version "6.11.2" --linkage dynamic --output-dir "%RUNNER_TEMP%\qt"
+        call scripts\ci\download_toolchain.bat --kind qt --version "%QT_VERSION%" --linkage dynamic --output-dir "%RUNNER_TEMP%\qt"
     - name: Download Eigen package
       shell: cmd
       env:
@@ -147,6 +148,7 @@ jobs:
       run: |
         choco install ninja
     - name: Load external dependency versions
+      id: deps
       shell: bash
       run: ./scripts/ci/load_external_deps.sh
     - name: Download Eigen package
@@ -169,7 +171,7 @@ jobs:
       uses: actions/cache@v5
       with:
         path: Qt6_static
-        key: qt-6.11.2-static-windows-x86_64-v2
+        key: qt-${{ steps.deps.outputs.QT_VERSION }}-static-windows-x86_64-v2
     - name: Download pre-built static Qt
       id: download-qt-static
       if: steps.cache-qt-static.outputs.cache-hit != 'true'
@@ -177,14 +179,15 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh release download qt_binaries -p "qt6_6112_static_binaries_win.zip" -D $env:TEMP
+        $qtArchive = "qt6_$($env:QT_VERSION_TOKEN)_static_binaries_win.zip"
+        gh release download qt_binaries -p $qtArchive -D $env:TEMP
         mkdir Qt6_static -Force
-        7z x "$env:TEMP\qt6_6112_static_binaries_win.zip" -o"Qt6_static" -y
+        7z x (Join-Path $env:TEMP $qtArchive) -o"Qt6_static" -y
     - name: Build static Qt from source
       if: steps.cache-qt-static.outputs.cache-hit != 'true' && steps.download-qt-static.outcome != 'success'
       run: |
         cd ..
-        git clone https://code.qt.io/qt/qt5.git -b v6.11.2
+        git clone https://code.qt.io/qt/qt5.git -b "v$env:QT_VERSION"
         mkdir qt6_shadow
         cd qt6_shadow
         $vsInstallPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath

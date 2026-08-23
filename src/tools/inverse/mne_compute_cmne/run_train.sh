@@ -30,6 +30,8 @@ EventsFile="${SampleDir}/sample_audvis_raw-eve.fif"
 # ── Resolve build directory ─────────────────────────────────────────────
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 OUT_DIR="$SCRIPT_DIR/../../../../out"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/../../../external/external_deps.env"
 
 BuildRoot=""
 BuildPath=""
@@ -71,7 +73,7 @@ LIB_DIR="$BuildRoot/lib"
 
 # ── Set library paths ───────────────────────────────────────────────────
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    QT_BASE="${QT_BASE:-$HOME/Qt/6.11.2/macos}"
+    QT_BASE="${QT_BASE:-$HOME/Qt/$QT_VERSION/macos}"
 
     unset QT_PLUGIN_PATH 2>/dev/null || true
     unset QT_QPA_PLATFORM_PLUGIN_PATH 2>/dev/null || true
@@ -91,7 +93,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         export DYLD_LIBRARY_PATH="$LIB_DIR${EXTRA_LIB}${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
     fi
 else
-    QT_BASE="${QT_BASE:-$HOME/Qt/6.11.2/gcc_64}"
+    QT_BASE="${QT_BASE:-$HOME/Qt/$QT_VERSION/gcc_64}"
     if [ -d "$QT_BASE/plugins" ]; then
         export QT_PLUGIN_PATH="$QT_BASE/plugins"
     fi

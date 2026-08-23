@@ -4,8 +4,12 @@ setlocal EnableDelayedExpansion
 set "REPO_ROOT=%~dp0"
 if "%REPO_ROOT:~-1%"=="\" set "REPO_ROOT=%REPO_ROOT:~0,-1%"
 
-set "QT_VERSION=6.11.2"
-set "EIGEN_VERSION=5.0.1"
+set "EXTERNAL_DEPS_ENV=%REPO_ROOT%\src\external\external_deps.env"
+for /f "usebackq tokens=1,2 delims==" %%A in ("%EXTERNAL_DEPS_ENV%") do (
+    set "deps_key=%%A"
+    set "deps_key=!deps_key: =!"
+    if not "!deps_key!"=="" if not "!deps_key:~0,1!"=="#" set "%%A=%%B"
+)
 set "LINKAGE=dynamic"
 set "BUILD_TYPE=Release"
 set "BUILD_DIR="
@@ -204,7 +208,7 @@ echo Bootstraps a developer build by downloading the MNE-CPP-maintained Qt and E
 echo artifacts into src\external and configuring a build directory from the repo root.
 echo.
 echo Options:
-echo   --qt-version ^<version^>        Qt version to use ^(default: 6.11.2^)
+echo   --qt-version ^<version^>        Qt version to use ^(default: %QT_VERSION%^)
 echo   --eigen-version ^<version^>     Eigen version to use ^(default: 5.0.1^)
 echo   --linkage ^<dynamic^|static^>   Qt linkage / MNE-CPP linkage ^(default: dynamic^)
 echo   --build-type ^<type^>           CMake build type ^(default: Release^)

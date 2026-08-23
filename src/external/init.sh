@@ -9,7 +9,7 @@ Usage: ./src/external/init.sh [options]
 Downloads the MNE-CPP-maintained Qt and Eigen dependency bundles into src/external.
 
 Options:
-    --qt-version <version>        Qt version to download (default: 6.11.2)
+    --qt-version <version>      Qt version to download (default: external_deps.env)
   --eigen-version <version>     Eigen version to download (default: 5.0.1)
   --linkage <dynamic|static>    Qt linkage to prepare (default: dynamic)
   --qt-dir <path>               Target directory for the Qt bundle
@@ -44,7 +44,7 @@ fi
 # below remains the "ONNX disabled locally" flag so sourcing never auto-enables it.
 ONNXRUNTIME_DEFAULT_VERSION="${ONNXRUNTIME_VERSION:-1.21.0}"
 
-QT_VERSION="6.11.2"
+: "${QT_VERSION:?QT_VERSION must be set in external_deps.env}"
 EIGEN_VERSION="${EIGEN_VERSION:-5.0.1}"
 LINKAGE="dynamic"
 QT_DIR=""
