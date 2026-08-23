@@ -270,6 +270,12 @@ private slots:
 
     //=========================================================================================================
     /**
+     * Verifies RtFiffRawViewModel metadata, ring-buffer data flow, selection, freeze, and trigger state.
+     */
+    void rtFiffRawViewModel_dataFlow();
+
+    //=========================================================================================================
+    /**
      * Verifies that EvokedSetModel constructs, reports sensible defaults, and
      * setEvokedSet does not crash on an empty set.
      */
@@ -672,6 +678,90 @@ void TestDispViewers2::rtFiffRawViewModel_basics()
     scaleMap[FIFFV_MEG_CH] = 1e-12f;
     model.setScaling(scaleMap);
     QCOMPARE(model.getScaling().value(FIFFV_MEG_CH, 0.0f), 1e-12f);
+
+    QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::rtFiffRawViewModel_dataFlow()
+{
+    RtFiffRawViewModel model;
+    auto info = createBrowserTestInfo();
+    model.setFiffInfo(info);
+
+    QCOMPARE(model.rowCount(), 4);
+    QCOMPARE(model.getKind(0), FIFFV_MEG_CH);
+    QCOMPARE(model.getUnit(0), FIFF_UNIT_T);
+    QCOMPARE(model.getCoil(0), FIFFV_COIL_VV_MAG_T3);
+    QCOMPARE(model.getKind(99), 0);
+    QCOMPARE(model.getUnit(99), FIFF_UNIT_NONE);
+    QCOMPARE(model.getCoil(99), FIFFV_COIL_NONE);
+
+    model.setSamplingInfo(100.0f, 1, true);
+    QCOMPARE(model.getMaxSamples(), 100);
+
+    QSignalSpy dataSpy(&model, &QAbstractItemModel::dataChanged);
+    Eigen::MatrixXd firstBlock = Eigen::MatrixXd::Zero(4, 60);
+    firstBlock.row(0).setConstant(1.0);
+    firstBlock.row(1).setConstant(-1.0);
+    firstBlock(3, 10) = 3.0;
+    model.addData({firstBlock});
+    QCOMPARE(model.getCurrentSampleIndex(), 60);
+    QCOMPARE(model.getLastBlock(), firstBlock);
+    QCOMPARE(dataSpy.size(), 1);
+
+    Eigen::MatrixXd secondBlock = Eigen::MatrixXd::Zero(4, 60);
+    secondBlock.row(0).setConstant(2.0);
+    secondBlock.row(2).setConstant(-2.0);
+    model.addData({secondBlock});
+    QCOMPARE(model.getCurrentSampleIndex(), 60);
+    QCOMPARE(model.getLastBlock(), secondBlock);
+    QCOMPARE(model.getMaxValueFromRawViewModel(0), static_cast<double>(1e-11f));
+    QCOMPARE(dataSpy.size(), 2);
+
+    model.addData({Eigen::MatrixXd::Zero(3, 10)});
+    QCOMPARE(model.getCurrentSampleIndex(), 60);
+    QCOMPARE(dataSpy.size(), 2);
+
+    model.toggleFreeze(QModelIndex());
+    QVERIFY(model.isFreezed());
+    model.toggleFreeze(QModelIndex());
+    QVERIFY(!model.isFreezed());
+
+    QSignalSpy selectionSpy(&model, &RtFiffRawViewModel::newSelection);
+    model.selectRows({0, 2, 99});
+    QCOMPARE(model.getIdxSelMap().size(), 2);
+    QCOMPARE(model.getIdxSelMap().value(0), 0);
+    QCOMPARE(model.getIdxSelMap().value(1), 2);
+    QCOMPARE(selectionSpy.size(), 1);
+    model.hideRows({0});
+    QCOMPARE(model.getIdxSelMap().size(), 1);
+    model.resetSelection();
+    QCOMPARE(model.getIdxSelMap().size(), 4);
+
+    model.markChBad(model.index(0, 0), true);
+    QVERIFY(info->bads.contains(QStringLiteral("MEG0111")));
+    model.markChBad(model.index(0, 0), false);
+    QVERIFY(!info->bads.contains(QStringLiteral("MEG0111")));
+    model.markChBad({model.index(0, 0), model.index(2, 0)}, true);
+    QVERIFY(info->bads.contains(QStringLiteral("MEG0111")));
+    QVERIFY(info->bads.contains(QStringLiteral("MEG0113")));
+
+    QMap<double, QColor> triggerColors;
+    triggerColors.insert(3.0, Qt::red);
+    model.triggerInfoChanged(triggerColors, true, QStringLiteral("STI014"), 1.0);
+    QVERIFY(model.triggerDetectionActive());
+    QCOMPARE(model.getTriggerName(), QStringLiteral("STI014"));
+    QCOMPARE(model.getTriggerThreshold(), 1.0);
+    QCOMPARE(model.getCurrentTriggerIndex(), 3);
+
+    Eigen::MatrixXd triggerBlock = Eigen::MatrixXd::Zero(4, 20);
+    triggerBlock(3, 5) = 3.0;
+    model.updateSpharaActivation(true);
+    model.addData({triggerBlock});
+    model.updateSpharaActivation(false);
+    QVERIFY(!model.getDetectedTriggers().isEmpty());
 
     QApplication::processEvents();
 }
