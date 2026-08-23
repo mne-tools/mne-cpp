@@ -323,5 +323,3 @@ add_subdirectory(test_writetofile_status)
 add_subdirectory(test_project_resume_layout)
 add_subdirectory(test_fiffsimulator_ssp)
 
-# Documentation screenshot tool (mne_doc_shots) smoke test
-add_subdirectory(test_doc_shots)

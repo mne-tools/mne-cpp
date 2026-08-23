@@ -7,3 +7,7 @@ enable_testing()
 # so existing paths that rely on PROJECT_SOURCE_DIR remain unchanged.
 add_subdirectory(src)
 add_subdirectory(doc)
+
+if(BUILD_TESTS AND TARGET mne_doc_shots)
+	add_subdirectory(src/testframes/test_doc_shots)
+endif()

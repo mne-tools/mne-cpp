@@ -52,6 +52,7 @@ QString locateToolBinary()
 {
     const QString appDir = QCoreApplication::applicationDirPath();
     const QStringList candidates = {
+    QStringLiteral(MNE_DOC_SHOTS_PATH),
         appDir + QStringLiteral("/mne_doc_shots"),
 #ifdef Q_OS_MAC
         appDir + QStringLiteral("/mne_doc_shots.app/Contents/MacOS/mne_doc_shots"),
