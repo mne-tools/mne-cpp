@@ -50,6 +50,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
+#include <QFileInfo>
 #include <QTextStream>
 #include <QDebug>
 
@@ -120,6 +121,14 @@ int main(int argc, char *argv[])
         qCritical("Both --fif and --bad are required.");
         return 1;
     }
+    if (!QFileInfo(badName).isReadable()) {
+        qCritical("Cannot open bad channel file: %s", qPrintable(badName));
+        return 1;
+    }
+    if (!QFileInfo(fifName).isReadable()) {
+        qCritical("Cannot read FIFF file: %s", qPrintable(fifName));
+        return 1;
+    }
 
     // Read the bad channel list
     QStringList bads = readBadChannelList(badName);
@@ -134,7 +143,13 @@ int main(int argc, char *argv[])
 
     // Open the FIFF file and read raw data
     QFile file(fifName);
-    FiffRawData raw(file);
+    FiffRawData raw;
+    try {
+        raw = FiffRawData(file);
+    } catch (const std::exception& error) {
+        qCritical("Cannot read FIFF file %s: %s", qPrintable(fifName), error.what());
+        return 1;
+    }
     if (raw.info.isEmpty()) {
         qCritical("Cannot read FIFF file: %s", qPrintable(fifName));
         return 1;

@@ -247,6 +247,10 @@ void TestToolExitCodes::unreadableInputFile_data()
         << "mne_change_nave"
         << QStringList{"--meas", "__MISSING__", "--nave", "1", "--out", "__MISSING_OUT__"};
 
+    QTest::newRow("mne_mark_bad_channels")
+        << "mne_mark_bad_channels"
+        << QStringList{"--fif", "__MISSING__", "--bad", "__MISSING__"};
+
     QTest::newRow("mne_cov2proj")
         << "mne_cov2proj"
         << QStringList{"--cov", "__MISSING__", "--out", "__MISSING_OUT__"};

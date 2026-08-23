@@ -1432,12 +1432,13 @@ private slots:
             bf.close();
         }
 
-        QString output = runTool("mne_mark_bad_channels", {
-            "--bad", badFile,
-            "--fif", copyPath
-        }, 60000);
-        // Verify the file was modified (should still exist)
+        QCOMPARE(runToolExitCode("mne_mark_bad_channels", {
+                     "--bad", badFile,
+                     "--fif", copyPath
+                 }, 60000),
+                 0);
         QVERIFY(QFile::exists(copyPath));
+        QVERIFY(QFileInfo(copyPath).size() > 0);
     }
 
     //=========================================================================================================
