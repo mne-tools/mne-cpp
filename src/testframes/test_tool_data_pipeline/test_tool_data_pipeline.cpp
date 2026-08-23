@@ -38,6 +38,7 @@
 //=============================================================================================================
 
 #include <inv/inv_source_estimate.h>
+#include <inv/dipole_fit/inv_ecd_set.h>
 #include <mne/mne_bem.h>
 
 //=============================================================================================================
@@ -1208,6 +1209,34 @@ private slots:
         QCOMPARE(cmne.tstep, dspm.tstep);
         QVERIFY(dspm.data.allFinite());
         QVERIFY(cmne.data.allFinite());
+    }
+
+    //=========================================================================================================
+    // mne_dipole_fit application - fit and reparse dipoles without entering the GUI event loop
+    //=========================================================================================================
+
+    void testDipoleFitApplication()
+    {
+        if (!toolExists("mne_dipole_fit")) QSKIP("mne_dipole_fit not found");
+
+        const QString evokedFile = m_sResourcePath + "MEG/sample/sample_audvis-ave.fif";
+        if (!QFile::exists(evokedFile)) QSKIP("Evoked data not available");
+
+        const QString dipoleFile = m_tempDir.filePath("application-fit.dip");
+        QCOMPARE(runToolExitCode("mne_dipole_fit", {
+                     "--meas", evokedFile,
+                     "--set", "1",
+                     "--meg",
+                     "--eeg",
+                     "--tmin", "32",
+                     "--tmax", "42",
+                     "--bmin", "-100",
+                     "--bmax", "0",
+                     "--dip", dipoleFile}, 180000),
+                 0);
+
+        const INVLIB::InvEcdSet dipoles = INVLIB::InvEcdSet::read_dipoles_dip(dipoleFile);
+        QVERIFY(dipoles.size() >= 1);
     }
 
     //=========================================================================================================

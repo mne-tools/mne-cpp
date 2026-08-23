@@ -173,6 +173,7 @@ void TestToolExitCodes::setupProcess(QProcess& proc) const
 #endif
 
     env.insert("PATH", appDir + separator + qtBinDir + separator + env.value("PATH"));
+    env.insert("QT_QPA_PLATFORM", "offscreen");
     proc.setProcessEnvironment(env);
 }
 
@@ -219,6 +220,7 @@ void TestToolExitCodes::missingRequiredArguments_data()
     QTest::newRow("mne_epochs2mat")           << "mne_epochs2mat";
     QTest::newRow("mne_compute_cmne")         << "mne_compute_cmne";
     QTest::newRow("mne_make_scalp_surfaces")  << "mne_make_scalp_surfaces";
+    QTest::newRow("mne_dipole_fit")           << "mne_dipole_fit";
     QTest::newRow("mne_toggle_skips")       << "mne_toggle_skips";
 }
 
@@ -291,6 +293,10 @@ void TestToolExitCodes::unreadableInputFile_data()
     QTest::newRow("mne_make_scalp_surfaces")
         << "mne_make_scalp_surfaces"
         << QStringList{"--bem", "__MISSING__", "--out", "__MISSING_OUT__"};
+
+    QTest::newRow("mne_dipole_fit")
+        << "mne_dipole_fit"
+        << QStringList{"--meas", "__MISSING__", "--dip", "__MISSING_OUT__", "--meg"};
 }
 
 //=============================================================================================================
@@ -338,6 +344,7 @@ void TestToolExitCodes::helpSucceeds_data()
     QTest::newRow("mne_epochs2mat")           << "mne_epochs2mat";
     QTest::newRow("mne_compute_cmne")         << "mne_compute_cmne";
     QTest::newRow("mne_make_scalp_surfaces")  << "mne_make_scalp_surfaces";
+    QTest::newRow("mne_dipole_fit")           << "mne_dipole_fit";
 }
 
 //=============================================================================================================

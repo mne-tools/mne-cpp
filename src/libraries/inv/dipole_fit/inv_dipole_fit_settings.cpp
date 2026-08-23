@@ -379,7 +379,7 @@ bool InvDipoleFitSettings::check_args (int *argc,char **argv)
         }
         else if (strcmp(argv[k],"--help") == 0) {
             usage(argv[0]);
-            exit(1);
+            exit(0);
         }
         else if (strcmp(argv[k],"--guess") == 0) {
             found = 2;

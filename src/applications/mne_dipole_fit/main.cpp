@@ -46,6 +46,7 @@
 #include <mne/mne_bem.h>
 
 #include <QFile>
+#include <QFileInfo>
 
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
@@ -103,8 +104,22 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     InvDipoleFitSettings settings(&argc,argv);
+    if (settings.measname.isEmpty()
+        || (settings.dipname.isEmpty() && settings.bdipname.isEmpty())
+        || (!settings.include_meg && !settings.include_eeg)) {
+        return 1;
+    }
+    if (!QFileInfo(settings.measname).isReadable()) {
+        qCritical("Measurement data file is not readable: %s", settings.measname.toUtf8().constData());
+        return 1;
+    }
+
     InvDipoleFit dipFit(&settings);
     InvEcdSet set = dipFit.calculateFit();
+    if (set.size() == 0) {
+        qCritical("Dipole fitting failed: no dipoles were fitted.");
+        return 1;
+    }
 
     BrainView *pViewer = nullptr;
     if(settings.gui) {
@@ -129,15 +144,21 @@ int main(int argc, char *argv[])
     /*
      * Saving...
      */
-    if (!set.save_dipoles_dip(settings.dipname))
+    if (!settings.dipname.isEmpty() && !set.save_dipoles_dip(settings.dipname)) {
         qCritical("Dipoles could not be saved to %s.", settings.dipname.toUtf8().data());
-    if (!set.save_dipoles_bdip(settings.bdipname))
+        return 1;
+    }
+    if (!settings.bdipname.isEmpty() && !set.save_dipoles_bdip(settings.bdipname)) {
         qCritical("Dipoles could not be saved to %s.", settings.bdipname.toUtf8().data());
+        return 1;
+    }
 
     /*
      * Test - Reading again
      */
-    InvEcdSet::read_dipoles_dip(settings.dipname);
+    if (!settings.dipname.isEmpty()) {
+        InvEcdSet::read_dipoles_dip(settings.dipname);
+    }
 
-    return app.exec();
+    return settings.gui ? app.exec() : 0;
 }
