@@ -29,6 +29,8 @@
 #include <core/fiffbuffer.h>
 #include <core/capabilitycatalog.h>
 #include <core/capabilityutils.h>
+#include <workbench/llmsettingsdialog.h>
+#include <workbench/pillselectorwidget.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -40,6 +42,10 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QFile>
+#include <QLabel>
+#include <QSettings>
+
+#include <algorithm>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -65,6 +71,7 @@ private:
 
 private slots:
     void initTestCase();
+    void cleanupTestCase();
 
     void jsonRpc_requestRoundTrips();
     void jsonRpc_responseAndErrorAreDistinct();
@@ -75,6 +82,7 @@ private slots:
     void planner_mockModeIsConfiguredWithoutCredentials();
     void planner_httpModeNeedsEndpointAndModel();
     void planner_statusSummaryMentionsMode();
+    void llmSettingsDialog_ruleBasedAndProfileFlow();
 
     void fiffBuffer_reportsUriAndKind();
     void fiffBuffer_missingFileFailsToOpen();
@@ -103,6 +111,17 @@ void TestStudioCore::initTestCase()
     qunsetenv("MNE_ANALYZE_STUDIO_LLM_ENDPOINT");
     qunsetenv("MNE_ANALYZE_STUDIO_LLM_API_KEY");
     qunsetenv("MNE_ANALYZE_STUDIO_LLM_MODEL");
+}
+
+//=============================================================================================================
+
+void TestStudioCore::cleanupTestCase()
+{
+    QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+    settings.remove("agent/profiles/coverage-test-profile");
+    if(settings.value("agent/selected_profile").toString() == QLatin1String("coverage-test-profile")) {
+        settings.remove("agent/selected_profile");
+    }
 }
 
 //=============================================================================================================
@@ -297,6 +316,73 @@ void TestStudioCore::planner_statusSummaryMentionsMode()
 
 //=============================================================================================================
 
+void TestStudioCore::llmSettingsDialog_ruleBasedAndProfileFlow()
+{
+    QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
+    const QString profileName = "coverage-test-profile";
+    const QString profileKey = QString("agent/profiles/%1").arg(profileName);
+    settings.setValue(QString("%1/mode").arg(profileKey), "openai_responses");
+    settings.setValue(QString("%1/model").arg(profileKey), "coverage-model");
+    settings.setValue(QString("%1/api_key").arg(profileKey), "coverage-key");
+    settings.setValue("agent/selected_profile", profileName);
+
+    LlmPlannerConfig config;
+    config.mode = "disabled";
+    LlmSettingsDialog dialog(config);
+    QCOMPARE(dialog.configuration().mode, QString("disabled"));
+    QVERIFY(!dialog.hasValidationResult());
+
+    dialog.setTestScenario("show the active raw view", QJsonArray(), QJsonObject());
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "runPlannerTest", Qt::DirectConnection));
+    QVERIFY(dialog.hasValidationResult());
+    QVERIFY(!dialog.lastValidationSucceeded());
+    QVERIFY(!dialog.lastValidationMessage().isEmpty());
+
+    QVERIFY(QMetaObject::invokeMethod(&dialog,
+                                      "applySelectedProfile",
+                                      Qt::DirectConnection,
+                                      Q_ARG(QString, profileName)));
+    const LlmPlannerConfig profileConfig = dialog.configuration();
+    QCOMPARE(profileConfig.mode, QString("openai_responses"));
+    QCOMPARE(profileConfig.model, QString("coverage-model"));
+    QCOMPARE(profileConfig.apiKey, QString("coverage-key"));
+
+    const auto selectors = dialog.findChildren<PillSelectorWidget*>();
+    PillSelectorWidget* modeSelector = nullptr;
+    PillSelectorWidget* suggestedModelSelector = nullptr;
+    for(PillSelectorWidget* selector : selectors) {
+        if(selector->currentValue() == QLatin1String("openai_responses")) {
+            modeSelector = selector;
+        } else if(selector->currentValue().isEmpty()) {
+            suggestedModelSelector = selector;
+        }
+    }
+    QVERIFY(modeSelector != nullptr);
+    QVERIFY(suggestedModelSelector != nullptr);
+
+    modeSelector->setCurrentValue("gemini_openai");
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "updateModeDefaults", Qt::DirectConnection));
+    QCOMPARE(dialog.configuration().mode, QString("gemini_openai"));
+    QVERIFY(dialog.configuration().model.isEmpty());
+    QVERIFY(!dialog.hasValidationResult());
+
+    suggestedModelSelector->setItems({qMakePair(QString("Gemini test"), QString("gemini-test"))});
+    suggestedModelSelector->setCurrentValue("gemini-test");
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "applySuggestedModel", Qt::DirectConnection));
+    QCOMPARE(dialog.configuration().model, QString("gemini-test"));
+
+    modeSelector->setCurrentValue("disabled");
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "updateModeDefaults", Qt::DirectConnection));
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "browseModels", Qt::DirectConnection));
+    const auto statusLabels = dialog.findChildren<QLabel*>();
+    QVERIFY(std::any_of(statusLabels.cbegin(), statusLabels.cend(), [](const QLabel* label) {
+        return label->text().contains("No model catalog endpoint");
+    }));
+
+}
+
+//=============================================================================================================
+
 void TestStudioCore::fiffBuffer_reportsUriAndKind()
 {
     FiffBuffer buffer("/some/where/example.fif");
@@ -347,5 +433,5 @@ void TestStudioCore::fiffBuffer_realFileOpensAndDescribesItself()
 // MAIN
 //=============================================================================================================
 
-QTEST_GUILESS_MAIN(TestStudioCore)
+QTEST_MAIN(TestStudioCore)
 #include "test_studio_core.moc"

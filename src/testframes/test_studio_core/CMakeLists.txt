@@ -6,7 +6,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Gui Test Widgets Svg Concurrent)
+set(QT_REQUIRED_COMPONENTS Core Gui Test Widgets Svg Concurrent Network)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
@@ -15,7 +15,15 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(SOURCES
     test_studio_core.cpp
+    ../../applications/mne_analyze_studio/workbench/llmsettingsdialog.cpp
+    ../../applications/mne_analyze_studio/workbench/llmsettingsdialog.h
+    ../../applications/mne_analyze_studio/workbench/pillselectorwidget.cpp
+    ../../applications/mne_analyze_studio/workbench/pillselectorwidget.h
 )
+
+if(WITH_CODE_COV)
+    add_compile_options("--coverage" "-O1" "-g")
+endif()
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
@@ -34,6 +42,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ../../applications/mne_analyze_studio/core
+    ../../applications/mne_analyze_studio/workbench
 )
 
 add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})

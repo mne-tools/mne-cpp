@@ -611,13 +611,13 @@ void LlmSettingsDialog::applySelectedProfile(const QString& profileName)
     const QString baseKey = QString("agent/profiles/%1").arg(trimmedProfile);
     const QString mode = settings.value(QString("%1/mode").arg(baseKey)).toString().trimmed();
     m_modeSelector->setCurrentValue(mode);
+    updateModeDefaults();
     m_modelLineEdit->setText(settings.value(QString("%1/model").arg(baseKey)).toString());
     const QString storedApiKey = readSecretFromKeychain(providerSecretAccountName(trimmedProfile));
     m_apiKeyLineEdit->setText(storedApiKey.isEmpty()
                                   ? settings.value(QString("%1/api_key").arg(baseKey)).toString()
                                   : storedApiKey);
     settings.setValue("agent/selected_profile", trimmedProfile);
-    updateModeDefaults();
     m_testStatusLabel->setText(QString("Loaded provider profile `%1`.").arg(trimmedProfile));
 }
 
