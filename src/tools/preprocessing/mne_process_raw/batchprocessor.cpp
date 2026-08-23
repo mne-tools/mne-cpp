@@ -54,6 +54,9 @@
 #include <QDir>
 #include <QTextStream>
 
+#include <exception>
+#include <optional>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -145,7 +148,14 @@ int BatchProcessor::run(const ProcessingSettings &settings)
 
         // Open raw data file
         QFile rawFile(rawName);
-        FiffRawData raw(rawFile);
+        std::optional<FiffRawData> rawData;
+        try {
+            rawData.emplace(rawFile);
+        } catch (const std::exception &error) {
+            qCritical() << "Failed to open raw data file:" << rawName << error.what();
+            return 1;
+        }
+        FiffRawData &raw = *rawData;
 
         if (raw.info.nchan == 0) {
             qCritical() << "Failed to open raw data file:" << rawName;

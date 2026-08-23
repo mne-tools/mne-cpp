@@ -79,11 +79,15 @@ private slots:
     // writeLog tests
     void testWriteLogBasic();
     void testWriteLogEmptyParams();
+    void testWriteLogOpenFailure();
 
     // run pipeline tests
     void testRunNoRawFiles();
+    void testRunInvalidRawFile();
     void testRunWithSampleData();
     void testRunSaveFilteredData();
+    void testRunInvalidAverageDescription();
+    void testRunInvalidCovarianceDescription();
 
     void cleanupTestCase();
 
@@ -207,6 +211,11 @@ void TestBatchProcessor::testWriteLogEmptyParams()
     QVERIFY(BatchProcessor::writeLog("/some/path.log", ""));
 }
 
+void TestBatchProcessor::testWriteLogOpenFailure()
+{
+    QVERIFY(!BatchProcessor::writeLog(m_tempDir.path(), "content"));
+}
+
 //=============================================================================================================
 // run pipeline tests
 //=============================================================================================================
@@ -217,6 +226,19 @@ void TestBatchProcessor::testRunNoRawFiles()
     // No raw files specified — should fail
     int result = BatchProcessor::run(settings);
     QVERIFY(result != 0);
+}
+
+void TestBatchProcessor::testRunInvalidRawFile()
+{
+    QString rawPath = m_tempDir.path() + "/not_raw.fif";
+    QFile rawFile(rawPath);
+    QVERIFY(rawFile.open(QIODevice::WriteOnly | QIODevice::Text));
+    rawFile.write("not a FIFF file");
+    rawFile.close();
+
+    ProcessingSettings settings;
+    settings.rawFiles << rawPath;
+    QVERIFY(BatchProcessor::run(settings) != 0);
 }
 
 void TestBatchProcessor::testRunWithSampleData()
@@ -252,6 +274,32 @@ void TestBatchProcessor::testRunSaveFilteredData()
     QVERIFY(QFile::exists(outPath));
     QFileInfo fi(outPath);
     QVERIFY(fi.size() > 0);
+}
+
+void TestBatchProcessor::testRunInvalidAverageDescription()
+{
+    QString rawPath = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+    if (!QFile::exists(rawPath))
+        QSKIP("Sample raw data not available");
+
+    ProcessingSettings settings;
+    settings.rawFiles << rawPath;
+    settings.aveFiles << m_tempDir.path() + "/missing-average-description.txt";
+
+    QVERIFY(BatchProcessor::run(settings) != 0);
+}
+
+void TestBatchProcessor::testRunInvalidCovarianceDescription()
+{
+    QString rawPath = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+    if (!QFile::exists(rawPath))
+        QSKIP("Sample raw data not available");
+
+    ProcessingSettings settings;
+    settings.rawFiles << rawPath;
+    settings.covFiles << m_tempDir.path() + "/missing-covariance-description.txt";
+
+    QVERIFY(BatchProcessor::run(settings) != 0);
 }
 
 //=============================================================================================================

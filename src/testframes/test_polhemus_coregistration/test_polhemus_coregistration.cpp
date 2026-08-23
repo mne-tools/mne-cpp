@@ -80,6 +80,10 @@ private:
     static void writeVec3(QSettings& settings, const QString& key, const QVector3D& v);
 
 private slots:
+    void defaultsAndConfiguration();
+    void liveDataOperationsRequireSamples();
+    void pivotAndRegistrationReset();
+
     void registration_recoversKnownTransform_data();
     void registration_recoversKnownTransform();
 
@@ -93,6 +97,113 @@ private slots:
 
 //=============================================================================================================
 // DEFINE METHODS
+//=============================================================================================================
+
+void TestPolhemusCoregistration::defaultsAndConfiguration()
+{
+    PolhemusCoregistration coreg;
+
+    QCOMPARE(coreg.trackerStation(), 2);
+    QCOMPARE(coreg.penStation(), 1);
+    QCOMPARE(coreg.probeStation(), 3);
+    QVERIFY(coreg.deviceToWorld().isIdentity());
+    QVERIFY(coreg.headToWorld().isIdentity());
+    QVERIFY(coreg.headToDevice().isIdentity());
+    QVERIFY(coreg.worldToModel().isIdentity());
+    QVERIFY(!coreg.registrationValid());
+    QVERIFY(!coreg.haveLivePenPosition());
+    QVERIFY(!coreg.haveLiveProbePosition());
+    QVERIFY(coreg.connection() == nullptr);
+    QVERIFY(coreg.acquiredPoints() != nullptr);
+
+    coreg.setTrackerStation(5);
+    coreg.setPenStation(6);
+    coreg.setProbeStation(7);
+    QCOMPARE(coreg.trackerStation(), 5);
+    QCOMPARE(coreg.penStation(), 6);
+    QCOMPARE(coreg.probeStation(), 7);
+
+    const QVector3D tipOffset(0.001f, -0.002f, 0.003f);
+    coreg.setPenTipOffset(tipOffset);
+    coreg.setTipOffsetEnabled(true);
+    QCOMPARE(coreg.penTipOffset(), tipOffset);
+    QVERIFY(coreg.tipOffsetEnabled());
+
+    coreg.setAxisMirror(true, true);
+    QVERIFY(coreg.mirrorX());
+    QVERIFY(coreg.mirrorY());
+
+    const QVector3D trackerOffset(0.01f, 0.02f, -0.03f);
+    const QQuaternion trackerRotation = QQuaternion::fromAxisAndAngle(QVector3D(0, 0, 1), 25.0f);
+    coreg.setTrackerToDeviceOffset(trackerOffset, trackerRotation);
+    QCOMPARE(coreg.trackerToDeviceTranslation(), trackerOffset);
+    QCOMPARE(coreg.trackerToDeviceRotation(), trackerRotation);
+
+    coreg.setKnownTrackerToObjectiveDistance(0.15f);
+    QCOMPARE(coreg.knownTrackerToObjectiveDistance(), 0.15f);
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::liveDataOperationsRequireSamples()
+{
+    PolhemusCoregistration coreg;
+
+    QVERIFY(!coreg.captureCurrentPenPositionAsFiducial(FiducialId::LPA));
+    QVERIFY(!coreg.captureCurrentPenPositionAsHeadShape());
+    QVERIFY(!coreg.captureCurrentPenPositionAsVertex());
+    QVERIFY(!coreg.captureOpticalCalibSample());
+    QVERIFY(!coreg.captureObjectiveCenter());
+    QVERIFY(!coreg.solveOpticalCalibration());
+
+    QVector3D origin;
+    QVector3D direction;
+    QVector3D up;
+    float correctionDeg = -1.0f;
+    QVERIFY(!coreg.opticalRayInWorld(origin, direction));
+    QVERIFY(!coreg.opticalUpInWorld(up));
+    QVERIFY(!coreg.applyOpticalAxisFineAdjust(QVector3D(0.0f, 0.0f, 1.0f), correctionDeg));
+
+    coreg.clearOpticalCalibSamples();
+    coreg.clearObjectiveCenter();
+    coreg.clearOpticalFineAdjust();
+    QCOMPARE(coreg.opticalCalibSampleCount(), 0);
+    QVERIFY(!coreg.opticalCalibrationValid());
+    QVERIFY(!coreg.hasObjectiveCenter());
+    QVERIFY(!coreg.opticalFineAdjustApplied());
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::pivotAndRegistrationReset()
+{
+    PolhemusCoregistration coreg;
+    QSignalSpy pivotSpy(&coreg, &PolhemusCoregistration::pivotStateChanged);
+    QSignalSpy registrationSpy(&coreg, &PolhemusCoregistration::registrationChanged);
+
+    QCOMPARE(coreg.pivotState(), PolhemusCoregistration::PivotState::Idle);
+    coreg.startPivotCalibration();
+    QCOMPARE(coreg.pivotState(), PolhemusCoregistration::PivotState::WaitingForStart);
+    QCOMPARE(coreg.pivotSampleCount(), 0);
+    QCOMPARE(pivotSpy.count(), 1);
+
+    coreg.cancelPivotCalibration();
+    QCOMPARE(coreg.pivotState(), PolhemusCoregistration::PivotState::Idle);
+    QCOMPARE(coreg.pivotSampleCount(), 0);
+    QCOMPARE(pivotSpy.count(), 2);
+
+    coreg.setModelVertex(QVector3D(0.0f, 0.1f, 0.1f));
+    QVERIFY(coreg.hasModelVertex());
+    coreg.resetRegistration();
+    QVERIFY(!coreg.registrationValid());
+    QVERIFY(coreg.headToWorld().isIdentity());
+    QVERIFY(coreg.headToDevice().isIdentity());
+    QVERIFY(coreg.worldToModel().isIdentity());
+    QVERIFY(!coreg.hasPenVertex());
+    QVERIFY(!coreg.hasAllPenFiducials());
+    QCOMPARE(registrationSpy.count(), 1);
+}
+
 //=============================================================================================================
 
 void TestPolhemusCoregistration::writeVec3(QSettings& settings, const QString& key, const QVector3D& v)
