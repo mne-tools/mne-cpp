@@ -19,6 +19,8 @@ set(SOURCES
   ../../applications/mne_analyze_studio/workbench/analysisresultwidget.h
   ../../applications/mne_analyze_studio/workbench/agentchatdockwidget.cpp
   ../../applications/mne_analyze_studio/workbench/agentchatdockwidget.h
+    ../../applications/mne_analyze_studio/workbench/extensionhostedviewwidget.cpp
+    ../../applications/mne_analyze_studio/workbench/extensionhostedviewwidget.h
     ../../applications/mne_analyze_studio/workbench/llmsettingsdialog.cpp
     ../../applications/mne_analyze_studio/workbench/llmsettingsdialog.h
     ../../applications/mne_analyze_studio/workbench/pillselectorwidget.cpp

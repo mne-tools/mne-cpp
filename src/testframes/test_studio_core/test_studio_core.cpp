@@ -31,6 +31,7 @@
 #include <core/capabilityutils.h>
 #include <workbench/analysisresultwidget.h>
 #include <workbench/agentchatdockwidget.h>
+#include <workbench/extensionhostedviewwidget.h>
 #include <workbench/llmsettingsdialog.h>
 #include <workbench/pillselectorwidget.h>
 #include <workbench/workflowminimapwidget.h>
@@ -50,6 +51,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSettings>
+#include <QSlider>
 #include <QStackedWidget>
 #include <QTableWidget>
 #include <QTreeWidget>
@@ -95,6 +97,7 @@ private slots:
     void llmSettingsDialog_ruleBasedAndProfileFlow();
     void workflowMiniMapWidget_graphRenderingAndActivation();
     void analysisResultWidget_jsonAndStatisticsViews();
+    void extensionHostedViewWidget_descriptorCommandsAndUpdates();
 
     void fiffBuffer_reportsUriAndKind();
     void fiffBuffer_missingFileFailsToOpen();
@@ -638,6 +641,89 @@ void TestStudioCore::analysisResultWidget_jsonAndStatisticsViews()
     widget.setResult("neurokernel.raw_stats", QJsonObject{{"top_channels", "invalid"}});
     QCOMPARE(stack->currentWidget(), tree);
     QCOMPARE(table->rowCount(), 0);
+}
+
+//=============================================================================================================
+
+void TestStudioCore::extensionHostedViewWidget_descriptorCommandsAndUpdates()
+{
+    ExtensionHostedViewWidget widget;
+    QSlider* opacitySlider = widget.findChild<QSlider*>();
+    QVERIFY(opacitySlider);
+
+    QSignalSpy commandSpy(&widget, &ExtensionHostedViewWidget::viewCommandRequested);
+    QVERIFY(QMetaObject::invokeMethod(opacitySlider, "sliderReleased"));
+    QCOMPARE(commandSpy.size(), 0);
+    QCOMPARE(widget.sessionId(), QString());
+    QCOMPARE(widget.filePath(), QString());
+
+    const QJsonObject descriptor{
+        {"session_id", "session-42"},
+        {"file", "/tmp/sample-raw.fif"},
+        {"provider_display_name", "Surface Viewer"},
+        {"extension_display_name", "Dummy 3D"},
+        {"slot", "center"},
+        {"scene_id", "scene-7"},
+        {"message", "Rendering surface"},
+        {"state", QJsonObject{{"hemisphere", "left"}, {"camera", "lateral"}, {"opacity", 0.65}}},
+        {"controls", QJsonObject{{"opacity", QJsonObject{{"command", "change_opacity"},
+                                                          {"target_argument", "alpha"}}}}},
+        {"actions", QJsonArray{
+            QJsonObject{{"command", "reset_camera"},
+                        {"label", "Reset Camera"},
+                        {"description", "Restore the default view"},
+                        {"arguments", QJsonObject{{"camera", "lateral"}}}},
+            QJsonObject{{"label", "Ignored"}}
+        }}
+    };
+    widget.setSessionDescriptor(descriptor);
+    QCOMPARE(widget.sessionId(), QString("session-42"));
+    QCOMPARE(widget.filePath(), QString("/tmp/sample-raw.fif"));
+    QCOMPARE(opacitySlider->value(), 65);
+
+    opacitySlider->setValue(40);
+    QVERIFY(QMetaObject::invokeMethod(opacitySlider, "sliderReleased"));
+    QCOMPARE(commandSpy.size(), 1);
+    QList<QVariant> arguments = commandSpy.takeFirst();
+    QCOMPARE(arguments.at(0).toString(), QString("session-42"));
+    QCOMPARE(arguments.at(1).toString(), QString("change_opacity"));
+    const QJsonObject expectedOpacityArguments{{"alpha", 0.4}};
+    QCOMPARE(arguments.at(2).toJsonObject(), expectedOpacityArguments);
+
+    QPushButton* resetButton = nullptr;
+    for(QPushButton* button : widget.findChildren<QPushButton*>()) {
+        if(button->text() == QLatin1String("Reset Camera")) {
+            resetButton = button;
+            break;
+        }
+    }
+    QVERIFY(resetButton);
+    resetButton->click();
+    QCOMPARE(commandSpy.size(), 1);
+    arguments = commandSpy.takeFirst();
+    QCOMPARE(arguments.at(0).toString(), QString("session-42"));
+    QCOMPARE(arguments.at(1).toString(), QString("reset_camera"));
+    const QJsonObject expectedCameraArguments{{"camera", "lateral"}};
+    QCOMPARE(arguments.at(2).toJsonObject(), expectedCameraArguments);
+
+    widget.applySessionUpdate(QJsonObject{{"file", "/tmp/updated.fif"},
+                                          {"state", QJsonObject{{"opacity", 0.25}}},
+                                          {"actions", QJsonArray()}});
+    QCOMPARE(widget.sessionId(), QString("session-42"));
+    QCOMPARE(widget.filePath(), QString("/tmp/updated.fif"));
+    QCOMPARE(opacitySlider->value(), 25);
+
+    widget.setSessionDescriptor(QJsonObject{{"actions", QJsonArray{QJsonObject{{"command", "refresh"}}}}});
+    QPushButton* refreshButton = nullptr;
+    for(QPushButton* button : widget.findChildren<QPushButton*>()) {
+        if(button->text() == QLatin1String("refresh")) {
+            refreshButton = button;
+            break;
+        }
+    }
+    QVERIFY(refreshButton);
+    refreshButton->click();
+    QCOMPARE(commandSpy.size(), 0);
 }
 
 //=============================================================================================================
