@@ -15,13 +15,14 @@
   },
   "unregistered": {
     "test_mna_coverage": "Placeholder directory; its CMakeLists.txt names a test_mna_coverage.cpp that was never written. Kept out of the build until the MNA coverage test is authored.",
+    "test_doc_shots": "Registered from the repository root after doc/ creates the mne_doc_shots target, rather than from src/testframes/CMakeLists.txt.",
     "test_wasm_multi_draw": "Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case.",
     "test_wasm_multi_pass": "Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case."
   },
   "ratchet": {
     "$comment": "Counts of registered tests still missing metadata. These numbers may only decrease. Labels and timeouts become mandatory once the CTest registration helper (T1.1) lands and the leaf tests are migrated (T1.2/T1.3).",
     "max_tests_without_labels": 223,
-    "max_tests_without_timeout": 214
+    "max_tests_without_timeout": 213
   },
   "$conditional_comment": "Tests whose add_test() sits behind an early return(), so they vanish from CTest whenever the guard fires. Each needs a reason naming the guard. This list is a defect inventory, not an approved pattern: T1.1 is expected to replace these guards with a declarative registration helper so the skip is visible in the run instead of silent.",
   "conditional": {
@@ -29,7 +30,6 @@
     "test_cortical_surface_labels": "Skipped when the analyze_cortical_surface target is not built.",
     "test_cortical_surface_picking": "Skipped when the analyze_cortical_surface target is not built.",
     "test_cortical_surface_stc": "Skipped when the analyze_cortical_surface target is not built.",
-    "test_doc_shots": "Skipped when the mne_doc_shots target is not built. Currently skipped in the default developer configure.",
     "test_electrodes_plugin": "Skipped when the inspect_electrodes target is not built.",
     "test_mne_inspect_multimodal": "Skipped unless inspect_electrodes, inspect_mri_slices, mne_disp3D and mne_inspect_app_core are all built.",
     "test_mri_slices_plugin": "Skipped when the inspect_mri_slices target is not built.",
