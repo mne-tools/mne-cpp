@@ -8,8 +8,8 @@ UseTab: Never
 
 # --- Braces / blocks ---
 BreakBeforeBraces: Attach        # class {, function {, namespace { on same line
-IndentBraces: false
 BraceWrapping:
+  IndentBraces: false
   AfterClass: false
   AfterControlStatement: false
   AfterEnum: false

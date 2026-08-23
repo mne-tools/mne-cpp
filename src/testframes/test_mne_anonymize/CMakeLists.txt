@@ -24,6 +24,10 @@ else()
     add_executable(${PROJECT_NAME} ${SOURCES})
 endif()
 
+if(WITH_CODE_COV)
+  target_compile_options(${PROJECT_NAME} PRIVATE --coverage -O1 -g)
+endif()
+
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 

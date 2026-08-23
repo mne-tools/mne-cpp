@@ -15,7 +15,7 @@
 #    3. Deletes previous build/out dirs (clean build)
 #    4. Configures CMake with BUILD_TESTS=ON (and WITH_CODE_COV if requested)
 #    5. Builds with all available cores
-#    6. Runs all tests via scripts/test/test_all.bat
+#    6. Runs all registered tests via CTest
 #    7. If coverage: generates lcov/fastcov report
 # ==========================================================================
 set -euo pipefail
@@ -202,13 +202,20 @@ export MNE_DATA="${MNE_DATA}"
 
 if [ "$WITH_COVERAGE" = "true" ]; then
   export QTEST_FUNCTION_TIMEOUT=1800000   # 30 min per test function
-  "${SCRIPT_DIR}/test_all.bat" verbose withCoverage "build-name=${BUILD_NAME}"
+  TEST_TIMEOUT=3600
 else
   export QTEST_FUNCTION_TIMEOUT=900000    # 15 min per test function
-  "${SCRIPT_DIR}/test_all.bat" verbose "build-name=${BUILD_NAME}"
+  TEST_TIMEOUT=1800
 fi
 
+set +e
+ctest --test-dir "$BUILD_DIR" \
+  --output-on-failure \
+  --no-tests=error \
+  --output-junit "${BUILD_DIR}/test-results.xml" \
+  --timeout "$TEST_TIMEOUT"
 TEST_EXIT=$?
+set -e
 echo ""
 
 # ======================================================================
@@ -219,10 +226,10 @@ if [ "$WITH_COVERAGE" = "true" ]; then
 
   if command -v fastcov &>/dev/null; then
     echo "  Using fastcov …"
-    fastcov -d "$BUILD_DIR" -o "${BUILD_DIR}/coverage.json"
+    fastcov --process-gcno -d "$BUILD_DIR" -o "${BUILD_DIR}/coverage.json"
     fastcov -C "${BUILD_DIR}/coverage.json" --lcov -o "${BUILD_DIR}/coverage.info"
     fastcov -C "${BUILD_DIR}/coverage.json" --lcov -o "${BUILD_DIR}/coverage_filtered.info" \
-      --include src/libraries/ \
+      --include src/libraries/ src/applications/ src/tools/ \
       --exclude /usr Qt eigen
 
     # Extract summary
@@ -238,7 +245,7 @@ if [ "$WITH_COVERAGE" = "true" ]; then
 
     echo ""
     echo "  ════════════════════════════════════════════════"
-    echo "  Coverage Summary (libraries only)"
+    echo "  Coverage Summary (libraries, applications, and tools)"
     echo "  ════════════════════════════════════════════════"
     echo "  Lines hit  : $HIT_LINES / $TOTAL_LINES"
     echo "  Coverage   : ${COVERAGE}%"
@@ -247,6 +254,13 @@ if [ "$WITH_COVERAGE" = "true" ]; then
     echo "  Reports:"
     echo "    Full   : ${BUILD_DIR}/coverage.info"
     echo "    Filtered: ${BUILD_DIR}/coverage_filtered.info"
+    echo ""
+
+    python3 "${BASE_DIR}/tools/quality/summarize_coverage.py" \
+      "${BUILD_DIR}/coverage_filtered.info" \
+      --json "${BUILD_DIR}/coverage-baseline.json" \
+      --markdown "${BUILD_DIR}/coverage-baseline.md"
+    echo "  Baseline: ${BUILD_DIR}/coverage-baseline.{json,md}"
     echo ""
 
     # HTML report if genhtml is available
@@ -262,8 +276,8 @@ if [ "$WITH_COVERAGE" = "true" ]; then
     echo "  Using lcov (slower — consider installing fastcov) …"
     lcov --capture --directory "$BUILD_DIR" \
       --output-file "${BUILD_DIR}/coverage.info" --quiet
-    lcov --remove "${BUILD_DIR}/coverage.info" \
-      '/usr/*' '*/Qt/*' '*/eigen/*' '*/external/*' '*/testframes/*' '*/examples/*' '*/applications/*' \
+    lcov --extract "${BUILD_DIR}/coverage.info" \
+      '*/src/libraries/*' '*/src/applications/*' '*/src/tools/*' \
       --output-file "${BUILD_DIR}/coverage_filtered.info" --quiet
 
     TOTAL_LINES=$(grep -c "^DA:" "${BUILD_DIR}/coverage_filtered.info" 2>/dev/null || echo "0")
@@ -278,13 +292,20 @@ if [ "$WITH_COVERAGE" = "true" ]; then
 
     echo ""
     echo "  ════════════════════════════════════════════════"
-    echo "  Coverage Summary (libraries only)"
+    echo "  Coverage Summary (libraries, applications, and tools)"
     echo "  ════════════════════════════════════════════════"
     echo "  Lines hit  : $HIT_LINES / $TOTAL_LINES"
     echo "  Coverage   : ${COVERAGE}%"
     echo "  ════════════════════════════════════════════════"
     echo ""
     echo "  Report: ${BUILD_DIR}/coverage_filtered.info"
+    echo ""
+
+    python3 "${BASE_DIR}/tools/quality/summarize_coverage.py" \
+      "${BUILD_DIR}/coverage_filtered.info" \
+      --json "${BUILD_DIR}/coverage-baseline.json" \
+      --markdown "${BUILD_DIR}/coverage-baseline.md"
+    echo "  Baseline: ${BUILD_DIR}/coverage-baseline.{json,md}"
     echo ""
 
     if command -v genhtml &>/dev/null; then

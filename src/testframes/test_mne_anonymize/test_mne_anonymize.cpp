@@ -48,9 +48,12 @@
 //=============================================================================================================
 
 #include <QtTest>
+#include <QFileInfo>
 #include <QProcess>
 #include <QScopedPointer>
 #include <QTimeZone>
+
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -76,6 +79,9 @@ public:
 private slots:
     //test app behaviour
     void initTestCase();
+    void testAnonymizerDefaultsAndRequiredFiles();
+    void testAnonymizerConfiguration();
+    void testAnonymizerCopyAndMove();
     void testDefaultOutput();
     void testDeleteInputFile();
     void testInPlace();
@@ -108,6 +114,99 @@ TestMneAnonymize::TestMneAnonymize()
 void TestMneAnonymize::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
+}
+
+//=============================================================================================================
+
+void TestMneAnonymize::testAnonymizerDefaultsAndRequiredFiles()
+{
+    FiffAnonymizer anonymizer;
+
+    QVERIFY(!anonymizer.isFileInSet());
+    QVERIFY(!anonymizer.isFileOutSet());
+    QVERIFY(anonymizer.getFileNameIn().isEmpty());
+    QVERIFY(anonymizer.getFileNameOut().isEmpty());
+    QVERIFY(!anonymizer.getVerboseMode());
+    QVERIFY(!anonymizer.getBruteMode());
+    QVERIFY(!anonymizer.getMNEEnvironmentMode());
+    QCOMPARE(anonymizer.getMeasurementDate().date(), QDate(2000, 1, 1));
+    QCOMPARE(anonymizer.getMeasurementDate().time(), QTime(1, 1, 0));
+    QCOMPARE(anonymizer.getMeasurementDayOffset(), 0);
+    QVERIFY(!anonymizer.getUseMeasurementDayOffset());
+    QCOMPARE(anonymizer.getSubjectBirthday(), QDate(2000, 1, 1));
+    QCOMPARE(anonymizer.getSubjectBirthdayOffset(), 0);
+    QVERIFY(!anonymizer.getUseSubjectBirthdayOffset());
+    QCOMPARE(anonymizer.getSubjectHisID(), QString("mne_anonymize"));
+
+    QCOMPARE(anonymizer.anonymizeFile(), 1);
+    QCOMPARE(anonymizer.setInFile("input.fif"), 0);
+    QCOMPARE(anonymizer.anonymizeFile(), 1);
+}
+
+//=============================================================================================================
+
+void TestMneAnonymize::testAnonymizerConfiguration()
+{
+    FiffAnonymizer anonymizer;
+    const QDateTime measurementDate(QDate(1998, 7, 6), QTime(14, 30));
+    const QDate birthday(1975, 3, 2);
+
+    anonymizer.setVerboseMode(true);
+    anonymizer.setBruteMode(true);
+    anonymizer.setMNEEnvironmentMode(true);
+    anonymizer.setMeasurementDate(measurementDate);
+    anonymizer.setMeasurementDateOffset(42);
+    anonymizer.setUseMeasurementDateOffset(true);
+    anonymizer.setSubjectBirthday(birthday);
+    anonymizer.setSubjectBirthdayOffset(17);
+    anonymizer.setUseSubjectBirthdayOffset(true);
+    anonymizer.setSubjectHisId("subject-001");
+
+    QVERIFY(anonymizer.getVerboseMode());
+    QVERIFY(anonymizer.getBruteMode());
+    QVERIFY(anonymizer.getMNEEnvironmentMode());
+    QCOMPARE(anonymizer.getMeasurementDate().date(), measurementDate.date());
+    QCOMPARE(anonymizer.getMeasurementDate().time(), QTime(1, 1, 0));
+    QCOMPARE(anonymizer.getMeasurementDayOffset(), 42);
+    QVERIFY(anonymizer.getUseMeasurementDayOffset());
+    QCOMPARE(anonymizer.getSubjectBirthday(), birthday);
+    QCOMPARE(anonymizer.getSubjectBirthdayOffset(), 17);
+    QVERIFY(anonymizer.getUseSubjectBirthdayOffset());
+    QCOMPARE(anonymizer.getSubjectHisID(), QString("subject-001"));
+
+    anonymizer.setMeasurementDate("05042001");
+    anonymizer.setSubjectBirthday("03021980");
+    QCOMPARE(anonymizer.getMeasurementDate().date(), QDate(2001, 4, 5));
+    QCOMPARE(anonymizer.getSubjectBirthday(), QDate(1980, 2, 3));
+
+    QCOMPARE(anonymizer.setInFile("input.fif"), 0);
+    QVERIFY(anonymizer.isFileInSet());
+    QCOMPARE(anonymizer.setOutFile("input.fif"), 1);
+    QVERIFY(!anonymizer.isFileOutSet());
+    QCOMPARE(anonymizer.setOutFile("output.fif"), 0);
+    QVERIFY(anonymizer.isFileOutSet());
+    QVERIFY(QFileInfo(anonymizer.getFileNameIn()).isAbsolute());
+    QVERIFY(QFileInfo(anonymizer.getFileNameOut()).isAbsolute());
+}
+
+//=============================================================================================================
+
+void TestMneAnonymize::testAnonymizerCopyAndMove()
+{
+    FiffAnonymizer original;
+    original.setBruteMode(true);
+    original.setMeasurementDateOffset(23);
+    original.setSubjectHisId("subject-002");
+
+    FiffAnonymizer copy(original);
+    QCOMPARE(copy.getBruteMode(), original.getBruteMode());
+    QCOMPARE(copy.getMeasurementDayOffset(), original.getMeasurementDayOffset());
+    QCOMPARE(copy.getSubjectHisID(), original.getSubjectHisID());
+
+    FiffAnonymizer moved(std::move(copy));
+    QCOMPARE(moved.getBruteMode(), original.getBruteMode());
+    QCOMPARE(moved.getMeasurementDayOffset(), original.getMeasurementDayOffset());
+    QCOMPARE(moved.getSubjectHisID(), original.getSubjectHisID());
 }
 
 //=============================================================================================================
