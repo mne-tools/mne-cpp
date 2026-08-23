@@ -29,6 +29,7 @@
 #include <core/fiffbuffer.h>
 #include <core/capabilitycatalog.h>
 #include <core/capabilityutils.h>
+#include <workbench/analysisresultwidget.h>
 #include <workbench/agentchatdockwidget.h>
 #include <workbench/llmsettingsdialog.h>
 #include <workbench/pillselectorwidget.h>
@@ -50,6 +51,8 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QStackedWidget>
+#include <QTableWidget>
+#include <QTreeWidget>
 
 #include <algorithm>
 
@@ -91,6 +94,7 @@ private slots:
     void agentChatDockWidget_conversationAndConfirmations();
     void llmSettingsDialog_ruleBasedAndProfileFlow();
     void workflowMiniMapWidget_graphRenderingAndActivation();
+    void analysisResultWidget_jsonAndStatisticsViews();
 
     void fiffBuffer_reportsUriAndKind();
     void fiffBuffer_missingFileFailsToOpen();
@@ -578,6 +582,62 @@ void TestStudioCore::workflowMiniMapWidget_graphRenderingAndActivation()
     widget.setWorkflowGraph(QJsonObject{{"pipeline", QJsonArray()}});
     image.fill(Qt::transparent);
     widget.render(&image);
+}
+
+//=============================================================================================================
+
+void TestStudioCore::analysisResultWidget_jsonAndStatisticsViews()
+{
+    AnalysisResultWidget widget;
+    QTreeWidget* tree = widget.findChild<QTreeWidget*>();
+    QTableWidget* table = widget.findChild<QTableWidget*>();
+    QStackedWidget* stack = widget.findChild<QStackedWidget*>();
+    QVERIFY(tree);
+    QVERIFY(table);
+    QVERIFY(stack);
+
+    const QJsonObject genericResult{
+        {"message", "Generic output"},
+        {"object", QJsonObject{{"enabled", true}, {"missing", QJsonValue::Null}}},
+        {"array", QJsonArray{"entry", 2.5}},
+        {"count", 7}
+    };
+    widget.setResult("custom.summary", genericResult);
+    QCOMPARE(widget.toolName(), QString("custom.summary"));
+    QCOMPARE(widget.result(), genericResult);
+    QCOMPARE(stack->currentWidget(), tree);
+    QCOMPARE(tree->topLevelItemCount(), genericResult.size());
+    QVERIFY(tree->findItems("object", Qt::MatchExactly).constFirst()->childCount() == 2);
+    widget.setResultHistory(QJsonArray{genericResult});
+    widget.setRuntimeContext(QJsonObject{{"selected_channel", "MEG 0111"}});
+
+    const QJsonArray channelStats{
+        QJsonObject{{"name", "MEG 0111"}, {"rms", 1.25}, {"mean_abs", 0.75}, {"peak_abs", 3.5}},
+        QJsonObject{{"name", "EEG 001"}, {"rms", 2.0}, {"mean_abs", 1.0}, {"peak_abs", 4.0}}
+    };
+    widget.setResult("neurokernel.channel_stats",
+                     QJsonObject{{"message", "Channel statistics"}, {"channels", channelStats}});
+    QCOMPARE(stack->currentWidget(), table);
+    QCOMPARE(table->rowCount(), 2);
+    QCOMPARE(table->item(0, 0)->text(), QString("MEG 0111"));
+    QCOMPARE(table->item(0, 1)->text(), QString("1.25"));
+    QCOMPARE(table->item(0, 2)->text(), QString("0.75"));
+    QCOMPARE(table->item(0, 3)->text(), QString("3.5"));
+
+    const QJsonArray rawStats{
+        QJsonObject{{"name", "MEG 0121"}, {"rms", 9.5}}
+    };
+    widget.setResult("neurokernel.raw_stats", QJsonObject{{"top_channels", rawStats}});
+    QCOMPARE(stack->currentWidget(), table);
+    QCOMPARE(table->rowCount(), 1);
+    QCOMPARE(table->item(0, 0)->text(), QString("MEG 0121"));
+    QCOMPARE(table->item(0, 1)->text(), QString("9.5"));
+    QCOMPARE(table->item(0, 2)->text(), QString("-"));
+    QCOMPARE(table->item(0, 3)->text(), QString("-"));
+
+    widget.setResult("neurokernel.raw_stats", QJsonObject{{"top_channels", "invalid"}});
+    QCOMPARE(stack->currentWidget(), tree);
+    QCOMPARE(table->rowCount(), 0);
 }
 
 //=============================================================================================================
