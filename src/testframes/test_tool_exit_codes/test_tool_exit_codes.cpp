@@ -74,6 +74,7 @@ private slots:
     void helpSucceeds_data();
     void helpSucceeds();
     void invalidListSourceSpaceInputs();
+    void invalidCmneModes();
     void validFiffFileOperations();
 
 private:
@@ -216,6 +217,7 @@ void TestToolExitCodes::missingRequiredArguments_data()
     QTest::newRow("mne_add_patch_info")      << "mne_add_patch_info";
     QTest::newRow("mne_list_source_space")   << "mne_list_source_space";
     QTest::newRow("mne_epochs2mat")           << "mne_epochs2mat";
+    QTest::newRow("mne_compute_cmne")         << "mne_compute_cmne";
     QTest::newRow("mne_toggle_skips")       << "mne_toggle_skips";
 }
 
@@ -279,6 +281,11 @@ void TestToolExitCodes::unreadableInputFile_data()
         << QStringList{"--raw", "__MISSING__", "--event", "__MISSING__",
                        "--tmin", "-0.1", "--tmax", "0.2", "--event-id", "1",
                        "--out", "__MISSING_OUT__"};
+
+    QTest::newRow("mne_compute_cmne")
+        << "mne_compute_cmne"
+        << QStringList{"--fwd", "__MISSING__", "--cov", "__MISSING__",
+                       "--evoked", "__MISSING__", "--out", "__MISSING_OUT__"};
 }
 
 //=============================================================================================================
@@ -324,6 +331,7 @@ void TestToolExitCodes::helpSucceeds_data()
     QTest::newRow("mne_add_patch_info")      << "mne_add_patch_info";
     QTest::newRow("mne_list_source_space")   << "mne_list_source_space";
     QTest::newRow("mne_epochs2mat")           << "mne_epochs2mat";
+    QTest::newRow("mne_compute_cmne")         << "mne_compute_cmne";
 }
 
 //=============================================================================================================
@@ -369,6 +377,42 @@ void TestToolExitCodes::invalidListSourceSpaceInputs()
 
     QCOMPARE(runTool(listSourceSpace, {"--src", sourceFile, "--pnt", m_tempDir.path()}), 1);
     QCOMPARE(runTool(listSourceSpace, {"--src", sourceFile, "--dip", m_tempDir.path()}), 1);
+}
+
+//=============================================================================================================
+
+void TestToolExitCodes::invalidCmneModes()
+{
+    const QString computeCmne = findTool("mne_compute_cmne");
+    if (computeCmne.isEmpty()) {
+        QSKIP("mne_compute_cmne was not built in this configuration");
+    }
+
+    QCOMPARE(runTool(computeCmne, {"--mode", "unknown"}), 1);
+    QCOMPARE(runTool(computeCmne, {"--mode", "train"}), 1);
+    QCOMPARE(runTool(computeCmne, {"--mode", "finetune"}), 1);
+
+    const QString missingPython = m_tempDir.filePath("missing-python");
+    const QStringList trainingArguments = {
+        "--fwd", m_sMissingFile,
+        "--cov", m_sMissingFile,
+        "--epochs", m_sMissingFile,
+        "--onnx-out", m_tempDir.filePath("cmne.onnx"),
+        "--python", missingPython
+    };
+    QCOMPARE(runTool(computeCmne,
+                     QStringList{"--mode", "train"} + trainingArguments),
+             1);
+
+    const QString existingOnnx = m_tempDir.filePath("existing.onnx");
+    QFile onnxFile(existingOnnx);
+    QVERIFY(onnxFile.open(QIODevice::WriteOnly));
+    QCOMPARE(onnxFile.write("placeholder"), 11);
+    onnxFile.close();
+    QCOMPARE(runTool(computeCmne,
+                     QStringList{"--mode", "finetune", "--finetune", existingOnnx}
+                         + trainingArguments),
+             1);
 }
 
 //=============================================================================================================

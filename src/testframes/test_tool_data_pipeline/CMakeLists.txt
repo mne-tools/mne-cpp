@@ -19,6 +19,8 @@ endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Test
+    mne_inv
+    Eigen3::Eigen
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

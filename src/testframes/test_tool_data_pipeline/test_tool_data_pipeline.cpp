@@ -34,6 +34,12 @@
  */
 
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <inv/inv_source_estimate.h>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -1155,6 +1161,51 @@ private slots:
         bool hasStc = QFile::exists(outBase + "-lh.stc") ||
                       QFile::exists(outBase + "-rh.stc");
         QVERIFY(hasStc || !output.isEmpty());
+    }
+
+    //=========================================================================================================
+    // mne_compute_cmne - real dSPM and contextual source-estimate workflow
+    //=========================================================================================================
+
+    void testComputeCmne()
+    {
+        if (!toolExists("mne_compute_cmne")) QSKIP("mne_compute_cmne not found");
+
+        const QString fwdFile = m_sResourcePath + "Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+        const QString covFile = m_sResourcePath + "MEG/sample/sample_audvis-cov.fif";
+        const QString evokedFile = m_sResourcePath + "MEG/sample/sample_audvis-ave.fif";
+        if (!QFile::exists(fwdFile) || !QFile::exists(covFile) || !QFile::exists(evokedFile)) {
+            QSKIP("CMNE test data not available");
+        }
+
+        const QString outPrefix = m_tempDir.filePath("test_cmne");
+        QCOMPARE(runToolExitCode("mne_compute_cmne", {
+                     "--mode", "compute",
+                     "--fwd", fwdFile,
+                     "--cov", covFile,
+                     "--evoked", evokedFile,
+                     "--setno", "0",
+                     "--look-back", "8",
+                     "--out", outPrefix}, 180000),
+                 0);
+
+        INVLIB::InvSourceEstimate dspm;
+        QFile dspmFile(outPrefix + "-dspm.stc");
+        QVERIFY(INVLIB::InvSourceEstimate::read(dspmFile, dspm));
+
+        INVLIB::InvSourceEstimate cmne;
+        QFile cmneFile(outPrefix + "-cmne.stc");
+        QVERIFY(INVLIB::InvSourceEstimate::read(cmneFile, cmne));
+
+        QCOMPARE(dspm.data.rows(), 7928);
+        QCOMPARE(dspm.data.cols(), 421);
+        QCOMPARE(cmne.data.rows(), dspm.data.rows());
+        QCOMPARE(cmne.data.cols(), dspm.data.cols());
+        QCOMPARE(cmne.vertices.size(), dspm.vertices.size());
+        QCOMPARE(cmne.tmin, dspm.tmin);
+        QCOMPARE(cmne.tstep, dspm.tstep);
+        QVERIFY(dspm.data.allFinite());
+        QVERIFY(cmne.data.allFinite());
     }
 
     //=========================================================================================================
