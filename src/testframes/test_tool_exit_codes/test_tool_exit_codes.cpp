@@ -211,6 +211,7 @@ void TestToolExitCodes::missingRequiredArguments_data()
     QTest::newRow("mne_mark_bad_channels")  << "mne_mark_bad_channels";
     QTest::newRow("mne_cov2proj")            << "mne_cov2proj";
     QTest::newRow("mne_compare_fif_files")   << "mne_compare_fif_files";
+    QTest::newRow("mne_collect_transforms")  << "mne_collect_transforms";
     QTest::newRow("mne_toggle_skips")       << "mne_toggle_skips";
 }
 
@@ -258,6 +259,9 @@ void TestToolExitCodes::unreadableInputFile_data()
     QTest::newRow("mne_compare_fif_files")
         << "mne_compare_fif_files"
         << QStringList{"--file1", "__MISSING__", "--file2", "__MISSING__"};
+
+    QTest::newRow("mne_collect_transforms")
+        << "mne_collect_transforms" << QStringList{"--meas", "__MISSING__"};
 }
 
 //=============================================================================================================
@@ -299,6 +303,7 @@ void TestToolExitCodes::helpSucceeds_data()
     QTest::newRow("mne_change_nave")        << "mne_change_nave";
     QTest::newRow("mne_cov2proj")            << "mne_cov2proj";
     QTest::newRow("mne_compare_fif_files")   << "mne_compare_fif_files";
+    QTest::newRow("mne_collect_transforms")  << "mne_collect_transforms";
 }
 
 //=============================================================================================================
@@ -325,8 +330,12 @@ void TestToolExitCodes::validFiffFileOperations()
                             + "/../resources/data/mne-cpp-test-data/MEG/sample/";
     const QString covFile = dataDir + "sample_audvis-cov.fif";
     const QString evokedFile = dataDir + "sample_audvis-ave.fif";
+    const QString rawFile = dataDir + "sample_audvis_trunc_raw.fif";
+    const QString transFile = dataDir + "all-trans.fif";
     QVERIFY(QFileInfo::exists(covFile));
     QVERIFY(QFileInfo::exists(evokedFile));
+    QVERIFY(QFileInfo::exists(rawFile));
+    QVERIFY(QFileInfo::exists(transFile));
 
     const QString cov2proj = findTool("mne_cov2proj");
     const QString compareFif = findTool("mne_compare_fif_files");
@@ -344,6 +353,18 @@ void TestToolExitCodes::validFiffFileOperations()
     if (!compareFif.isEmpty()) {
         QCOMPARE(runTool(compareFif, {"--file1", covFile, "--file2", covFile}), 0);
         QCOMPARE(runTool(compareFif, {"--file1", covFile, "--file2", evokedFile}), 1);
+    }
+
+    const QString collectTransforms = findTool("mne_collect_transforms");
+    if (!collectTransforms.isEmpty()) {
+        const QString outputFile = m_tempDir.filePath("collected-transforms.fif");
+        QCOMPARE(runTool(collectTransforms,
+                         {"--meas", rawFile, "--mri", transFile, "--out", outputFile}),
+                 0);
+        QVERIFY(QFileInfo(outputFile).size() > 0);
+        if (!compareFif.isEmpty()) {
+            QCOMPARE(runTool(compareFif, {"--file1", outputFile, "--file2", outputFile}), 0);
+        }
     }
 }
 
