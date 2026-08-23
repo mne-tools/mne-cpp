@@ -3,8 +3,8 @@ project(test_tool_data_pipeline LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Test)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Test)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Test)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Test)
 
 set(SOURCES
     test_tool_data_pipeline.cpp
@@ -18,6 +18,7 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Test
     mne_inv
     mne_mne

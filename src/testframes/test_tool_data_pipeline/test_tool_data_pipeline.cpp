@@ -49,6 +49,7 @@
 #include <QProcessEnvironment>
 #include <QCoreApplication>
 #include <QDir>
+#include <QImage>
 #include <QTemporaryDir>
 #include <QTextStream>
 
@@ -1207,6 +1208,62 @@ private slots:
         QCOMPARE(cmne.tstep, dspm.tstep);
         QVERIFY(dspm.data.allFinite());
         QVERIFY(cmne.data.allFinite());
+    }
+
+    //=========================================================================================================
+    // mne_make_movie - render a synthetic source estimate on a real cortical surface
+    //=========================================================================================================
+
+    void testMakeMovie()
+    {
+        if (!toolExists("mne_make_movie")) QSKIP("mne_make_movie not found");
+
+        const QString surfaceFile = m_sResourcePath + "subjects/sample/surf/lh.white";
+        if (!QFile::exists(surfaceFile)) QSKIP("Cortical surface data not available");
+
+        Eigen::VectorXi vertices(4);
+        vertices << 0, 1, 2, 3;
+        Eigen::MatrixXd data(4, 2);
+        data << 4.0, -4.0,
+                6.0, -6.0,
+                8.0, -8.0,
+                10.0, -10.0;
+
+        const QString stcPrefix = m_tempDir.filePath("movie-source");
+        INVLIB::InvSourceEstimate stc(data, vertices, 0.0f, 0.001f);
+        QFile stcFile(stcPrefix + "-lh.stc");
+        QVERIFY(stc.write(stcFile));
+
+        const QString pngPrefix = m_tempDir.filePath("movie-frame");
+        QCOMPARE(runToolExitCode("mne_make_movie", {
+                     "--stcin", stcPrefix,
+                     "--subject", "sample",
+                     "--subjects-dir", m_sResourcePath + "subjects",
+                     "--surface", "white",
+                     "--lh",
+                     "--signed",
+                     "--tmin", "0",
+                     "--tmax", "0",
+                     "--width", "320",
+                     "--height", "240",
+                     "--png", pngPrefix}),
+                 0);
+
+        const QString framePath = pngPrefix + "-lh-00000.png";
+        QImage frame(framePath);
+        QVERIFY(!frame.isNull());
+        QCOMPARE(frame.size(), QSize(320, 240));
+
+        bool hasRenderedPixel = false;
+        for (int y = 0; y < frame.height() && !hasRenderedPixel; ++y) {
+            for (int x = 0; x < frame.width(); ++x) {
+                if (frame.pixelColor(x, y) != QColor(Qt::black)) {
+                    hasRenderedPixel = true;
+                    break;
+                }
+            }
+        }
+        QVERIFY(hasRenderedPixel);
     }
 
     //=========================================================================================================

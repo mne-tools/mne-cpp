@@ -49,12 +49,12 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
+#include <QGuiApplication>
 #include <QImage>
 #include <QPainter>
 #include <QDebug>
@@ -211,7 +211,7 @@ static QImage renderFrame(const FsSurface& surf,
 int main(int argc, char *argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
-    QCoreApplication app(argc, argv);
+    QGuiApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_movie");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
