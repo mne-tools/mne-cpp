@@ -1,0 +1,37 @@
+cmake_minimum_required(VERSION 3.14)
+project(test_sensor_field_mapper LANGUAGES CXX)
+
+set(CMAKE_AUTOMOC ON)
+
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Test)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Test)
+
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION test_sensor_field_mapper.cpp)
+else()
+    add_executable(${PROJECT_NAME} test_sensor_field_mapper.cpp)
+endif()
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::Test
+    mne_disp3D
+    mne_fiff
+    Eigen3::Eigen
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    WIN32_EXECUTABLE FALSE
+    MACOSX_BUNDLE FALSE
+)
+
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(${PROJECT_NAME})
+endif()
+
+enable_testing()
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()
