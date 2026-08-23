@@ -17,23 +17,36 @@ env:
   QT_BINARY_RELEASE_TITLE: Qt Toolchain Artifacts
   QT_BINARY_RELEASE_NOTES: Reusable Qt runtime, static, WASM and Installer Framework assets for CI.
   QT_MIN_VERSION: '6.10.0'
-  QT_MAX_VERSION: '6.11.1'
+  QT_MAX_VERSION: '6.11.2'
   QIF_VERSION: '4.11.0'
   QIF_VERSION_TOKEN: '4110'
   QIF_QT_VERSION: '6.9.1'
 
 jobs:
+  PrepareQtVersions:
+    runs-on: ubuntu-24.04
+    outputs:
+      dynamic_matrix: ${{ steps.versions.outputs.dynamic_matrix }}
+      max_version: ${{ steps.versions.outputs.max_version }}
+      max_version_token: ${{ steps.versions.outputs.max_version_token }}
+    steps:
+    - name: Prepare Qt versions
+      id: versions
+      shell: bash
+      run: |
+        min_version_token="${QT_MIN_VERSION//./}"
+        max_version_token="${QT_MAX_VERSION//./}"
+        echo "dynamic_matrix={\"include\":[{\"qt_version\":\"${QT_MIN_VERSION}\",\"version_token\":\"${min_version_token}\"},{\"qt_version\":\"${QT_MAX_VERSION}\",\"version_token\":\"${max_version_token}\"}]}" >> "$GITHUB_OUTPUT"
+        echo "max_version=${QT_MAX_VERSION}" >> "$GITHUB_OUTPUT"
+        echo "max_version_token=${max_version_token}" >> "$GITHUB_OUTPUT"
+
   GenerateLinuxDynamicBinaries:
+    needs: PrepareQtVersions
     runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - qt_version: '6.10.0'
-            version_token: '6100'
-          - qt_version: '6.11.1'
-            version_token: '6111'
+      matrix: ${{ fromJSON(needs.PrepareQtVersions.outputs.dynamic_matrix) }}
 
     steps:
     - name: Clone repository
@@ -83,16 +96,12 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt6_${{ matrix.version_token }}_dynamic_binaries_linux.tar.gz" --clobber
 
   GenerateMacOSDynamicBinaries:
+    needs: PrepareQtVersions
     runs-on: macos-26
 
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - qt_version: '6.10.0'
-            version_token: '6100'
-          - qt_version: '6.11.1'
-            version_token: '6111'
+      matrix: ${{ fromJSON(needs.PrepareQtVersions.outputs.dynamic_matrix) }}
 
     steps:
     - name: Clone repository
@@ -144,16 +153,12 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz" --clobber
 
   GenerateWinDynamicBinaries:
+    needs: PrepareQtVersions
     runs-on: windows-2025-vs2026
 
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - qt_version: '6.10.0'
-            version_token: '6100'
-          - qt_version: '6.11.1'
-            version_token: '6111'
+      matrix: ${{ fromJSON(needs.PrepareQtVersions.outputs.dynamic_matrix) }}
 
     steps:
     - name: Clone repository
@@ -551,6 +556,7 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt_ifw_${{ env.QIF_VERSION_TOKEN }}_win.zip" --clobber
 
   GenerateLinuxStaticBinaries:
+    needs: PrepareQtVersions
     runs-on: ubuntu-24.04
     
     steps:
@@ -565,7 +571,7 @@ jobs:
       run: |
         # Clone Qt6 repo
         cd ..
-        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v6.11.1
+        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v${{ needs.PrepareQtVersions.outputs.max_version }}
         cd qt5
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 ./init-repository -f --module-subset=qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport
         # Create shadow build folder
@@ -578,20 +584,21 @@ jobs:
         cmake --install .
     - name: Package binaries
       run: |
-        tar cfvz qt6_6111_static_binaries_linux.tar.gz -C ../Qt6_binaries .
+        tar cfvz qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_linux.tar.gz -C ../Qt6_binaries .
     - uses: actions/upload-artifact@v7
       with:
-        name: qt6_6111_static_binaries_linux.tar.gz
-        path: qt6_6111_static_binaries_linux.tar.gz
+        name: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_linux.tar.gz
+        path: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_linux.tar.gz
     - name: Create qt_binaries release and upload
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
-        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6111_static_binaries_linux.tar.gz --clobber
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_linux.tar.gz --clobber
 
   GenerateMacOSStaticBinaries:
+    needs: PrepareQtVersions
     runs-on: macos-26
     
     steps:
@@ -604,7 +611,7 @@ jobs:
       run: |
         # Clone Qt6 repo
         cd ..
-        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v6.11.1
+        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v${{ needs.PrepareQtVersions.outputs.max_version }}
         cd qt5
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 ./init-repository -f --module-subset=qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport
         # Create shadow build folder
@@ -617,20 +624,21 @@ jobs:
         cmake --install .
     - name: Package binaries
       run: |
-        tar cfvz qt6_6111_static_binaries_macos.tar.gz -C ../Qt6_binaries .
+        tar cfvz qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_macos.tar.gz -C ../Qt6_binaries .
     - uses: actions/upload-artifact@v7
       with:
-        name: qt6_6111_static_binaries_macos.tar.gz
-        path: qt6_6111_static_binaries_macos.tar.gz
+        name: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_macos.tar.gz
+        path: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_macos.tar.gz
     - name: Upload to qt_binaries release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
-        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6111_static_binaries_macos.tar.gz --clobber
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_macos.tar.gz --clobber
 
   GenerateWinStaticBinaries:
+    needs: PrepareQtVersions
     runs-on: windows-2025-vs2026
 
     steps:
@@ -648,7 +656,7 @@ jobs:
       run: |
         # Clone Qt6 repo
         cd ..
-        git clone https://code.qt.io/qt/qt5.git -b v6.11.1
+        git clone https://code.qt.io/qt/qt5.git -b v${{ needs.PrepareQtVersions.outputs.max_version }}
         # Create shadow build folder
         mkdir qt6_shadow
         cd qt6_shadow
@@ -665,20 +673,21 @@ jobs:
     - name: Package binaries
       run: |
         cd ..\Qt6_binaries
-        7z a ..\mne-cpp\qt6_6111_static_binaries_win.zip .
+        7z a ..\mne-cpp\qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_win.zip .
     - uses: actions/upload-artifact@v7
       with:
-        name: qt6_6111_static_binaries_win.zip
-        path: qt6_6111_static_binaries_win.zip
+        name: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_win.zip
+        path: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_win.zip
     - name: Upload to qt_binaries release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
-        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6111_static_binaries_win.zip --clobber
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_win.zip --clobber
 
   GenerateWasmBinaries:
+    needs: PrepareQtVersions
     runs-on: ubuntu-24.04
 
     steps:
@@ -701,7 +710,7 @@ jobs:
       run: |
         cd ..
         # Clone Qt6 repo
-        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v6.11.1
+        "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v${{ needs.PrepareQtVersions.outputs.max_version }}
         cd qt5
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 ./init-repository -f --module-subset=qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport
         # Build minimal host Qt
@@ -724,15 +733,15 @@ jobs:
         cmake --install .
     - name: Package binaries
       run: |
-        tar cfvz qt6_6111_static_binaries_wasm.tar.gz -C ../Qt6_binaries .
+        tar cfvz qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_wasm.tar.gz -C ../Qt6_binaries .
     - uses: actions/upload-artifact@v7
       with:
-        name: qt6_6111_static_binaries_wasm.tar.gz
-        path: qt6_6111_static_binaries_wasm.tar.gz
+        name: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_wasm.tar.gz
+        path: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_wasm.tar.gz
     - name: Upload to qt_binaries release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         bash ./scripts/ci/ensure_toolchain_release.sh "${{ env.QT_BINARY_RELEASE_TAG }}"
-        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_6111_static_binaries_wasm.tar.gz --clobber
+        gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_wasm.tar.gz --clobber
