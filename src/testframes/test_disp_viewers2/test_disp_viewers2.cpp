@@ -87,6 +87,7 @@
 #include <QLayout>
 #include <QSharedPointer>
 #include <QScrollBar>
+#include <QSignalSpy>
 #include <QStringList>
 #include <QTableView>
 
@@ -287,6 +288,12 @@ private slots:
      * visibility filter and viewport/sample mapping.
      */
     void channelDataView_hideBadChannelsAndMapping();
+
+    //=========================================================================================================
+    /**
+        * Verifies ChannelRhiView public state, clamping, signals, and overlays without rendering.
+     */
+    void channelRhiView_stateContracts();
 
     //=========================================================================================================
     /**
@@ -775,6 +782,140 @@ void TestDispViewers2::channelDataView_hideBadChannelsAndMapping()
     const int x = view.sampleToViewportX(sample);
     const int roundTripSample = view.viewportXToSample(x);
     QVERIFY(qAbs(roundTripSample - sample) <= 2);
+
+    QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::channelRhiView_stateContracts()
+{
+    ChannelDataView view(QStringLiteral("test_disp_viewers2_rhi_state"));
+    const auto info = createBrowserTestInfo();
+    view.resize(800, 400);
+    view.init(info);
+    view.setFileBounds(100, 299);
+    view.setData(createBrowserTestData(), 100);
+    if (view.layout()) {
+        view.layout()->activate();
+    }
+
+    auto *rhiView = view.findChild<ChannelRhiView*>();
+    QVERIFY(rhiView != nullptr);
+    rhiView->resize(640, 360);
+
+    QSignalSpy scrollSpy(rhiView, &ChannelRhiView::scrollSampleChanged);
+    QSignalSpy zoomSpy(rhiView, &ChannelRhiView::samplesPerPixelChanged);
+    QSignalSpy channelSpy(rhiView, &ChannelRhiView::channelOffsetChanged);
+
+    rhiView->setSamplesPerPixel(0.0f);
+    QCOMPARE(rhiView->samplesPerPixel(), 1.0e-4f);
+    QCOMPARE(zoomSpy.size(), 1);
+    rhiView->zoomTo(2.0f, 0);
+    QCOMPARE(rhiView->samplesPerPixel(), 2.0f);
+    QCOMPARE(rhiView->visibleSampleCount(), 1280);
+
+    rhiView->setLastFileSample(299);
+    rhiView->setFirstFileSample(100);
+    rhiView->setScrollSample(-50.0f);
+    QCOMPARE(rhiView->visibleFirstSample(), 100);
+    rhiView->scrollTo(500.0f, 0);
+    QCOMPARE(rhiView->visibleFirstSample(), 100);
+    QVERIFY(!scrollSpy.isEmpty());
+
+    rhiView->setScrollSpeedFactor(0.0f);
+    QCOMPARE(rhiView->scrollSpeedFactor(), 0.25f);
+    rhiView->setScrollSpeedFactor(10.0f);
+    QCOMPARE(rhiView->scrollSpeedFactor(), 4.0f);
+    rhiView->setPrefetchFactor(0.0f);
+
+    rhiView->setVisibleChannelCount(2);
+    QCOMPARE(rhiView->visibleChannelCount(), 2);
+    rhiView->setFirstVisibleChannel(99);
+    QCOMPARE(rhiView->firstVisibleChannel(), 2);
+    QCOMPARE(channelSpy.size(), 1);
+    rhiView->setChannelIndices({0, 2});
+    QCOMPARE(rhiView->totalLogicalChannels(), 2);
+    QCOMPARE(rhiView->firstVisibleChannel(), 0);
+    rhiView->setChannelIndices({});
+    QCOMPARE(rhiView->totalLogicalChannels(), 4);
+
+    rhiView->setHideBadChannels(true);
+    QCOMPARE(rhiView->totalLogicalChannels(), 3);
+    rhiView->setButterflyMode(true);
+    QVERIFY(rhiView->butterflyMode());
+
+    rhiView->setFrozen(true);
+    QVERIFY(rhiView->isFrozen());
+    rhiView->setGridVisible(false);
+    QVERIFY(!rhiView->gridVisible());
+    rhiView->setWheelScrollsChannels(false);
+    QVERIFY(!rhiView->wheelScrollsChannels());
+    rhiView->setCrosshairEnabled(true);
+    QVERIFY(rhiView->crosshairEnabled());
+    rhiView->setCrosshairEnabled(false);
+    rhiView->setScalebarsVisible(false);
+    QVERIFY(!rhiView->scalebarsVisible());
+    rhiView->setBackgroundColor(Qt::darkBlue);
+    QCOMPARE(rhiView->backgroundColor(), QColor(Qt::darkBlue));
+    rhiView->setSfreq(-1.0f);
+
+    rhiView->setEvents({ChannelRhiView::EventMarker{120, 1, Qt::red, QStringLiteral("event")}});
+    rhiView->setEventsVisible(false);
+    QVERIFY(!rhiView->eventsVisible());
+    rhiView->setEpochMarkers({125, 150});
+    rhiView->setEpochMarkersVisible(false);
+    QVERIFY(!rhiView->epochMarkersVisible());
+    rhiView->setClippingVisible(false);
+    QVERIFY(!rhiView->clippingVisible());
+    rhiView->setZScoreMode(true);
+    QVERIFY(rhiView->zScoreMode());
+    rhiView->setAnnotations({ChannelRhiView::AnnotationSpan{130, 145, Qt::yellow,
+                                                            QStringLiteral("annotation")}});
+    rhiView->setAnnotationSelectionEnabled(true);
+    rhiView->setAnnotationsVisible(false);
+    QVERIFY(!rhiView->annotationsVisible());
+
+    QSignalSpy clickSpy(rhiView, &ChannelRhiView::sampleClicked);
+    QSignalSpy rangeSpy(rhiView, &ChannelRhiView::sampleRangeSelected);
+    QSignalSpy boundarySpy(rhiView, &ChannelRhiView::annotationBoundaryMoved);
+
+    rhiView->setSamplesPerPixel(0.5f);
+    rhiView->setFrozen(true);
+    QTest::mouseClick(rhiView, Qt::LeftButton, Qt::NoModifier, QPoint(40, 40));
+    QCOMPARE(clickSpy.size(), 1);
+    QCOMPARE(clickSpy.takeFirst().at(0).toInt(), 120);
+
+    QTest::mousePress(rhiView, Qt::LeftButton, Qt::NoModifier, QPoint(60, 40));
+    QTest::mouseMove(rhiView, QPoint(80, 40));
+    QTest::mouseRelease(rhiView, Qt::LeftButton, Qt::NoModifier, QPoint(80, 40));
+    QCOMPARE(boundarySpy.size(), 1);
+    QCOMPARE(boundarySpy.takeFirst().at(2).toInt(), 140);
+
+    QTest::mousePress(rhiView, Qt::RightButton, Qt::NoModifier, QPoint(100, 40));
+    QTest::mouseMove(rhiView, QPoint(200, 40));
+    QTest::mouseRelease(rhiView, Qt::RightButton, Qt::NoModifier, QPoint(200, 40));
+    QCOMPARE(rangeSpy.size(), 1);
+    QCOMPARE(rangeSpy.takeFirst().at(0).toInt(), 150);
+
+    rhiView->setAnnotationSelectionEnabled(false);
+    QTest::mousePress(rhiView, Qt::RightButton, Qt::NoModifier, QPoint(20, 20));
+    QTest::mouseMove(rhiView, QPoint(100, 22));
+    QTest::mouseRelease(rhiView, Qt::RightButton, Qt::NoModifier, QPoint(100, 22));
+
+    rhiView->setFrozen(false);
+    QTest::mouseClick(rhiView, Qt::LeftButton, Qt::NoModifier, QPoint(50, 40));
+    QCOMPARE(clickSpy.size(), 1);
+    QTest::mousePress(rhiView, Qt::LeftButton, Qt::AltModifier, QPoint(200, 40));
+    QTest::mouseMove(rhiView, QPoint(180, 40));
+    QTest::mouseRelease(rhiView, Qt::LeftButton, Qt::AltModifier, QPoint(180, 40));
+
+    rhiView->setWheelScrollsChannels(true);
+    rhiView->setFirstVisibleChannel(0);
+    QWheelEvent wheelEvent(QPointF(50, 40), QPointF(50, 40), QPoint(), QPoint(0, -120),
+                           Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false);
+    QApplication::sendEvent(rhiView, &wheelEvent);
+    QCOMPARE(rhiView->firstVisibleChannel(), 1);
 
     QApplication::processEvents();
 }
