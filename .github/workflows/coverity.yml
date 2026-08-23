@@ -54,7 +54,7 @@ jobs:
         run: |
           ./scripts/ci/download_toolchain.sh \
             --kind qt \
-            --version "6.11.1" \
+            --version "6.11.2" \
             --linkage dynamic \
             --output-dir "$RUNNER_TEMP/qt"
       - name: Download Eigen package

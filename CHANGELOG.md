@@ -88,7 +88,7 @@ All notable changes to MNE-CPP will be documented in this file.
 - Fixed 15 pipeline annotations in staging/codeql workflows
 - Removed broken auto-fix-build workflow
 - Consolidated license-headers workflow into staging pipeline
-- Qt 6.11.1 toolchain across all CI workflows
+- Qt 6.11.2 toolchain across all CI workflows
 
 ### Documentation
 

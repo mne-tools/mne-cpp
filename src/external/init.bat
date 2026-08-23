@@ -28,7 +28,7 @@ if defined ONNXRUNTIME_VERSION (
     set "ONNXRUNTIME_DEFAULT_VERSION=1.21.0"
 )
 
-set "QT_VERSION=6.11.1"
+set "QT_VERSION=6.11.2"
 if not defined EIGEN_VERSION set "EIGEN_VERSION=5.0.1"
 set "LINKAGE=dynamic"
 set "QT_DIR="
@@ -268,7 +268,7 @@ echo.
 echo Downloads the MNE-CPP-maintained Qt and Eigen dependency bundles into src\external.
 echo.
 echo Options:
-echo   --qt-version ^<version^>        Qt version to download ^(default: 6.11.1^)
+echo   --qt-version ^<version^>        Qt version to download ^(default: 6.11.2^)
 echo   --eigen-version ^<version^>     Eigen version to download ^(default: 5.0.1^)
 echo   --linkage ^<dynamic^|static^>   Qt linkage to prepare ^(default: dynamic^)
 echo   --qt-dir ^<path^>               Target directory for the Qt bundle
