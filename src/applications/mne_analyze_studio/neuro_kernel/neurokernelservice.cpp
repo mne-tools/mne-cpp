@@ -171,6 +171,21 @@ bool NeuroKernelService::start(const QString& socketName)
 QJsonObject NeuroKernelService::handleToolCall(const QJsonObject& params) const
 {
     const QString toolName = params.value("name").toString();
+    try {
+        return handleToolCallUnchecked(params);
+    } catch(const std::exception& exception) {
+        return QJsonObject{
+            {"status", "error"},
+            {"tool_name", toolName},
+            {"message", QString("Neuro-Kernel tool %1 failed: %2")
+                            .arg(toolName, QString::fromUtf8(exception.what()))}
+        };
+    }
+}
+
+QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& params) const
+{
+    const QString toolName = params.value("name").toString();
     const QJsonObject arguments = params.value("arguments").toObject();
 
     if(toolName == "neurokernel.raw_stats") {

@@ -58,6 +58,7 @@ public:
 
 private:
     QJsonObject handleToolCall(const QJsonObject& params) const;
+    QJsonObject handleToolCallUnchecked(const QJsonObject& params) const;
     QJsonObject handleToolsList() const;
     QJsonArray toolDefinitions() const;
 
