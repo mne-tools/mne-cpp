@@ -73,6 +73,7 @@ private slots:
     void unreadableInputFile();
     void helpSucceeds_data();
     void helpSucceeds();
+    void invalidListSourceSpaceInputs();
     void validFiffFileOperations();
 
 private:
@@ -213,6 +214,7 @@ void TestToolExitCodes::missingRequiredArguments_data()
     QTest::newRow("mne_compare_fif_files")   << "mne_compare_fif_files";
     QTest::newRow("mne_collect_transforms")  << "mne_collect_transforms";
     QTest::newRow("mne_add_patch_info")      << "mne_add_patch_info";
+    QTest::newRow("mne_list_source_space")   << "mne_list_source_space";
     QTest::newRow("mne_toggle_skips")       << "mne_toggle_skips";
 }
 
@@ -267,6 +269,9 @@ void TestToolExitCodes::unreadableInputFile_data()
     QTest::newRow("mne_add_patch_info")
         << "mne_add_patch_info"
         << QStringList{"--src", "__MISSING__", "--out", "__MISSING_OUT__"};
+
+    QTest::newRow("mne_list_source_space")
+        << "mne_list_source_space" << QStringList{"--src", "__MISSING__"};
 }
 
 //=============================================================================================================
@@ -310,6 +315,7 @@ void TestToolExitCodes::helpSucceeds_data()
     QTest::newRow("mne_compare_fif_files")   << "mne_compare_fif_files";
     QTest::newRow("mne_collect_transforms")  << "mne_collect_transforms";
     QTest::newRow("mne_add_patch_info")      << "mne_add_patch_info";
+    QTest::newRow("mne_list_source_space")   << "mne_list_source_space";
 }
 
 //=============================================================================================================
@@ -326,6 +332,35 @@ void TestToolExitCodes::helpSucceeds()
     const int code = runTool(path, QStringList{"--help"});
     QVERIFY2(code != -1, "the tool could not be started at all");
     QCOMPARE(code, 0);
+}
+
+//=============================================================================================================
+
+void TestToolExitCodes::invalidListSourceSpaceInputs()
+{
+    const QString listSourceSpace = findTool("mne_list_source_space");
+    if (listSourceSpace.isEmpty()) {
+        QSKIP("mne_list_source_space was not built in this configuration");
+    }
+
+    const QString sourceFile = QCoreApplication::applicationDirPath()
+                               + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/"
+                                 "sample-oct-6-src.fif";
+    if (!QFileInfo::exists(sourceFile)) {
+        QSKIP("source-space test data is not available");
+    }
+
+    QCOMPARE(runTool(listSourceSpace, {"--src", sourceFile, "--coord", "scanner"}), 1);
+
+    const QString malformedFile = m_tempDir.filePath("malformed-source-space.fif");
+    QFile file(malformedFile);
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    QCOMPARE(file.write("not a FIFF file"), 15);
+    file.close();
+    QCOMPARE(runTool(listSourceSpace, {"--src", malformedFile}), 1);
+
+    QCOMPARE(runTool(listSourceSpace, {"--src", sourceFile, "--pnt", m_tempDir.path()}), 1);
+    QCOMPARE(runTool(listSourceSpace, {"--src", sourceFile, "--dip", m_tempDir.path()}), 1);
 }
 
 //=============================================================================================================
@@ -383,7 +418,17 @@ void TestToolExitCodes::validFiffFileOperations()
         QCOMPARE(runTool(addPatchInfo, {"--src", sourceFile, "--out", outputFile}), 0);
         QVERIFY(QFileInfo(outputFile).size() > 0);
         if (!listSourceSpace.isEmpty()) {
-            QCOMPARE(runTool(listSourceSpace, {"--src", outputFile}), 0);
+            const QString pointFile = m_tempDir.filePath("source-space.pnt");
+            const QString dipoleFile = m_tempDir.filePath("source-space.dip");
+            const QString vertexFile = m_tempDir.filePath("source-space.vert");
+            QCOMPARE(runTool(listSourceSpace,
+                             {"--src", outputFile, "--coord", "head",
+                              "--pnt", pointFile, "--dip", dipoleFile,
+                              "--vert", vertexFile}),
+                     0);
+            QVERIFY(QFileInfo(pointFile).size() > 0);
+            QVERIFY(QFileInfo(dipoleFile).size() > 0);
+            QVERIFY(QFileInfo(vertexFile).size() > 0);
         }
     }
 }
