@@ -43,7 +43,8 @@ class TestStudioSkillHost : public QObject {
 };
 
 void TestStudioSkillHost::initTestCase() {
-    const QString socketName = QStringLiteral("mne-cpp-skill-host-test-") + QUuid::createUuid().toString(QUuid::WithoutBraces);
+    const QString socketName = QStringLiteral("mne-sh-")
+                               + QUuid::createUuid().toString(QUuid::Id128).left(12);
     QVERIFY(m_service.start(socketName, QStringLiteral(MNE_STUDIO_EXTENSIONS_DIR)));
     m_socket.connectToServer(socketName);
     QVERIFY(m_socket.waitForConnected(5000));

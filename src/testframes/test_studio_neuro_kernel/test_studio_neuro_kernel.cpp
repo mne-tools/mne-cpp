@@ -50,7 +50,8 @@ class TestStudioNeuroKernel : public QObject {
 };
 
 void TestStudioNeuroKernel::initTestCase() {
-    const QString socketName = QStringLiteral("mne-cpp-neuro-kernel-test-") + QUuid::createUuid().toString(QUuid::WithoutBraces);
+    const QString socketName = QStringLiteral("mne-nk-")
+                               + QUuid::createUuid().toString(QUuid::Id128).left(12);
     QVERIFY(m_service.start(socketName));
     m_socket.connectToServer(socketName);
     QVERIFY(m_socket.waitForConnected(5000));

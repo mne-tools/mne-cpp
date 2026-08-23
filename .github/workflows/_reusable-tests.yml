@@ -230,6 +230,7 @@ jobs:
       if: matrix.os == 'windows-2025-vs2026'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
+        QT_QPA_PLATFORM: offscreen
         MNE_DATA: ~/mne_data
         MNE_REQUIRE_PYTHON: 'true'
       run: |
