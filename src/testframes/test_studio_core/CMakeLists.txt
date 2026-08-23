@@ -15,6 +15,8 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(SOURCES
     test_studio_core.cpp
+  ../../applications/mne_analyze_studio/workbench/agentchatdockwidget.cpp
+  ../../applications/mne_analyze_studio/workbench/agentchatdockwidget.h
     ../../applications/mne_analyze_studio/workbench/llmsettingsdialog.cpp
     ../../applications/mne_analyze_studio/workbench/llmsettingsdialog.h
     ../../applications/mne_analyze_studio/workbench/pillselectorwidget.cpp

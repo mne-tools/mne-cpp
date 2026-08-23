@@ -29,6 +29,7 @@
 #include <core/fiffbuffer.h>
 #include <core/capabilitycatalog.h>
 #include <core/capabilityutils.h>
+#include <workbench/agentchatdockwidget.h>
 #include <workbench/llmsettingsdialog.h>
 #include <workbench/pillselectorwidget.h>
 
@@ -43,7 +44,10 @@
 #include <QJsonDocument>
 #include <QFile>
 #include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
 #include <QSettings>
+#include <QStackedWidget>
 
 #include <algorithm>
 
@@ -82,6 +86,7 @@ private slots:
     void planner_mockModeIsConfiguredWithoutCredentials();
     void planner_httpModeNeedsEndpointAndModel();
     void planner_statusSummaryMentionsMode();
+    void agentChatDockWidget_conversationAndConfirmations();
     void llmSettingsDialog_ruleBasedAndProfileFlow();
 
     void fiffBuffer_reportsUriAndKind();
@@ -312,6 +317,115 @@ void TestStudioCore::planner_statusSummaryMentionsMode()
     QVERIFY2(!summary.isEmpty(), "status summary is empty");
     QVERIFY2(summary.contains("Mock", Qt::CaseInsensitive),
              qPrintable(QString("summary does not mention the mode: %1").arg(summary)));
+}
+
+//=============================================================================================================
+
+void TestStudioCore::agentChatDockWidget_conversationAndConfirmations()
+{
+    AgentChatDockWidget widget;
+    widget.resize(480, 720);
+
+    auto* input = widget.findChild<QLineEdit*>("agentInput");
+    auto* sendButton = widget.findChild<QPushButton*>("agentSendBtn");
+    auto* connectionButton = widget.findChild<QPushButton*>("agentConnectBtn");
+    auto* statusLabel = widget.findChild<QLabel*>("agentStatusLabel");
+    auto* validationLabel = widget.findChild<QLabel*>("agentValidationLabel");
+    auto* mainStack = widget.findChild<QStackedWidget*>();
+    QVERIFY(input != nullptr);
+    QVERIFY(sendButton != nullptr);
+    QVERIFY(connectionButton != nullptr);
+    QVERIFY(statusLabel != nullptr);
+    QVERIFY(validationLabel != nullptr);
+    QVERIFY(mainStack != nullptr);
+
+    QSignalSpy commandSpy(&widget, &AgentChatDockWidget::commandSubmitted);
+    input->setText("  inspect active data  ");
+    QTest::mouseClick(sendButton, Qt::LeftButton);
+    QCOMPARE(commandSpy.size(), 1);
+    QCOMPARE(commandSpy.takeFirst().at(0).toString(), QString("inspect active data"));
+    QVERIFY(input->text().isEmpty());
+    QCOMPARE(widget.currentConversationEntries().size(), 1);
+
+    widget.appendTranscript("Assistant> analysis complete");
+    QCOMPARE(widget.currentConversationEntries().size(), 2);
+    widget.appendTranscript("You> start another task");
+    QCOMPARE(widget.archivedConversationSessions().size(), 1);
+    QCOMPARE(widget.currentConversationEntries().size(), 1);
+    QCOMPARE(widget.archivedConversationSessions().first().toObject().value("title").toString(),
+             QString("inspect active data"));
+    widget.appendTranscript("   ");
+    QCOMPARE(widget.currentConversationEntries().size(), 1);
+
+    QSignalSpy approveSpy(&widget, &AgentChatDockWidget::confirmationRequested);
+    QSignalSpy dismissSpy(&widget, &AgentChatDockWidget::confirmationDismissed);
+    widget.setPendingConfirmations({QJsonObject{{"command", "apply-filter"},
+                                                {"title", "Apply filter"},
+                                                {"reason", "changes data"},
+                                                {"stale", true},
+                                                {"stale_reason", "view changed"}},
+                                    QJsonObject{{"command", ""}}});
+    auto* approveButton = widget.findChild<QPushButton*>("agentApproveBtn");
+    auto* dismissButton = widget.findChild<QPushButton*>("agentDismissBtn");
+    QVERIFY(approveButton != nullptr);
+    QVERIFY(dismissButton != nullptr);
+    QCOMPARE(approveButton->text(), QString("Approve Anyway"));
+    QTest::mouseClick(approveButton, Qt::LeftButton);
+    QTest::mouseClick(dismissButton, Qt::LeftButton);
+    QCOMPARE(approveSpy.takeFirst().at(0).toString(), QString("apply-filter"));
+    QCOMPARE(dismissSpy.takeFirst().at(0).toString(), QString("apply-filter"));
+    widget.setPendingConfirmations({});
+
+    widget.setPlannerStatus("LLM: Connected | Provider: OpenAI | Model: gpt-test");
+    QVERIFY(statusLabel->text().contains("OpenAI"));
+    QVERIFY(statusLabel->text().contains("gpt-test"));
+    widget.setPlannerStatus("Deterministic fallback only");
+    QCOMPARE(statusLabel->text(), QString("Rule-based planning active"));
+
+    widget.setConnectionState("Remote", true, "API key missing");
+    QCOMPARE(connectionButton->text(), QString("!"));
+    QVERIFY(validationLabel->isVisibleTo(&widget));
+    QCOMPARE(validationLabel->text(), QString("API key missing"));
+    widget.setConnectionState("Rule-based", false);
+    QVERIFY(!connectionButton->isVisibleTo(&widget));
+
+    QSignalSpy settingsSpy(&widget, &AgentChatDockWidget::openConnectionSettingsRequested);
+    widget.setConnectionState("Remote", false);
+    QTest::mouseClick(connectionButton, Qt::LeftButton);
+    QCOMPARE(settingsSpy.size(), 1);
+
+    widget.setConnectionProfiles({"work", "local"}, "work");
+    widget.setConnectionModes({qMakePair(QString("OpenAI"), QString("openai_responses")),
+                               qMakePair(QString("Rule-Based"), QString("disabled"))},
+                              "openai_responses");
+    widget.setSuggestedModels({"model-a", "model-b"}, "model-b");
+    widget.setPlannerSafetyLevel("safe");
+    widget.setPlannerSafetyLevel("unsupported");
+
+    const QJsonArray restoredCurrent{QJsonObject{{"text", "Assistant> restored"},
+                                                 {"timestamp", "2026-08-23T10:00:00Z"}}};
+    const QJsonArray restoredArchive{QJsonObject{{"title", "Prior session"},
+                                                 {"preview", "prior preview"},
+                                                 {"timestamp", "2026-08-22T10:00:00Z"},
+                                                 {"entries", restoredCurrent}}};
+    widget.restoreConversationState(restoredCurrent, restoredArchive);
+    QCOMPARE(widget.currentConversationEntries(), restoredCurrent);
+    QCOMPARE(widget.archivedConversationSessions(), restoredArchive);
+
+    QPushButton* historyButton = nullptr;
+    for(QPushButton* button : widget.findChildren<QPushButton*>("agentHeaderBtn")) {
+        if(button->text() == QLatin1String("History")) {
+            historyButton = button;
+            break;
+        }
+    }
+    QVERIFY(historyButton != nullptr);
+    QTest::mouseClick(historyButton, Qt::LeftButton);
+    QCOMPARE(mainStack->currentIndex(), 1);
+    QTest::mouseClick(historyButton, Qt::LeftButton);
+    QCOMPARE(mainStack->currentIndex(), 0);
+
+    QApplication::processEvents();
 }
 
 //=============================================================================================================
