@@ -49,6 +49,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
+#include <QFileInfo>
 #include <QDir>
 #include <QDebug>
 
@@ -72,71 +73,6 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PROGRAM_VERSION MNE_CPP_VERSION
-
-//=============================================================================================================
-
-/**
- * Simple uniform surface decimation by selecting every nth vertex.
- * Returns a new BEM surface with approximately targetNVert vertices.
- */
-static MNEBemSurface decimateSurface(const MNEBemSurface &src, int targetNVert)
-{
-    MNEBemSurface dst(src);
-
-    if (targetNVert >= src.np) {
-        qInfo("  Target %d >= source %d vertices, keeping original." , targetNVert, src.np);
-        return dst;
-    }
-
-    // Select vertices uniformly
-    double step = static_cast<double>(src.np) / targetNVert;
-    Eigen::VectorXi selectedVerts(targetNVert);
-    QMap<int, int> oldToNew;
-
-    for (int i = 0; i < targetNVert; ++i) {
-        int idx = static_cast<int>(i * step);
-        if (idx >= src.np) idx = src.np - 1;
-        selectedVerts(i) = idx;
-        oldToNew[idx] = i;
-    }
-
-    // Build new vertex positions and normals
-    using PointsT = Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>;
-    PointsT newRr(targetNVert, 3);
-    PointsT newNn(targetNVert, 3);
-    for (int i = 0; i < targetNVert; ++i) {
-        newRr.row(i) = src.rr.row(selectedVerts(i));
-        newNn.row(i) = src.nn.row(selectedVerts(i));
-    }
-
-    dst.rr = newRr;
-    dst.nn = newNn;
-    dst.np = targetNVert;
-
-    // Build new triangulation: keep only triangles where all 3 vertices are selected
-    using TrianglesT = Eigen::Matrix<int, Eigen::Dynamic, 3, Eigen::RowMajor>;
-    QList<Eigen::Vector3i> newTris;
-    for (int t = 0; t < src.ntri; ++t) {
-        int v0 = src.itris(t, 0);
-        int v1 = src.itris(t, 1);
-        int v2 = src.itris(t, 2);
-        if (oldToNew.contains(v0) && oldToNew.contains(v1) && oldToNew.contains(v2)) {
-            newTris.append(Eigen::Vector3i(oldToNew[v0], oldToNew[v1], oldToNew[v2]));
-        }
-    }
-
-    dst.ntri = newTris.size();
-    TrianglesT itris(newTris.size(), 3);
-    for (int t = 0; t < newTris.size(); ++t) {
-        itris.row(t) = newTris[t].transpose();
-    }
-    dst.itris = itris;
-    dst.tris.clear();
-
-    return dst;
-}
-
-//=============================================================================================================
 
 int main(int argc, char *argv[])
 {
@@ -183,6 +119,12 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    const QFileInfo bemFileInfo(bemFile);
+    if (!bemFileInfo.isFile() || !bemFileInfo.isReadable()) {
+        qCritical("Cannot read BEM from: %s", qPrintable(bemFile));
+        return 1;
+    }
+
     // Read BEM
     QFile file(bemFile);
     MNEBem bem(file);
@@ -220,7 +162,13 @@ int main(int argc, char *argv[])
     // Generate decimated surfaces
     for (int targetVerts : grades) {
         qInfo("Decimating to %d vertices..." , targetVerts);
-        MNEBemSurface decimated = decimateSurface(skin, targetVerts);
+        const QList<MNEBemSurface> surfaces =
+            MNEBemSurface::makeScalpSurfaces(skin, {targetVerts});
+        if (surfaces.isEmpty()) {
+            qCritical("Could not decimate scalp surface to %d vertices.", targetVerts);
+            return 1;
+        }
+        const MNEBemSurface& decimated = surfaces.constFirst();
 
         // Write as FIFF BEM surface
         QString outPath = QDir(outDir).filePath(

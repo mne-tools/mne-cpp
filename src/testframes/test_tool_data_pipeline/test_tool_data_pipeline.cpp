@@ -38,6 +38,7 @@
 //=============================================================================================================
 
 #include <inv/inv_source_estimate.h>
+#include <mne/mne_bem.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -1444,6 +1445,40 @@ private slots:
         }, 120000);
         // Check if it ran without crashing; output format may vary
         QVERIFY(!output.isEmpty() || QFile::exists(outPath));
+    }
+
+    //=========================================================================================================
+    // mne_make_scalp_surfaces - topology-preserving BEM decimation
+    //=========================================================================================================
+
+    void testMakeScalpSurfacesRun()
+    {
+        if (!toolExists("mne_make_scalp_surfaces")) QSKIP("mne_make_scalp_surfaces not found");
+        const QString bemFile = m_sResourcePath + "subjects/sample/bem/sample-5120-bem.fif";
+        if (!QFile::exists(bemFile)) QSKIP("BEM data not available");
+
+        const QString outputDir = m_tempDir.filePath("scalp-surfaces");
+        QCOMPARE(runToolExitCode("mne_make_scalp_surfaces", {
+                     "--bem", bemFile,
+                     "--out", outputDir,
+                     "--grades", "256,512,5120"}, 180000),
+                 0);
+
+        const QList<QPair<int, int>> expectedMeshes = {
+            {256, 508},
+            {512, 1020},
+            {5120, 5120}
+        };
+        for (const auto& [grade, expectedTriangles] : expectedMeshes) {
+            QFile outputFile(QDir(outputDir).filePath(QString("scalp-%1.fif").arg(grade)));
+            MNELIB::MNEBem bem(outputFile);
+            QCOMPARE(bem.size(), 1);
+            const int expectedVertices = grade == 5120 ? 2562 : grade;
+            QCOMPARE(bem[0].np, expectedVertices);
+            QCOMPARE(bem[0].ntri, expectedTriangles);
+            QVERIFY(bem[0].itris.minCoeff() >= 0);
+            QVERIFY(bem[0].itris.maxCoeff() < bem[0].np);
+        }
     }
 
     //=========================================================================================================

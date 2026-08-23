@@ -218,6 +218,7 @@ void TestToolExitCodes::missingRequiredArguments_data()
     QTest::newRow("mne_list_source_space")   << "mne_list_source_space";
     QTest::newRow("mne_epochs2mat")           << "mne_epochs2mat";
     QTest::newRow("mne_compute_cmne")         << "mne_compute_cmne";
+    QTest::newRow("mne_make_scalp_surfaces")  << "mne_make_scalp_surfaces";
     QTest::newRow("mne_toggle_skips")       << "mne_toggle_skips";
 }
 
@@ -286,6 +287,10 @@ void TestToolExitCodes::unreadableInputFile_data()
         << "mne_compute_cmne"
         << QStringList{"--fwd", "__MISSING__", "--cov", "__MISSING__",
                        "--evoked", "__MISSING__", "--out", "__MISSING_OUT__"};
+
+    QTest::newRow("mne_make_scalp_surfaces")
+        << "mne_make_scalp_surfaces"
+        << QStringList{"--bem", "__MISSING__", "--out", "__MISSING_OUT__"};
 }
 
 //=============================================================================================================
@@ -332,6 +337,7 @@ void TestToolExitCodes::helpSucceeds_data()
     QTest::newRow("mne_list_source_space")   << "mne_list_source_space";
     QTest::newRow("mne_epochs2mat")           << "mne_epochs2mat";
     QTest::newRow("mne_compute_cmne")         << "mne_compute_cmne";
+    QTest::newRow("mne_make_scalp_surfaces")  << "mne_make_scalp_surfaces";
 }
 
 //=============================================================================================================
