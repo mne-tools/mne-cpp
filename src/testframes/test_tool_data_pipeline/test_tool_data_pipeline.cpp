@@ -137,6 +137,82 @@ private slots:
     }
 
     //=========================================================================================================
+    // mne_epochs2mat - event selection, bounds handling, and MAT5 output
+    //=========================================================================================================
+
+    void testEpochs2MatValidation()
+    {
+        if (!toolExists("mne_epochs2mat")) QSKIP("mne_epochs2mat not found");
+
+        const QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+        if (!QFile::exists(rawFile)) QSKIP("Raw data not available");
+
+        const QString eventFile = m_tempDir.filePath("empty-events.txt");
+        QFile file(eventFile);
+        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
+        QCOMPARE(file.write("# no usable events\nmalformed\n"), 29);
+        file.close();
+
+        QCOMPARE(runToolExitCode("mne_epochs2mat", {
+                     "--raw", rawFile,
+                     "--event", eventFile,
+                     "--tmin", "0.1",
+                     "--tmax", "-0.1",
+                     "--event-id", "1",
+                     "--out", m_tempDir.filePath("invalid-window")}),
+                 1);
+        QCOMPARE(runToolExitCode("mne_epochs2mat", {
+                     "--raw", rawFile,
+                     "--event", eventFile,
+                     "--tmin", "-0.1",
+                     "--tmax", "0.1",
+                     "--event-id", "1",
+                     "--out", m_tempDir.filePath("empty-events")}),
+                 1);
+    }
+
+    void testEpochs2MatRoundTrip()
+    {
+        if (!toolExists("mne_epochs2mat")) QSKIP("mne_epochs2mat not found");
+
+        const QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+        if (!QFile::exists(rawFile)) QSKIP("Raw data not available");
+
+        const QString eventFile = m_tempDir.filePath("epochs-events.txt");
+        QFile file(eventFile);
+        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
+        const QByteArray events = "# sample previous id\n"
+                                  "12900 0 7\n"
+                                  "13200 0 7\n"
+                                  "13300 0 8\n";
+        QCOMPARE(file.write(events), events.size());
+        file.close();
+
+        const QString outputDir = m_tempDir.filePath("epochs-mat");
+        QCOMPARE(runToolExitCode("mne_epochs2mat", {
+                     "--raw", rawFile,
+                     "--event", eventFile,
+                     "--tmin", "-0.01",
+                     "--tmax", "0.02",
+                     "--event-id", "7",
+                     "--out", outputDir}),
+                 0);
+
+        const QDir output(outputDir);
+        QCOMPARE(output.entryList({"*.mat"}, QDir::Files), QStringList{"epoch_001.mat"});
+
+        QFile matFile(output.filePath("epoch_001.mat"));
+        QVERIFY(matFile.open(QIODevice::ReadOnly));
+        const QByteArray contents = matFile.readAll();
+        QVERIFY(contents.size() > 128);
+        QVERIFY(contents.startsWith("MATLAB 5.0 MAT-file, created by mne_epochs2mat"));
+        QCOMPARE(contents.mid(126, 2), QByteArray("IM"));
+        QVERIFY(contents.contains("data"));
+        QVERIFY(contents.contains("sfreq"));
+        QVERIFY(contents.contains("times"));
+    }
+
+    //=========================================================================================================
     // mne_compensate_data
     //=========================================================================================================
 

@@ -215,6 +215,7 @@ void TestToolExitCodes::missingRequiredArguments_data()
     QTest::newRow("mne_collect_transforms")  << "mne_collect_transforms";
     QTest::newRow("mne_add_patch_info")      << "mne_add_patch_info";
     QTest::newRow("mne_list_source_space")   << "mne_list_source_space";
+    QTest::newRow("mne_epochs2mat")           << "mne_epochs2mat";
     QTest::newRow("mne_toggle_skips")       << "mne_toggle_skips";
 }
 
@@ -272,6 +273,12 @@ void TestToolExitCodes::unreadableInputFile_data()
 
     QTest::newRow("mne_list_source_space")
         << "mne_list_source_space" << QStringList{"--src", "__MISSING__"};
+
+    QTest::newRow("mne_epochs2mat")
+        << "mne_epochs2mat"
+        << QStringList{"--raw", "__MISSING__", "--event", "__MISSING__",
+                       "--tmin", "-0.1", "--tmax", "0.2", "--event-id", "1",
+                       "--out", "__MISSING_OUT__"};
 }
 
 //=============================================================================================================
@@ -316,6 +323,7 @@ void TestToolExitCodes::helpSucceeds_data()
     QTest::newRow("mne_collect_transforms")  << "mne_collect_transforms";
     QTest::newRow("mne_add_patch_info")      << "mne_add_patch_info";
     QTest::newRow("mne_list_source_space")   << "mne_list_source_space";
+    QTest::newRow("mne_epochs2mat")           << "mne_epochs2mat";
 }
 
 //=============================================================================================================

@@ -52,6 +52,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
+#include <QFileInfo>
 #include <QDir>
 #include <QTextStream>
 #include <QDataStream>
@@ -272,6 +273,12 @@ int main(int argc, char *argv[])
 
     if (tmin >= tmax) {
         qCritical("--tmin must be less than --tmax.");
+        return 1;
+    }
+
+    const QFileInfo rawFileInfo(rawFile);
+    if (!rawFileInfo.isFile() || !rawFileInfo.isReadable()) {
+        qCritical("Cannot read raw data: %s", qPrintable(rawFile));
         return 1;
     }
 
