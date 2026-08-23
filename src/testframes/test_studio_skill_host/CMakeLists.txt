@@ -48,6 +48,10 @@ if(QT_VERSION_MAJOR EQUAL 6)
 endif()
 
 add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+set_tests_properties(${PROJECT_NAME} PROPERTIES
+    LABELS "integration"
+    TIMEOUT 60
+)
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
