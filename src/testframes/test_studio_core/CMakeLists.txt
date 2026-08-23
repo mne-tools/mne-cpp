@@ -21,6 +21,8 @@ set(SOURCES
     ../../applications/mne_analyze_studio/workbench/llmsettingsdialog.h
     ../../applications/mne_analyze_studio/workbench/pillselectorwidget.cpp
     ../../applications/mne_analyze_studio/workbench/pillselectorwidget.h
+    ../../applications/mne_analyze_studio/workbench/workflowminimapwidget.cpp
+    ../../applications/mne_analyze_studio/workbench/workflowminimapwidget.h
 )
 
 if(WITH_CODE_COV)

@@ -32,6 +32,7 @@
 #include <workbench/agentchatdockwidget.h>
 #include <workbench/llmsettingsdialog.h>
 #include <workbench/pillselectorwidget.h>
+#include <workbench/workflowminimapwidget.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -43,6 +44,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QFile>
+#include <QImage>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
@@ -88,6 +90,7 @@ private slots:
     void planner_statusSummaryMentionsMode();
     void agentChatDockWidget_conversationAndConfirmations();
     void llmSettingsDialog_ruleBasedAndProfileFlow();
+    void workflowMiniMapWidget_graphRenderingAndActivation();
 
     void fiffBuffer_reportsUriAndKind();
     void fiffBuffer_missingFileFailsToOpen();
@@ -493,6 +496,88 @@ void TestStudioCore::llmSettingsDialog_ruleBasedAndProfileFlow()
         return label->text().contains("No model catalog endpoint");
     }));
 
+}
+
+//=============================================================================================================
+
+void TestStudioCore::workflowMiniMapWidget_graphRenderingAndActivation()
+{
+    WorkflowMiniMapWidget widget;
+    widget.resize(600, 300);
+    widget.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&widget));
+    QCOMPARE(widget.minimumSizeHint(), QSize(280, 180));
+    QCOMPARE(widget.sizeHint(), QSize(420, 220));
+
+    QImage image(widget.size(), QImage::Format_ARGB32_Premultiplied);
+    image.fill(Qt::transparent);
+    widget.render(&image);
+    QVERIFY(!image.isNull());
+
+    const QJsonObject sourceNode{
+        {"uid", "source"},
+        {"label", "Load Raw"},
+        {"stage", "input"},
+        {"outputs", QJsonObject{{"raw", "raw-output"}}},
+        {"runtime", QJsonObject{{"status", "completed"}}}
+    };
+    const QJsonObject processNode{
+        {"uid", "process"},
+        {"label", "Filter"},
+        {"skill_id", "filter-skill"},
+        {"inputs", QJsonObject{{"raw", "raw-output"}}},
+        {"outputs", QJsonObject{{"filtered", "filtered-output"}}},
+        {"runtime", QJsonObject{{"status", "running"}}}
+    };
+    const QJsonObject resultNode{
+        {"uid", "result"},
+        {"inputs", QJsonObject{{"data", "filtered-output"}}},
+        {"runtime", QJsonObject{{"status", "failed"}}}
+    };
+    widget.setWorkflowGraph(QJsonObject{{"pipeline", QJsonArray{resultNode, sourceNode, processNode}}});
+    widget.setFocusNodeUid("process");
+
+    image.fill(Qt::transparent);
+    widget.render(&image);
+    QVERIFY(image.pixelColor(image.width() / 2, image.height() / 2).alpha() > 0);
+
+    QSignalSpy activationSpy(&widget, &WorkflowMiniMapWidget::nodeActivated);
+    QTest::mouseMove(&widget, QPoint(300, 150));
+    QCOMPARE(widget.cursor().shape(), Qt::PointingHandCursor);
+    QTest::mouseClick(&widget, Qt::LeftButton, Qt::NoModifier, QPoint(300, 150));
+    QCOMPARE(activationSpy.size(), 1);
+    QCOMPARE(activationSpy.takeFirst().at(0).toString(), QString("process"));
+    QTest::mouseClick(&widget, Qt::RightButton, Qt::NoModifier, QPoint(300, 150));
+    QCOMPARE(activationSpy.size(), 0);
+    QTest::mouseMove(&widget, QPoint(5, 5));
+    QCOMPARE(widget.cursor().shape(), Qt::ArrowCursor);
+
+    QEvent leaveEvent(QEvent::Leave);
+    QApplication::sendEvent(&widget, &leaveEvent);
+    QCOMPARE(widget.cursor().shape(), Qt::ArrowCursor);
+
+    widget.setFocusNodeUid("missing");
+    widget.setFocusNodeUid("source");
+    widget.resize(20, 20);
+    image = QImage(widget.size(), QImage::Format_ARGB32_Premultiplied);
+    image.fill(Qt::transparent);
+    widget.render(&image);
+
+    const QJsonObject cycleA{{"uid", "a"},
+                             {"inputs", QJsonObject{{"input", "b-output"}}},
+                             {"outputs", QJsonObject{{"output", "a-output"}}}};
+    const QJsonObject cycleB{{"uid", "b"},
+                             {"inputs", QJsonObject{{"input", "a-output"}}},
+                             {"outputs", QJsonObject{{"output", "b-output"}}}};
+    widget.resize(400, 220);
+    widget.setWorkflowGraph(QJsonObject{{"pipeline", QJsonArray{cycleB, QJsonObject(), cycleA}}});
+    image = QImage(widget.size(), QImage::Format_ARGB32_Premultiplied);
+    image.fill(Qt::transparent);
+    widget.render(&image);
+
+    widget.setWorkflowGraph(QJsonObject{{"pipeline", QJsonArray()}});
+    image.fill(Qt::transparent);
+    widget.render(&image);
 }
 
 //=============================================================================================================
