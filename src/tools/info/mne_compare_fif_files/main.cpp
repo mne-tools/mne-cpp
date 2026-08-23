@@ -126,17 +126,7 @@ int main(int argc, char *argv[])
 
     // Open both files
     QFile f1(file1);
-    if (!f1.open(QIODevice::ReadOnly)) {
-        qCritical("Cannot open: %s", qPrintable(file1));
-        return 1;
-    }
-
     QFile f2(file2);
-    if (!f2.open(QIODevice::ReadOnly)) {
-        qCritical("Cannot open: %s", qPrintable(file2));
-        return 1;
-    }
-
     FiffStream::SPtr stream1(new FiffStream(&f1));
     FiffStream::SPtr stream2(new FiffStream(&f2));
 
@@ -171,7 +161,7 @@ int main(int argc, char *argv[])
 
         bool dataMatch = false;
         if (sizeMatch && tag1 && tag2) {
-            dataMatch = (tag1->data() == tag2->data());
+            dataMatch = (*tag1 == *tag2);
         }
 
         bool isMatch = kindMatch && typeMatch && sizeMatch && dataMatch;

@@ -112,7 +112,14 @@ int main(int argc, char *argv[])
 
     // Read covariance
     QFile fCov(covFile);
-    FiffCov cov(fCov);
+    FiffCov cov;
+    try {
+        cov = FiffCov(fCov);
+    } catch (const std::exception& error) {
+        qCritical("Cannot read covariance from %s: %s",
+                  qPrintable(covFile), error.what());
+        return 1;
+    }
     if (cov.isEmpty()) {
         qCritical("Cannot read covariance from: %s", qPrintable(covFile));
         return 1;

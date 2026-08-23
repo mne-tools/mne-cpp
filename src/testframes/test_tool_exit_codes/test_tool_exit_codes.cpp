@@ -16,8 +16,8 @@
  * A tool that prints an error and then exits zero is worse than one that says
  * nothing at all: every script built on it treats the run as a success. This
  * test drives a handful of tools into their most ordinary failure - a required
- * argument that is missing, or an input file that does not exist - and checks
- * only the exit status.
+ * argument that is missing, or an input file that does not exist - and also
+ * exercises representative successful file operations.
  *
  * It deliberately does not assert on message text. Wording changes for good
  * reasons and a test that pins it down turns every improvement to an error
@@ -73,6 +73,7 @@ private slots:
     void unreadableInputFile();
     void helpSucceeds_data();
     void helpSucceeds();
+    void validFiffFileOperations();
 
 private:
     /** Locate a tool next to the test binary, or an empty string when it was not built. */
@@ -208,6 +209,8 @@ void TestToolExitCodes::missingRequiredArguments_data()
     QTest::newRow("mne_add_triggers")       << "mne_add_triggers";
     QTest::newRow("mne_change_nave")        << "mne_change_nave";
     QTest::newRow("mne_mark_bad_channels")  << "mne_mark_bad_channels";
+    QTest::newRow("mne_cov2proj")            << "mne_cov2proj";
+    QTest::newRow("mne_compare_fif_files")   << "mne_compare_fif_files";
     QTest::newRow("mne_toggle_skips")       << "mne_toggle_skips";
 }
 
@@ -243,6 +246,14 @@ void TestToolExitCodes::unreadableInputFile_data()
     QTest::newRow("mne_change_nave")
         << "mne_change_nave"
         << QStringList{"--meas", "__MISSING__", "--nave", "1", "--out", "__MISSING_OUT__"};
+
+    QTest::newRow("mne_cov2proj")
+        << "mne_cov2proj"
+        << QStringList{"--cov", "__MISSING__", "--out", "__MISSING_OUT__"};
+
+    QTest::newRow("mne_compare_fif_files")
+        << "mne_compare_fif_files"
+        << QStringList{"--file1", "__MISSING__", "--file2", "__MISSING__"};
 }
 
 //=============================================================================================================
@@ -282,6 +293,8 @@ void TestToolExitCodes::helpSucceeds_data()
     QTest::newRow("mne_fix_mag_coil_types") << "mne_fix_mag_coil_types";
     QTest::newRow("mne_mark_bad_channels")  << "mne_mark_bad_channels";
     QTest::newRow("mne_change_nave")        << "mne_change_nave";
+    QTest::newRow("mne_cov2proj")            << "mne_cov2proj";
+    QTest::newRow("mne_compare_fif_files")   << "mne_compare_fif_files";
 }
 
 //=============================================================================================================
@@ -298,6 +311,36 @@ void TestToolExitCodes::helpSucceeds()
     const int code = runTool(path, QStringList{"--help"});
     QVERIFY2(code != -1, "the tool could not be started at all");
     QCOMPARE(code, 0);
+}
+
+//=============================================================================================================
+
+void TestToolExitCodes::validFiffFileOperations()
+{
+    const QString dataDir = QCoreApplication::applicationDirPath()
+                            + "/../resources/data/mne-cpp-test-data/MEG/sample/";
+    const QString covFile = dataDir + "sample_audvis-cov.fif";
+    const QString evokedFile = dataDir + "sample_audvis-ave.fif";
+    QVERIFY(QFileInfo::exists(covFile));
+    QVERIFY(QFileInfo::exists(evokedFile));
+
+    const QString cov2proj = findTool("mne_cov2proj");
+    const QString compareFif = findTool("mne_compare_fif_files");
+    if (!cov2proj.isEmpty()) {
+        const QString outputFile = m_tempDir.filePath("covariance-projections.fif");
+        QCOMPARE(runTool(cov2proj,
+                         {"--cov", covFile, "--nproj", "2", "--out", outputFile}),
+                 0);
+        QVERIFY(QFileInfo(outputFile).size() > 0);
+        if (!compareFif.isEmpty()) {
+            QCOMPARE(runTool(compareFif, {"--file1", outputFile, "--file2", outputFile}), 0);
+        }
+    }
+
+    if (!compareFif.isEmpty()) {
+        QCOMPARE(runTool(compareFif, {"--file1", covFile, "--file2", covFile}), 0);
+        QCOMPARE(runTool(compareFif, {"--file1", covFile, "--file2", evokedFile}), 1);
+    }
 }
 
 //=============================================================================================================
