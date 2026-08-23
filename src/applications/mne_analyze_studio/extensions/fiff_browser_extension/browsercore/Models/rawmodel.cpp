@@ -369,7 +369,7 @@ bool RawModel::loadFiffData(QIODevice* qFile)
 
     if(QFile* sourceFile = qobject_cast<QFile*>(qFile)) {
         QSharedPointer<QFile> persistentFile(new QFile(sourceFile->fileName()));
-        if(!persistentFile->open(QIODevice::ReadOnly)) {
+        if(!persistentFile->exists()) {
             qWarning() << "RawModel: ERROR! Could not open source file" << sourceFile->fileName();
             endResetModel();
             return false;
@@ -388,7 +388,6 @@ bool RawModel::loadFiffData(QIODevice* qFile)
 
         m_sourceBuffer = qFile->readAll();
         QSharedPointer<QBuffer> persistentBuffer(new QBuffer(&m_sourceBuffer));
-        persistentBuffer->open(QIODevice::ReadOnly);
         m_pSourceDevice = persistentBuffer;
     }
 
