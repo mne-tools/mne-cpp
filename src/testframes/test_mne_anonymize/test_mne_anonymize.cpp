@@ -50,7 +50,9 @@
 #include <QtTest>
 #include <QFileInfo>
 #include <QProcess>
+#include <QRegularExpression>
 #include <QScopedPointer>
+#include <QTemporaryDir>
 #include <QTimeZone>
 
 #include <utility>
@@ -61,6 +63,32 @@
 
 using namespace FIFFLIB;
 using namespace MNEANONYMIZE;
+
+class TestSettingsControllerCl : public SettingsControllerCl
+{
+public:
+    using SettingsControllerCl::SettingsControllerCl;
+
+    FiffAnonymizer* anonymizer() const
+    {
+        return m_pAnonymizer.data();
+    }
+
+    QString randomFileName()
+    {
+        return generateRandomFileName();
+    }
+
+    bool deleteInputFileAfter() const
+    {
+        return m_bDeleteInputFileAfter;
+    }
+
+    bool deleteInputFileConfirmation() const
+    {
+        return m_bDeleteInputFileConfirmation;
+    }
+};
 
 //=============================================================================================================
 /**
@@ -82,6 +110,8 @@ private slots:
     void testAnonymizerDefaultsAndRequiredFiles();
     void testAnonymizerConfiguration();
     void testAnonymizerCopyAndMove();
+    void testCommandLineConfiguration();
+    void testCommandLineOffsetsAndInvalidPaths();
     void testDefaultOutput();
     void testDeleteInputFile();
     void testInPlace();
@@ -207,6 +237,76 @@ void TestMneAnonymize::testAnonymizerCopyAndMove()
     QCOMPARE(moved.getBruteMode(), original.getBruteMode());
     QCOMPARE(moved.getMeasurementDayOffset(), original.getMeasurementDayOffset());
     QCOMPARE(moved.getSubjectHisID(), original.getSubjectHisID());
+}
+
+//=============================================================================================================
+
+void TestMneAnonymize::testCommandLineConfiguration()
+{
+    QTemporaryDir temporaryDir;
+    QVERIFY(temporaryDir.isValid());
+    const QString inputFile = QCoreApplication::applicationDirPath()
+                              + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    const QString outputFile = temporaryDir.filePath("explicit-output.fif");
+    const QStringList arguments{
+        "mne_anonymize", "--no-gui", "--in", inputFile, "--out", outputFile,
+        "--verbose", "--silent", "--brute", "--delete_input_file_after",
+        "--avoid_delete_confirmation", "--measurement_date", "05042001",
+        "--subject_birthday", "03021980", "--his", "subject-007", "--mne_environment"
+    };
+
+    TestSettingsControllerCl controller(arguments);
+    QCOMPARE(controller.getQFiInFile().absoluteFilePath(), QFileInfo(inputFile).absoluteFilePath());
+    QCOMPARE(controller.getQFiOutFile().absoluteFilePath(), QFileInfo(outputFile).absoluteFilePath());
+    QVERIFY(controller.deleteInputFileAfter());
+    QVERIFY(!controller.deleteInputFileConfirmation());
+    QVERIFY(!controller.anonymizer()->getVerboseMode());
+    QVERIFY(controller.anonymizer()->getBruteMode());
+    QVERIFY(controller.anonymizer()->getMNEEnvironmentMode());
+    QCOMPARE(controller.anonymizer()->getMeasurementDate().date(), QDate(2001, 4, 5));
+    QCOMPARE(controller.anonymizer()->getSubjectBirthday(), QDate(1980, 2, 3));
+    QCOMPARE(controller.anonymizer()->getSubjectHisID(), QString("subject-007"));
+
+    const QRegularExpression randomNamePattern("^mne_anonymize_[a-l1-9]{12}\\.fif$");
+    QVERIFY(randomNamePattern.match(controller.randomFileName()).hasMatch());
+
+    TestSettingsControllerCl sameFileController(
+        {"mne_anonymize", "--no-gui", "--in", inputFile, "--out", inputFile});
+    QVERIFY(sameFileController.getQFiOutFile().absoluteFilePath()
+            != sameFileController.getQFiInFile().absoluteFilePath());
+    QVERIFY(randomNamePattern.match(sameFileController.getQFiOutFile().fileName()).hasMatch());
+}
+
+//=============================================================================================================
+
+void TestMneAnonymize::testCommandLineOffsetsAndInvalidPaths()
+{
+    const QString inputFile = QCoreApplication::applicationDirPath()
+                              + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    TestSettingsControllerCl offsetController(
+        {"mne_anonymize", "--no-gui", "--in", inputFile,
+         "--measurement_date_offset", "41", "--subject_birthday_offset", "17"});
+    QVERIFY(offsetController.anonymizer()->getUseMeasurementDayOffset());
+    QCOMPARE(offsetController.anonymizer()->getMeasurementDayOffset(), 41);
+    QVERIFY(offsetController.anonymizer()->getUseSubjectBirthdayOffset());
+    QCOMPARE(offsetController.anonymizer()->getSubjectBirthdayOffset(), 17);
+    QVERIFY(offsetController.getQFiOutFile().fileName().endsWith("_anonymized.fif"));
+
+    TestSettingsControllerCl missingInputController(
+        {"mne_anonymize", "--no-gui", "--in", "/path/that/does/not/exist.fif"});
+    QVERIFY(!missingInputController.getQFiInFile().isFile());
+    QCOMPARE(missingInputController.run(), 1);
+
+    QTemporaryDir temporaryDir;
+    QVERIFY(temporaryDir.isValid());
+    TestSettingsControllerCl directoryOutputController(
+        {"mne_anonymize", "--no-gui", "--in", inputFile, "--out", temporaryDir.path()});
+    QVERIFY(directoryOutputController.getQFiOutFile().isDir());
+
+    TestSettingsControllerCl defaultController;
+    QVERIFY(defaultController.getQFiInFile().filePath().isEmpty());
+    QVERIFY(defaultController.getQFiOutFile().filePath().isEmpty());
+    QCOMPARE(defaultController.run(), 1);
 }
 
 //=============================================================================================================
