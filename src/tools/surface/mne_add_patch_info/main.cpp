@@ -189,16 +189,17 @@ int main(int argc, char *argv[])
 
     // Read source space
     QFile file(srcFile);
-    if (!file.open(QIODevice::ReadOnly)) {
+    FiffStream::SPtr stream(new FiffStream(&file));
+    if (!stream->open()) {
         qCritical("Cannot open source space file: %s", qPrintable(srcFile));
         return 1;
     }
-    FiffStream::SPtr stream(new FiffStream(&file));
     MNESourceSpaces src;
     if (!MNESourceSpaces::readFromStream(stream, true, src) || src.size() == 0) {
         qCritical("Cannot read source space: %s", qPrintable(srcFile));
         return 1;
     }
+    stream->close();
 
     qInfo("Read source space: %d hemispheres" , (int)src.size());
 
@@ -262,13 +263,13 @@ int main(int argc, char *argv[])
     qInfo("\nWriting source space with patch info to: %s" , qPrintable(outFile));
 
     QFile outF(outFile);
-    if (!outF.open(QIODevice::WriteOnly)) {
+    FiffStream::SPtr outStream = FiffStream::start_file(outF);
+    if (!outStream) {
         qCritical("Cannot open output file: %s", qPrintable(outFile));
         return 1;
     }
-    FiffStream::SPtr outStream(new FiffStream(&outF));
     src.writeToStream(outStream.data());
-    outF.close();
+    outStream->end_file();
 
     qInfo("Done.");
     return 0;

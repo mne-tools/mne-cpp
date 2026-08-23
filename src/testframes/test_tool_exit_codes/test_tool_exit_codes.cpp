@@ -212,6 +212,7 @@ void TestToolExitCodes::missingRequiredArguments_data()
     QTest::newRow("mne_cov2proj")            << "mne_cov2proj";
     QTest::newRow("mne_compare_fif_files")   << "mne_compare_fif_files";
     QTest::newRow("mne_collect_transforms")  << "mne_collect_transforms";
+    QTest::newRow("mne_add_patch_info")      << "mne_add_patch_info";
     QTest::newRow("mne_toggle_skips")       << "mne_toggle_skips";
 }
 
@@ -262,6 +263,10 @@ void TestToolExitCodes::unreadableInputFile_data()
 
     QTest::newRow("mne_collect_transforms")
         << "mne_collect_transforms" << QStringList{"--meas", "__MISSING__"};
+
+    QTest::newRow("mne_add_patch_info")
+        << "mne_add_patch_info"
+        << QStringList{"--src", "__MISSING__", "--out", "__MISSING_OUT__"};
 }
 
 //=============================================================================================================
@@ -304,6 +309,7 @@ void TestToolExitCodes::helpSucceeds_data()
     QTest::newRow("mne_cov2proj")            << "mne_cov2proj";
     QTest::newRow("mne_compare_fif_files")   << "mne_compare_fif_files";
     QTest::newRow("mne_collect_transforms")  << "mne_collect_transforms";
+    QTest::newRow("mne_add_patch_info")      << "mne_add_patch_info";
 }
 
 //=============================================================================================================
@@ -364,6 +370,20 @@ void TestToolExitCodes::validFiffFileOperations()
         QVERIFY(QFileInfo(outputFile).size() > 0);
         if (!compareFif.isEmpty()) {
             QCOMPARE(runTool(compareFif, {"--file1", outputFile, "--file2", outputFile}), 0);
+        }
+    }
+
+    const QString addPatchInfo = findTool("mne_add_patch_info");
+    const QString listSourceSpace = findTool("mne_list_source_space");
+    const QString sourceFile = QCoreApplication::applicationDirPath()
+                               + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/"
+                                 "sample-oct-6-src.fif";
+    if (!addPatchInfo.isEmpty() && QFileInfo::exists(sourceFile)) {
+        const QString outputFile = m_tempDir.filePath("source-space-with-patches.fif");
+        QCOMPARE(runTool(addPatchInfo, {"--src", sourceFile, "--out", outputFile}), 0);
+        QVERIFY(QFileInfo(outputFile).size() > 0);
+        if (!listSourceSpace.isEmpty()) {
+            QCOMPARE(runTool(listSourceSpace, {"--src", outputFile}), 0);
         }
     }
 }
