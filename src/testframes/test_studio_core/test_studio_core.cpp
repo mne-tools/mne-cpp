@@ -31,6 +31,7 @@
 #include <core/capabilityutils.h>
 #include <workbench/analysisresultwidget.h>
 #include <workbench/agentchatdockwidget.h>
+#include <workbench/editortabbar.h>
 #include <workbench/extensionhostedviewwidget.h>
 #include <workbench/llmsettingsdialog.h>
 #include <workbench/pillselectorwidget.h>
@@ -54,6 +55,7 @@
 #include <QSlider>
 #include <QStackedWidget>
 #include <QTableWidget>
+#include <QToolButton>
 #include <QTreeWidget>
 
 #include <algorithm>
@@ -98,6 +100,7 @@ private slots:
     void workflowMiniMapWidget_graphRenderingAndActivation();
     void analysisResultWidget_jsonAndStatisticsViews();
     void extensionHostedViewWidget_descriptorCommandsAndUpdates();
+    void editorTabBar_closeButtonsFollowTabIndexes();
 
     void fiffBuffer_reportsUriAndKind();
     void fiffBuffer_missingFileFailsToOpen();
@@ -724,6 +727,43 @@ void TestStudioCore::extensionHostedViewWidget_descriptorCommandsAndUpdates()
     QVERIFY(refreshButton);
     refreshButton->click();
     QCOMPARE(commandSpy.size(), 0);
+}
+
+//=============================================================================================================
+
+void TestStudioCore::editorTabBar_closeButtonsFollowTabIndexes()
+{
+    EditorTabBar tabBar;
+    QVERIFY(tabBar.isMovable());
+    QVERIFY(!tabBar.expanding());
+    QVERIFY(tabBar.documentMode());
+    QVERIFY(tabBar.usesScrollButtons());
+
+    tabBar.addTab("First");
+    tabBar.addTab("Second");
+    tabBar.addTab("Third");
+    for(int index = 0; index < tabBar.count(); ++index) {
+        QToolButton* closeButton = qobject_cast<QToolButton*>(tabBar.tabButton(index, QTabBar::RightSide));
+        QVERIFY(closeButton);
+        QCOMPARE(closeButton->toolTip(), QString("Close"));
+    }
+
+    QWidget* obsoleteLeftButton = new QWidget(&tabBar);
+    tabBar.setTabButton(0, QTabBar::LeftSide, obsoleteLeftButton);
+
+    QSignalSpy closeSpy(&tabBar, &EditorTabBar::closeButtonClicked);
+    QToolButton* secondCloseButton = qobject_cast<QToolButton*>(tabBar.tabButton(1, QTabBar::RightSide));
+    QVERIFY(secondCloseButton);
+    secondCloseButton->click();
+    QCOMPARE(closeSpy.takeFirst().at(0).toInt(), 1);
+
+    tabBar.removeTab(1);
+    QVERIFY(!tabBar.tabButton(0, QTabBar::LeftSide));
+    QCOMPARE(tabBar.count(), 2);
+    QToolButton* reindexedCloseButton = qobject_cast<QToolButton*>(tabBar.tabButton(1, QTabBar::RightSide));
+    QVERIFY(reindexedCloseButton);
+    reindexedCloseButton->click();
+    QCOMPARE(closeSpy.takeFirst().at(0).toInt(), 1);
 }
 
 //=============================================================================================================
