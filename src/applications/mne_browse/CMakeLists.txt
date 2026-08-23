@@ -15,8 +15,7 @@ endif()
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-set(SOURCES
-    main.cpp
+set(APP_CORE_SOURCES
     Views/rawview.cpp
     Utils/datamarker.cpp
     Utils/rawsettings.cpp
@@ -131,12 +130,6 @@ if(APPLE)
     endforeach()
 endif()
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
-else()
-  add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
-endif()
-
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
@@ -153,11 +146,25 @@ set(MNE_LIBS_REQUIRED
     mne_dsp
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
+add_library(mne_browse_app_core STATIC ${APP_CORE_SOURCES} ${HEADERS} ${FORMS})
+target_include_directories(mne_browse_app_core PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/mne_browse_app_core_autogen/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/mne_browse_app_core_autogen/include_$<CONFIG>>
+)
+target_link_libraries(mne_browse_app_core PUBLIC
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen
 )
+
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+  qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION main.cpp ${RESOURCES})
+else()
+  add_executable(${PROJECT_NAME} main.cpp ${RESOURCES})
+endif()
+
+target_link_libraries(${PROJECT_NAME} PRIVATE mne_browse_app_core)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
   MACOSX_BUNDLE_GUI_IDENTIFIER org.mne-cpp.mne_browse
@@ -179,5 +186,6 @@ if(QT_VERSION_MAJOR EQUAL 6)
 endif()
 
 if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(mne_browse_app_core PRIVATE STATICBUILD)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
