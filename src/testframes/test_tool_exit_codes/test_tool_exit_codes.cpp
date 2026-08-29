@@ -331,20 +331,50 @@ void TestToolExitCodes::helpSucceeds_data()
 {
     QTest::addColumn<QString>("tool");
 
-    // The counterpart to the cases above: asking for help is not an error, and
-    // a tool that fails here would make the failure cases meaningless.
-    QTest::newRow("mne_fix_mag_coil_types") << "mne_fix_mag_coil_types";
-    QTest::newRow("mne_mark_bad_channels")  << "mne_mark_bad_channels";
-    QTest::newRow("mne_change_nave")        << "mne_change_nave";
-    QTest::newRow("mne_cov2proj")            << "mne_cov2proj";
-    QTest::newRow("mne_compare_fif_files")   << "mne_compare_fif_files";
-    QTest::newRow("mne_collect_transforms")  << "mne_collect_transforms";
-    QTest::newRow("mne_add_patch_info")      << "mne_add_patch_info";
-    QTest::newRow("mne_list_source_space")   << "mne_list_source_space";
-    QTest::newRow("mne_epochs2mat")           << "mne_epochs2mat";
-    QTest::newRow("mne_compute_cmne")         << "mne_compute_cmne";
-    QTest::newRow("mne_make_scalp_surfaces")  << "mne_make_scalp_surfaces";
-    QTest::newRow("mne_dipole_fit")           << "mne_dipole_fit";
+    // Every listed tool has an explicit --help handler. Optional tools that
+    // are absent from a particular build are skipped by helpSucceeds().
+    const QStringList tools = {
+        // Conversion
+        "mne_brain_vision2fiff", "mne_convert_ctf_markers", "mne_convert_dig_data",
+        "mne_convert_lspcov", "mne_convert_ncov", "mne_convert_surface",
+        "mne_ctf_dig2fiff", "mne_ctf2fiff", "mne_edf2fiff", "mne_epochs2mat",
+        "mne_eximia2fiff", "mne_kit2fiff", "mne_make_cor_set",
+        "mne_mna_bids_converter", "mne_raw2mat", "mne_tufts2fiff",
+
+        // Forward modeling
+        "mne_average_forward_solutions", "mne_check_surface", "mne_fit_sphere_to_surf",
+        "mne_forward_solution", "mne_make_scalp_surfaces", "mne_make_source_space",
+        "mne_make_sphere_bem", "mne_prepare_bem_model", "mne_transform_points",
+
+        // Information and inspection
+        "mne_check_eeg_locations", "mne_collect_transforms", "mne_compare_fif_files",
+        "mne_evoked_data_summary", "mne_list_bem", "mne_list_coil_def", "mne_list_proj",
+        "mne_list_source_space", "mne_sensor_locations", "mne_show_mna",
+
+        // Inverse modeling
+        "mne_average_estimates", "mne_compute_cmne", "mne_compute_mne",
+        "mne_compute_raw_inverse", "mne_dipole_fit", "mne_inverse_operator",
+        "mne_inverse_pipeline", "mne_label_ssp", "mne_make_movie", "mne_make_uniform_stc",
+        "mne_map_data", "mne_process_stc", "mne_sensitivity_map", "mne_smooth",
+        "mne_volume_data2mri",
+
+        // Preprocessing
+        "mne_add_to_meas_info", "mne_add_triggers", "mne_anonymize",
+        "mne_change_baselines", "mne_change_nave", "mne_compensate_data",
+        "mne_copy_processing_history", "mne_cov2proj", "mne_create_comp_data",
+        "mne_dacq_annotator", "mne_fix_mag_coil_types", "mne_fix_stim14",
+        "mne_insert_4D_comp", "mne_make_derivations", "mne_mark_bad_channels",
+        "mne_process_raw", "mne_rename_channels", "mne_toggle_skips",
+
+        // Surface, simulation, server, and visualization
+        "mne_add_patch_info", "mne_annot2labels", "mne_make_eeg_layout",
+        "mne_make_morph_maps", "mne_morph_labels", "mne_volume_source_space",
+        "mne_rt_server", "mne_simu", "mne_screenshot_regression"
+    };
+
+    for (const QString& tool : tools) {
+        QTest::newRow(tool.toUtf8().constData()) << tool;
+    }
 }
 
 //=============================================================================================================
