@@ -14,10 +14,10 @@
 
 #include <jsonrpcmessage.h>
 
+#include <QDeadlineTimer>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QLocalSocket>
-#include <QSignalSpy>
 #include <QUuid>
 #include <QtTest>
 
@@ -56,9 +56,9 @@ void TestStudioSkillHost::sendRequest(const QString& method,
     const QJsonObject request = JsonRpcMessage::createRequest(QStringLiteral("request"), method, params);
     m_socket.write(JsonRpcMessage::serialize(request));
     QVERIFY(m_socket.flush());
-    if (!m_socket.canReadLine()) {
-        QSignalSpy readyReadSpy(&m_socket, &QLocalSocket::readyRead);
-        QVERIFY(readyReadSpy.wait(5000));
+    QDeadlineTimer deadline(5000);
+    while (!m_socket.canReadLine()) {
+        QVERIFY(m_socket.waitForReadyRead(deadline.remainingTime()));
     }
 
     QJsonObject response;
@@ -71,9 +71,9 @@ void TestStudioSkillHost::sendRequest(const QString& method,
 void TestStudioSkillHost::malformedRequest() {
     m_socket.write("{bad json\n");
     QVERIFY(m_socket.flush());
-    if (!m_socket.canReadLine()) {
-        QSignalSpy readyReadSpy(&m_socket, &QLocalSocket::readyRead);
-        QVERIFY(readyReadSpy.wait(5000));
+    QDeadlineTimer deadline(5000);
+    while (!m_socket.canReadLine()) {
+        QVERIFY(m_socket.waitForReadyRead(deadline.remainingTime()));
     }
 
     QJsonObject response;
