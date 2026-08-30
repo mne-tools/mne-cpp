@@ -181,13 +181,13 @@ private slots:
     void testClusterAssignmentCorrectness()
     {
         // 3 well-separated clusters
-        KMeans kmeans("sqeuclidean", "sample", 3, "error", true, 100);
+        KMeans kmeans("sqeuclidean", "sample", 100, "error", true, 100);
         MatrixXd X = generateBlobs(20, 3);
         VectorXi idx;
         MatrixXd C, D;
         VectorXd sumD;
 
-        kmeans.calculate(X, 3, idx, C, sumD, D);
+        QVERIFY(kmeans.calculate(X, 3, idx, C, sumD, D));
 
         // Verify all points in the same original cluster share the same label
         int label0 = idx(0);
@@ -198,6 +198,13 @@ private slots:
         for (int i = 21; i < 40; ++i) {
             QCOMPARE(idx(i), label1);
         }
+        int label2 = idx(40);
+        for (int i = 41; i < 60; ++i) {
+            QCOMPARE(idx(i), label2);
+        }
+        QVERIFY(label0 != label1);
+        QVERIFY(label0 != label2);
+        QVERIFY(label1 != label2);
     }
 
     void testSumDNonNegative()

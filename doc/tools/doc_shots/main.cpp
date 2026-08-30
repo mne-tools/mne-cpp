@@ -37,6 +37,7 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFileInfo>
+#include <QTimer>
 
 // Force the offscreen Qt platform plugin BEFORE QApplication is constructed.
 // This is required so the tool can run on CI / docs builds with no display.
@@ -92,5 +93,8 @@ int main(int argc, char* argv[])
     opts.force = parser.isSet(forceOption);
 
     DOCSHOTS::ShotRunner runner(opts);
-    return runner.run() ? 0 : 1;
+    QTimer::singleShot(0, &app, [&app, &runner]() {
+        app.exit(runner.run() ? 0 : 1);
+    });
+    return app.exec();
 }
