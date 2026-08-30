@@ -40,6 +40,9 @@
 #include <inv/inv_source_estimate.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
 #include <fiff/fiff_cov.h>
+#include <fiff/fiff_evoked_set.h>
+#include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_stream.h>
 #include <mne/mne_bem.h>
 
 //=============================================================================================================
@@ -68,6 +71,9 @@ private:
     QString m_sResourcePath;
     QTemporaryDir m_tempDir;
     QString m_invPath;  // path to generated inverse operator, shared across tests
+    bool m_lastProcessFinished{false};
+    QProcess::ExitStatus m_lastExitStatus{QProcess::CrashExit};
+    int m_lastExitCode{-1};
 
     QString runTool(const QString& toolName, const QStringList& args, int timeoutMs = 60000)
     {
@@ -82,7 +88,9 @@ private:
         proc.setProgram(path);
         proc.setArguments(args);
         proc.start();
-        proc.waitForFinished(timeoutMs);
+        m_lastProcessFinished = proc.waitForFinished(timeoutMs);
+        m_lastExitStatus = proc.exitStatus();
+        m_lastExitCode = proc.exitCode();
         return proc.readAllStandardOutput() + proc.readAllStandardError();
     }
 
@@ -301,6 +309,323 @@ private slots:
         QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
                 output.contains("4D", Qt::CaseInsensitive) ||
                 output.contains("comp", Qt::CaseInsensitive));
+    }
+
+    void testInsert4DComp()
+    {
+        if (!toolExists("mne_insert_4D_comp")) QSKIP("mne_insert_4D_comp not found");
+        const QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+        if (!QFile::exists(rawFile)) QSKIP("Raw data not available");
+
+        QFile sourceFile(rawFile);
+        FIFFLIB::FiffRawData sourceRaw(sourceFile);
+        QVERIFY(!sourceRaw.info.isEmpty());
+        Eigen::MatrixXd sourceData;
+        Eigen::MatrixXd sourceTimes;
+        QVERIFY(sourceRaw.read_raw_segment(sourceData, sourceTimes,
+                                            sourceRaw.first_samp,
+                                            sourceRaw.first_samp + 2));
+
+        const QString refFile = m_tempDir.filePath("reference-data.txt");
+        QFile references(refFile);
+        QVERIFY(references.open(QIODevice::WriteOnly | QIODevice::Text));
+        const QByteArray refContents = "1.5 2.5\n3.5 4.5\n5.5 6.5\n";
+        QCOMPARE(references.write(refContents), refContents.size());
+        references.close();
+
+        const QString outFile = m_tempDir.filePath("raw-with-reference-channels.fif");
+        const QString output = runTool("mne_insert_4D_comp", {
+            "--in", rawFile, "--ref", refFile, "--out", outFile
+        }, 120000);
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+
+        QFile mergedFile(outFile);
+        FIFFLIB::FiffRawData mergedRaw(mergedFile);
+        QVERIFY(!mergedRaw.info.isEmpty());
+        QCOMPARE(mergedRaw.info.nchan, sourceRaw.info.nchan + 2);
+        QCOMPARE(mergedRaw.first_samp, sourceRaw.first_samp);
+        QCOMPARE(mergedRaw.info.chs[sourceRaw.info.nchan].ch_name, QString("REF001"));
+        QCOMPARE(mergedRaw.info.chs[sourceRaw.info.nchan + 1].ch_name, QString("REF002"));
+
+        Eigen::MatrixXd mergedData;
+        Eigen::MatrixXd mergedTimes;
+        QVERIFY(mergedRaw.read_raw_segment(mergedData, mergedTimes,
+                                            mergedRaw.first_samp,
+                                            mergedRaw.first_samp + 2));
+        const double maxSourceError =
+            (mergedData.topRows(sourceRaw.info.nchan) - sourceData).cwiseAbs().maxCoeff();
+        QVERIFY(maxSourceError < 1e-7);
+        QVERIFY(mergedData.bottomRows(2).isApprox(
+            (Eigen::Matrix<double, 2, 3>() << 1.5, 3.5, 5.5,
+                                               2.5, 4.5, 6.5).finished()));
+    }
+
+    //=========================================================================================================
+    // mne_sensor_locations
+    //=========================================================================================================
+
+    void testSensorLocations()
+    {
+        if (!toolExists("mne_sensor_locations")) QSKIP("mne_sensor_locations not found");
+        const QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+        if (!QFile::exists(rawFile)) QSKIP("Raw data not available");
+
+        for (const QString& frame : {QString("head"), QString("device")}) {
+            const QString outFile = m_tempDir.filePath("sensors-" + frame + ".txt");
+            const QString output = runTool("mne_sensor_locations", {
+                "--meas", rawFile, "--out", outFile, "--frame", frame
+            });
+            QVERIFY2(m_lastProcessFinished, qPrintable(output));
+            QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+            QCOMPARE(m_lastExitCode, 0);
+
+            QFile sensors(outFile);
+            QVERIFY(sensors.open(QIODevice::ReadOnly | QIODevice::Text));
+            const QByteArray contents = sensors.readAll();
+            QVERIFY(contents.contains("MEG"));
+            QVERIFY(contents.contains("EEG"));
+            QVERIFY(contents.count('\n') > 300);
+        }
+    }
+
+    //=========================================================================================================
+    // mne_evoked_data_summary
+    //=========================================================================================================
+
+    void testEvokedDataSummary()
+    {
+        if (!toolExists("mne_evoked_data_summary")) QSKIP("mne_evoked_data_summary not found");
+        const QString evokedFile = m_sResourcePath + "MEG/sample/sample_audvis-ave.fif";
+        if (!QFile::exists(evokedFile)) QSKIP("Evoked data not available");
+
+        const QString output = runTool("mne_evoked_data_summary", {"--meas", evokedFile});
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QCOMPARE(m_lastExitCode, 0);
+        QVERIFY(output.contains("Number of evoked data sets"));
+        QVERIFY(output.contains("Channels"));
+        QVERIFY(output.contains("MEG_GRAD"));
+        QVERIFY(output.contains("EEG"));
+    }
+
+    //=========================================================================================================
+    // mne_transform_points
+    //=========================================================================================================
+
+    void testTransformPointsRoundTrip()
+    {
+        if (!toolExists("mne_transform_points")) QSKIP("mne_transform_points not found");
+        const QString transFile = m_sResourcePath + "MEG/sample/all-trans.fif";
+        if (!QFile::exists(transFile)) QSKIP("Coordinate transform not available");
+
+        const QString inputFile = m_tempDir.filePath("points-mri.txt");
+        QFile input(inputFile);
+        QVERIFY(input.open(QIODevice::WriteOnly | QIODevice::Text));
+        const QByteArray inputText = "# MRI coordinates\n0.001 0.002 0.003\n-0.010 0.020 0.030\n";
+        QCOMPARE(input.write(inputText), inputText.size());
+        input.close();
+
+        const QString headFile = m_tempDir.filePath("points-head.txt");
+        QString output = runTool("mne_transform_points", {
+            "--trans", transFile, "--in", inputFile, "--out", headFile,
+            "--from", "mri", "--to", "head"
+        });
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QCOMPARE(m_lastExitCode, 0);
+
+        const QString roundTripFile = m_tempDir.filePath("points-mri-roundtrip.txt");
+        output = runTool("mne_transform_points", {
+            "--trans", transFile, "--in", headFile, "--out", roundTripFile,
+            "--from", "head", "--to", "mri"
+        });
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QCOMPARE(m_lastExitCode, 0);
+
+        QFile roundTrip(roundTripFile);
+        QVERIFY(roundTrip.open(QIODevice::ReadOnly | QIODevice::Text));
+        QTextStream stream(&roundTrip);
+        const QList<QVector3D> expected = {
+            QVector3D(0.001f, 0.002f, 0.003f),
+            QVector3D(-0.010f, 0.020f, 0.030f)
+        };
+        for (const QVector3D& point : expected) {
+            const QStringList fields = stream.readLine().split(' ', Qt::SkipEmptyParts);
+            QCOMPARE(fields.size(), 3);
+            QVERIFY(qAbs(fields[0].toFloat() - point.x()) < 1e-6f);
+            QVERIFY(qAbs(fields[1].toFloat() - point.y()) < 1e-6f);
+            QVERIFY(qAbs(fields[2].toFloat() - point.z()) < 1e-6f);
+        }
+    }
+
+    //=========================================================================================================
+    // mne_add_triggers
+    //=========================================================================================================
+
+    void testAddTriggers()
+    {
+        if (!toolExists("mne_add_triggers")) QSKIP("mne_add_triggers not found");
+        const QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+        if (!QFile::exists(rawFile)) QSKIP("Raw data not available");
+
+        QFile inputRawFile(rawFile);
+        FIFFLIB::FiffRawData inputRaw(inputRawFile);
+        QVERIFY(!inputRaw.info.isEmpty());
+        const int firstSample = inputRaw.first_samp;
+
+        const QString triggerFile = m_tempDir.filePath("triggers.txt");
+        QFile triggers(triggerFile);
+        QVERIFY(triggers.open(QIODevice::WriteOnly | QIODevice::Text));
+        const QByteArray triggerText = QString("# sample value\n%1 42\n%2 99\n")
+                                           .arg(firstSample + 10)
+                                           .arg(firstSample + 20)
+                                           .toUtf8();
+        QCOMPARE(triggers.write(triggerText), triggerText.size());
+        triggers.close();
+
+        const QString outFile = m_tempDir.filePath("raw-with-triggers.fif");
+        const QString output = runTool("mne_add_triggers", {
+            "--raw", rawFile, "--trg", triggerFile, "--out", outFile
+        }, 120000);
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QCOMPARE(m_lastExitCode, 0);
+        QVERIFY(QFileInfo(outFile).size() > 0);
+
+        QFile outputRawFile(outFile);
+        FIFFLIB::FiffRawData outputRaw(outputRawFile);
+        QVERIFY(!outputRaw.info.isEmpty());
+        QCOMPARE(outputRaw.first_samp, firstSample);
+        int stimIndex = -1;
+        for (int index = 0; index < outputRaw.info.chs.size(); ++index) {
+            if (outputRaw.info.chs[index].kind == FIFFV_STIM_CH) {
+                if (outputRaw.info.chs[index].ch_name.contains("014") || stimIndex < 0) {
+                    stimIndex = index;
+                }
+            }
+        }
+        QVERIFY(stimIndex >= 0);
+
+        Eigen::MatrixXd data;
+        Eigen::MatrixXd times;
+        QVERIFY(outputRaw.read_raw_segment(data, times, firstSample + 10, firstSample + 20));
+        QCOMPARE(qRound(data(stimIndex, 0)), 42);
+        QCOMPARE(qRound(data(stimIndex, 10)), 99);
+    }
+
+    //=========================================================================================================
+    // mne_fix_stim14
+    //=========================================================================================================
+
+    void testFixStim14MissingChannels()
+    {
+        if (!toolExists("mne_fix_stim14")) QSKIP("mne_fix_stim14 not found");
+        const QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+        if (!QFile::exists(rawFile)) QSKIP("Raw data not available");
+
+        QFile inputFile(rawFile);
+        FIFFLIB::FiffRawData inputRaw(inputFile);
+        QVERIFY(!inputRaw.info.isEmpty());
+
+        const QString outFile = m_tempDir.filePath("raw-fixed-stim14.fif");
+        const QString output = runTool("mne_fix_stim14", {
+            "--raw", rawFile, "--out", outFile
+        }, 120000);
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QCOMPARE(m_lastExitCode, 1);
+        QVERIFY(output.contains("Cannot find channel: STI 001"));
+        QVERIFY(!QFileInfo::exists(outFile));
+    }
+
+    //=========================================================================================================
+    // mne_list_proj
+    //=========================================================================================================
+
+    void testListProj()
+    {
+        if (!toolExists("mne_list_proj")) QSKIP("mne_list_proj not found");
+        const QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+        if (!QFile::exists(rawFile)) QSKIP("Raw data not available");
+
+        const QString output = runTool("mne_list_proj", {"--meas", rawFile});
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QCOMPARE(m_lastExitCode, 0);
+        QVERIFY(output.contains("Found 4 SSP projector"));
+        QVERIFY(output.contains("PCA-v1"));
+        QVERIFY(output.contains("Average EEG reference"));
+    }
+
+    //=========================================================================================================
+    // mne_list_coil_def
+    //=========================================================================================================
+
+    void testListCoilDefinitions()
+    {
+        if (!toolExists("mne_list_coil_def")) QSKIP("mne_list_coil_def not found");
+        const QString coilFile = m_sBinDir + "/../resources/general/coilDefinitions/coil_def.dat";
+        if (!QFile::exists(coilFile)) QSKIP("Coil definitions not available");
+
+        const QString output = runTool("mne_list_coil_def", {"--coildef", coilFile});
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QCOMPARE(m_lastExitCode, 0);
+        QVERIFY(output.contains("Read "));
+        QVERIFY(output.contains("PLANAR_GRAD"));
+        QVERIFY(output.contains("MAG"));
+        QVERIFY(output.contains("accurate"));
+    }
+
+    //=========================================================================================================
+    // mne_average_estimates
+    //=========================================================================================================
+
+    void testAverageEstimates()
+    {
+        if (!toolExists("mne_average_estimates")) QSKIP("mne_average_estimates not found");
+
+        const Eigen::VectorXi vertices = Eigen::VectorXi::LinSpaced(3, 10, 12);
+        const QString firstPath = m_tempDir.filePath("average-first.stc");
+        const QString secondPath = m_tempDir.filePath("average-second.stc");
+        {
+            QFile firstFile(firstPath);
+            INVLIB::InvSourceEstimate first(Eigen::MatrixXd::Constant(3, 4, 2.0),
+                                            vertices, 0.0f, 0.001f);
+            QVERIFY(first.write(firstFile));
+        }
+        {
+            QFile secondFile(secondPath);
+            INVLIB::InvSourceEstimate second(Eigen::MatrixXd::Constant(3, 4, 8.0),
+                                             vertices, 0.0f, 0.001f);
+            QVERIFY(second.write(secondFile));
+        }
+
+        const QString descriptionPath = m_tempDir.filePath("average-description.txt");
+        QFile description(descriptionPath);
+        QVERIFY(description.open(QIODevice::WriteOnly | QIODevice::Text));
+        const QByteArray contents = QString("# weight path\n1 %1\n3 %2\n")
+                                        .arg(firstPath, secondPath)
+                                        .toUtf8();
+        QCOMPARE(description.write(contents), contents.size());
+        description.close();
+
+        const QString outPath = m_tempDir.filePath("weighted-average.stc");
+        const QString output = runTool("mne_average_estimates", {
+            "--desc", descriptionPath, "--out", outPath
+        });
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+
+        QFile resultFile(outPath);
+        INVLIB::InvSourceEstimate result;
+        QVERIFY(INVLIB::InvSourceEstimate::read(resultFile, result));
+        QCOMPARE(result.vertices, vertices);
+        QVERIFY(result.data.isApprox(Eigen::MatrixXd::Constant(3, 4, 6.5)));
     }
 
     //=========================================================================================================
@@ -1094,11 +1419,21 @@ private slots:
             "--snr", "3.0",
             "--out", outBase
         }, 180000);
-        // STC output — check for lh or rh files
-        bool hasStc = QFile::exists(outBase + "-lh.stc") ||
-                      QFile::exists(outBase + "-rh.stc") ||
-                      QFile::exists(outBase + ".stc");
-        QVERIFY(hasStc || !output.isEmpty());
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+        INVLIB::InvSourceEstimate left;
+        QFile leftFile(outBase + "-lh.stc");
+        QVERIFY2(INVLIB::InvSourceEstimate::read(leftFile, left), qPrintable(output));
+        INVLIB::InvSourceEstimate right;
+        QFile rightFile(outBase + "-rh.stc");
+        QVERIFY2(INVLIB::InvSourceEstimate::read(rightFile, right), qPrintable(output));
+        QVERIFY(left.data.rows() > 0);
+        QCOMPARE(left.data.cols(), right.data.cols());
+        QCOMPARE(left.tmin, right.tmin);
+        QCOMPARE(left.tstep, right.tstep);
+        QVERIFY(left.data.allFinite());
+        QVERIFY(right.data.allFinite());
     }
 
     //=========================================================================================================
@@ -1121,9 +1456,17 @@ private slots:
             "--spm",
             "--out", outBase
         }, 180000);
-        bool hasStc = QFile::exists(outBase + "-lh.stc") ||
-                      QFile::exists(outBase + "-rh.stc");
-        QVERIFY(hasStc || !output.isEmpty());
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+        INVLIB::InvSourceEstimate left;
+        QFile leftFile(outBase + "-lh.stc");
+        QVERIFY2(INVLIB::InvSourceEstimate::read(leftFile, left), qPrintable(output));
+        INVLIB::InvSourceEstimate right;
+        QFile rightFile(outBase + "-rh.stc");
+        QVERIFY2(INVLIB::InvSourceEstimate::read(rightFile, right), qPrintable(output));
+        QVERIFY(left.data.allFinite());
+        QVERIFY(right.data.allFinite());
     }
 
     //=========================================================================================================
@@ -1146,9 +1489,17 @@ private slots:
             "--sLORETA",
             "--out", outBase
         }, 180000);
-        bool hasStc = QFile::exists(outBase + "-lh.stc") ||
-                      QFile::exists(outBase + "-rh.stc");
-        QVERIFY(hasStc || !output.isEmpty());
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+        INVLIB::InvSourceEstimate left;
+        QFile leftFile(outBase + "-lh.stc");
+        QVERIFY2(INVLIB::InvSourceEstimate::read(leftFile, left), qPrintable(output));
+        INVLIB::InvSourceEstimate right;
+        QFile rightFile(outBase + "-rh.stc");
+        QVERIFY2(INVLIB::InvSourceEstimate::read(rightFile, right), qPrintable(output));
+        QVERIFY(left.data.allFinite());
+        QVERIFY(right.data.allFinite());
     }
 
     //=========================================================================================================
@@ -1166,11 +1517,105 @@ private slots:
         QString output = runTool("mne_compute_mne", {
             "--inv", m_invPath,
             "--fwd", fwdFile,
+            "--tmax", "1",
             "--out", outBase
         }, 180000);
-        bool hasStc = QFile::exists(outBase + "-lh.stc") ||
-                      QFile::exists(outBase + "-rh.stc");
-        QVERIFY(hasStc || !output.isEmpty());
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+        INVLIB::InvSourceEstimate left;
+        QFile leftFile(outBase + "-lh.stc");
+        QVERIFY2(INVLIB::InvSourceEstimate::read(leftFile, left), qPrintable(output));
+        INVLIB::InvSourceEstimate right;
+        QFile rightFile(outBase + "-rh.stc");
+        QVERIFY2(INVLIB::InvSourceEstimate::read(rightFile, right), qPrintable(output));
+        QVERIFY(left.data.allFinite());
+        QVERIFY(right.data.allFinite());
+    }
+
+    //=========================================================================================================
+    // mne_map_data
+    //=========================================================================================================
+
+    void testMapData()
+    {
+        if (!toolExists("mne_map_data")) QSKIP("mne_map_data not found");
+        const QString evokedFile = m_sResourcePath + "MEG/sample/sample_audvis-ave.fif";
+        const QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+        const QString fwdFile = m_sResourcePath + "Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+        if (!QFile::exists(evokedFile) || !QFile::exists(rawFile) || !QFile::exists(fwdFile)) {
+            QSKIP("Mapping data not available");
+        }
+
+        QFile sourceFile(evokedFile);
+        FIFFLIB::FiffEvokedSet sourceSet;
+        QVERIFY(FIFFLIB::FiffEvokedSet::read(sourceFile, sourceSet));
+        QVERIFY(!sourceSet.evoked.isEmpty());
+        sourceSet.evoked = {sourceSet.evoked.first()};
+        const QString sourceEvokedFile = m_tempDir.filePath("single-condition-evoked.fif");
+        QVERIFY(sourceSet.save(sourceEvokedFile));
+
+        const QString invalidInvFile = m_tempDir.filePath("invalid-inverse.fif");
+        QFile invalidInv(invalidInvFile);
+        QVERIFY(invalidInv.open(QIODevice::WriteOnly));
+        invalidInv.write("not a FIFF inverse operator");
+        invalidInv.close();
+
+        const QString outFile = m_tempDir.filePath("mapped-evoked.fif");
+        const QString output = runTool("mne_map_data", {
+            "--from", sourceEvokedFile,
+            "--to", rawFile,
+            "--fwd", fwdFile,
+            "--inv", invalidInvFile,
+            "--out", outFile,
+            "--snr", "3.0"
+        }, 180000);
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode != 0, qPrintable(output));
+        QVERIFY(!QFile::exists(outFile));
+        QVERIFY(output.contains("inverse", Qt::CaseInsensitive));
+    }
+
+    //=========================================================================================================
+    // mne_label_ssp
+    //=========================================================================================================
+
+    void testLabelSsp()
+    {
+        if (!toolExists("mne_label_ssp")) QSKIP("mne_label_ssp not found");
+        const QString fwdFile =
+            m_sResourcePath + "Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+        const QString labelFile = m_sResourcePath + "subjects/sample/label/lh.V1.label";
+        if (!QFile::exists(fwdFile) || !QFile::exists(labelFile)) {
+            QSKIP("Label SSP data not available");
+        }
+
+        const QString outFile = m_tempDir.filePath("label-ssp-proj.fif");
+        const QString output = runTool("mne_label_ssp", {
+            "--fwd", fwdFile,
+            "--label", labelFile,
+            "--ncomp", "2",
+            "--out", outFile
+        }, 180000);
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+
+        QFile file(outFile);
+        FIFFLIB::FiffStream::SPtr stream(new FIFFLIB::FiffStream(&file));
+        QVERIFY(stream->open());
+        const QList<FIFFLIB::FiffProj> projectors = stream->read_proj(stream->dirtree());
+        stream->close();
+        QCOMPARE(projectors.size(), 2);
+        for (const FIFFLIB::FiffProj& projector : projectors) {
+            QVERIFY(projector.data);
+            QCOMPARE(projector.data->nrow, 1);
+            QCOMPARE(projector.data->ncol, 366);
+            QCOMPARE(projector.data->col_names.size(), 366);
+            QVERIFY(projector.data->data.allFinite());
+            QVERIFY(projector.data->data.norm() > 0.0);
+        }
     }
 
     //=========================================================================================================
@@ -1302,6 +1747,120 @@ private slots:
     }
 
     //=========================================================================================================
+    // mne_volume_data2mri - map a synthetic source estimate into source-space coordinates
+    //=========================================================================================================
+
+    void testVolumeData2Mri()
+    {
+        if (!toolExists("mne_volume_data2mri")) QSKIP("mne_volume_data2mri not found");
+        const QString sourceFile =
+            m_sResourcePath + "subjects/sample/bem/sample-oct-6-src.fif";
+        if (!QFile::exists(sourceFile)) QSKIP("Source-space data not available");
+
+        Eigen::VectorXi vertices(4);
+        vertices << 0, 1, 2, 3;
+        Eigen::MatrixXd data(4, 2);
+        data << 1.0, 5.0,
+                2.0, 6.0,
+                3.0, 7.0,
+                4.0, 8.0;
+        const QString stcPath = m_tempDir.filePath("volume-source.stc");
+        INVLIB::InvSourceEstimate stc(data, vertices, 0.0f, 0.001f);
+        QFile stcFile(stcPath);
+        QVERIFY(stc.write(stcFile));
+
+        const QString outFile = m_tempDir.filePath("volume-overlay.txt");
+        const QString output = runTool("mne_volume_data2mri", {
+            "--src", sourceFile,
+            "--stc", stcPath,
+            "--tpoint", "1",
+            "--out", outFile
+        });
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+
+        QFile overlay(outFile);
+        QVERIFY(overlay.open(QIODevice::ReadOnly | QIODevice::Text));
+        const QString text = QString::fromUtf8(overlay.readAll());
+        QVERIFY(text.contains("# MNE volume data overlay"));
+        QVERIFY2(text.contains("# Non-zero: 4"), qPrintable(text));
+        for (int vertex = 0; vertex < 4; ++vertex) {
+            const QRegularExpression row(QStringLiteral("^%1\\s+.*\\s+%2$")
+                                             .arg(vertex)
+                                             .arg(vertex + 5),
+                                         QRegularExpression::MultilineOption);
+            QVERIFY2(row.match(text).hasMatch(), qPrintable(text));
+        }
+    }
+
+    //=========================================================================================================
+    // mne_make_uniform_stc and mne_process_stc
+    //=========================================================================================================
+
+    void testMakeUniformStc()
+    {
+        if (!toolExists("mne_make_uniform_stc")) QSKIP("mne_make_uniform_stc not found");
+        const QString sourceFile =
+            m_sResourcePath + "subjects/sample/bem/sample-oct-6-src.fif";
+        if (!QFile::exists(sourceFile)) QSKIP("Source-space data not available");
+
+        const QString outFile = m_tempDir.filePath("uniform.stc");
+        const QString output = runTool("mne_make_uniform_stc", {
+            "--src", sourceFile,
+            "--val", "2.5",
+            "--out", outFile
+        });
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+
+        INVLIB::InvSourceEstimate result;
+        QFile resultFile(outFile);
+        QVERIFY2(INVLIB::InvSourceEstimate::read(resultFile, result), qPrintable(output));
+        QVERIFY(result.data.rows() > 0);
+        QCOMPARE(result.data.cols(), 1);
+        QVERIFY(result.data.isConstant(2.5));
+    }
+
+    void testProcessStc()
+    {
+        if (!toolExists("mne_process_stc")) QSKIP("mne_process_stc not found");
+        Eigen::VectorXi vertices(4);
+        vertices << 0, 1, 2, 3;
+        Eigen::MatrixXd data(4, 2);
+        data << 1.0, -2.0,
+                2.0, -4.0,
+                3.0, -6.0,
+                4.0, -8.0;
+        const QString inputPath = m_tempDir.filePath("process-input.stc");
+        INVLIB::InvSourceEstimate input(data, vertices, 0.1f, 0.002f);
+        QFile inputFile(inputPath);
+        QVERIFY(input.write(inputFile));
+
+        const QString outFile = m_tempDir.filePath("process-output.stc");
+        const QString asciiFile = m_tempDir.filePath("process-output.txt");
+        const QString output = runTool("mne_process_stc", {
+            "--in", inputPath,
+            "--scaleby", "3",
+            "--scaleto", "12",
+            "--out", outFile,
+            "--outasc", asciiFile
+        });
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+
+        INVLIB::InvSourceEstimate result;
+        QFile resultFile(outFile);
+        QVERIFY2(INVLIB::InvSourceEstimate::read(resultFile, result), qPrintable(output));
+        QVERIFY(result.data.isApprox(data * 1.5, 1e-6));
+        QFile ascii(asciiFile);
+        QVERIFY(ascii.open(QIODevice::ReadOnly | QIODevice::Text));
+        QCOMPARE(QString::fromUtf8(ascii.readAll()).count('\n'), 8);
+    }
+
+    //=========================================================================================================
     // mne_compute_raw_inverse — apply inverse to raw data with label
     //=========================================================================================================
 
@@ -1322,8 +1881,15 @@ private slots:
             "--snr", "1.0",
             "--out", outBase
         }, 180000);
-        // Just verify it ran — output depends on available labels
-        QVERIFY(!output.isEmpty() || QFile::exists(outBase + "-lh.stc"));
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+        INVLIB::InvSourceEstimate result;
+        QFile resultFile(outBase);
+        QVERIFY2(INVLIB::InvSourceEstimate::read(resultFile, result), qPrintable(output));
+        QVERIFY(result.data.rows() > 0);
+        QVERIFY(result.data.cols() > 0);
+        QVERIFY(result.data.allFinite());
     }
 
     //=========================================================================================================
@@ -1799,7 +2365,13 @@ private slots:
             "--snr", "1.0",
             "--out", outBase
         }, 180000);
-        QVERIFY(!output.isEmpty() || QFile::exists(outBase + "-lh.stc"));
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+        INVLIB::InvSourceEstimate result;
+        QFile resultFile(outBase);
+        QVERIFY2(INVLIB::InvSourceEstimate::read(resultFile, result), qPrintable(output));
+        QVERIFY(result.data.allFinite());
     }
 
     //=========================================================================================================
@@ -1824,7 +2396,13 @@ private slots:
             "--snr", "1.0",
             "--out", outBase
         }, 180000);
-        QVERIFY(!output.isEmpty() || QFile::exists(outBase + "-lh.stc"));
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+        INVLIB::InvSourceEstimate result;
+        QFile resultFile(outBase);
+        QVERIFY2(INVLIB::InvSourceEstimate::read(resultFile, result), qPrintable(output));
+        QVERIFY(result.data.allFinite());
     }
 
     //=========================================================================================================
@@ -1849,7 +2427,13 @@ private slots:
             "--snr", "1.0",
             "--out", outBase
         }, 180000);
-        QVERIFY(!output.isEmpty() || QFile::exists(outBase + "-lh.stc"));
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
+        QVERIFY2(m_lastExitCode == 0, qPrintable(output));
+        INVLIB::InvSourceEstimate result;
+        QFile resultFile(outBase);
+        QVERIFY2(INVLIB::InvSourceEstimate::read(resultFile, result), qPrintable(output));
+        QVERIFY(result.data.allFinite());
     }
 
     //=========================================================================================================

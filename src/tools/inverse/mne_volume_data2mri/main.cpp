@@ -36,6 +36,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff.h>
+#include <inv/inv_source_estimate.h>
 #include <mne/mne.h>
 #include <mne/mne_source_space.h>
 #include <memory>
@@ -65,6 +66,7 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace INVLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
 using namespace Eigen;
@@ -108,51 +110,6 @@ static bool readWFile(const QString& filename, VectorXd& data, VectorXi& vertice
         float val;
         in >> val;
         data(i) = val;
-    }
-    return true;
-}
-
-//=============================================================================================================
-
-static bool readStcFile(const QString& filename, MatrixXd& data, VectorXi& vertices,
-                        float& tmin, float& tstep)
-{
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qCritical() << "Cannot open stc file:" << filename;
-        return false;
-    }
-    QDataStream in(&file);
-    in.setByteOrder(QDataStream::BigEndian);
-
-    // Time parameters
-    float ftmin, ftstep;
-    in >> ftmin >> ftstep;
-    tmin = ftmin;
-    tstep = ftstep;
-
-    // Number of vertices
-    qint32 nvert;
-    in >> nvert;
-
-    vertices.resize(nvert);
-    for (int i = 0; i < nvert; i++) {
-        qint32 v;
-        in >> v;
-        vertices(i) = v;
-    }
-
-    // Number of time points
-    qint32 ntime;
-    in >> ntime;
-
-    data.resize(nvert, ntime);
-    for (int t = 0; t < ntime; t++) {
-        for (int i = 0; i < nvert; i++) {
-            float val;
-            in >> val;
-            data(i, t) = val;
-        }
     }
     return true;
 }
@@ -207,13 +164,12 @@ int main(int argc, char *argv[])
     // Read source space
     //
     std::vector<std::unique_ptr<MNESourceSpace>> spaces;
-    int nspace = MNESourceSpace::read_source_spaces(srcFile, spaces);
-    if (nspace <= 0 || spaces.empty()) {
+    if (MNESourceSpace::read_source_spaces(srcFile, spaces) != FIFF_OK || spaces.empty()) {
         fprintf(stderr, "Failed to read source space from: %s\n", srcFile.toUtf8().constData());
         return 1;
     }
 
-    qInfo("Read %d source spaces" , nspace);
+    qInfo("Read %lld source spaces", static_cast<long long>(spaces.size()));
 
     //
     // Read source estimate data
@@ -222,20 +178,21 @@ int main(int argc, char *argv[])
     VectorXi vertices;
 
     if (!stcFile.isEmpty()) {
-        MatrixXd stcData;
-        float tmin, tstep;
-        if (!readStcFile(stcFile, stcData, vertices, tmin, tstep)) {
+        QFile file(stcFile);
+        InvSourceEstimate stc;
+        if (!InvSourceEstimate::read(file, stc)) {
             fprintf(stderr, "Failed to read stc file.\n");
             return 1;
         }
-        if (tpoint < 0 || tpoint >= static_cast<int>(stcData.cols())) {
+        if (tpoint < 0 || tpoint >= static_cast<int>(stc.data.cols())) {
             fprintf(stderr, "Time point %d out of range (0-%ld)\n",
-                    tpoint, static_cast<long>(stcData.cols() - 1));
+                    tpoint, static_cast<long>(stc.data.cols() - 1));
             return 1;
         }
-        values = stcData.col(tpoint);
+        vertices = stc.vertices;
+        values = stc.data.col(tpoint);
         qInfo("Read STC: %ld vertices, %ld time points, using tpoint %d" ,
-               static_cast<long>(stcData.rows()), static_cast<long>(stcData.cols()), tpoint);
+               static_cast<long>(stc.data.rows()), static_cast<long>(stc.data.cols()), tpoint);
     } else {
         if (!readWFile(wFile, values, vertices)) {
             fprintf(stderr, "Failed to read w file.\n");

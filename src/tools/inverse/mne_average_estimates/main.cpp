@@ -144,17 +144,11 @@ int main(int argc, char *argv[])
         const QString& path = entries[i].second;
 
         QFile stcFile(path);
-        if (!stcFile.open(QIODevice::ReadOnly)) {
-            qCritical() << "Cannot open STC file:" << path;
-            return 1;
-        }
-
         InvSourceEstimate stc;
         if (!InvSourceEstimate::read(stcFile, stc)) {
             qCritical() << "Failed to read STC file:" << path;
             return 1;
         }
-        stcFile.close();
 
         if (i == 0) {
             result = stc;
@@ -178,16 +172,10 @@ int main(int argc, char *argv[])
 
     //--- Write output ---
     QFile outFile(parser.value(outOpt));
-    if (!outFile.open(QIODevice::WriteOnly)) {
-        qCritical() << "Cannot open output file:" << parser.value(outOpt);
-        return 1;
-    }
-
     if (!result.write(outFile)) {
         qCritical() << "Failed to write output STC.";
         return 1;
     }
-    outFile.close();
 
     qInfo() << "Averaged" << entries.size() << "STC files -> " << parser.value(outOpt);
     return 0;

@@ -332,7 +332,7 @@ void TestMneSurf2Bem::testSingleSurfConversion()
         QFAIL("mne_surf2bem executable not found");
     }
     if (!m_bDataAvailable) {
-        QFAIL("Sample data not available");
+        QSKIP("Sample data not available");
     }
 
     //
@@ -340,7 +340,7 @@ void TestMneSurf2Bem::testSingleSurfConversion()
     //
     QString inputSurf = findSurfaceFile("inner_skull.surf");
     if (inputSurf.isEmpty()) {
-        QFAIL("inner_skull.surf not found in sample data");
+        QSKIP("inner_skull.surf not found in sample data");
     }
 
     QString outputFif = m_tempDir.path() + "/single_surf_test.fif";
@@ -399,7 +399,7 @@ void TestMneSurf2Bem::testMultiSurfConversion()
         QFAIL("mne_surf2bem executable not found");
     }
     if (!m_bDataAvailable) {
-        QFAIL("Sample data not available");
+        QSKIP("Sample data not available");
     }
 
     //
@@ -410,7 +410,7 @@ void TestMneSurf2Bem::testMultiSurfConversion()
     QString outerSkin  = findSurfaceFile("outer_skin.surf");
 
     if (innerSkull.isEmpty() || outerSkull.isEmpty() || outerSkin.isEmpty()) {
-        QFAIL("Not all three BEM surfaces found in sample data");
+        QSKIP("Not all three BEM surfaces found in sample data");
     }
 
     QString outputFif = m_tempDir.path() + "/multi_surf_test.fif";
@@ -470,7 +470,7 @@ void TestMneSurf2Bem::testSurfConversionWithCheck()
         QFAIL("mne_surf2bem executable not found");
     }
     if (!m_bDataAvailable) {
-        QFAIL("Sample data not available");
+        QSKIP("Sample data not available");
     }
 
     //
@@ -481,7 +481,7 @@ void TestMneSurf2Bem::testSurfConversionWithCheck()
     QString outerSkin  = findSurfaceFile("outer_skin.surf");
 
     if (innerSkull.isEmpty() || outerSkull.isEmpty() || outerSkin.isEmpty()) {
-        QFAIL("Not all three BEM surfaces found in sample data");
+        QSKIP("Not all three BEM surfaces found in sample data");
     }
 
     QString outputFif = m_tempDir.path() + "/checked_surf_test.fif";
@@ -529,12 +529,12 @@ void TestMneSurf2Bem::testOverwriteOutput()
         QFAIL("mne_surf2bem executable not found");
     }
     if (!m_bDataAvailable) {
-        QFAIL("Sample data not available");
+        QSKIP("Sample data not available");
     }
 
     QString inputSurf = findSurfaceFile("inner_skull.surf");
     if (inputSurf.isEmpty()) {
-        QFAIL("inner_skull.surf not found in sample data");
+        QSKIP("inner_skull.surf not found in sample data");
     }
 
     QString outputFif = m_tempDir.path() + "/overwrite_test.fif";

@@ -112,18 +112,11 @@ int main(int argc, char *argv[])
 
     //--- Read input STC ---
     QFile inFile(parser.value(inOpt));
-    if (!inFile.open(QIODevice::ReadOnly)) {
-        qCritical() << "Cannot open input file:" << parser.value(inOpt);
-        return 1;
-    }
-
     InvSourceEstimate stc;
     if (!InvSourceEstimate::read(inFile, stc)) {
         qCritical() << "Failed to read STC file:" << parser.value(inOpt);
         return 1;
     }
-    inFile.close();
-
     //--- Apply scaling ---
     if (parser.isSet(scaleByOpt)) {
         bool ok;
@@ -155,15 +148,10 @@ int main(int argc, char *argv[])
     //--- Write binary STC ---
     if (parser.isSet(outOpt)) {
         QFile outFile(parser.value(outOpt));
-        if (!outFile.open(QIODevice::WriteOnly)) {
-            qCritical() << "Cannot open output file:" << parser.value(outOpt);
-            return 1;
-        }
         if (!stc.write(outFile)) {
             qCritical() << "Failed to write output STC.";
             return 1;
         }
-        outFile.close();
         qInfo() << "Wrote binary STC:" << parser.value(outOpt);
     }
 

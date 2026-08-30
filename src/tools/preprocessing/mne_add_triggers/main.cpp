@@ -39,6 +39,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
+#include <fiff/fiff_file.h>
 #include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
@@ -205,11 +206,14 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    fiff_int_t firstSample = raw.first_samp;
+    outStream->write_int(FIFF_FIRST_SAMPLE, &firstSample);
+
     int chunkSize = 10000;
     for (int start = 0; start < data.cols(); start += chunkSize) {
         int end = std::min(start + chunkSize, static_cast<int>(data.cols()));
         MatrixXd chunk = data.block(0, start, data.rows(), end - start);
-        outStream->write_raw_buffer(chunk);
+        outStream->write_raw_buffer(chunk, cals);
     }
     outStream->finish_writing_raw();
 

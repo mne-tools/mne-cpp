@@ -39,6 +39,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Eigen3::Eigen
 )
 
+if(TARGET mne_surf2bem)
+    add_dependencies(${PROJECT_NAME} mne_surf2bem)
+endif()
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
   WIN32_EXECUTABLE FALSE
   MACOSX_BUNDLE FALSE

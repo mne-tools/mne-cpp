@@ -338,6 +338,14 @@ int main(int argc, char *argv[])
     // Write raw data with merged reference channels
     outStream->start_block(FIFFB_RAW_DATA);
 
+    fiff_int_t firstSample = raw.first_samp;
+    outStream->write_int(FIFF_FIRST_SAMPLE, &firstSample);
+    RowVectorXd cals(totalCh);
+    for (int channel = 0; channel < raw.info.nchan; ++channel) {
+        cals[channel] = raw.info.chs[channel].range * raw.info.chs[channel].cal;
+    }
+    cals.tail(nRefCh).setOnes();
+
     int bufSize = static_cast<int>(10.0f * raw.info.sfreq);
     MatrixXd readData;
     MatrixXd times;
@@ -365,9 +373,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        fiff_int_t firstSamp = start;
-        outStream->write_int(FIFF_FIRST_SAMPLE, &firstSamp);
-        outStream->write_float_matrix(FIFF_DATA_BUFFER, merged);
+        outStream->write_raw_buffer(merged.cast<double>(), cals);
     }
 
     outStream->end_block(FIFFB_RAW_DATA);

@@ -26,7 +26,26 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Eigen3::Eigen
 )
 
-foreach(CLI_TOOL IN ITEMS mne_convert_ncov mne_dacq_annotator mne_check_eeg_locations)
+foreach(CLI_TOOL IN ITEMS
+    mne_add_triggers
+    mne_average_estimates
+    mne_check_eeg_locations
+    mne_compute_mne
+    mne_convert_ncov
+    mne_dacq_annotator
+    mne_evoked_data_summary
+    mne_fix_stim14
+    mne_insert_4D_comp
+    mne_list_coil_def
+    mne_list_proj
+    mne_label_ssp
+    mne_map_data
+    mne_make_uniform_stc
+    mne_process_stc
+    mne_sensor_locations
+    mne_transform_points
+    mne_volume_data2mri
+)
     if(TARGET ${CLI_TOOL})
         add_dependencies(${PROJECT_NAME} ${CLI_TOOL})
     endif()

@@ -111,11 +111,6 @@ int main(int argc, char *argv[])
 
     //--- Read source space ---
     QFile srcFile(parser.value(srcOpt));
-    if (!srcFile.open(QIODevice::ReadOnly)) {
-        qCritical() << "Cannot open source space file:" << parser.value(srcOpt);
-        return 1;
-    }
-
     FiffStream::SPtr pStream(new FiffStream(&srcFile));
     if (!pStream->open()) {
         qCritical() << "Failed to open FIFF stream from:" << parser.value(srcOpt);
@@ -157,16 +152,10 @@ int main(int argc, char *argv[])
 
     //--- Write output ---
     QFile outFile(parser.value(outOpt));
-    if (!outFile.open(QIODevice::WriteOnly)) {
-        qCritical() << "Cannot open output file:" << parser.value(outOpt);
-        return 1;
-    }
-
     if (!stc.write(outFile)) {
         qCritical() << "Failed to write output STC.";
         return 1;
     }
-    outFile.close();
 
     qInfo() << "Created uniform STC with" << totalVerts << "vertices, value ="
             << uniformVal << "->" << parser.value(outOpt);

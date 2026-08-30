@@ -865,15 +865,32 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        // Forward matrix: nChannels x nSources, transpose and scale
-        // Each column becomes a time point (one per source)
-        data = fwd.sol->data * fwdAmp;  // nChannels x nSources
-        nTimes = data.cols();
-        tmin = 0.0f;
+        MatrixXd pickedData(invOp.nchan, fwd.sol->data.cols());
+        for (int channel = 0; channel < invOp.noise_cov->names.size(); ++channel) {
+            const int fwdChannel = fwd.sol->row_names.indexOf(invOp.noise_cov->names[channel]);
+            if (fwdChannel < 0) {
+                qCritical("Error: Forward solution is missing inverse-operator channel %s.",
+                          invOp.noise_cov->names[channel].toUtf8().constData());
+                return 1;
+            }
+            pickedData.row(channel) = fwd.sol->data.row(fwdChannel) * fwdAmp;
+        }
+
         tstep = 0.001f;  // 1 ms per source
+        int firstSource = 0;
+        int lastSource = pickedData.cols() - 1;
+        if (parser.isSet(tminOpt)) {
+            firstSource = qBound(0, parser.value(tminOpt).toInt(), lastSource);
+        }
+        if (parser.isSet(tmaxOpt)) {
+            lastSource = qBound(firstSource, parser.value(tmaxOpt).toInt(), lastSource);
+        }
+        nTimes = lastSource - firstSource + 1;
+        data = pickedData.middleCols(firstSource, nTimes);
+        tmin = firstSource * tstep;
         nave = 1;
 
-        qInfo("  Forward synthetic data: %d channels, %d sources (time points)" ,
+        qInfo("  Forward synthetic data: %d channels, %d selected sources (time points)" ,
                (int)data.rows(), nTimes);
 
         // Time vector for label output
@@ -975,9 +992,17 @@ int main(int argc, char *argv[])
                    evoked.times(tmaxIdx) * 1000.0f, tmaxIdx);
         }
 
+        FiffEvoked pickedEvoked = evoked.pick_channels(invOp.noise_cov->names);
+        if (pickedEvoked.info.nchan != invOp.nchan) {
+            qCritical("Error: Found %d of %d inverse-operator channels in the evoked data.",
+                      pickedEvoked.info.nchan, invOp.nchan);
+            return 1;
+        }
+        qInfo("  Picked %d inverse-operator channels", pickedEvoked.info.nchan);
+
         // Extract the time window
         nTimes = tmaxIdx - tminIdx + 1;
-        data = evoked.data.block(0, tminIdx, evoked.data.rows(), nTimes);
+        data = pickedEvoked.data.block(0, tminIdx, pickedEvoked.data.rows(), nTimes);
         tmin = evoked.times(tminIdx);
         tstep = (evoked.times.size() > 1) ?
                       (evoked.times(1) - evoked.times(0)) : 1.0f;
