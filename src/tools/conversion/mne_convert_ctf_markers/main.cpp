@@ -150,6 +150,7 @@ static QList<CtfMarker> parseCtfMarkers(const QString &filename)
                 inList = false;
                 if (!current.name.isEmpty()) {
                     markers.append(current);
+                    current = CtfMarker();
                 }
             }
             continue;

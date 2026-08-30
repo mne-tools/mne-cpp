@@ -57,6 +57,7 @@
 #include <fs/fs_annotationset.h>
 
 #include <iostream>
+#include <memory>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -98,8 +99,20 @@ int main(int argc, char *argv[])
     // Q_INIT_RESOURCE(mne_disp3d);
     // #endif
 
+    bool guiRequested = false;
+    for (int index = 1; index < argc; ++index) {
+        if (qstrcmp(argv[index], "--gui") == 0) {
+            guiRequested = true;
+            break;
+        }
+    }
     qInstallMessageHandler(MNELogger::customLogWriter);
-    QApplication app(argc, argv);
+    std::unique_ptr<QCoreApplication> app;
+    if (guiRequested) {
+        app = std::make_unique<QApplication>(argc, argv);
+    } else {
+        app = std::make_unique<QCoreApplication>(argc, argv);
+    }
     QCoreApplication::setApplicationName("mne_dipole_fit");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
@@ -160,5 +173,5 @@ int main(int argc, char *argv[])
         InvEcdSet::read_dipoles_dip(settings.dipname);
     }
 
-    return settings.gui ? app.exec() : 0;
+    return settings.gui ? app->exec() : 0;
 }

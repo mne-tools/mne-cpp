@@ -50,6 +50,31 @@
 #include "../../tools/conversion/mne_tufts2fiff/main.cpp"
 #undef main
 
+// --- mne_ctf2fiff ---
+#define main _ctf2fiff_main_unused
+#include "../../tools/conversion/mne_ctf2fiff/main.cpp"
+#undef main
+
+// --- mne_kit2fiff ---
+#define main _kit2fiff_main_unused
+#include "../../tools/conversion/mne_kit2fiff/main.cpp"
+#undef main
+
+// --- mne_make_cor_set ---
+#define main _make_cor_set_main_unused
+#include "../../tools/conversion/mne_make_cor_set/main.cpp"
+#undef main
+
+// --- mne_convert_lspcov ---
+#define main _convert_lspcov_main_unused
+#include "../../tools/conversion/mne_convert_lspcov/main.cpp"
+#undef main
+
+// --- mne_convert_ctf_markers ---
+#define main _convert_ctf_markers_main_unused
+#include "../../tools/conversion/mne_convert_ctf_markers/main.cpp"
+#undef main
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -87,6 +112,13 @@ private slots:
     void testReadCalibrationBasic();
     void testReadCalibrationValues();
 
+    // --- Additional converter tests ---
+    void testCtfChannelMappingAndData();
+    void testKitHeaderLayoutTransformAndData();
+    void testWriteCorDescription();
+    void testParseLspMatrix();
+    void testParseCtfMarkers();
+
     void cleanupTestCase();
 
 private:
@@ -101,6 +133,155 @@ void TestToolConversionExtended::initTestCase()
     QString binDir = QCoreApplication::applicationDirPath();
     m_sResourcePath = binDir + "/../resources/data/mne-cpp-test-data/";
     QVERIFY(m_tempDir.isValid());
+}
+
+//=============================================================================================================
+// Additional converter tests
+//=============================================================================================================
+
+void TestToolConversionExtended::testCtfChannelMappingAndData()
+{
+    CtfSensorInfo sensor{};
+    qstrncpy(sensor.name, "MLC11", CTF_SENSOR_NAME_SIZE);
+    sensor.sensorType = CTF_SEN_TYPE_MEG;
+    sensor.nCoils = 2;
+    sensor.coils[0] = {1.0, 2.0, 3.0, 0.0, 0.0, 1.0, 0.01};
+    sensor.properGain = 2.0;
+    sensor.qGain = 5.0;
+    sensor.ioGain = 10.0;
+
+    FiffChInfo channel;
+    mapCtfToFiff(sensor, channel);
+    QCOMPARE(channel.ch_name, QString("MLC11"));
+    QCOMPARE(channel.kind, FIFFV_MEG_CH);
+    QCOMPARE(channel.chpos.coil_type, FIFFV_COIL_CTF_GRAD);
+    QCOMPARE(channel.chpos.r0, Vector3f(1.0f, 2.0f, 3.0f));
+
+    const QString meg4Path = m_tempDir.filePath("synthetic.meg4");
+    QFile meg4(meg4Path);
+    QVERIFY(meg4.open(QIODevice::WriteOnly));
+    meg4.write("MEG41CP", 8);
+    QDataStream stream(&meg4);
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream << qint32(100) << qint32(-200);
+    meg4.close();
+
+    CtfDatasetInfo info;
+    info.meg4Path = meg4Path;
+    info.nChannels = 1;
+    info.nSamples = 2;
+    info.nTrials = 1;
+    info.sensors.append(sensor);
+    MatrixXd data;
+    QVERIFY(readMeg4Data(info, data));
+    QCOMPARE(data.rows(), 1);
+    QCOMPARE(data.cols(), 2);
+    QCOMPARE(data(0, 0), 1.0);
+    QCOMPARE(data(0, 1), -2.0);
+}
+
+void TestToolConversionExtended::testKitHeaderLayoutTransformAndData()
+{
+    const QString sqdPath = m_tempDir.filePath("synthetic.sqd");
+    QFile sqd(sqdPath);
+    QVERIFY(sqd.open(QIODevice::WriteOnly));
+    sqd.resize(KIT_HEADER_SIZE + 12);
+    QDataStream stream(&sqd);
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream.setFloatingPointPrecision(QDataStream::DoublePrecision);
+    sqd.seek(KIT_SYSTEM_ID_OFFSET);
+    stream << qint32(1234);
+    sqd.seek(KIT_NCHAN_OFFSET);
+    stream << qint32(2);
+    sqd.seek(KIT_SFREQ_OFFSET);
+    stream << 1000.0;
+    sqd.seek(KIT_NSAMP_OFFSET);
+    stream << qint32(3);
+    sqd.seek(KIT_DATA_OFFSET_OFFSET);
+    stream << qint32(KIT_HEADER_SIZE);
+    sqd.seek(KIT_HEADER_SIZE);
+    stream << qint16(1) << qint16(2) << qint16(3)
+           << qint16(4) << qint16(5) << qint16(6);
+    sqd.close();
+
+    KitDatasetInfo info;
+    QVERIFY(parseSqdHeader(sqdPath, info));
+    QCOMPARE(info.systemId, 1234);
+    QCOMPARE(info.nChannels, 2);
+    QCOMPARE(info.nSamples, 3);
+    QCOMPARE(info.sfreq, 1000.0);
+
+    const QString sensorPath = m_tempDir.filePath("synthetic.sns");
+    QFile sensors(sensorPath);
+    QVERIFY(sensors.open(QIODevice::WriteOnly | QIODevice::Text));
+    sensors.write("# index x y z ox oy oz\n1 10 20 30 0 0 1\n2 -10 0 40 0 1 0\n");
+    sensors.close();
+    QVERIFY(readSensorLayout(sensorPath, info));
+    QCOMPARE(info.sensors[0].coil.position, Vector3d(0.01, 0.02, 0.03));
+
+    const QString hpiPath = m_tempDir.filePath("synthetic.hpi");
+    QFile hpi(hpiPath);
+    QVERIFY(hpi.open(QIODevice::WriteOnly | QIODevice::Text));
+    hpi.write("0 0 0 10 20 30\n10 0 0 20 20 30\n0 10 0 10 30 30\n");
+    hpi.close();
+    FiffCoordTrans transform;
+    QVERIFY(computeDevHeadTransform(hpiPath, transform));
+    QCOMPARE(transform.from, FIFFV_COORD_DEVICE);
+    QCOMPARE(transform.to, FIFFV_COORD_HEAD);
+    QVERIFY((transform.trans.block<3, 1>(0, 3) - Vector3f(0.01f, 0.02f, 0.03f)).norm() < 1e-6f);
+
+    info.sensors[0].gain = 2.0;
+    info.sensors[1].gain = 0.5;
+    MatrixXd data;
+    QVERIFY(readSqdData(sqdPath, info, data));
+    QCOMPARE(data(0, 0), 2.0);
+    QCOMPARE(data(1, 0), 1.0);
+    QCOMPARE(data(0, 2), 10.0);
+    QCOMPARE(data(1, 2), 3.0);
+}
+
+void TestToolConversionExtended::testWriteCorDescription()
+{
+    const std::vector<std::vector<unsigned char>> slices = {{0, 1, 2, 3}};
+    const QString outputPath = m_tempDir.filePath("cor-description.fif");
+    QVERIFY(writeMriDescription(outputPath, slices, 2, 2, 1));
+    QVERIFY(QFileInfo(outputPath).size() > 0);
+}
+
+void TestToolConversionExtended::testParseLspMatrix()
+{
+    QString valid = "; covariance\n((1 2) (2 4))\n";
+    QTextStream validStream(&valid);
+    MatrixXd matrix;
+    QVERIFY(parseLspMatrix(validStream, matrix));
+    QCOMPARE(matrix.rows(), 2);
+    QCOMPARE(matrix.cols(), 2);
+    QCOMPARE(matrix(0, 1), 2.0);
+    QCOMPARE(matrix(1, 1), 4.0);
+
+    QString invalid = "((1 2 3) (4 5))\n";
+    QTextStream invalidStream(&invalid);
+    QVERIFY(!parseLspMatrix(invalidStream, matrix));
+}
+
+void TestToolConversionExtended::testParseCtfMarkers()
+{
+    const QString markerPath = m_tempDir.filePath("MarkerFile.mrk");
+    QFile markerFile(markerPath);
+    QVERIFY(markerFile.open(QIODevice::WriteOnly | QIODevice::Text));
+    markerFile.write(
+        "MARKER CLASSIFICATION\nNAME: auditory\nCLASSID: 7\nNUMBER OF MARKERS: 2\n"
+        "LIST OF MARKERS:\nTRIAL NUMBER TIME\n12 0.1\n34 0.2\n"
+        "MARKER CLASSIFICATION\nNAME: visual\nCLASSID: 9\nNUMBER OF MARKERS: 1\n"
+        "LIST OF MARKERS:\nTRIAL NUMBER TIME\n56 0.3\n");
+    markerFile.close();
+
+    const QList<CtfMarker> markers = parseCtfMarkers(markerPath);
+    QCOMPARE(markers.size(), 2);
+    QCOMPARE(markers[0].name, QString("auditory"));
+    QCOMPARE(markers[0].eventId, 7);
+    QCOMPARE(markers[0].samples, QList<int>({12, 34}));
+    QCOMPARE(markers[1].samples, QList<int>({56}));
 }
 
 //=============================================================================================================

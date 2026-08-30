@@ -39,6 +39,7 @@
 
 #include <inv/inv_source_estimate.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
+#include <fiff/fiff_cov.h>
 #include <mne/mne_bem.h>
 
 //=============================================================================================================
@@ -75,6 +76,9 @@ private:
         path += ".exe";
 #endif
         QProcess proc;
+        QProcessEnvironment environment = QProcessEnvironment::systemEnvironment();
+        environment.insert("QT_QPA_PLATFORM", "offscreen");
+        proc.setProcessEnvironment(environment);
         proc.setProgram(path);
         proc.setArguments(args);
         proc.start();
@@ -89,6 +93,9 @@ private:
         path += ".exe";
 #endif
         QProcess proc;
+        QProcessEnvironment environment = QProcessEnvironment::systemEnvironment();
+        environment.insert("QT_QPA_PLATFORM", "offscreen");
+        proc.setProcessEnvironment(environment);
         proc.setProgram(path);
         proc.setArguments(args);
         proc.start();
@@ -1212,7 +1219,7 @@ private slots:
     }
 
     //=========================================================================================================
-    // mne_dipole_fit application - fit and reparse dipoles without entering the GUI event loop
+    // mne_dipole_fit headless mode - fit and reparse dipoles
     //=========================================================================================================
 
     void testDipoleFitApplication()
@@ -1225,12 +1232,11 @@ private slots:
         const QString dipoleFile = m_tempDir.filePath("application-fit.dip");
         QCOMPARE(runToolExitCode("mne_dipole_fit", {
                      "--meas", evokedFile,
-                     "--set", "1",
                      "--meg",
                      "--eeg",
-                     "--tmin", "32",
-                     "--tmax", "42",
-                     "--bmin", "-100",
+                 "--tmin", "32",
+                 "--tmax", "42",
+                 "--bmin", "-100",
                      "--bmax", "0",
                      "--dip", dipoleFile}, 180000),
                  0);
@@ -2220,6 +2226,113 @@ private slots:
             "--tag", "100"
         }, 60000);
         QVERIFY(!output.isEmpty());
+    }
+
+    //=========================================================================================================
+    // mne_convert_ncov — generated ASCII covariance to FIFF
+    //=========================================================================================================
+
+    void testConvertNcov()
+    {
+        if (!toolExists("mne_convert_ncov")) QSKIP("mne_convert_ncov not found");
+        const QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+        if (!QFile::exists(rawFile)) QSKIP("Raw data not available");
+
+        QFile measurement(rawFile);
+        const FIFFLIB::FiffRawData raw(measurement);
+        QVERIFY(!raw.info.isEmpty());
+        int megCount = 0;
+        int eegCount = 0;
+        for (const FIFFLIB::FiffChInfo& channel : raw.info.chs) {
+            if (channel.kind == FIFFV_MEG_CH || channel.kind == FIFFV_REF_MEG_CH) {
+                ++megCount;
+            } else if (channel.kind == FIFFV_EEG_CH) {
+                ++eegCount;
+            }
+        }
+        const int channelCount = megCount + eegCount;
+
+        const QString ncovPath = m_tempDir.filePath("synthetic.ncov");
+        QFile ncovFile(ncovPath);
+        QVERIFY(ncovFile.open(QIODevice::WriteOnly | QIODevice::Text));
+        QTextStream stream(&ncovFile);
+        stream << "#!ascii\n" << megCount << ' ' << eegCount << " 42\n";
+        for (int row = 0; row < channelCount; ++row) {
+            for (int column = 0; column < channelCount; ++column) {
+                stream << (row == column ? "1 " : "0 ");
+            }
+            stream << '\n';
+        }
+        ncovFile.close();
+
+        const QString outputPath = m_tempDir.filePath("synthetic-meg-cov.fif");
+        QCOMPARE(runToolExitCode("mne_convert_ncov",
+                                 {"--ncov", ncovPath, "--meas", rawFile,
+                                  "--meg", "--cov", outputPath}),
+                 0);
+        QFile outputFile(outputPath);
+        const FIFFLIB::FiffCov covariance(outputFile);
+        QCOMPARE(covariance.dim, megCount);
+        QCOMPARE(covariance.nfree, 42);
+        QCOMPARE(covariance.data.rows(), megCount * (megCount + 1) / 2);
+        QCOMPARE(covariance.data.cols(), 1);
+        QCOMPARE(covariance.data(0, 0), 1.0);
+    }
+
+    //=========================================================================================================
+    // mne_dacq_annotator — add, list, and remove events
+    //=========================================================================================================
+
+    void testDacqAnnotatorEventRoundTrip()
+    {
+        if (!toolExists("mne_dacq_annotator")) QSKIP("mne_dacq_annotator not found");
+        const QString inputPath = m_tempDir.filePath("events-input.txt");
+        QFile inputFile(inputPath);
+        QVERIFY(inputFile.open(QIODevice::WriteOnly | QIODevice::Text));
+        inputFile.write("# sample before after comment\n100 0 1 existing\n");
+        inputFile.close();
+
+        const QString addedPath = m_tempDir.filePath("events-added.txt");
+        QCOMPARE(runToolExitCode("mne_dacq_annotator",
+                                 {"--events", inputPath, "--add", "200:0:7:new:event",
+                                  "--out", addedPath}),
+                 0);
+        QFile addedFile(addedPath);
+        QVERIFY(addedFile.open(QIODevice::ReadOnly | QIODevice::Text));
+        const QString added = QString::fromUtf8(addedFile.readAll());
+        QVERIFY(added.contains("100\t0\t1\texisting"));
+        QVERIFY(added.contains("200\t0\t7\tnew:event"));
+
+        const QString listed = runTool("mne_dacq_annotator", {"--events", addedPath, "--list"});
+        QVERIFY(listed.contains("existing"));
+        QVERIFY(listed.contains("new:event"));
+        QVERIFY(listed.contains("Total: 2 event(s)"));
+
+        const QString removedPath = m_tempDir.filePath("events-removed.txt");
+        QCOMPARE(runToolExitCode("mne_dacq_annotator",
+                                 {"--events", addedPath, "--remove", "100",
+                                  "--out", removedPath}),
+                 0);
+        QFile removedFile(removedPath);
+        QVERIFY(removedFile.open(QIODevice::ReadOnly | QIODevice::Text));
+        const QString removed = QString::fromUtf8(removedFile.readAll());
+        QVERIFY(!removed.contains("100\t0\t1"));
+        QVERIFY(removed.contains("200\t0\t7"));
+    }
+
+    //=========================================================================================================
+    // mne_check_eeg_locations — validate the sample montage
+    //=========================================================================================================
+
+    void testCheckEegLocations()
+    {
+        if (!toolExists("mne_check_eeg_locations")) QSKIP("mne_check_eeg_locations not found");
+        const QString rawFile = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+        if (!QFile::exists(rawFile)) QSKIP("Raw data not available");
+
+        const QString output = runTool("mne_check_eeg_locations", {"--meas", rawFile});
+        QVERIFY(output.contains("Found 60 EEG channels"));
+        QVERIFY(output.contains("All 60 EEG channels have valid locations"));
     }
 
 };

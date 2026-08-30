@@ -38,3 +38,17 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE FALSE
     WIN32_EXECUTABLE FALSE
 )
+
+install(TARGETS ${PROJECT_NAME}
+    BUNDLE DESTINATION . COMPONENT applications
+    RUNTIME DESTINATION bin COMPONENT applications
+    LIBRARY DESTINATION lib COMPONENT applications
+)
+
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(${PROJECT_NAME})
+endif()
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()

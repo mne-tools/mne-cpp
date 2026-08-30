@@ -20,10 +20,17 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Test
+    mne_fiff
     mne_inv
     mne_mne
     Eigen3::Eigen
 )
+
+foreach(CLI_TOOL IN ITEMS mne_convert_ncov mne_dacq_annotator mne_check_eeg_locations)
+    if(TARGET ${CLI_TOOL})
+        add_dependencies(${PROJECT_NAME} ${CLI_TOOL})
+    endif()
+endforeach()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE FALSE

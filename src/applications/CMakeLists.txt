@@ -25,7 +25,7 @@ if(WITH_CODE_COV)
 endif()
 
 ##==============================================================================
-## GUI applications only — CLI tools have moved to src/tools/
+## GUI applications. mne_dipole_fit also supports headless CLI operation.
 
 option(BUILD_MNE_SCAN "Build MNE Scan" ON)
 option(BUILD_MNE_ANALYZE "Build MNE Analyze" ON)
