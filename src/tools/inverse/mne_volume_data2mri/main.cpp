@@ -116,6 +116,25 @@ static bool readWFile(const QString& filename, VectorXd& data, VectorXi& vertice
 
 //=============================================================================================================
 
+static bool readStcFile(const QString& filename, MatrixXd& data, VectorXi& vertices,
+                        float& tmin, float& tstep)
+{
+    QFile file(filename);
+    InvSourceEstimate stc;
+    if (!InvSourceEstimate::read(file, stc)) {
+        qCritical() << "Cannot read STC file:" << filename;
+        return false;
+    }
+
+    data = stc.data;
+    vertices = stc.vertices;
+    tmin = stc.tmin;
+    tstep = stc.tstep;
+    return true;
+}
+
+//=============================================================================================================
+
 int main(int argc, char *argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
@@ -178,21 +197,21 @@ int main(int argc, char *argv[])
     VectorXi vertices;
 
     if (!stcFile.isEmpty()) {
-        QFile file(stcFile);
-        InvSourceEstimate stc;
-        if (!InvSourceEstimate::read(file, stc)) {
+        MatrixXd stcData;
+        float tmin;
+        float tstep;
+        if (!readStcFile(stcFile, stcData, vertices, tmin, tstep)) {
             fprintf(stderr, "Failed to read stc file.\n");
             return 1;
         }
-        if (tpoint < 0 || tpoint >= static_cast<int>(stc.data.cols())) {
+        if (tpoint < 0 || tpoint >= static_cast<int>(stcData.cols())) {
             fprintf(stderr, "Time point %d out of range (0-%ld)\n",
-                    tpoint, static_cast<long>(stc.data.cols() - 1));
+                    tpoint, static_cast<long>(stcData.cols() - 1));
             return 1;
         }
-        vertices = stc.vertices;
-        values = stc.data.col(tpoint);
+        values = stcData.col(tpoint);
         qInfo("Read STC: %ld vertices, %ld time points, using tpoint %d" ,
-               static_cast<long>(stc.data.rows()), static_cast<long>(stc.data.cols()), tpoint);
+               static_cast<long>(stcData.rows()), static_cast<long>(stcData.cols()), tpoint);
     } else {
         if (!readWFile(wFile, values, vertices)) {
             fprintf(stderr, "Failed to read w file.\n");

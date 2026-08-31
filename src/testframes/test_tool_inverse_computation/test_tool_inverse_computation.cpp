@@ -478,29 +478,15 @@ void TestToolInverseComputation::testReadWFileSynthetic()
 
 void TestToolInverseComputation::testReadStcFileSynthetic()
 {
-    // Create a synthetic STC file (big-endian format)
     QString stcPath = m_tempDir.path() + "/test.stc";
-    QFile file(stcPath);
-    QVERIFY(file.open(QIODevice::WriteOnly));
-    QDataStream out(&file);
-    out.setByteOrder(QDataStream::BigEndian);
-
-    float tmin = 0.0f, tstep = 0.001f;
-    out << tmin << tstep;
-
-    qint32 nvert = 2;
-    out << nvert;
-    qint32 v0 = 10, v1 = 20;
-    out << v0 << v1;
-
-    qint32 ntime = 3;
-    out << ntime;
-
-    // Data: [t=0: v0, v1], [t=1: v0, v1], [t=2: v0, v1]
-    float vals[] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
-    for (int i = 0; i < 6; i++) out << vals[i];
-
-    file.close();
+    MatrixXd inputData(2, 3);
+    inputData << 1.0, 3.0, 5.0,
+                 2.0, 4.0, 6.0;
+    VectorXi inputVertices(2);
+    inputVertices << 10, 20;
+    InvSourceEstimate input(inputData, inputVertices, 0.0f, 0.001f);
+    QFile outputFile(stcPath);
+    QVERIFY(input.write(outputFile));
 
     MatrixXd data;
     VectorXi vertices;
