@@ -37,7 +37,10 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFileInfo>
-#ifndef Q_OS_WIN
+#ifdef Q_OS_WIN
+#include <cstdio>
+#include <cstdlib>
+#else
 #include <QTimer>
 #endif
 
@@ -96,7 +99,16 @@ int main(int argc, char* argv[])
 
     DOCSHOTS::ShotRunner runner(opts);
 #ifdef Q_OS_WIN
-    return runner.run() ? 0 : 1;
+    // Every shot renderer drains its own bounded event pump, so the tool never
+    // needs QApplication::exec() here. On Windows CI the offscreen QApplication
+    // teardown (and any background threads/timers the real-app MainWindows
+    // spin up) can wedge the process indefinitely after the PNGs are already
+    // written, which hangs the test harness. Flush our output and terminate
+    // hard before Qt's global destructors run.
+    const int rc = runner.run() ? 0 : 1;
+    std::fflush(stdout);
+    std::fflush(stderr);
+    std::_Exit(rc);
 #else
     QTimer::singleShot(0, &app, [&app, &runner]() {
         app.exit(runner.run() ? 0 : 1);
