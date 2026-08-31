@@ -9,6 +9,23 @@
 cmake_minimum_required(VERSION 3.15)
 project(mne_doc_shots LANGUAGES CXX)
 
+# On Windows, emit the executable next to the MNE runtime DLLs it links against
+# (mne_disp3D, mne_fiff, mne_inspect_app_core, …) so the loader can resolve
+# them. Without this the tool lands in its own build subtree with no DLLs
+# beside it and not on PATH; the missing-DLL loader dialog then blocks the
+# process forever on headless CI, and test_doc_shots — which spawns the tool —
+# times out. Elsewhere the build-tree RPATH already handles this. Mirrors
+# src/applications/CMakeLists.txt; BINARY_OUTPUT_DIRECTORY is set in
+# src/CMakeLists.txt but that is a sibling scope, so fall back to its default.
+if(WIN32)
+    if(NOT DEFINED BINARY_OUTPUT_DIRECTORY)
+        set(BINARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/${CMAKE_BUILD_TYPE})
+    endif()
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/bin)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif()
+
 # Eigen3 must be found explicitly — the src/-level find_package result
 # does not propagate into this subdirectory tree.
 find_package(Eigen3 REQUIRED)
