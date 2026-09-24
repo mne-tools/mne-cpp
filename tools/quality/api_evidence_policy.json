@@ -1,0 +1,18 @@
+{
+  "$comment": "Policy for tools/quality/audit_api_evidence.py (v2.4.0 T0.3). Proposed example-eligibility rules for gate G3. An exported class is example-eligible unless a rule below exempts it. Every rule states why; T3.2 turns accepted rules into per-record example_exempt/example_exempt_reason fields in doc/api_registry.json and this file then shrinks.",
+  "exempt_header_prefixes": {
+    "disp/viewers/": "Qt widget or view; evidenced by a screenshot scenario and GUI test (G4), not by a compiled console example.",
+    "disp3D/model/": "Scene-graph item owned and driven by BrainView; not constructed directly by library users.",
+    "disp3D/workers/": "Background worker owned by a real-time view; its behaviour is exercised through the owning view.",
+    "disp3D/core/": "Renderer internals behind the BrainView/MultimodalScene facade.",
+    "disp3D/geometry/": "Renderer internals behind the BrainView/MultimodalScene facade.",
+    "disp3D/input/": "Interaction handler of an interactive view; evidenced by GUI tests.",
+    "com/rt_client/": "Requires a running mne_rt_server; evidenced by integration tests rather than a runnable example.",
+    "com/rt_command/": "Requires a running mne_rt_server; evidenced by integration tests rather than a runnable example."
+  },
+  "exempt_name_suffixes": {
+    "Private": "Implementation detail behind a public facade.",
+    "Delegate": "Qt item delegate; only meaningful inside a view.",
+    "Settings": "Plain parameter record consumed by an algorithm class; shown inside that class's example."
+  }
+}

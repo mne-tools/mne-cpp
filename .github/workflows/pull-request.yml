@@ -96,6 +96,16 @@ jobs:
     - name: Audit dependency architecture
       run: python3 tools/quality/audit_dependencies.py --check
 
+    - name: Generate quality dashboard
+      run: python3 tools/quality/generate_quality_report.py --out-dir "$RUNNER_TEMP/quality"
+
+    - name: Upload quality dashboard
+      uses: actions/upload-artifact@v7
+      with:
+        name: quality-dashboard
+        path: ${{ runner.temp }}/quality
+        retention-days: 30
+
     - name: Generate placeholder screenshots
       run: |
         cd doc/website

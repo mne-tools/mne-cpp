@@ -1,0 +1,6780 @@
+{
+  "schema_version": 1,
+  "generated_by": "tools/quality/audit_tests.py",
+  "ci_source": {
+    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/33441161302",
+    "commit": "7122ccb773617012b014fb066875f3f8e32b4c39"
+  },
+  "summary": {
+    "directories": 232,
+    "registration": {
+      "unconditional": 215,
+      "conditional": 14,
+      "unregistered": 3
+    },
+    "missing_directories": [],
+    "duplicate_test_names": {},
+    "without_labels": 223,
+    "without_timeout": 213,
+    "requirements": {
+      "freesurfer": 2,
+      "python": 9,
+      "sample-data": 17,
+      "test-data": 90
+    },
+    "gui": 33,
+    "with_qskip": 71,
+    "ci_excluded": {
+      "test_mne_flash_bem": [
+        "windows-2025-vs2026"
+      ],
+      "test_mne_watershed_bem": [
+        "windows-2025-vs2026"
+      ]
+    },
+    "retry_paths": [
+      {
+        "path": "scripts/test/test_all.bat",
+        "line": 88,
+        "text": "@REM Re-run failed tests: if a test passes on retry it is treated as a"
+      },
+      {
+        "path": "scripts/test/test_all.bat",
+        "line": 94,
+        "text": "ECHO ======= Re-running FAILED tests ^(retry once^) ===================="
+      },
+      {
+        "path": "scripts/test/test_all.bat",
+        "line": 110,
+        "text": "ECHO ---- %%~nxf PASSED on retry ^(flaky^) ----"
+      },
+      {
+        "path": "scripts/test/test_all.bat",
+        "line": 290,
+        "text": "# Re-run failed tests: if a test passes on retry it is treated as a"
+      },
+      {
+        "path": "scripts/test/test_all.bat",
+        "line": 296,
+        "text": "echo \"======= Re-running FAILED tests (retry once) ======================\""
+      },
+      {
+        "path": "scripts/test/test_all.bat",
+        "line": 313,
+        "text": "echo \"---- $testName PASSED on retry (flaky) ----\""
+      }
+    ],
+    "ci": {
+      "macos-26": {
+        "executed": 229,
+        "failures": 0,
+        "skipped": 0,
+        "registered_not_executed": [],
+        "executed_not_in_inventory": []
+      },
+      "ubuntu-24.04": {
+        "executed": 229,
+        "failures": 0,
+        "skipped": 0,
+        "registered_not_executed": [],
+        "executed_not_in_inventory": []
+      },
+      "windows-2025-vs2026": {
+        "executed": 227,
+        "failures": 0,
+        "skipped": 0,
+        "registered_not_executed": [
+          "test_mne_flash_bem",
+          "test_mne_watershed_bem"
+        ],
+        "executed_not_in_inventory": []
+      }
+    }
+  },
+  "tests": [
+    {
+      "name": "test_anshared_models",
+      "cmake": "src/testframes/test_anshared_models/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_anshared_models"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_api_registry",
+      "cmake": "src/testframes/test_api_registry/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_api_registry"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_batch_processor",
+      "cmake": "src/testframes/test_batch_processor/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_batch_processor"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 4,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_bids",
+      "cmake": "src/testframes/test_bids/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_bids"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "BIDSPath",
+        "BidsRawData"
+      ]
+    },
+    {
+      "name": "test_bids_coordinate_system",
+      "cmake": "src/testframes/test_bids_coordinate_system/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_bids_coordinate_system"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_browse_virtual_channels",
+      "cmake": "src/testframes/test_browse_virtual_channels/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_browse_virtual_channels"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_com",
+      "cmake": "src/testframes/test_com/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_com"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_com_rt_client",
+      "cmake": "src/testframes/test_com_rt_client/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_com_rt_client"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_compute_raw_inverse",
+      "cmake": "src/testframes/test_compute_raw_inverse/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_compute_raw_inverse"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "python",
+        "sample-data",
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 16,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvMinimumNorm"
+      ]
+    },
+    {
+      "name": "test_conn_network",
+      "cmake": "src/testframes/test_conn_network/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_conn_network"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_connectivity_aec",
+      "cmake": "src/testframes/test_connectivity_aec/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_connectivity_aec"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "ConnectivityAec"
+      ]
+    },
+    {
+      "name": "test_connectivity_metrics",
+      "cmake": "src/testframes/test_connectivity_metrics/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_connectivity_metrics"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "Coherence",
+        "Connectivity",
+        "PhaseLagIndex",
+        "PhaseLockingValue"
+      ]
+    },
+    {
+      "name": "test_coregistration",
+      "cmake": "src/testframes/test_coregistration/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_coregistration"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "MneICP"
+      ]
+    },
+    {
+      "name": "test_cortical_surface_inverse",
+      "cmake": "src/testframes/test_cortical_surface_inverse/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": "Skipped when the analyze_cortical_surface target is not built.",
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_cortical_surface_inverse"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data"
+      ],
+      "gui": true,
+      "qskip_sites": 2,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_cortical_surface_labels",
+      "cmake": "src/testframes/test_cortical_surface_labels/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": "Skipped when the analyze_cortical_surface target is not built.",
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_cortical_surface_labels"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_cortical_surface_picking",
+      "cmake": "src/testframes/test_cortical_surface_picking/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": "Skipped when the analyze_cortical_surface target is not built.",
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_cortical_surface_picking"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data"
+      ],
+      "gui": true,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_cortical_surface_stc",
+      "cmake": "src/testframes/test_cortical_surface_stc/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": "Skipped when the analyze_cortical_surface target is not built.",
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_cortical_surface_stc"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_crossval_covariance",
+      "cmake": "src/testframes/test_crossval_covariance/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_crossval_covariance"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "python"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_decoding_csp",
+      "cmake": "src/testframes/test_decoding_csp/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_decoding_csp"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "DecodingCsp"
+      ]
+    },
+    {
+      "name": "test_decoding_spoc",
+      "cmake": "src/testframes/test_decoding_spoc/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_decoding_spoc"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "DecodingSpoc"
+      ]
+    },
+    {
+      "name": "test_decoding_ssd",
+      "cmake": "src/testframes/test_decoding_ssd/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_decoding_ssd"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "DecodingSsd"
+      ]
+    },
+    {
+      "name": "test_dipole_fit",
+      "cmake": "src/testframes/test_dipole_fit/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dipole_fit"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvDipoleFit"
+      ]
+    },
+    {
+      "name": "test_disp3d_brainsurface",
+      "cmake": "src/testframes/test_disp3d_brainsurface/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_disp3d_brainsurface"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_disp3d_brainview",
+      "cmake": "src/testframes/test_disp3d_brainview/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_disp3d_brainview"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_disp3d_headless",
+      "cmake": "src/testframes/test_disp3d_headless/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_disp3d_headless"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 5,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_disp3d_viewstate",
+      "cmake": "src/testframes/test_disp3d_viewstate/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_disp3d_viewstate"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_disp_colormap",
+      "cmake": "src/testframes/test_disp_colormap/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_disp_colormap"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_disp_plots",
+      "cmake": "src/testframes/test_disp_plots/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_disp_plots"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_disp_viewers",
+      "cmake": "src/testframes/test_disp_viewers/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_disp_viewers"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_disp_viewers2",
+      "cmake": "src/testframes/test_disp_viewers2/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_disp_viewers2"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 3,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_disp_viewers3",
+      "cmake": "src/testframes/test_disp_viewers3/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_disp_viewers3"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_doc_shots",
+      "cmake": "src/testframes/test_doc_shots/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "CMakeLists.txt",
+        "conditions": [
+          "BUILD_TESTS AND TARGET mne_doc_shots"
+        ],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_doc_shots"
+      ],
+      "labels": [
+        "gui",
+        "integration"
+      ],
+      "timeout": 300,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 10,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_dsp_annotate_artifact",
+      "cmake": "src/testframes/test_dsp_annotate_artifact/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_annotate_artifact"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "AnnotateArtifact"
+      ]
+    },
+    {
+      "name": "test_dsp_artifact_detect",
+      "cmake": "src/testframes/test_dsp_artifact_detect/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_artifact_detect"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_dsp_bad_channel_detect",
+      "cmake": "src/testframes/test_dsp_bad_channel_detect/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_bad_channel_detect"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_dsp_bad_channels_lof",
+      "cmake": "src/testframes/test_dsp_bad_channels_lof/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_bad_channels_lof"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "BadChannelsLof"
+      ]
+    },
+    {
+      "name": "test_dsp_bad_channels_maxwell",
+      "cmake": "src/testframes/test_dsp_bad_channels_maxwell/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_bad_channels_maxwell"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "BadChannelsMaxwell"
+      ]
+    },
+    {
+      "name": "test_dsp_bridged_electrodes",
+      "cmake": "src/testframes/test_dsp_bridged_electrodes/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_bridged_electrodes"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "BridgedElectrodes"
+      ]
+    },
+    {
+      "name": "test_dsp_channel_derivation",
+      "cmake": "src/testframes/test_dsp_channel_derivation/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_channel_derivation"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_dsp_csd",
+      "cmake": "src/testframes/test_dsp_csd/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_csd"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_dsp_eeg_reference",
+      "cmake": "src/testframes/test_dsp_eeg_reference/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_eeg_reference"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "EegReference"
+      ]
+    },
+    {
+      "name": "test_dsp_eog_regression",
+      "cmake": "src/testframes/test_dsp_eog_regression/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_eog_regression"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "EogRegression"
+      ]
+    },
+    {
+      "name": "test_dsp_epoch_extractor",
+      "cmake": "src/testframes/test_dsp_epoch_extractor/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_epoch_extractor"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_dsp_filter_chpi",
+      "cmake": "src/testframes/test_dsp_filter_chpi/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_filter_chpi"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FilterChpi"
+      ]
+    },
+    {
+      "name": "test_dsp_filterio",
+      "cmake": "src/testframes/test_dsp_filterio/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_filterio"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_dsp_firfilter",
+      "cmake": "src/testframes/test_dsp_firfilter/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_firfilter"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FirFilter"
+      ]
+    },
+    {
+      "name": "test_dsp_ica",
+      "cmake": "src/testframes/test_dsp_ica/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_ica"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "ICA"
+      ]
+    },
+    {
+      "name": "test_dsp_iirfilter",
+      "cmake": "src/testframes/test_dsp_iirfilter/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_iirfilter"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "IirFilter"
+      ]
+    },
+    {
+      "name": "test_dsp_infomax",
+      "cmake": "src/testframes/test_dsp_infomax/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_infomax"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "ExtendedInfomax"
+      ]
+    },
+    {
+      "name": "test_dsp_morlet_tfr",
+      "cmake": "src/testframes/test_dsp_morlet_tfr/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_morlet_tfr"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "MorletTfr"
+      ]
+    },
+    {
+      "name": "test_dsp_multitaper",
+      "cmake": "src/testframes/test_dsp_multitaper/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_multitaper"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "MultitaperPsd",
+        "MultitaperTfr"
+      ]
+    },
+    {
+      "name": "test_dsp_peak_finder",
+      "cmake": "src/testframes/test_dsp_peak_finder/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_peak_finder"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "PeakFinder"
+      ]
+    },
+    {
+      "name": "test_dsp_resample",
+      "cmake": "src/testframes/test_dsp_resample/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_resample"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "Resample"
+      ]
+    },
+    {
+      "name": "test_dsp_rt_cov",
+      "cmake": "src/testframes/test_dsp_rt_cov/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_rt_cov"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_dsp_simulate",
+      "cmake": "src/testframes/test_dsp_simulate/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_simulate"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "Simulate"
+      ]
+    },
+    {
+      "name": "test_dsp_spectrogram",
+      "cmake": "src/testframes/test_dsp_spectrogram/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_spectrogram"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_dsp_sphara",
+      "cmake": "src/testframes/test_dsp_sphara/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_sphara"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "Sphara"
+      ]
+    },
+    {
+      "name": "test_dsp_sss",
+      "cmake": "src/testframes/test_dsp_sss/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_sss"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "SSS"
+      ]
+    },
+    {
+      "name": "test_dsp_stim_artifact",
+      "cmake": "src/testframes/test_dsp_stim_artifact/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_stim_artifact"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "StimArtifact"
+      ]
+    },
+    {
+      "name": "test_dsp_welch_psd",
+      "cmake": "src/testframes/test_dsp_welch_psd/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_welch_psd"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "WelchPsd"
+      ]
+    },
+    {
+      "name": "test_dsp_xdawn",
+      "cmake": "src/testframes/test_dsp_xdawn/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_dsp_xdawn"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "Xdawn"
+      ]
+    },
+    {
+      "name": "test_edf2fiff_rwr",
+      "cmake": "src/testframes/test_edf2fiff_rwr/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_edf2fiff_rwr"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_electrode_object",
+      "cmake": "src/testframes/test_electrode_object/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_electrode_object"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_electrodes_plugin",
+      "cmake": "src/testframes/test_electrodes_plugin/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": "Skipped when the inspect_electrodes target is not built.",
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_electrodes_plugin"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_epochs",
+      "cmake": "src/testframes/test_epochs/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_epochs"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FiffEpochs"
+      ]
+    },
+    {
+      "name": "test_events",
+      "cmake": "src/testframes/test_events/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_events"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_field_map",
+      "cmake": "src/testframes/test_field_map/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_field_map"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "python",
+        "sample-data",
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 16,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_annotation_event_utils",
+      "cmake": "src/testframes/test_fiff_annotation_event_utils/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_annotation_event_utils"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FiffAnnotationEventUtils"
+      ]
+    },
+    {
+      "name": "test_fiff_annotations",
+      "cmake": "src/testframes/test_fiff_annotations/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_annotations"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FiffAnnotations"
+      ]
+    },
+    {
+      "name": "test_fiff_byte_swap",
+      "cmake": "src/testframes/test_fiff_byte_swap/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_byte_swap"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_coord_trans",
+      "cmake": "src/testframes/test_fiff_coord_trans/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_coord_trans"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FiffCoordTrans"
+      ]
+    },
+    {
+      "name": "test_fiff_coord_transform",
+      "cmake": "src/testframes/test_fiff_coord_transform/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_coord_transform"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_cov",
+      "cmake": "src/testframes/test_fiff_cov/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_cov"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 2,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FiffCov"
+      ]
+    },
+    {
+      "name": "test_fiff_cov_python",
+      "cmake": "src/testframes/test_fiff_cov_python/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_cov_python"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_coverage",
+      "cmake": "src/testframes/test_fiff_coverage/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_coverage"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_data_types",
+      "cmake": "src/testframes/test_fiff_data_types/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_data_types"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 3,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_dig_point_python",
+      "cmake": "src/testframes/test_fiff_dig_point_python/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_dig_point_python"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_digitizer",
+      "cmake": "src/testframes/test_fiff_digitizer/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_digitizer"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_evoked_python",
+      "cmake": "src/testframes/test_fiff_evoked_python/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_evoked_python"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_extended",
+      "cmake": "src/testframes/test_fiff_extended/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_extended"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 10,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_fs_library",
+      "cmake": "src/testframes/test_fiff_fs_library/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_fs_library"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 51,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_info",
+      "cmake": "src/testframes/test_fiff_info/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_info"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 16,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FiffInfo"
+      ]
+    },
+    {
+      "name": "test_fiff_io_evoked_info",
+      "cmake": "src/testframes/test_fiff_io_evoked_info/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_io_evoked_info"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FiffEvoked"
+      ]
+    },
+    {
+      "name": "test_fiff_mne_types_io",
+      "cmake": "src/testframes/test_fiff_mne_types_io/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_mne_types_io"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_proj_python",
+      "cmake": "src/testframes/test_fiff_proj_python/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_proj_python"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "python",
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiff_raw_io",
+      "cmake": "src/testframes/test_fiff_raw_io/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_raw_io"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 30,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FiffRawData",
+        "FiffStream"
+      ]
+    },
+    {
+      "name": "test_fiff_rwr",
+      "cmake": "src/testframes/test_fiff_rwr/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiff_rwr"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fiffsimulator_ssp",
+      "cmake": "src/testframes/test_fiffsimulator_ssp/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fiffsimulator_ssp"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data"
+      ],
+      "gui": true,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_filter_data",
+      "cmake": "src/testframes/test_filter_data/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_filter_data"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_filter_kernel",
+      "cmake": "src/testframes/test_filter_kernel/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_filter_kernel"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FilterKernel"
+      ]
+    },
+    {
+      "name": "test_filtering",
+      "cmake": "src/testframes/test_filtering/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_filtering"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fine_calibration",
+      "cmake": "src/testframes/test_fine_calibration/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fine_calibration"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FineCalibration"
+      ]
+    },
+    {
+      "name": "test_fs",
+      "cmake": "src/testframes/test_fs/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fs"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FsSurface"
+      ]
+    },
+    {
+      "name": "test_fs_annotation_labels",
+      "cmake": "src/testframes/test_fs_annotation_labels/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fs_annotation_labels"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 3,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FsAnnotation",
+        "FsLabel"
+      ]
+    },
+    {
+      "name": "test_fs_atlas_lookup",
+      "cmake": "src/testframes/test_fs_atlas_lookup/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fs_atlas_lookup"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data",
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fs_io",
+      "cmake": "src/testframes/test_fs_io/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fs_io"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fs_surface_annotation",
+      "cmake": "src/testframes/test_fs_surface_annotation/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fs_surface_annotation"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fwd_bem_data",
+      "cmake": "src/testframes/test_fwd_bem_data/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fwd_bem_data"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 33,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FwdBemModel",
+        "MNEBem"
+      ]
+    },
+    {
+      "name": "test_fwd_bem_field_computation",
+      "cmake": "src/testframes/test_fwd_bem_field_computation/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fwd_bem_field_computation"
+      ],
+      "labels": [],
+      "timeout": 1800,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fwd_extended",
+      "cmake": "src/testframes/test_fwd_extended/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fwd_extended"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fwd_library",
+      "cmake": "src/testframes/test_fwd_library/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fwd_library"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 24,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fwd_models",
+      "cmake": "src/testframes/test_fwd_models/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fwd_models"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 2,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_fwd_sphere_settings",
+      "cmake": "src/testframes/test_fwd_sphere_settings/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_fwd_sphere_settings"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FwdEegSphereModel"
+      ]
+    },
+    {
+      "name": "test_geometryinfo",
+      "cmake": "src/testframes/test_geometryinfo/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_geometryinfo"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_hpiDataUpdater",
+      "cmake": "src/testframes/test_hpiDataUpdater/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_hpiDataUpdater"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_hpiFit",
+      "cmake": "src/testframes/test_hpiFit/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_hpiFit"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvHpiFit",
+        "SimplexAlgorithm"
+      ]
+    },
+    {
+      "name": "test_hpiFit_integration",
+      "cmake": "src/testframes/test_hpiFit_integration/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_hpiFit_integration"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data",
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_hpiModelParameter",
+      "cmake": "src/testframes/test_hpiModelParameter/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_hpiModelParameter"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_ica_label",
+      "cmake": "src/testframes/test_ica_label/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_ica_label"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "MlIcaLabel"
+      ]
+    },
+    {
+      "name": "test_interpolation",
+      "cmake": "src/testframes/test_interpolation/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_interpolation"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_inv_beamformer",
+      "cmake": "src/testframes/test_inv_beamformer/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_inv_beamformer"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 7,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvDICS",
+        "InvLCMV"
+      ]
+    },
+    {
+      "name": "test_inv_cmne",
+      "cmake": "src/testframes/test_inv_cmne/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_inv_cmne"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvCMNE"
+      ]
+    },
+    {
+      "name": "test_inv_convenience",
+      "cmake": "src/testframes/test_inv_convenience/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_inv_convenience"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvConvenience"
+      ]
+    },
+    {
+      "name": "test_inv_dipole_rap_mne",
+      "cmake": "src/testframes/test_inv_dipole_rap_mne/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_inv_dipole_rap_mne"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data",
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvRapMusic"
+      ]
+    },
+    {
+      "name": "test_inv_loreta",
+      "cmake": "src/testframes/test_inv_loreta/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_inv_loreta"
+      ],
+      "labels": [],
+      "timeout": 600,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 12,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_inv_rt_library",
+      "cmake": "src/testframes/test_inv_rt_library/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_inv_rt_library"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 9,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_inv_sparse",
+      "cmake": "src/testframes/test_inv_sparse/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_inv_sparse"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvGammaMap",
+        "InvMxne"
+      ]
+    },
+    {
+      "name": "test_inverse_data",
+      "cmake": "src/testframes/test_inverse_data/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_inverse_data"
+      ],
+      "labels": [],
+      "timeout": 300,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 30,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_inverse_rap_dipole",
+      "cmake": "src/testframes/test_inverse_rap_dipole/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_inverse_rap_dipole"
+      ],
+      "labels": [],
+      "timeout": 300,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 20,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_label_time_course",
+      "cmake": "src/testframes/test_label_time_course/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_label_time_course"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvLabelTimeCourse"
+      ]
+    },
+    {
+      "name": "test_label_utils",
+      "cmake": "src/testframes/test_label_utils/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_label_utils"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FsLabelUtils"
+      ]
+    },
+    {
+      "name": "test_lsl",
+      "cmake": "src/testframes/test_lsl/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_lsl"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 5,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_maxwell_movement_comp",
+      "cmake": "src/testframes/test_maxwell_movement_comp/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_maxwell_movement_comp"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "MaxwellMovementComp"
+      ]
+    },
+    {
+      "name": "test_ml_models",
+      "cmake": "src/testframes/test_ml_models/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_ml_models"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "MlModel",
+        "MlOnnxModel",
+        "MlTensor"
+      ]
+    },
+    {
+      "name": "test_ml_trainer",
+      "cmake": "src/testframes/test_ml_trainer/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_ml_trainer"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "python"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "MLTrainer"
+      ]
+    },
+    {
+      "name": "test_mna_bids",
+      "cmake": "src/testframes/test_mna_bids/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mna_bids"
+      ],
+      "labels": [],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 10,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mna_coverage",
+      "cmake": "src/testframes/test_mna_coverage/CMakeLists.txt",
+      "registration": {
+        "state": "unregistered",
+        "via": null,
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": "Placeholder directory; its CMakeLists.txt names a test_mna_coverage.cpp that was never written. Kept out of the build until the MNA coverage test is authored."
+      },
+      "add_test_names": [
+        "test_mna_coverage"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "ubuntu-24.04": "absent",
+        "windows-2025-vs2026": "absent"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mna_graph_execution",
+      "cmake": "src/testframes/test_mna_graph_execution/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mna_graph_execution"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mna_inverse_pipeline",
+      "cmake": "src/testframes/test_mna_inverse_pipeline/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mna_inverse_pipeline"
+      ],
+      "labels": [],
+      "timeout": 300,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 2,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mna_io",
+      "cmake": "src/testframes/test_mna_io/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mna_io"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mna_registry_loader",
+      "cmake": "src/testframes/test_mna_registry_loader/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mna_registry_loader"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 4,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mna_serialization",
+      "cmake": "src/testframes/test_mna_serialization/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mna_serialization"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "python"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mna_skill_graph_equivalence",
+      "cmake": "src/testframes/test_mna_skill_graph_equivalence/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mna_skill_graph_equivalence"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data",
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 7,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_analyze_studio_core_capabilities",
+      "cmake": "src/testframes/test_mne_analyze_studio_core_capabilities/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_analyze_studio_core_capabilities"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_analyze_studio_scene_jsonrpc",
+      "cmake": "src/testframes/test_mne_analyze_studio_scene_jsonrpc/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_analyze_studio_scene_jsonrpc"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data"
+      ],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_analyze_studio_workflow_integration",
+      "cmake": "src/testframes/test_mne_analyze_studio_workflow_integration/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_analyze_studio_workflow_integration"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 4,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_anonymize",
+      "cmake": "src/testframes/test_mne_anonymize/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_anonymize"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_browse_app",
+      "cmake": "src/testframes/test_mne_browse_app/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [
+          "BUILD_MNE_BROWSE"
+        ],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_browse_app"
+      ],
+      "labels": [],
+      "timeout": 60,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_browse_data",
+      "cmake": "src/testframes/test_mne_browse_data/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_browse_data"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 20,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_channel_selection",
+      "cmake": "src/testframes/test_mne_channel_selection/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_channel_selection"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_compute_raw_inverse",
+      "cmake": "src/testframes/test_mne_compute_raw_inverse/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_compute_raw_inverse"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "python",
+        "sample-data",
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 12,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_cov_matrix",
+      "cmake": "src/testframes/test_mne_cov_matrix/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_cov_matrix"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_data_types",
+      "cmake": "src/testframes/test_mne_data_types/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_data_types"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data",
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 31,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_extended",
+      "cmake": "src/testframes/test_mne_extended/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_extended"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_flash_bem",
+      "cmake": "src/testframes/test_mne_flash_bem/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [
+          "BUILD_MNE_FLASH_BEM"
+        ],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_flash_bem"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "freesurfer"
+      ],
+      "gui": false,
+      "qskip_sites": 11,
+      "spawns_processes": true,
+      "ci_excluded_on": [
+        "windows-2025-vs2026"
+      ],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "absent"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_forward_ops",
+      "cmake": "src/testframes/test_mne_forward_ops/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_forward_ops"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 14,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_forward_solution",
+      "cmake": "src/testframes/test_mne_forward_solution/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_forward_solution"
+      ],
+      "labels": [],
+      "timeout": 1800,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "MNEForwardSolution"
+      ]
+    },
+    {
+      "name": "test_mne_hemisphere_epoch",
+      "cmake": "src/testframes/test_mne_hemisphere_epoch/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_hemisphere_epoch"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 35,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_inspect_multimodal",
+      "cmake": "src/testframes/test_mne_inspect_multimodal/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": "Skipped unless inspect_electrodes, inspect_mri_slices, mne_disp3D and mne_inspect_app_core are all built.",
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_inspect_multimodal"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_inv_coverage",
+      "cmake": "src/testframes/test_mne_inv_coverage/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_inv_coverage"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_io_coverage",
+      "cmake": "src/testframes/test_mne_io_coverage/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_io_coverage"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 9,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_library",
+      "cmake": "src/testframes/test_mne_library/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_library"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data",
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 76,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_msh_display_surface_set",
+      "cmake": "src/testframes/test_mne_msh_display_surface_set/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_msh_display_surface_set"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_project_to_surface",
+      "cmake": "src/testframes/test_mne_project_to_surface/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_project_to_surface"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_projections",
+      "cmake": "src/testframes/test_mne_projections/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_projections"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "FiffProj"
+      ]
+    },
+    {
+      "name": "test_mne_raw_proj_comp",
+      "cmake": "src/testframes/test_mne_raw_proj_comp/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_raw_proj_comp"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_setup_mri",
+      "cmake": "src/testframes/test_mne_setup_mri/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_setup_mri"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data"
+      ],
+      "gui": false,
+      "qskip_sites": 7,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_source_analysis",
+      "cmake": "src/testframes/test_mne_source_analysis/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_source_analysis"
+      ],
+      "labels": [],
+      "timeout": 300,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 22,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_source_data",
+      "cmake": "src/testframes/test_mne_source_data/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_source_data"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 28,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "MNESourceSpace"
+      ]
+    },
+    {
+      "name": "test_mne_source_space_python",
+      "cmake": "src/testframes/test_mne_source_space_python/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_source_space_python"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "python",
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_surf2bem",
+      "cmake": "src/testframes/test_mne_surf2bem/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_surf2bem"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data"
+      ],
+      "gui": false,
+      "qskip_sites": 8,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_watershed_bem",
+      "cmake": "src/testframes/test_mne_watershed_bem/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [
+          "BUILD_MNE_WATERSHED_BEM"
+        ],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_watershed_bem"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "freesurfer",
+        "sample-data"
+      ],
+      "gui": false,
+      "qskip_sites": 10,
+      "spawns_processes": true,
+      "ci_excluded_on": [
+        "windows-2025-vs2026"
+      ],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "absent"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mri_io",
+      "cmake": "src/testframes/test_mri_io/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mri_io"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "sample-data"
+      ],
+      "gui": false,
+      "qskip_sites": 7,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mri_nifti_io",
+      "cmake": "src/testframes/test_mri_nifti_io/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mri_nifti_io"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mri_slicer",
+      "cmake": "src/testframes/test_mri_slicer/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mri_slicer"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mri_slices_plugin",
+      "cmake": "src/testframes/test_mri_slices_plugin/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": "Skipped when the inspect_mri_slices target is not built.",
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mri_slices_plugin"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mri_vol_data",
+      "cmake": "src/testframes/test_mri_vol_data/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mri_vol_data"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_multimodal_scene",
+      "cmake": "src/testframes/test_multimodal_scene/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": "Skipped when the mne_disp3D target is not built.",
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_multimodal_scene"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_network_visualization",
+      "cmake": "src/testframes/test_network_visualization/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_network_visualization"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_picard_ica",
+      "cmake": "src/testframes/test_picard_ica/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_picard_ica"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "PicardIca"
+      ]
+    },
+    {
+      "name": "test_polhemus_coregistration",
+      "cmake": "src/testframes/test_polhemus_coregistration/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_polhemus_coregistration"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_project_resume_layout",
+      "cmake": "src/testframes/test_project_resume_layout/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_project_resume_layout"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_python_runner",
+      "cmake": "src/testframes/test_python_runner/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_python_runner"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "python",
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_report",
+      "cmake": "src/testframes/test_report/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_report"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "Report"
+      ]
+    },
+    {
+      "name": "test_resolution_matrix",
+      "cmake": "src/testframes/test_resolution_matrix/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_resolution_matrix"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvResolutionMatrix"
+      ]
+    },
+    {
+      "name": "test_rt_source_streaming",
+      "cmake": "src/testframes/test_rt_source_streaming/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_rt_source_streaming"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_rtcmne_cmne",
+      "cmake": "src/testframes/test_rtcmne_cmne/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_rtcmne_cmne"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_rtprocessing_averaging",
+      "cmake": "src/testframes/test_rtprocessing_averaging/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_rtprocessing_averaging"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 29,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_rtprocessing_extended",
+      "cmake": "src/testframes/test_rtprocessing_extended/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_rtprocessing_extended"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_scdisp_widgets",
+      "cmake": "src/testframes/test_scdisp_widgets/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_scdisp_widgets"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_scmeas_measurements",
+      "cmake": "src/testframes/test_scmeas_measurements/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": "Skipped when the scan_writetofile target is not built.",
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_scmeas_measurements"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_scshared_management",
+      "cmake": "src/testframes/test_scshared_management/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_scshared_management"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_sensorSet",
+      "cmake": "src/testframes/test_sensorSet/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_sensorSet"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_sensor_field_mapper",
+      "cmake": "src/testframes/test_sensor_field_mapper/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_sensor_field_mapper"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_sensor_streaming",
+      "cmake": "src/testframes/test_sensor_streaming/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_sensor_streaming"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_setup_forward_model",
+      "cmake": "src/testframes/test_setup_forward_model/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_setup_forward_model"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_signalModel",
+      "cmake": "src/testframes/test_signalModel/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_signalModel"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_source_estimate_io",
+      "cmake": "src/testframes/test_source_estimate_io/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_source_estimate_io"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvSourceEstimateIO"
+      ]
+    },
+    {
+      "name": "test_source_estimate_types",
+      "cmake": "src/testframes/test_source_estimate_types/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_source_estimate_types"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvSourceEstimate",
+        "InvVectorSourceEstimate",
+        "InvVolumeSourceEstimate"
+      ]
+    },
+    {
+      "name": "test_source_morph",
+      "cmake": "src/testframes/test_source_morph/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_source_morph"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "SourceMorph"
+      ]
+    },
+    {
+      "name": "test_spectral_connectivity",
+      "cmake": "src/testframes/test_spectral_connectivity/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_spectral_connectivity"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "DirectedTransferFunction",
+        "GrangerCausality",
+        "PartialDirectedCoherence"
+      ]
+    },
+    {
+      "name": "test_standard_montage",
+      "cmake": "src/testframes/test_standard_montage/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_standard_montage"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "StandardMontage"
+      ]
+    },
+    {
+      "name": "test_sts_cluster",
+      "cmake": "src/testframes/test_sts_cluster/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_sts_cluster"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "StatsAdjacency",
+        "StatsCluster"
+      ]
+    },
+    {
+      "name": "test_sts_cov_estimators",
+      "cmake": "src/testframes/test_sts_cov_estimators/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_sts_cov_estimators"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "StsCovEstimators"
+      ]
+    },
+    {
+      "name": "test_studio_core",
+      "cmake": "src/testframes/test_studio_core/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_studio_core"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_studio_dummy3d_view",
+      "cmake": "src/testframes/test_studio_dummy3d_view/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_studio_dummy3d_view"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_studio_extension_widgets",
+      "cmake": "src/testframes/test_studio_extension_widgets/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_studio_extension_widgets"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_studio_mna_skills",
+      "cmake": "src/testframes/test_studio_mna_skills/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_studio_mna_skills"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_studio_neuro_kernel",
+      "cmake": "src/testframes/test_studio_neuro_kernel/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_studio_neuro_kernel"
+      ],
+      "labels": [
+        "integration"
+      ],
+      "timeout": 60,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 2,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_studio_raw_model",
+      "cmake": "src/testframes/test_studio_raw_model/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_studio_raw_model"
+      ],
+      "labels": [
+        "requires-data",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 3,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_studio_skill_host",
+      "cmake": "src/testframes/test_studio_skill_host/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_studio_skill_host"
+      ],
+      "labels": [
+        "integration"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_surface_checks",
+      "cmake": "src/testframes/test_surface_checks/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_surface_checks"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 3,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_surface_laplacian",
+      "cmake": "src/testframes/test_surface_laplacian/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_surface_laplacian"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "SurfaceLaplacian"
+      ]
+    },
+    {
+      "name": "test_tf_mxne",
+      "cmake": "src/testframes/test_tf_mxne/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tf_mxne"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvTfMxne"
+      ]
+    },
+    {
+      "name": "test_tool_compute_pipeline",
+      "cmake": "src/testframes/test_tool_compute_pipeline/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_compute_pipeline"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 24,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_tool_conversion_extended",
+      "cmake": "src/testframes/test_tool_conversion_extended/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_conversion_extended"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_tool_conversion_functions",
+      "cmake": "src/testframes/test_tool_conversion_functions/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_conversion_functions"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 2,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_tool_data_pipeline",
+      "cmake": "src/testframes/test_tool_data_pipeline/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_data_pipeline"
+      ],
+      "labels": [],
+      "timeout": 600,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 220,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_tool_exit_codes",
+      "cmake": "src/testframes/test_tool_exit_codes/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_exit_codes"
+      ],
+      "labels": [
+        "integration"
+      ],
+      "timeout": 300,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 6,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_tool_forward_generation",
+      "cmake": "src/testframes/test_tool_forward_generation/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_forward_generation"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "ComputeFwd"
+      ]
+    },
+    {
+      "name": "test_tool_info_helpers",
+      "cmake": "src/testframes/test_tool_info_helpers/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_info_helpers"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_tool_inverse_computation",
+      "cmake": "src/testframes/test_tool_inverse_computation/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_inverse_computation"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 3,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_tool_inverse_operator",
+      "cmake": "src/testframes/test_tool_inverse_operator/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_inverse_operator"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 13,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "MNEInverseOperator"
+      ]
+    },
+    {
+      "name": "test_tool_list_source_space",
+      "cmake": "src/testframes/test_tool_list_source_space/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_list_source_space"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 2,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_tool_preproc_helpers",
+      "cmake": "src/testframes/test_tool_preproc_helpers/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_preproc_helpers"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_tool_preprocessing",
+      "cmake": "src/testframes/test_tool_preprocessing/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_preprocessing"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 15,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_tool_show_fiff",
+      "cmake": "src/testframes/test_tool_show_fiff/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_show_fiff"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 14,
+      "spawns_processes": true,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_tool_surface_math",
+      "cmake": "src/testframes/test_tool_surface_math/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_tool_surface_math"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_trap_music",
+      "cmake": "src/testframes/test_trap_music/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_trap_music"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "InvTrapMusic"
+      ]
+    },
+    {
+      "name": "test_utils_circularbuffer",
+      "cmake": "src/testframes/test_utils_circularbuffer/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_utils_circularbuffer"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_utils_ioutils",
+      "cmake": "src/testframes/test_utils_ioutils/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_utils_ioutils"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_utils_kmeans",
+      "cmake": "src/testframes/test_utils_kmeans/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_utils_kmeans"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "KMeans"
+      ]
+    },
+    {
+      "name": "test_utils_layout_selection",
+      "cmake": "src/testframes/test_utils_layout_selection/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_utils_layout_selection"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 4,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_utils_logger",
+      "cmake": "src/testframes/test_utils_logger/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_utils_logger"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_utils_mnemath",
+      "cmake": "src/testframes/test_utils_mnemath/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_utils_mnemath"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "Linalg"
+      ]
+    },
+    {
+      "name": "test_utils_observer_pattern",
+      "cmake": "src/testframes/test_utils_observer_pattern/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_utils_observer_pattern"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_utils_spectral",
+      "cmake": "src/testframes/test_utils_spectral/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_utils_spectral"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_utils_sphere",
+      "cmake": "src/testframes/test_utils_sphere/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_utils_sphere"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "Sphere"
+      ]
+    },
+    {
+      "name": "test_utils_warp",
+      "cmake": "src/testframes/test_utils_warp/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_utils_warp"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": [
+        "Warp"
+      ]
+    },
+    {
+      "name": "test_wasm_multi_draw",
+      "cmake": "src/testframes/test_wasm_multi_draw/CMakeLists.txt",
+      "registration": {
+        "state": "unregistered",
+        "via": null,
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": "Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case."
+      },
+      "add_test_names": [
+        "test_wasm_multi_draw"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "ubuntu-24.04": "absent",
+        "windows-2025-vs2026": "absent"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_wasm_multi_pass",
+      "cmake": "src/testframes/test_wasm_multi_pass/CMakeLists.txt",
+      "registration": {
+        "state": "unregistered",
+        "via": null,
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": "Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case."
+      },
+      "add_test_names": [
+        "test_wasm_multi_pass"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "ubuntu-24.04": "absent",
+        "windows-2025-vs2026": "absent"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_writetofile_status",
+      "cmake": "src/testframes/test_writetofile_status/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": "Skipped when the scan_writetofile target is not built.",
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_writetofile_status"
+      ],
+      "labels": [],
+      "timeout": null,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    }
+  ]
+}

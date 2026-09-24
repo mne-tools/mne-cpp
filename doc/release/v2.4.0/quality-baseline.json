@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "generated_by": "tools/quality/generate_quality_report.py",
+  "thresholds": {
+    "coverage_line_libraries": 70.0,
+    "coverage_branch_libraries": 55.0,
+    "coverage_line_applications": 50.0,
+    "coverage_line_tools": 50.0,
+    "coverage_line_combined": 60.0,
+    "example_eligible_backed": 100.0
+  },
+  "gates": {
+    "G1_test_integrity": {
+      "registered": 229,
+      "conditional": 14,
+      "unregistered": 3,
+      "without_labels": 223,
+      "without_timeout": 213,
+      "ci_executed": {
+        "macos-26": 229,
+        "ubuntu-24.04": 229,
+        "windows-2025-vs2026": 227
+      },
+      "ci_failures": 0,
+      "ci_platform_exclusions": {
+        "test_mne_flash_bem": [
+          "windows-2025-vs2026"
+        ],
+        "test_mne_watershed_bem": [
+          "windows-2025-vs2026"
+        ]
+      },
+      "retry_paths": 6
+    },
+    "G2_coverage": {
+      "commit": "7122ccb773617012b014fb066875f3f8e32b4c39",
+      "source": "https://github.com/mne-tools/mne-cpp/actions/runs/33441161302",
+      "line_combined": 47.18,
+      "line_libraries": 61.59,
+      "line_applications": 23.96,
+      "line_tools": 60.24,
+      "branch_reported": false,
+      "lines_to_combined_target": 17765,
+      "lines_to_scope_targets": {
+        "libraries": 5874,
+        "applications": 13666,
+        "tools": 0
+      }
+    },
+    "G3_api_documentation": {
+      "public_api_units": 477,
+      "exported_not_registered": 141,
+      "example_eligible": 382,
+      "eligible_backed_percent": 4.97,
+      "snippets": 0,
+      "registered_test_percent": 28.57
+    },
+    "G4_screenshots": {
+      "referenced_images": 21,
+      "referenced_without_producer": 9,
+      "doc_shots_run_in_ci": false,
+      "placeholder_workflows": 3,
+      "golden_comparisons": 0
+    },
+    "G5_maintainability": {
+      "compiler_warnings": 0,
+      "null_macro": 43,
+      "typedef_struct": 12,
+      "c_style_cast": 430,
+      "raw_new": 168,
+      "raw_delete": 276,
+      "console_io": 370,
+      "numeric_define": 831,
+      "qt_new_unparented": 825,
+      "oversized_unit": 8
+    },
+    "G6_parity": {
+      "reference": "1.11.0",
+      "unpinned_ci_packages": [
+        "fastcov",
+        "mne",
+        "numpy",
+        "pip",
+        "scikit-learn",
+        "scipy"
+      ],
+      "inventoried_apis": 443,
+      "by_status": {
+        "implemented": 251,
+        "partial": 47,
+        "missing": 137,
+        "not-applicable": 8
+      },
+      "claims": 358,
+      "claims_by_evidence": {
+        "cross-validated-static": 3,
+        "cross-validated-live": 1,
+        "tested": 84,
+        "unverified": 270
+      }
+    }
+  }
+}

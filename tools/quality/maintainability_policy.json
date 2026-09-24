@@ -1,0 +1,13 @@
+{
+  "$comment": "Policy for tools/quality/audit_maintainability.py (v2.4.0 T0.5). Lexical debt metrics for gate G5. Counts are candidates, not verdicts: every metric names the files it found so T6.4-T6.8 can assign path-disjoint tranches. Paths are relative to the repository root.",
+  "scan_roots": ["src/libraries", "src/applications", "src/tools"],
+  "extensions": [".h", ".hpp", ".cpp", ".cc", ".cxx"],
+  "exclude_path_fragments": {
+    "/FormFiles/": "Qt Designer generated forms (uic input); not hand-maintained C++.",
+    "_autogen/": "moc/uic/rcc output; generated at build time."
+  },
+  "oversized_lines": 2000,
+  "suppressions": {
+    "$comment": "Map metric -> { 'path': 'reason' }. A suppression hides one file from one metric and must say why. None are needed yet."
+  }
+}

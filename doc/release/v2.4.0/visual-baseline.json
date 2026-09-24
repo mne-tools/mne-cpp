@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "generated_by": "tools/quality/audit_visual_assets.py",
+  "summary": {
+    "manifest_shots": 12,
+    "referenced_images": 21,
+    "referenced_without_producer": 9,
+    "produced_without_consumer": 0,
+    "implemented_kinds": [
+      "mne_align_app",
+      "mne_inspect_app",
+      "scene_only",
+      "widget_mockup"
+    ],
+    "placeholder_workflows": [
+      ".github/workflows/main.yml",
+      ".github/workflows/pull-request.yml",
+      ".github/workflows/staging.yml"
+    ],
+    "doc_shots_run_in_ci": false,
+    "regression_jobs": [
+      {
+        "workflow": ".github/workflows/screenshot-regression.yml",
+        "invocations": 2,
+        "compares_to_golden": false
+      }
+    ],
+    "golden_references": 0
+  },
+  "images": [
+    {
+      "id": "inspect-multimodal/load-electrodes",
+      "kind": "mne_inspect_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
+      "consumers": [
+        "doc/website/docs/manual/mne-inspect-multimodal.mdx"
+      ]
+    },
+    {
+      "id": "inspect-multimodal/load-mri",
+      "kind": "mne_inspect_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
+      "consumers": [
+        "doc/website/docs/manual/mne-inspect-multimodal.mdx"
+      ]
+    },
+    {
+      "id": "inspect-multimodal/overview",
+      "kind": "mne_inspect_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
+      "consumers": [
+        "doc/website/docs/manual/mne-inspect-multimodal.mdx"
+      ]
+    },
+    {
+      "id": "inspect-multimodal/pick-dock",
+      "kind": "mne_inspect_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
+      "consumers": [
+        "doc/website/docs/manual/mne-inspect-multimodal.mdx"
+      ]
+    },
+    {
+      "id": "mne-align/overview",
+      "kind": "mne_align_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
+      "consumers": [
+        "doc/website/docs/manual/mne-align.mdx"
+      ]
+    },
+    {
+      "id": "mne-align/step1-setup",
+      "kind": "mne_align_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
+      "consumers": [
+        "doc/website/docs/manual/mne-align.mdx"
+      ]
+    },
+    {
+      "id": "mne-align/step2-fiducials",
+      "kind": "mne_align_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
+      "consumers": [
+        "doc/website/docs/manual/mne-align.mdx"
+      ]
+    },
+    {
+      "id": "mne-align/step3-eeg-cap",
+      "kind": "mne_align_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
+      "consumers": [
+        "doc/website/docs/manual/mne-align.mdx"
+      ]
+    },
+    {
+      "id": "mne-align/step4-head-shape",
+      "kind": "mne_align_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
+      "consumers": [
+        "doc/website/docs/manual/mne-align.mdx"
+      ]
+    },
+    {
+      "id": "mne-align/step5-verify",
+      "kind": "mne_align_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
+      "consumers": [
+        "doc/website/docs/manual/mne-align.mdx"
+      ]
+    },
+    {
+      "id": "mne-align/step6-save",
+      "kind": "mne_align_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
+      "consumers": [
+        "doc/website/docs/manual/mne-align.mdx"
+      ]
+    },
+    {
+      "id": "mne-align/step7-done",
+      "kind": "mne_align_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
+      "consumers": [
+        "doc/website/docs/manual/mne-align.mdx"
+      ]
+    },
+    {
+      "id": "mne-analyze-studio/filter-then-source-estimation-demo",
+      "kind": null,
+      "size": null,
+      "producer": "none",
+      "consumers": [
+        "doc/website/docs/manual/mne-analyze-studio.mdx"
+      ]
+    },
+    {
+      "id": "mne-analyze-studio/skill-run-mna-graph",
+      "kind": null,
+      "size": null,
+      "producer": "none",
+      "consumers": [
+        "doc/website/docs/manual/mne-analyze-studio.mdx"
+      ]
+    },
+    {
+      "id": "mne-analyze-studio/source-estimation-multimodal-demo",
+      "kind": null,
+      "size": null,
+      "producer": "none",
+      "consumers": [
+        "doc/website/docs/manual/mne-analyze-studio.mdx"
+      ]
+    },
+    {
+      "id": "mne-analyze-studio/temporal-filter-demo",
+      "kind": null,
+      "size": null,
+      "producer": "none",
+      "consumers": [
+        "doc/website/docs/manual/mne-analyze-studio.mdx"
+      ]
+    },
+    {
+      "id": "mne-analyze-studio/workbench-overview",
+      "kind": null,
+      "size": null,
+      "producer": "none",
+      "consumers": [
+        "doc/website/docs/manual/mne-analyze-studio.mdx"
+      ]
+    },
+    {
+      "id": "mne-scan/main-window",
+      "kind": null,
+      "size": null,
+      "producer": "none",
+      "consumers": [
+        "doc/website/docs/manual/mne-scan-quickstart.mdx"
+      ]
+    },
+    {
+      "id": "mne-scan/pipeline-fiffsim-writetofile",
+      "kind": null,
+      "size": null,
+      "producer": "none",
+      "consumers": [
+        "doc/website/docs/manual/mne-scan-quickstart.mdx"
+      ]
+    },
+    {
+      "id": "mne-scan/plugin-toolbar",
+      "kind": null,
+      "size": null,
+      "producer": "none",
+      "consumers": [
+        "doc/website/docs/manual/mne-scan-hardware.mdx"
+      ]
+    },
+    {
+      "id": "mne-scan/writetofile-prefs",
+      "kind": null,
+      "size": null,
+      "producer": "none",
+      "consumers": [
+        "doc/website/docs/manual/mne-scan-deployment.mdx"
+      ]
+    }
+  ]
+}
