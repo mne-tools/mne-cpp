@@ -1,15 +1,12 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
  * @file     writetofilestatuswidget.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.3.0
  * @date     May, 2026
- *
- * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
- *
- * Copyright (C) 2026, MNE-CPP Authors. All rights reserved. (BSD-3-Clause)
- *
  * @brief    Definition of WriteToFileStatusWidget.
  */
 

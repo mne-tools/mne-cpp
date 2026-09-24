@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
-# =============================================================================================================
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 #
-# @file     generate_quality_report.py
-# @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
 # @since    2.4.0
 # @date     September, 2026
 #
-# SPDX-License-Identifier: BSD-3-Clause
-# Copyright (c) 2026 MNE-CPP Authors
 #
 # @brief    Regenerate every v2.4.0 baseline report and the combined quality dashboard.
-#
-# =============================================================================================================
 """One command for the v2.4.0 quality baseline (package T0.7).
 
 Regenerates, from the working tree plus the pinned CI evidence in

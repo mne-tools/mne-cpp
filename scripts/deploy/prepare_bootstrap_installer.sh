@@ -1,6 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (c) 2010-2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 #
 # Prepare a Qt Installer Framework offline-installer payload by hydrating the

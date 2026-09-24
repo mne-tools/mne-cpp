@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
-# =============================================================================================================
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 #
-# @file     validate_test_inventory.py
-# @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
 # @since    2.4.0
 # @date     July, 2026
 #
-# SPDX-License-Identifier: BSD-3-Clause
-# Copyright (c) 2026 MNE-CPP Authors
 #
 # @brief    Validate the invariants that keep the test suite honest.
-#
-# =============================================================================================================
 """Validate the test inventory under ``src/testframes``.
 
 A test that builds but never runs is worse than a missing test: it looks like

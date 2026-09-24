@@ -1,15 +1,12 @@
 //=============================================================================================================
 /**
- * @file     test_api_registry.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     May, 2026
- *
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
+ * @file     test_api_registry.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     May, 2026
  * @brief    Validates invariants of doc/api_registry.json:
  *             1. JSON is well-formed and has a `classes` array.
  *             2. Every `header` path exists under `src/libraries/`.

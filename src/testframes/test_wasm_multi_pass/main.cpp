@@ -1,10 +1,11 @@
+//=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2010-2026 MNE-CPP Authors
  *
-
- * @file main.cpp
- * @brief Minimal multi-pass QRhi rendering test for WASM/WebGL.
+ * @file     main.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @brief    Minimal multi-pass QRhi rendering test for WASM/WebGL.
  *
  * Validates that multiple beginPass()/endPass() cycles with
  * PreserveColorContents each support one drawIndexed() on the

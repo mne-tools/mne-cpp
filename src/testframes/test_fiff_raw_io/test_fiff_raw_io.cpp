@@ -1,15 +1,12 @@
 //=============================================================================================================
 /**
- * @file     test_fiff_raw_io.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     March, 2026
- *
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
+ * @file     test_fiff_raw_io.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     March, 2026
  * @brief    Data-driven tests exercising FIFF file I/O with real .fif files.
  */
 //=============================================================================================================

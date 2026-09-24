@@ -1,16 +1,12 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
  * @file     test_tool_exit_codes.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.4.0
  * @date     July, 2026
- *
- * @section  LICENSE
- *
- * Copyright (C) 2026, MNE-CPP Authors. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
- *
  * @brief    Assert that command line tools report failure through their exit status.
  *
  * A tool that prints an error and then exits zero is worse than one that says
@@ -23,7 +19,6 @@
  * reasons and a test that pins it down turns every improvement to an error
  * message into a test failure. The exit status is the part other programs
  * depend on, so the exit status is what is fixed here.
- *
  */
 
 //=============================================================================================================

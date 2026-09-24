@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 cmake_minimum_required(VERSION 3.21)
 project(test_mne_inv_coverage LANGUAGES CXX)
 

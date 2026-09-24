@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (c) 2010-2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 """Patch MLAS compute.cpp to guard FP16 template code for WASM builds.
 

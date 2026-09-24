@@ -62,9 +62,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/33441161302 (comm
 
 ## Retry paths that can turn a failure into a pass
 
-- `scripts/test/test_all.bat:88` @REM Re-run failed tests: if a test passes on retry it is treated as a
-- `scripts/test/test_all.bat:94` ECHO ======= Re-running FAILED tests ^(retry once^) ====================
-- `scripts/test/test_all.bat:110` ECHO ---- %%~nxf PASSED on retry ^(flaky^) ----
-- `scripts/test/test_all.bat:290` # Re-run failed tests: if a test passes on retry it is treated as a
-- `scripts/test/test_all.bat:296` echo "======= Re-running FAILED tests (retry once) ======================"
-- `scripts/test/test_all.bat:313` echo "---- $testName PASSED on retry (flaky) ----"
+- `scripts/test/test_all.bat:89` @REM Re-run failed tests: if a test passes on retry it is treated as a
+- `scripts/test/test_all.bat:95` ECHO ======= Re-running FAILED tests ^(retry once^) ====================
+- `scripts/test/test_all.bat:111` ECHO ---- %%~nxf PASSED on retry ^(flaky^) ----
+- `scripts/test/test_all.bat:291` # Re-run failed tests: if a test passes on retry it is treated as a
+- `scripts/test/test_all.bat:297` echo "======= Re-running FAILED tests (retry once) ======================"
+- `scripts/test/test_all.bat:314` echo "---- $testName PASSED on retry (flaky) ----"

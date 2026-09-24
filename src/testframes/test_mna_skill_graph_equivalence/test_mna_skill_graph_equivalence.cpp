@@ -1,27 +1,12 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
  * @file     test_mna_skill_graph_equivalence.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.3.0
  * @date     May, 2026
- *
- * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
- *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
- *
- *
  * @brief    Acceptance test: byte-identical equivalence between a Studio
  *           workflow executed via the bundled `filter_then_source_estimation_demo.mna`
  *           graph and the same operations driven by an explicit skill chain.

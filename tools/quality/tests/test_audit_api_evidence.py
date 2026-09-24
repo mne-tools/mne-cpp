@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
-# =============================================================================================================
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 #
-# @file     test_audit_api_evidence.py
-# @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
 # @since    2.4.0
 # @date     September, 2026
 #
-# SPDX-License-Identifier: BSD-3-Clause
-# Copyright (c) 2026 MNE-CPP Authors
 #
 # @brief    Tests for the API evidence audit (T0.3).
-#
-# =============================================================================================================
 """Tests for ``tools/quality/audit_api_evidence.py``."""
 
 from __future__ import annotations

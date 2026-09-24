@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2010-2026 MNE-CPP Authors
  *
-
  * @file     test_mne_forward_ops.cpp
- * @brief    Tests for MNEForwardSolution operations: pick, prepare, orient prior, depth prior.
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @brief       Tests for MNEForwardSolution operations: pick, prepare, orient prior, depth prior.
  */
 //=============================================================================================================
 

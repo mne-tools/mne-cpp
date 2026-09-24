@@ -1,15 +1,12 @@
 //=============================================================================================================
 /**
- * @file     test_fwd_bem_data.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     March, 2026
- *
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
+ * @file     test_fwd_bem_data.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     March, 2026
  * @brief    Data-driven tests exercising the fwd library with real BEM/source/forward data files.
  *           Reads BEM models, BEM solutions, forward solutions, and exercises FwdBemModel,
  *           FwdCoilSet, ComputeFwdSettings, and sphere model computations.

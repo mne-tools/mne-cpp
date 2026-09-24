@@ -1,10 +1,11 @@
+//=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2010-2026 MNE-CPP Authors
  *
-
- * @file test_mne_extended.cpp
- * @brief Comprehensive tests for MNELIB classes: MNENamedMatrix, MNEEpochData,
+ * @file     test_mne_extended.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @brief    Comprehensive tests for MNELIB classes: MNENamedMatrix, MNEEpochData,
  *        MNEEpochDataList, MNEClusterInfo, MNESourceSpaces, MNEForwardSolution.
  */
 #include <QTest>

@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
-# =============================================================================================================
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 #
-# @file     gcc_warning_sweep.py
-# @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
 # @since    2.4.0
 # @date     July, 2026
 #
-# SPDX-License-Identifier: BSD-3-Clause
-# Copyright (c) 2026 MNE-CPP Authors
 #
 # @brief    Reproduce the Linux GCC warning gate locally, on every translation unit.
-#
-# =============================================================================================================
 
 """Compile every translation unit with GCC and report the diagnostics.
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (c) 2010-2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 # aqt install-qt linux desktop 6.5.0 wasm_multithread --autodesktop
 

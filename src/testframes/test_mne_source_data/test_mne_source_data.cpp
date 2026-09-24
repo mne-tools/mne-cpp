@@ -1,15 +1,12 @@
 //=============================================================================================================
 /**
- * @file     test_mne_source_data.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     March, 2026
- *
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2026 MNE-CPP Authors
  *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
+ * @file     test_mne_source_data.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     March, 2026
  * @brief    Data-driven tests exercising MNE library with real data files.
  *           Reads source spaces, BEM, forward solutions, epoch data.
  */

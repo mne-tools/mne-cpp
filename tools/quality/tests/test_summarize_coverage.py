@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
-# =============================================================================================================
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 #
-# @file     test_summarize_coverage.py
-# @author   MNE-CPP maintainers
 # @since    2.4.0
 # @date     August, 2026
 #
-# SPDX-License-Identifier: BSD-3-Clause
-# Copyright (c) 2026 MNE-CPP Authors
 #
 # @brief    Tests for the deterministic LCOV coverage baseline summarizer.
-#
-# =============================================================================================================
 """Tests for ``tools/quality/summarize_coverage.py``."""
 
 from __future__ import annotations

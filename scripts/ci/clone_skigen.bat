@@ -1,6 +1,7 @@
 @echo off
 rem SPDX-License-Identifier: BSD-3-Clause
 rem Copyright (c) 2010-2026 MNE-CPP Authors
+rem   Christoph Dinh <christoph.dinh@mne-cpp.org>
 rem
 rem Clone Skigen at the centrally-configured git ref.
 rem

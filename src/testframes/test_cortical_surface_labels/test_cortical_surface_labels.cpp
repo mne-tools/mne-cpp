@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2010-2026 MNE-CPP Authors
  *
-
  * @file     test_cortical_surface_labels.cpp
- * @brief    Tests the CorticalSurface plugin's Labels dock plumbing.
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @brief       Tests the CorticalSurface plugin's Labels dock plumbing.
  *
  * Builds an in-memory @ref FSLIB::FsLabel, round-trips it through
  * `saveLabel` + @ref FSLIB::FsLabel::read, and extracts an ROI mean

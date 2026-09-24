@@ -1,3 +1,9 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2020-2026 MNE-CPP Authors
+#   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+#   Gabriel Motta <gabrielbenmotta@gmail.com>
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 name: WasmTest
 
 on:

@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
-# =============================================================================================================
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 #
-# @file     test_validate_test_inventory.py
-# @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
 # @since    2.4.0
 # @date     July, 2026
 #
-# SPDX-License-Identifier: BSD-3-Clause
-# Copyright (c) 2026 MNE-CPP Authors
 #
 # @brief    Fixtures proving the test-inventory validator rejects what it claims to reject.
-#
-# =============================================================================================================
 """Fixtures for ``tools/quality/validate_test_inventory.py``.
 
 A validator nobody has tried to fool is a validator nobody should trust, so each

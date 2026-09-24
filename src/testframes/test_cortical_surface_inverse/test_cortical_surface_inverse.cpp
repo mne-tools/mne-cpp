@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2010-2026 MNE-CPP Authors
  *
-
  * @file     test_cortical_surface_inverse.cpp
- * @brief    Tests the CorticalSurface plugin's "Compute Source Estimate" dispatch.
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @brief       Tests the CorticalSurface plugin's "Compute Source Estimate" dispatch.
  *
  * Construction of a self-contained MNE forward/cov/evoked FIFF triplet
  * in-memory is non-trivial, so the file-driven runComputeSourceEstimate

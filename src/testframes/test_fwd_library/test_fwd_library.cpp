@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2010-2026 MNE-CPP Authors
+//   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 //=============================================================================================================
 // test_fwd_library.cpp — Comprehensive tests for the FWD (Forward Modeling) library

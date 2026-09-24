@@ -35,32 +35,32 @@
     "retry_paths": [
       {
         "path": "scripts/test/test_all.bat",
-        "line": 88,
+        "line": 89,
         "text": "@REM Re-run failed tests: if a test passes on retry it is treated as a"
       },
       {
         "path": "scripts/test/test_all.bat",
-        "line": 94,
+        "line": 95,
         "text": "ECHO ======= Re-running FAILED tests ^(retry once^) ===================="
       },
       {
         "path": "scripts/test/test_all.bat",
-        "line": 110,
+        "line": 111,
         "text": "ECHO ---- %%~nxf PASSED on retry ^(flaky^) ----"
       },
       {
         "path": "scripts/test/test_all.bat",
-        "line": 290,
+        "line": 291,
         "text": "# Re-run failed tests: if a test passes on retry it is treated as a"
       },
       {
         "path": "scripts/test/test_all.bat",
-        "line": 296,
+        "line": 297,
         "text": "echo \"======= Re-running FAILED tests (retry once) ======================\""
       },
       {
         "path": "scripts/test/test_all.bat",
-        "line": 313,
+        "line": 314,
         "text": "echo \"---- $testName PASSED on retry (flaky) ----\""
       }
     ],

@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 # SDK interfaces and shared registries for MNE Analyze Studio extensions.
 
 cmake_minimum_required(VERSION 3.15)

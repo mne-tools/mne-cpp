@@ -1,3 +1,12 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2019-2026 MNE-CPP Authors
+#   Gabriel Motta <gabrielbenmotta@gmail.com>
+#   Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+#   Andrey Parfenov <a1994ndrey@gmail.com>
+#   Johannes Behrens <behrens@neoscan-solutions.com>
+#   Juan GPC <jgarciaprieto@mgh.harvard.edu>
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 name: Coverity
 on:
   schedule:

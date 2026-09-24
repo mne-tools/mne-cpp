@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 """Generate reference field-map data replicating the MNE helmet example.
 
 Replicates https://mne.tools/stable/auto_examples/visualization/mne_helmet.html

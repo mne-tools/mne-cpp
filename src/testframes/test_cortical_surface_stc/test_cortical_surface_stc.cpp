@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2010-2026 MNE-CPP Authors
  *
-
  * @file     test_cortical_surface_stc.cpp
- * @brief    Tests for STC overlay support in the cortical_surface mne_analyze plugin.
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @brief       Tests for STC overlay support in the cortical_surface mne_analyze plugin.
  *
  * Covers the v2.3.0 plugin extensions added in cortical_surface.{h,cpp}:
  *   - Loading a stub source estimate and verifying overlay row count vs. surface mapping.

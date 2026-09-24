@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 # MNA-aware workflow skills extension for MNE Analyze Studio.
 # Studio MNA workflow skills: read / write / execute
 # MNA projects from inside the Studio workflow graph.

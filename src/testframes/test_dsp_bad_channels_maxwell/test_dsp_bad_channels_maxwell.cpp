@@ -1,15 +1,12 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
  * @file     test_dsp_bad_channels_maxwell.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.3.0
  * @date     May, 2026
- *
- * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
- *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
  * @brief    Tests for SSS-based bad channel detection.
  */
 

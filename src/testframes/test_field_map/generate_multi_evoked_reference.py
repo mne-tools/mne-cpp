@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 """Generate reference *applied* field maps for ALL evoked conditions.
 
 This script complements generate_fieldmap_reference.py by computing

@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2010-2026 MNE-CPP Authors
  *
-
  * @file     test_mne_io_coverage.cpp
- * @brief    Coverage tests for FiffIO, MNERawInfo, InvSourceEstimate tokenization.
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @brief       Coverage tests for FiffIO, MNERawInfo, InvSourceEstimate tokenization.
  */
 //=============================================================================================================
 

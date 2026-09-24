@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2026 Christoph Dinh <christoph.dinh@mne-cpp.org>
+// Copyright (c) 2026 MNE-CPP Authors
+//   Christoph Dinh <christoph.dinh@mne-cpp.org>
 //
 // Headless screenshot regression tool for disp3D BrainView.
 //

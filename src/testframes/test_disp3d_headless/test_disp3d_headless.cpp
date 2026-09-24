@@ -1,10 +1,11 @@
+//=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2010-2026 MNE-CPP Authors
  *
-
- * @file test_disp3d_headless.cpp
- * @brief Headless tests for disp3D library: Interpolation functions,
+ * @file     test_disp3d_headless.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @brief    Headless tests for disp3D library: Interpolation functions,
  *        GeometryInfo (surface distances & projection), MeshFactory geometry,
  *        DataLoader I/O paths, and RtSourceDataController / RtSensorDataController setters.
  */

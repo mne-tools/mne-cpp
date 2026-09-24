@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (c) 2010-2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
 #
 # Load external dependency versions from src/external/external_deps.env and
 # export them to the GitHub Actions environment ($GITHUB_ENV) so downstream

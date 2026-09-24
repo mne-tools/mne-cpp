@@ -1,3 +1,9 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2022-2026 MNE-CPP Authors
+#   Gabriel Motta <gabrielbenmotta@gmail.com>
+#   johaenns <j.vorw01@gmail.com>
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 cmake_minimum_required(VERSION 3.14)
 project(analyze_averaging LANGUAGES CXX)
 

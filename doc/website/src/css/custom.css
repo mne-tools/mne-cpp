@@ -1,3 +1,10 @@
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ */
+
 :root {
     --ifm-color-primary: #6c5ce7;
     --ifm-color-primary-dark: #5a48e0;

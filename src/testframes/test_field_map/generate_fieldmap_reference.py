@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 """Generate reference field-map matrices using MNE-Python for cross-validation.
 
 This script computes the intermediate and final field-map matrices using

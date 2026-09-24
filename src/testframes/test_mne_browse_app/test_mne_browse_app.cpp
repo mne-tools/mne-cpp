@@ -1,13 +1,12 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
  * @file     test_mne_browse_app.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.4.0
  * @date     August, 2026
- *
- * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
- *
  * @brief    Offscreen application smoke tests for mne_browse.
  */
 

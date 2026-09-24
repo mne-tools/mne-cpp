@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
-# =============================================================================================================
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 #
-# @file     test_audit_dependencies.py
-# @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
 # @since    2.4.0
 # @date     July, 2026
 #
-# SPDX-License-Identifier: BSD-3-Clause
-# Copyright (c) 2026 MNE-CPP Authors
 #
 # @brief    Fixtures proving the dependency audit rejects the graphs it claims to reject.
-#
-# =============================================================================================================
 """Fixtures for ``tools/quality/audit_dependencies.py``.
 
 Each case builds a synthetic ``src/libraries`` in a temporary directory that

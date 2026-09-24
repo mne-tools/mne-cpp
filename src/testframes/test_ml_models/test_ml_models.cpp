@@ -1,15 +1,12 @@
 //=============================================================================================================
 /**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
  * @file     test_ml_models.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
- *
- * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
- *
- * Copyright (C) 2026, Christoph Dinh. All rights reserved.
- *
  * @brief    Tests for ML library (MlOnnxModel).
  */
 
