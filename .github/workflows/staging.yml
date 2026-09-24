@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 # ═══════════════════════════════════════════════════════════════════════════
 # Staging Branch Pipeline
 # ═══════════════════════════════════════════════════════════════════════════
@@ -223,9 +227,8 @@ jobs:
         path: ${{ runner.temp }}/quality
         retention-days: 30
 
-    - name: Validate SPDX license headers (advisory)
-      continue-on-error: true
-      run: python3 -m tools.license_headers.validate || echo "SPDX header validation found issues — see log above"
+    - name: Validate SPDX license headers
+      run: python3 -m tools.license_headers.validate
 
     - name: Generate placeholder screenshots
       run: |

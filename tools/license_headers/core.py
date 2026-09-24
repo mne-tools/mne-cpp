@@ -72,17 +72,19 @@ _LEGACY_LICENSE_HASH_RE = re.compile(
 )
 
 _SPDX_FIRST_LINE_RE = re.compile(
-    r"^(?://|#|::)\s*SPDX-License-Identifier:\s*BSD-3-Clause\s*$"
+    r"^(?://|:;#|#|::|rem)\s*SPDX-License-Identifier:\s*BSD-3-Clause\s*$", re.IGNORECASE
 )
 _SPDX_COPYRIGHT_RE = re.compile(
     # Accept both the new form `Copyright (c) <years>` and the legacy form
     # `Copyright (c) <years> MNE-CPP Authors` for backward compatibility,
     # so files migrated under v1 of the emitter don't churn on validation.
-    r"^(?://|#|::)\s*Copyright \(c\)\s+(\d{4}(?:-\d{4})?)(?:\s+MNE-CPP Authors)?\s*$"
+    r"^(?://|:;#|#|::|rem)\s*Copyright \(c\)\s+(\d{4}(?:-\d{4})?)(?:\s+MNE-CPP Authors)?\s*$", re.IGNORECASE
 )
 _SPDX_AUTHOR_RE = re.compile(
-    r"^(?://|#|::)\s{2,}(?P<name>[^<]+?)\s+<(?P<email>[^>]+)>\s*$"
+    r"^(?://|:;#|#|::|rem)\s{2,}(?P<name>[^<]+?)\s+<(?P<email>[^>]+)>\s*$", re.IGNORECASE
 )
+# Lines that must precede any comment: an interpreter line, or batch's echo switch.
+_PROLOG_RE = re.compile(r"^(?:#!.*|@echo\s+off)\s*$", re.IGNORECASE)
 
 _GENERATED_MARKER_RE = re.compile(r"GENERATED|auto-generated", re.IGNORECASE)
 
@@ -316,7 +318,7 @@ def detect_spdx_block(text: str) -> tuple[int, str, list[tuple[str, str]]] | Non
                 # ``@<tag>`` prefix but contain ``Name <email>;``.
                 in_author_block = False
                 _entry_re = re.compile(
-                    r"(?P<name>[A-ZÄÖÜ][^<;]*?)\s*<(?P<email>[^>]+@[^>]+)>"
+                    r"(?P<name>[^\s<;][^<;]*?)\s*<(?P<email>[^>]+@[^>]+)>"
                 )
                 for ln in inner[2:]:
                     if ln.strip() == "*/":
@@ -357,15 +359,16 @@ def detect_spdx_block(text: str) -> tuple[int, str, list[tuple[str, str]]] | Non
                     end_offset = sum(len(lines[i]) for i in range(end_line_in_lines))
                     return end_offset, year_range, authors
 
-    # v1: legacy bare line-comment form.
-    if not _SPDX_FIRST_LINE_RE.match(lines[0].rstrip("\n")):
+    # v1: legacy bare line-comment form, after an optional shebang / `@echo off`.
+    first = 1 if _PROLOG_RE.match(lines[0].rstrip("\n")) else 0
+    if len(lines) < first + 2 or not _SPDX_FIRST_LINE_RE.match(lines[first].rstrip("\n")):
         return None
-    m = _SPDX_COPYRIGHT_RE.match(lines[1].rstrip("\n"))
+    m = _SPDX_COPYRIGHT_RE.match(lines[first + 1].rstrip("\n"))
     if not m:
         return None
     year_range = m.group(1)
     authors = []
-    idx = 2
+    idx = first + 2
     while idx < len(lines):
         a = _SPDX_AUTHOR_RE.match(lines[idx].rstrip("\n"))
         if not a:
@@ -819,14 +822,15 @@ def validate_file(path: Path, *, strict: bool = False) -> list[str]:
     author_tag_lines = [
         ln for ln in block.splitlines() if re.match(r"^\s*\*\s*@author\b", ln)
     ]
-    if len(author_tag_lines) != 1:
+    doxygen_block = any(ln.strip() == "/**" for ln in block.splitlines()[:2])
+    if doxygen_block and len(author_tag_lines) != 1:
         return [
             f"{path}: SPDX header must use exactly one ``@author`` tag "
             f"(found {len(author_tag_lines)})"
         ]
     if len(authors) > 1:
         # Validate continuation prefix and ``;`` separator.
-        cont_re = re.compile(r"^ \*           [A-ZÄÖÜ][^<;]*<[^>]+@[^>]+>;?\s*$")
+        cont_re = re.compile(r"^ \*           [^\s<;][^<;]*<[^>]+@[^>]+>;?\s*$")
         for ln in block.splitlines():
             if re.match(r"^\s*\*\s+\S.*<[^>]+@[^>]+>;?\s*$", ln) and not (
                 re.match(r"^\s*\*\s*@author\b", ln) or cont_re.match(ln)

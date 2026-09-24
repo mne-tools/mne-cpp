@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
 # ═══════════════════════════════════════════════════════════════════════════
 # Pull Request Pipeline
 # ═══════════════════════════════════════════════════════════════════════════
@@ -95,6 +99,9 @@ jobs:
     # and expensive to unpick once they have been built on.
     - name: Audit dependency architecture
       run: python3 tools/quality/audit_dependencies.py --check
+
+    - name: Validate SPDX license headers
+      run: python3 -m tools.license_headers.validate
 
     - name: Generate quality dashboard
       run: python3 tools/quality/generate_quality_report.py --out-dir "$RUNNER_TEMP/quality"
