@@ -1,37 +1,16 @@
-
 //=============================================================================================================
 /**
- * @file     test_mne_anonymize.cpp
- * @author   Lorenz Esch <lorenzesch@hotmail.com>;
- * @since    0.1.0
- * @date     September, 2019
- *
  * SPDX-License-Identifier: BSD-3-Clause
  * Copyright (c) 2019-2026 MNE-CPP Authors
  *
- * Copyright (C) 2019, Lorenz Esch. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
- * the following conditions are met:
- *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
- *       following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
- *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
- *       to endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- *
+ * @file     test_mne_anonymize.cpp
+ * @author   Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     September, 2019
  * @brief    Test for anonymizing a fiff raw file
- *
  */
 
 //=============================================================================================================
@@ -89,6 +68,28 @@ public:
         return m_bDeleteInputFileConfirmation;
     }
 };
+
+//=============================================================================================================
+
+namespace {
+
+QString sampleRawFile()
+{
+    return QCoreApplication::applicationDirPath()
+           + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+}
+
+// Outputs land next to the input by default, so work on a copy to keep the test data read-only.
+QString copyInputTo(const QTemporaryDir& dir)
+{
+    const QString copy = dir.filePath("sample_audvis_trunc_raw.fif");
+    if(!dir.isValid() || !QFile::copy(sampleRawFile(), copy)) {
+        return QString();
+    }
+    return copy;
+}
+
+} // namespace
 
 //=============================================================================================================
 /**
@@ -314,8 +315,10 @@ void TestMneAnonymize::testCommandLineOffsetsAndInvalidPaths()
 void TestMneAnonymize::testDefaultOutput()
 {
     // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
+    QTemporaryDir tempDir;
+    const QString sFileIn(copyInputTo(tempDir));
+    QVERIFY(!sFileIn.isEmpty());
+    QString sFileOut(tempDir.filePath("sample_audvis_trunc_raw_anonymized.fif"));
 
     qInfo() << "\n\n-------------------------testDefaultOutput-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
@@ -344,9 +347,11 @@ void TestMneAnonymize::testDefaultOutput()
 void TestMneAnonymize::testDeleteInputFile()
 {
     // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileInTest(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/testing0.fif");
-    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/testing0_anonymized.fif");
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString sFileIn(sampleRawFile());
+    QString sFileInTest(tempDir.filePath("testing0.fif"));
+    QString sFileOutTest(tempDir.filePath("testing0_anonymized.fif"));
 
     qInfo() << "\n\n-------------------------testDeleteInputFile-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
@@ -378,9 +383,11 @@ void TestMneAnonymize::testDeleteInputFile()
 void TestMneAnonymize::testInPlace()
 {
     // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileInTest(QCoreApplication::applicationDirPath() +  "/../resources/data/mne-cpp-test-data/MEG/sample/testing1.fif");
-    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/testing1.fif");
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString sFileIn(sampleRawFile());
+    QString sFileInTest(tempDir.filePath("testing1.fif"));
+    QString sFileOutTest(tempDir.filePath("testing1.fif"));
 
     qInfo() << "\n\n-------------------------testInPlace-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
@@ -408,8 +415,10 @@ void TestMneAnonymize::testInPlace()
 
 void TestMneAnonymize::testDefaultAnonymizationOfTags()
 {
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
+    QTemporaryDir tempDir;
+    const QString sFileIn(copyInputTo(tempDir));
+    QVERIFY(!sFileIn.isEmpty());
+    QString sFileOut(tempDir.filePath("sample_audvis_trunc_raw_anonymized.fif"));
 
     qInfo() << "\n\n-------------------------testDefaultAnonymizationOfTags-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
@@ -442,8 +451,10 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
 void TestMneAnonymize::compareBirthdayOffsetOption()
 {
     // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
+    QTemporaryDir tempDir;
+    const QString sFileIn(copyInputTo(tempDir));
+    QVERIFY(!sFileIn.isEmpty());
+    QString sFileOut(tempDir.filePath("sample_audvis_trunc_raw_anonymized.fif"));
 
     qInfo() << "\n\n-------------------------compareBirthdayOffsetOption-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
@@ -479,8 +490,10 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
 void TestMneAnonymize::compareMeasureDateOffsetOption()
 {
     // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
+    QTemporaryDir tempDir;
+    const QString sFileIn(copyInputTo(tempDir));
+    QVERIFY(!sFileIn.isEmpty());
+    QString sFileOut(tempDir.filePath("sample_audvis_trunc_raw_anonymized.fif"));
 
     qInfo() << "\n\n-------------------------compareMeasureDateOffsetOption-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
