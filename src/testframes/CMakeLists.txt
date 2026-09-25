@@ -3,6 +3,8 @@
 #   Gabriel Motta <gabrielbenmotta@gmail.com>
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MneTesting.cmake)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/tests)
 set(BUILD_MAC_APP_BUNDLE OFF)
 
@@ -33,6 +35,8 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 if(WITH_CODE_COV)
   add_link_options("--coverage")
 endif()
+
+add_subdirectory(test_mne_testing_helper)
 
 add_subdirectory(test_coregistration)
 

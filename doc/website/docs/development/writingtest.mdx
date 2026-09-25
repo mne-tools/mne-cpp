@@ -18,6 +18,20 @@ A good starting point is to look at existing tests under `src/testframes/`. You 
 1. Rename the directory and source files to match your test name.
 2. Update the `CMakeLists.txt` inside the new test directory.
 3. Register the new test in the parent `src/testframes/CMakeLists.txt` via `add_subdirectory()`.
+4. Register it with CTest through `mne_add_test()` from `cmake/MneTesting.cmake` instead of a bare `add_test()`.
+
+`mne_add_test()` requires `LABELS` and `TIMEOUT`; leaving either out, or using a label or timeout outside `tools/quality/test_inventory_policy.json`, stops the configure step.
+
+```cmake
+mne_add_test(${PROJECT_NAME}
+    LABELS integration gui
+    TIMEOUT 300
+    ENVIRONMENT QT_QPA_PLATFORM=offscreen
+    REQUIRES_DATA mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif
+    REQUIRES_TARGETS inspect_electrodes)
+```
+
+`REQUIRES_DATA` paths are relative to `resources/data` and add the `requires-data` label. If a `REQUIRES_TARGETS` target is not built, or `PLATFORMS Linux Darwin SKIP_REASON "..."` excludes the current platform, the test is reported as skipped with that reason instead of disappearing from CTest. `MNE_TEST_SKIPPED` is then true, so you can `return()` before linking against the missing target.
 
 ## Structuring the Test
 

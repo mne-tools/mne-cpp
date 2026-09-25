@@ -93,8 +93,23 @@ _ADD_SUBDIRECTORY_RE = re.compile(r"^[ \t]*add_subdirectory[ \t]*\([ \t]*([A-Za-
 _PROJECT_RE = re.compile(r"^[ \t]*project[ \t]*\([ \t]*([A-Za-z0-9_.+-]+)", re.MULTILINE | re.IGNORECASE)
 # Commands are routinely spread over several lines, so these must not be anchored
 # to a single one.
-_ADD_TEST_CALL_RE = re.compile(r"\badd_test\s*\(", re.IGNORECASE)
+_ADD_TEST_CALL_RE = re.compile(r"\b(?:mne_)?add_test\s*\(", re.IGNORECASE)
 _ADD_TEST_NAME_RE = re.compile(r"\badd_test\s*\(\s*NAME\s+([^\s)]+)", re.IGNORECASE)
+# cmake/MneTesting.cmake; its first argument is the test name.
+_MNE_ADD_TEST_RE = re.compile(r"\bmne_add_test\s*\(", re.IGNORECASE)
+_MNE_ADD_TEST_KEYWORDS = frozenset(
+    {
+        "LABELS",
+        "TIMEOUT",
+        "COMMAND",
+        "WORKING_DIRECTORY",
+        "ENVIRONMENT",
+        "REQUIRES_DATA",
+        "REQUIRES_TARGETS",
+        "PLATFORMS",
+        "SKIP_REASON",
+    }
+)
 _SET_TESTS_PROPERTIES_RE = re.compile(r"set_tests_properties\s*\((.*?)\)", re.IGNORECASE | re.DOTALL)
 _LABELS_RE = re.compile(r"\bLABELS\s+(\"[^\"]*\"|[^\s)]+)", re.IGNORECASE)
 _TIMEOUT_RE = re.compile(r"\bTIMEOUT\s+([0-9]+)", re.IGNORECASE)
@@ -143,6 +158,39 @@ class TestEntry:
         return f"src/testframes/{self.directory}/CMakeLists.txt"
 
 
+def _call_arguments(text: str, open_paren: int) -> str:
+    """Return the text between the parenthesis at ``open_paren`` and its partner."""
+    depth = 0
+    for index in range(open_paren, len(text)):
+        if text[index] == "(":
+            depth += 1
+        elif text[index] == ")":
+            depth -= 1
+            if depth == 0:
+                return text[open_paren + 1 : index]
+    return text[open_paren + 1 :]
+
+
+def parse_mne_add_test(arguments: str) -> tuple[str, list[str], int | None]:
+    """Name, labels, and timeout declared in one ``mne_add_test()`` call."""
+    tokens = re.findall(r'"[^"]*"|[^\s"]+', arguments)
+    name = tokens[0].strip('"') if tokens else ""
+    labels: list[str] = []
+    timeout: int | None = None
+    keyword = None
+    for token in tokens[1:]:
+        if token in _MNE_ADD_TEST_KEYWORDS:
+            keyword = token
+            if keyword == "REQUIRES_DATA":
+                labels.append("requires-data")
+            continue
+        if keyword == "LABELS":
+            labels.extend(part for part in re.split(r"[;\s]+", token.strip('"')) if part)
+        elif keyword == "TIMEOUT" and token.isdigit():
+            timeout = int(token)
+    return name, labels, timeout
+
+
 def parse_registered_directories(root_cmake: Path) -> list[str]:
     text = strip_cmake_comments(root_cmake.read_text(encoding="utf-8"))
     return _ADD_SUBDIRECTORY_RE.findall(text)
@@ -182,6 +230,13 @@ def parse_leaf(directory: Path) -> TestEntry:
         if timeout_match:
             value = int(timeout_match.group(1))
             timeout = value if timeout is None else max(timeout, value)
+
+    for call in _MNE_ADD_TEST_RE.finditer(text):
+        name, call_labels, call_timeout = parse_mne_add_test(_call_arguments(text, call.end() - 1))
+        entry.add_test_names.append(name)
+        labels.extend(call_labels)
+        if call_timeout is not None:
+            timeout = call_timeout if timeout is None else max(timeout, call_timeout)
 
     entry.labels = sorted(set(labels))
     entry.timeout = timeout

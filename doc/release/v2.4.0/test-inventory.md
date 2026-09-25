@@ -6,8 +6,8 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/33441161302 (comm
 
 ## Registration
 
-- Test directories: 232
-- Registered unconditionally: 215
+- Test directories: 233
+- Registered unconditionally: 216
 - Registered behind a CMake condition or early `return()`: 14
 - Not registered: 3
 - Registered without `LABELS`: 223
@@ -18,9 +18,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/33441161302 (comm
 
 | Platform | Executed | Failures | Skipped | Registered but not executed |
 |---|---:|---:|---:|---|
-| macos-26 | 229 | 0 | 0 | - |
-| ubuntu-24.04 | 229 | 0 | 0 | - |
-| windows-2025-vs2026 | 227 | 0 | 0 | `test_mne_flash_bem`, `test_mne_watershed_bem` |
+| macos-26 | 229 | 0 | 0 | `test_mne_testing_helper` |
+| ubuntu-24.04 | 229 | 0 | 0 | `test_mne_testing_helper` |
+| windows-2025-vs2026 | 227 | 0 | 0 | `test_mne_flash_bem`, `test_mne_testing_helper`, `test_mne_watershed_bem` |
 
 ## Run-time requirements (lexical signals)
 

@@ -6,9 +6,9 @@
     "commit": "7122ccb773617012b014fb066875f3f8e32b4c39"
   },
   "summary": {
-    "directories": 232,
+    "directories": 233,
     "registration": {
-      "unconditional": 215,
+      "unconditional": 216,
       "conditional": 14,
       "unregistered": 3
     },
@@ -69,14 +69,18 @@
         "executed": 229,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [],
+        "registered_not_executed": [
+          "test_mne_testing_helper"
+        ],
         "executed_not_in_inventory": []
       },
       "ubuntu-24.04": {
         "executed": 229,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [],
+        "registered_not_executed": [
+          "test_mne_testing_helper"
+        ],
         "executed_not_in_inventory": []
       },
       "windows-2025-vs2026": {
@@ -85,6 +89,7 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_mne_flash_bem",
+          "test_mne_testing_helper",
           "test_mne_watershed_bem"
         ],
         "executed_not_in_inventory": []
@@ -4746,6 +4751,35 @@
         "macos-26": "run",
         "ubuntu-24.04": "run",
         "windows-2025-vs2026": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_testing_helper",
+      "cmake": "src/testframes/test_mne_testing_helper/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_testing_helper"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 600,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "ubuntu-24.04": "absent",
+        "windows-2025-vs2026": "absent"
       },
       "registry_classes": []
     },

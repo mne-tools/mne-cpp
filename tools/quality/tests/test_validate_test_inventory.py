@@ -154,6 +154,51 @@ class TestAddTestRegistration(ValidatorTestCase):
         self.assertTrue(entries["test_alpha"].has_add_test)
 
 
+class TestMneAddTest(ValidatorTestCase):
+    def test_helper_call_counts_as_registration_with_metadata(self) -> None:
+        self.fixture.add_test_dir(
+            "test_alpha",
+            extra=(
+                "mne_add_test(${PROJECT_NAME}\n"
+                '    LABELS unit "gui"\n'
+                "    TIMEOUT 300\n"
+                "    ENVIRONMENT QT_QPA_PLATFORM=offscreen\n"
+                "    REQUIRES_DATA mne-cpp-test-data/MEG/sample/raw.fif)"
+            ),
+        )
+        entries, _ = self.fixture.collect()
+        entry = entries["test_alpha"]
+        self.assertTrue(entry.has_add_test)
+        self.assertEqual(["${PROJECT_NAME}"], entry.add_test_names)
+        self.assertEqual(["gui", "requires-data", "unit"], entry.labels)
+        self.assertEqual(300, entry.timeout)
+        self.assertEqual([], vti.check_add_test(entries))
+        findings, actual = vti.check_ratchets(entries, self.policy)
+        self.assertEqual({"max_tests_without_labels": 0, "max_tests_without_timeout": 0}, actual)
+
+    def test_helper_labels_are_checked_against_the_vocabulary(self) -> None:
+        self.fixture.add_test_dir("test_alpha", extra="mne_add_test(${PROJECT_NAME} LABELS banana TIMEOUT 60)")
+        entries, _ = self.fixture.collect()
+        self.assertIn("TI030", self.codes(vti.check_labels(entries, self.policy)))
+
+    def test_helper_timeout_is_checked_against_the_band(self) -> None:
+        self.fixture.add_test_dir("test_alpha", extra="mne_add_test(${PROJECT_NAME} LABELS unit TIMEOUT 2)")
+        entries, _ = self.fixture.collect()
+        self.assertIn("TI040", self.codes(vti.check_timeouts(entries, self.policy)))
+
+    def test_skip_args_do_not_leak_into_labels(self) -> None:
+        self.fixture.add_test_dir(
+            "test_alpha",
+            extra=(
+                "mne_add_test(${PROJECT_NAME} LABELS unit TIMEOUT 60 "
+                'PLATFORMS Linux SKIP_REASON "needs (FreeSurfer) tools")'
+            ),
+        )
+        entries, _ = self.fixture.collect()
+        self.assertEqual(["unit"], entries["test_alpha"].labels)
+        self.assertEqual(60, entries["test_alpha"].timeout)
+
+
 class TestLabels(ValidatorTestCase):
     def _with_labels(self, labels: str) -> dict:
         self.fixture.add_test_dir(
