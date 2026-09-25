@@ -321,7 +321,7 @@ int main(int argc, char *argv[])
     outStream->write_int(FIFF_FIRST_SAMPLE, &firstSample);
     RowVectorXd cals(totalCh);
     for (int channel = 0; channel < raw.info.nchan; ++channel) {
-        cals[channel] = raw.info.chs[channel].range * raw.info.chs[channel].cal;
+        cals[channel] = static_cast<double>(raw.info.chs[channel].range) * raw.info.chs[channel].cal;
     }
     cals.tail(nRefCh).setOnes();
 
