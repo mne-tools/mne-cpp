@@ -138,11 +138,12 @@ endif()
 # Register with CTest. This test spawns one child process per case, so it is
 # slower than an in-process unit test but nowhere near the long-running ones.
 enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
-set_tests_properties(${PROJECT_NAME} PROPERTIES
-    LABELS "integration"
+mne_add_test(${PROJECT_NAME}
+    LABELS integration
     TIMEOUT 300
-)
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample
+        mne-cpp-test-data/subjects/sample)
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)

@@ -13,8 +13,12 @@ set(QT_REQUIRED_COMPONENTS Core Test Gui)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-if(NOT TARGET inspect_mri_slices)
-    message(STATUS "test_mri_slices_plugin: inspect_mri_slices not built — skipping")
+enable_testing()
+mne_add_test(${PROJECT_NAME}
+    LABELS unit
+    TIMEOUT 60
+    REQUIRES_TARGETS inspect_mri_slices)
+if(MNE_TEST_SKIPPED)
     return()
 endif()
 
@@ -51,8 +55,6 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
 
-enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()

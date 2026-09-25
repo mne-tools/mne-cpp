@@ -56,7 +56,11 @@ endif()
 
 # Register with CTest
 enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+mne_add_test(${PROJECT_NAME}
+    LABELS integration
+    TIMEOUT 60
+    PLATFORMS Linux Darwin
+    SKIP_REASON "needs FreeSurfer's mri_convert, which has no Windows build")
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()

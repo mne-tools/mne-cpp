@@ -41,7 +41,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Eigen3::Eigen
 )
 
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+mne_add_test(${PROJECT_NAME}
+    LABELS unit gui
+    TIMEOUT 60)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_finalize_executable(${PROJECT_NAME})

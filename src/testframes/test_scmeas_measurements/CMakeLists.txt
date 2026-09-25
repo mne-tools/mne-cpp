@@ -13,8 +13,12 @@ set(QT_REQUIRED_COMPONENTS Core Test Gui Widgets Svg)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-if(NOT TARGET scan_writetofile)
-    message(STATUS "${PROJECT_NAME}: scan_writetofile not built — skipping")
+enable_testing()
+mne_add_test(${PROJECT_NAME}
+    LABELS unit gui
+    TIMEOUT 60
+    REQUIRES_TARGETS scan_writetofile)
+if(MNE_TEST_SKIPPED)
     return()
 endif()
 
@@ -81,8 +85,6 @@ elseif(UNIX)
         INSTALL_RPATH "\$ORIGIN/../lib:\$ORIGIN")
 endif()
 
-enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
 
 if(APPLE)
     set_tests_properties(${PROJECT_NAME} PROPERTIES ENVIRONMENT

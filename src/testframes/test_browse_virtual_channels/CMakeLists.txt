@@ -54,7 +54,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${MNE_BROWSE_DIR}
 )
 
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+mne_add_test(${PROJECT_NAME}
+    LABELS unit
+    TIMEOUT 60)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_finalize_executable(${PROJECT_NAME})

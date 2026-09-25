@@ -65,8 +65,15 @@ if(QT_VERSION_MAJOR EQUAL 6)
 endif()
 
 enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
-set_tests_properties(${PROJECT_NAME} PROPERTIES TIMEOUT 600)
+mne_add_test(${PROJECT_NAME}
+    LABELS integration slow
+    TIMEOUT 600
+    REQUIRES_DATA
+        mne-cpp-test-data/BIDS/sub-01
+        mne-cpp-test-data/EEG
+        mne-cpp-test-data/MEG/sample
+        mne-cpp-test-data/Result
+        mne-cpp-test-data/subjects/sample)
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()

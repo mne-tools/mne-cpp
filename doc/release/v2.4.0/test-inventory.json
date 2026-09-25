@@ -8,14 +8,14 @@
   "summary": {
     "directories": 233,
     "registration": {
-      "unconditional": 217,
-      "conditional": 13,
+      "unconditional": 226,
+      "conditional": 4,
       "unregistered": 3
     },
     "missing_directories": [],
     "duplicate_test_names": {},
-    "without_labels": 48,
-    "without_timeout": 45,
+    "without_labels": 0,
+    "without_timeout": 0,
     "requirements": {
       "freesurfer": 2,
       "python": 9,
@@ -110,8 +110,12 @@
       "add_test_names": [
         "test_anshared_models"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -168,8 +172,11 @@
       "add_test_names": [
         "test_batch_processor"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -261,8 +268,10 @@
       "add_test_names": [
         "test_browse_virtual_channels"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -502,17 +511,21 @@
       "name": "test_cortical_surface_inverse",
       "cmake": "src/testframes/test_cortical_surface_inverse/CMakeLists.txt",
       "registration": {
-        "state": "conditional",
+        "state": "unconditional",
         "via": "src/testframes/CMakeLists.txt",
         "conditions": [],
-        "early_return_guard": "Skipped when the analyze_cortical_surface target is not built.",
+        "early_return_guard": null,
         "unregistered_reason": null
       },
       "add_test_names": [
         "test_cortical_surface_inverse"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 120,
       "requirements": [
         "sample-data"
       ],
@@ -531,17 +544,20 @@
       "name": "test_cortical_surface_labels",
       "cmake": "src/testframes/test_cortical_surface_labels/CMakeLists.txt",
       "registration": {
-        "state": "conditional",
+        "state": "unconditional",
         "via": "src/testframes/CMakeLists.txt",
         "conditions": [],
-        "early_return_guard": "Skipped when the analyze_cortical_surface target is not built.",
+        "early_return_guard": null,
         "unregistered_reason": null
       },
       "add_test_names": [
         "test_cortical_surface_labels"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -558,17 +574,20 @@
       "name": "test_cortical_surface_picking",
       "cmake": "src/testframes/test_cortical_surface_picking/CMakeLists.txt",
       "registration": {
-        "state": "conditional",
+        "state": "unconditional",
         "via": "src/testframes/CMakeLists.txt",
         "conditions": [],
-        "early_return_guard": "Skipped when the analyze_cortical_surface target is not built.",
+        "early_return_guard": null,
         "unregistered_reason": null
       },
       "add_test_names": [
         "test_cortical_surface_picking"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "integration"
+      ],
+      "timeout": 60,
       "requirements": [
         "sample-data"
       ],
@@ -587,17 +606,20 @@
       "name": "test_cortical_surface_stc",
       "cmake": "src/testframes/test_cortical_surface_stc/CMakeLists.txt",
       "registration": {
-        "state": "conditional",
+        "state": "unconditional",
         "via": "src/testframes/CMakeLists.txt",
         "conditions": [],
-        "early_return_guard": "Skipped when the analyze_cortical_surface target is not built.",
+        "early_return_guard": null,
         "unregistered_reason": null
       },
       "add_test_names": [
         "test_cortical_surface_stc"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1968,8 +1990,11 @@
       "add_test_names": [
         "test_edf2fiff_rwr"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2017,17 +2042,19 @@
       "name": "test_electrodes_plugin",
       "cmake": "src/testframes/test_electrodes_plugin/CMakeLists.txt",
       "registration": {
-        "state": "conditional",
+        "state": "unconditional",
         "via": "src/testframes/CMakeLists.txt",
         "conditions": [],
-        "early_return_guard": "Skipped when the inspect_electrodes target is not built.",
+        "early_return_guard": null,
         "unregistered_reason": null
       },
       "add_test_names": [
         "test_electrodes_plugin"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -4011,7 +4038,9 @@
       "add_test_names": [
         "test_mna_bids"
       ],
-      "labels": [],
+      "labels": [
+        "integration"
+      ],
       "timeout": 60,
       "requirements": [],
       "gui": false,
@@ -4215,8 +4244,11 @@
       "add_test_names": [
         "test_mna_skill_graph_equivalence"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "sample-data",
         "test-data"
@@ -4245,8 +4277,10 @@
       "add_test_names": [
         "test_mne_analyze_studio_core_capabilities"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -4272,8 +4306,11 @@
       "add_test_names": [
         "test_mne_analyze_studio_scene_jsonrpc"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "sample-data"
       ],
@@ -4301,8 +4338,11 @@
       "add_test_names": [
         "test_mne_analyze_studio_workflow_integration"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4330,8 +4370,11 @@
       "add_test_names": [
         "test_mne_anonymize"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4361,7 +4404,10 @@
       "add_test_names": [
         "test_mne_browse_app"
       ],
-      "labels": [],
+      "labels": [
+        "gui",
+        "unit"
+      ],
       "timeout": 60,
       "requirements": [],
       "gui": true,
@@ -4388,8 +4434,12 @@
       "add_test_names": [
         "test_mne_browse_data"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4446,8 +4496,12 @@
       "add_test_names": [
         "test_mne_compute_raw_inverse"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 300,
       "requirements": [
         "python",
         "sample-data",
@@ -4576,8 +4630,10 @@
       "add_test_names": [
         "test_mne_flash_bem"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration"
+      ],
+      "timeout": 60,
       "requirements": [
         "freesurfer"
       ],
@@ -4697,17 +4753,19 @@
       "name": "test_mne_inspect_multimodal",
       "cmake": "src/testframes/test_mne_inspect_multimodal/CMakeLists.txt",
       "registration": {
-        "state": "conditional",
+        "state": "unconditional",
         "via": "src/testframes/CMakeLists.txt",
         "conditions": [],
-        "early_return_guard": "Skipped unless inspect_electrodes, inspect_mri_slices, mne_disp3D and mne_inspect_app_core are all built.",
+        "early_return_guard": null,
         "unregistered_reason": null
       },
       "add_test_names": [
         "test_mne_inspect_multimodal"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -4960,8 +5018,10 @@
       "add_test_names": [
         "test_mne_setup_mri"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration"
+      ],
+      "timeout": 60,
       "requirements": [
         "sample-data"
       ],
@@ -5090,8 +5150,10 @@
       "add_test_names": [
         "test_mne_surf2bem"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration"
+      ],
+      "timeout": 120,
       "requirements": [
         "sample-data"
       ],
@@ -5150,8 +5212,10 @@
       "add_test_names": [
         "test_mne_watershed_bem"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration"
+      ],
+      "timeout": 60,
       "requirements": [
         "freesurfer",
         "sample-data"
@@ -5264,17 +5328,19 @@
       "name": "test_mri_slices_plugin",
       "cmake": "src/testframes/test_mri_slices_plugin/CMakeLists.txt",
       "registration": {
-        "state": "conditional",
+        "state": "unconditional",
         "via": "src/testframes/CMakeLists.txt",
         "conditions": [],
-        "early_return_guard": "Skipped when the inspect_mri_slices target is not built.",
+        "early_return_guard": null,
         "unregistered_reason": null
       },
       "add_test_names": [
         "test_mri_slices_plugin"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5629,8 +5695,11 @@
       "add_test_names": [
         "test_rtprocessing_averaging"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -5687,8 +5756,11 @@
       "add_test_names": [
         "test_scdisp_widgets"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -5705,17 +5777,20 @@
       "name": "test_scmeas_measurements",
       "cmake": "src/testframes/test_scmeas_measurements/CMakeLists.txt",
       "registration": {
-        "state": "conditional",
+        "state": "unconditional",
         "via": "src/testframes/CMakeLists.txt",
         "conditions": [],
-        "early_return_guard": "Skipped when the scan_writetofile target is not built.",
+        "early_return_guard": null,
         "unregistered_reason": null
       },
       "add_test_names": [
         "test_scmeas_measurements"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5741,8 +5816,11 @@
       "add_test_names": [
         "test_scshared_management"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -5858,8 +5936,10 @@
       "add_test_names": [
         "test_setup_forward_model"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -6140,8 +6220,12 @@
       "add_test_names": [
         "test_studio_core"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -6169,8 +6253,11 @@
       "add_test_names": [
         "test_studio_dummy3d_view"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -6196,8 +6283,11 @@
       "add_test_names": [
         "test_studio_extension_widgets"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -6223,8 +6313,10 @@
       "add_test_names": [
         "test_studio_mna_skills"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -6251,7 +6343,8 @@
         "test_studio_neuro_kernel"
       ],
       "labels": [
-        "integration"
+        "integration",
+        "requires-data"
       ],
       "timeout": 60,
       "requirements": [
@@ -6282,8 +6375,8 @@
         "test_studio_raw_model"
       ],
       "labels": [
-        "requires-data",
-        "unit"
+        "integration",
+        "requires-data"
       ],
       "timeout": 60,
       "requirements": [
@@ -6342,8 +6435,11 @@
       "add_test_names": [
         "test_surface_checks"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -6433,8 +6529,12 @@
       "add_test_names": [
         "test_tool_compute_pipeline"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data",
+        "slow"
+      ],
+      "timeout": 600,
       "requirements": [
         "test-data"
       ],
@@ -6462,8 +6562,10 @@
       "add_test_names": [
         "test_tool_conversion_extended"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -6491,8 +6593,11 @@
       "add_test_names": [
         "test_tool_conversion_functions"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -6520,7 +6625,11 @@
       "add_test_names": [
         "test_tool_data_pipeline"
       ],
-      "labels": [],
+      "labels": [
+        "integration",
+        "requires-data",
+        "slow"
+      ],
       "timeout": 600,
       "requirements": [
         "test-data"
@@ -6550,7 +6659,8 @@
         "test_tool_exit_codes"
       ],
       "labels": [
-        "integration"
+        "integration",
+        "requires-data"
       ],
       "timeout": 300,
       "requirements": [
@@ -6580,8 +6690,10 @@
       "add_test_names": [
         "test_tool_forward_generation"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -6611,8 +6723,10 @@
       "add_test_names": [
         "test_tool_info_helpers"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -6640,8 +6754,11 @@
       "add_test_names": [
         "test_tool_inverse_computation"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -6669,8 +6786,11 @@
       "add_test_names": [
         "test_tool_inverse_operator"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 120,
       "requirements": [
         "test-data"
       ],
@@ -6700,8 +6820,12 @@
       "add_test_names": [
         "test_tool_list_source_space"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -6729,8 +6853,10 @@
       "add_test_names": [
         "test_tool_preproc_helpers"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -6758,8 +6884,11 @@
       "add_test_names": [
         "test_tool_preprocessing"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -6787,8 +6916,11 @@
       "add_test_names": [
         "test_tool_show_fiff"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -6816,8 +6948,10 @@
       "add_test_names": [
         "test_tool_surface_math"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -7219,17 +7353,20 @@
       "name": "test_writetofile_status",
       "cmake": "src/testframes/test_writetofile_status/CMakeLists.txt",
       "registration": {
-        "state": "conditional",
+        "state": "unconditional",
         "via": "src/testframes/CMakeLists.txt",
         "conditions": [],
-        "early_return_guard": "Skipped when the scan_writetofile target is not built.",
+        "early_return_guard": null,
         "unregistered_reason": null
       },
       "add_test_names": [
         "test_writetofile_status"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,

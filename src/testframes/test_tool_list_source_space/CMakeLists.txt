@@ -36,4 +36,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 endif()
 
 enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+mne_add_test(${PROJECT_NAME}
+    LABELS integration parity
+    TIMEOUT 60
+    REQUIRES_DATA
+        mne-cpp-test-data/subjects/sample)

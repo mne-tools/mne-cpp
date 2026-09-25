@@ -20,22 +20,12 @@
     "test_wasm_multi_pass": "Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case."
   },
   "ratchet": {
-    "$comment": "Counts of registered tests still missing metadata. These numbers may only decrease. Labels and timeouts become mandatory once the CTest registration helper (T1.1) lands and the leaf tests are migrated (T1.2/T1.3).",
-    "max_tests_without_labels": 48,
-    "max_tests_without_timeout": 45
+    "$comment": "Counts of registered tests still missing metadata. These numbers may only decrease. Both reached zero when every leaf test moved to mne_add_test() (T1.2/T1.3), which now also refuses to configure a test without them.",
+    "max_tests_without_labels": 0,
+    "max_tests_without_timeout": 0
   },
-  "$conditional_comment": "Tests whose add_test() sits behind an early return(), so they vanish from CTest whenever the guard fires. Each needs a reason naming the guard. This list is a defect inventory, not an approved pattern: T1.1 is expected to replace these guards with a declarative registration helper so the skip is visible in the run instead of silent.",
-  "conditional": {
-    "test_cortical_surface_inverse": "Skipped when the analyze_cortical_surface target is not built.",
-    "test_cortical_surface_labels": "Skipped when the analyze_cortical_surface target is not built.",
-    "test_cortical_surface_picking": "Skipped when the analyze_cortical_surface target is not built.",
-    "test_cortical_surface_stc": "Skipped when the analyze_cortical_surface target is not built.",
-    "test_electrodes_plugin": "Skipped when the inspect_electrodes target is not built.",
-    "test_mne_inspect_multimodal": "Skipped unless inspect_electrodes, inspect_mri_slices, mne_disp3D and mne_inspect_app_core are all built.",
-    "test_mri_slices_plugin": "Skipped when the inspect_mri_slices target is not built.",
-    "test_scmeas_measurements": "Skipped when the scan_writetofile target is not built.",
-    "test_writetofile_status": "Skipped when the scan_writetofile target is not built."
-  },
+  "$conditional_comment": "Tests whose add_test() sits behind an early return(), so they vanish from CTest whenever the guard fires. Each needs a reason naming the guard. This list is a defect inventory, not an approved pattern, and is empty since T1.3: a missing target is declared with mne_add_test(... REQUIRES_TARGETS ...), which registers a visible skip before any return().",
+  "conditional": {},
   "$quarantine_schema": {
     "$comment": "Required shape of every entry in 'quarantine'. A quarantined test must name an owner, an issue, an expiry date, and a reason; an expired entry fails validation. Quarantine is the only sanctioned way to keep a failing test in the tree, because CI does not retry.",
     "test": "test_example",

@@ -15,8 +15,12 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 
 # The cortical_surface plugin is only built when mne_disp3D is available;
 # silently skip this test otherwise (e.g. WASM).
-if(NOT TARGET analyze_cortical_surface)
-    message(STATUS "test_cortical_surface_stc: analyze_cortical_surface not built — skipping")
+enable_testing()
+mne_add_test(${PROJECT_NAME}
+    LABELS unit gui
+    TIMEOUT 60
+    REQUIRES_TARGETS analyze_cortical_surface)
+if(MNE_TEST_SKIPPED)
     return()
 endif()
 
@@ -73,8 +77,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
 )
 
-enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
 
 # Ensure the dynamically-loaded plugin lib and shared libs are resolvable at test time.
 # In this build layout shared libs live under <repo>/out/<config>/lib and analyze plugins

@@ -6,7 +6,7 @@ Coverage from `7122ccb77` (https://github.com/mne-tools/mne-cpp/actions/runs/334
 | Gate | Criterion | Current | Status |
 |---|---|---|---|
 | G1 | Every registered test runs in CI | 230 registered; CI ran 229 on macos-26, 229 on ubuntu-24.04, 227 on windows-2025-vs2026 | **open** |
-| G1 | Tests carry labels and timeouts | 48 unlabelled, 45 untimed | **open** |
+| G1 | Tests carry labels and timeouts | 0 unlabelled, 0 untimed | met |
 | G1 | No retry-to-pass path | 6 retry lines in local scripts | **open** |
 | G2 | Combined line coverage >= 60.0% | 47.18% (17,765 lines short) | **open** |
 | G2 | Libraries >= 70.0% line | 61.59% | **open** |

@@ -13,8 +13,13 @@ set(QT_REQUIRED_COMPONENTS Core Test Gui)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-if(NOT TARGET inspect_electrodes OR NOT TARGET inspect_mri_slices OR NOT TARGET mne_disp3D OR NOT TARGET mne_inspect_app_core)
-    message(STATUS "test_mne_inspect_multimodal: required targets not built — skipping")
+enable_testing()
+mne_add_test(${PROJECT_NAME}
+    LABELS unit
+    TIMEOUT 60
+    ENVIRONMENT "DYLD_LIBRARY_PATH=$<TARGET_FILE_DIR:mne_disp3D>:$<TARGET_FILE_DIR:mne_inspect>"
+    REQUIRES_TARGETS inspect_electrodes inspect_mri_slices mne_disp3D mne_inspect_app_core)
+if(MNE_TEST_SKIPPED)
     return()
 endif()
 
@@ -65,11 +70,6 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
 
-enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
-set_tests_properties(${PROJECT_NAME} PROPERTIES
-    ENVIRONMENT "DYLD_LIBRARY_PATH=$<TARGET_FILE_DIR:mne_disp3D>:$<TARGET_FILE_DIR:mne_inspect>"
-)
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)

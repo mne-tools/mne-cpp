@@ -7,11 +7,11 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/33441161302 (comm
 ## Registration
 
 - Test directories: 233
-- Registered unconditionally: 217
-- Registered behind a CMake condition or early `return()`: 13
+- Registered unconditionally: 226
+- Registered behind a CMake condition or early `return()`: 4
 - Not registered: 3
-- Registered without `LABELS`: 48
-- Registered without explicit `TIMEOUT`: 45
+- Registered without `LABELS`: 0
+- Registered without explicit `TIMEOUT`: 0
 - Duplicate `add_test` names: 0
 
 ## CI execution
@@ -37,22 +37,13 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/33441161302 (comm
 
 | Test | State | Condition |
 |---|---|---|
-| `test_cortical_surface_inverse` | conditional | Skipped when the analyze_cortical_surface target is not built. |
-| `test_cortical_surface_labels` | conditional | Skipped when the analyze_cortical_surface target is not built. |
-| `test_cortical_surface_picking` | conditional | Skipped when the analyze_cortical_surface target is not built. |
-| `test_cortical_surface_stc` | conditional | Skipped when the analyze_cortical_surface target is not built. |
 | `test_doc_shots` | conditional | BUILD_TESTS AND TARGET mne_doc_shots |
-| `test_electrodes_plugin` | conditional | Skipped when the inspect_electrodes target is not built. |
 | `test_mna_coverage` | unregistered | Placeholder directory; its CMakeLists.txt names a test_mna_coverage.cpp that was never written. Kept out of the build until the MNA coverage test is authored. |
 | `test_mne_browse_app` | conditional | BUILD_MNE_BROWSE |
 | `test_mne_flash_bem` | conditional | BUILD_MNE_FLASH_BEM |
-| `test_mne_inspect_multimodal` | conditional | Skipped unless inspect_electrodes, inspect_mri_slices, mne_disp3D and mne_inspect_app_core are all built. |
 | `test_mne_watershed_bem` | conditional | BUILD_MNE_WATERSHED_BEM |
-| `test_mri_slices_plugin` | conditional | Skipped when the inspect_mri_slices target is not built. |
-| `test_scmeas_measurements` | conditional | Skipped when the scan_writetofile target is not built. |
 | `test_wasm_multi_draw` | unregistered | Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case. |
 | `test_wasm_multi_pass` | unregistered | Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case. |
-| `test_writetofile_status` | conditional | Skipped when the scan_writetofile target is not built. |
 
 ## Platform exclusions in CI
 

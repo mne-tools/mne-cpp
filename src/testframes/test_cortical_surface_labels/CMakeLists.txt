@@ -13,8 +13,12 @@ set(QT_REQUIRED_COMPONENTS Core Gui Widgets Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-if(NOT TARGET analyze_cortical_surface)
-    message(STATUS "test_cortical_surface_labels: analyze_cortical_surface not built — skipping")
+enable_testing()
+mne_add_test(${PROJECT_NAME}
+    LABELS unit gui
+    TIMEOUT 60
+    REQUIRES_TARGETS analyze_cortical_surface)
+if(MNE_TEST_SKIPPED)
     return()
 endif()
 
@@ -71,8 +75,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
 )
 
-enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
 
 set(_repo_lib_dir   "${CMAKE_SOURCE_DIR}/out/${CMAKE_BUILD_TYPE}/lib")
 set(_repo_plugins   "${CMAKE_SOURCE_DIR}/out/${CMAKE_BUILD_TYPE}/bin/mne_analyze_plugins")
