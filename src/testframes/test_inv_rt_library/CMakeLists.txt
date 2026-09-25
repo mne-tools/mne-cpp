@@ -16,7 +16,12 @@ qt_add_executable(test_inv_rt_library test_inv_rt_library.cpp)
 
 # Register with CTest
 enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+mne_add_test(${PROJECT_NAME}
+    LABELS integration
+    TIMEOUT 60
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample
+        mne-cpp-test-data/Result)
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(test_inv_rt_library PRIVATE STATICBUILD)
 endif()

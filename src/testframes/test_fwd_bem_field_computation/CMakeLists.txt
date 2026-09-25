@@ -49,12 +49,16 @@ if(QT_VERSION_MAJOR EQUAL 6)
 endif()
 
 enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
 # The BEM pipeline takes about 45 s in Release here but over seven minutes in a
 # debug or coverage build, and it has already aborted at 300 s on a loaded
 # runner. A test killed by a timeout also reports zero coverage for everything
 # it exercises, which is how compute_fwd.cpp came to look untested.
-set_tests_properties(${PROJECT_NAME} PROPERTIES TIMEOUT 1800)
+mne_add_test(${PROJECT_NAME}
+    LABELS integration slow
+    TIMEOUT 1800
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample
+        mne-cpp-test-data/subjects/sample)
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()

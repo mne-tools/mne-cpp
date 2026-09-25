@@ -28,4 +28,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_utils
     mne_math)
 
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+mne_add_test(${PROJECT_NAME}
+    LABELS unit
+    TIMEOUT 60)

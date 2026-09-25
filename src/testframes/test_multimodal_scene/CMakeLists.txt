@@ -13,10 +13,13 @@ set(QT_REQUIRED_COMPONENTS Core Gui Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-# disp3D requires Qt6::GuiPrivate and is only built when QRhi is available;
-# skip this test silently in builds where mne_disp3D is absent (e.g. WASM).
-if(NOT TARGET mne_disp3D)
-    message(STATUS "test_multimodal_scene: mne_disp3D not built — skipping")
+# disp3D requires Qt6::GuiPrivate and is only built when QRhi is available (not e.g. WASM).
+enable_testing()
+mne_add_test(${PROJECT_NAME}
+    LABELS unit
+    TIMEOUT 60
+    REQUIRES_TARGETS mne_disp3D)
+if(MNE_TEST_SKIPPED)
     return()
 endif()
 
@@ -53,9 +56,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
-
-enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)

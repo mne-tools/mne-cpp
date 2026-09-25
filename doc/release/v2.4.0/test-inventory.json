@@ -8,14 +8,14 @@
   "summary": {
     "directories": 233,
     "registration": {
-      "unconditional": 216,
-      "conditional": 14,
+      "unconditional": 217,
+      "conditional": 13,
       "unregistered": 3
     },
     "missing_directories": [],
     "duplicate_test_names": {},
-    "without_labels": 223,
-    "without_timeout": 213,
+    "without_labels": 48,
+    "without_timeout": 45,
     "requirements": {
       "freesurfer": 2,
       "python": 9,
@@ -139,8 +139,10 @@
       "add_test_names": [
         "test_api_registry"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -195,8 +197,11 @@
       "add_test_names": [
         "test_bids"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -227,8 +232,10 @@
       "add_test_names": [
         "test_bids_coordinate_system"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -281,8 +288,10 @@
       "add_test_names": [
         "test_com"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -308,8 +317,10 @@
       "add_test_names": [
         "test_com_rt_client"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -335,8 +346,12 @@
       "add_test_names": [
         "test_compute_raw_inverse"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 300,
       "requirements": [
         "python",
         "sample-data",
@@ -368,8 +383,10 @@
       "add_test_names": [
         "test_conn_network"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -395,8 +412,10 @@
       "add_test_names": [
         "test_connectivity_aec"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -424,8 +443,10 @@
       "add_test_names": [
         "test_connectivity_metrics"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -456,8 +477,11 @@
       "add_test_names": [
         "test_coregistration"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -599,8 +623,12 @@
       "add_test_names": [
         "test_crossval_covariance"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 300,
       "requirements": [
         "python"
       ],
@@ -628,8 +656,10 @@
       "add_test_names": [
         "test_decoding_csp"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -657,8 +687,10 @@
       "add_test_names": [
         "test_decoding_spoc"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -686,8 +718,10 @@
       "add_test_names": [
         "test_decoding_ssd"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -715,8 +749,11 @@
       "add_test_names": [
         "test_dipole_fit"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -746,8 +783,10 @@
       "add_test_names": [
         "test_disp3d_brainsurface"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -773,8 +812,11 @@
       "add_test_names": [
         "test_disp3d_brainview"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -800,8 +842,11 @@
       "add_test_names": [
         "test_disp3d_headless"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -829,8 +874,10 @@
       "add_test_names": [
         "test_disp3d_viewstate"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -856,8 +903,10 @@
       "add_test_names": [
         "test_disp_colormap"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -883,8 +932,11 @@
       "add_test_names": [
         "test_disp_plots"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -910,8 +962,11 @@
       "add_test_names": [
         "test_disp_viewers"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -937,8 +992,11 @@
       "add_test_names": [
         "test_disp_viewers2"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 3,
@@ -964,8 +1022,11 @@
       "add_test_names": [
         "test_disp_viewers3"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1023,8 +1084,10 @@
       "add_test_names": [
         "test_dsp_annotate_artifact"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1052,8 +1115,10 @@
       "add_test_names": [
         "test_dsp_artifact_detect"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1079,8 +1144,10 @@
       "add_test_names": [
         "test_dsp_bad_channel_detect"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1106,8 +1173,10 @@
       "add_test_names": [
         "test_dsp_bad_channels_lof"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1135,8 +1204,10 @@
       "add_test_names": [
         "test_dsp_bad_channels_maxwell"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1164,8 +1235,10 @@
       "add_test_names": [
         "test_dsp_bridged_electrodes"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1193,8 +1266,10 @@
       "add_test_names": [
         "test_dsp_channel_derivation"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1220,8 +1295,10 @@
       "add_test_names": [
         "test_dsp_csd"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1247,8 +1324,10 @@
       "add_test_names": [
         "test_dsp_eeg_reference"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1276,8 +1355,10 @@
       "add_test_names": [
         "test_dsp_eog_regression"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1305,8 +1386,10 @@
       "add_test_names": [
         "test_dsp_epoch_extractor"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1332,8 +1415,10 @@
       "add_test_names": [
         "test_dsp_filter_chpi"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1361,8 +1446,10 @@
       "add_test_names": [
         "test_dsp_filterio"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1388,8 +1475,10 @@
       "add_test_names": [
         "test_dsp_firfilter"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1417,8 +1506,10 @@
       "add_test_names": [
         "test_dsp_ica"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1446,8 +1537,10 @@
       "add_test_names": [
         "test_dsp_iirfilter"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1475,8 +1568,10 @@
       "add_test_names": [
         "test_dsp_infomax"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1504,8 +1599,10 @@
       "add_test_names": [
         "test_dsp_morlet_tfr"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1533,8 +1630,10 @@
       "add_test_names": [
         "test_dsp_multitaper"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1563,8 +1662,10 @@
       "add_test_names": [
         "test_dsp_peak_finder"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1592,8 +1693,10 @@
       "add_test_names": [
         "test_dsp_resample"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1621,8 +1724,10 @@
       "add_test_names": [
         "test_dsp_rt_cov"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1648,8 +1753,10 @@
       "add_test_names": [
         "test_dsp_simulate"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1677,8 +1784,10 @@
       "add_test_names": [
         "test_dsp_spectrogram"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1704,8 +1813,10 @@
       "add_test_names": [
         "test_dsp_sphara"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1733,8 +1844,10 @@
       "add_test_names": [
         "test_dsp_sss"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1762,8 +1875,10 @@
       "add_test_names": [
         "test_dsp_stim_artifact"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1791,8 +1906,10 @@
       "add_test_names": [
         "test_dsp_welch_psd"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1820,8 +1937,10 @@
       "add_test_names": [
         "test_dsp_xdawn"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -1878,8 +1997,10 @@
       "add_test_names": [
         "test_electrode_object"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1932,8 +2053,10 @@
       "add_test_names": [
         "test_epochs"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1961,8 +2084,10 @@
       "add_test_names": [
         "test_events"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -1988,8 +2113,12 @@
       "add_test_names": [
         "test_field_map"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 300,
       "requirements": [
         "python",
         "sample-data",
@@ -2019,8 +2148,10 @@
       "add_test_names": [
         "test_fiff_annotation_event_utils"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -2048,8 +2179,10 @@
       "add_test_names": [
         "test_fiff_annotations"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -2077,8 +2210,10 @@
       "add_test_names": [
         "test_fiff_byte_swap"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -2104,8 +2239,11 @@
       "add_test_names": [
         "test_fiff_coord_trans"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2135,8 +2273,10 @@
       "add_test_names": [
         "test_fiff_coord_transform"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -2162,8 +2302,11 @@
       "add_test_names": [
         "test_fiff_cov"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2193,8 +2336,12 @@
       "add_test_names": [
         "test_fiff_cov_python"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2222,8 +2369,11 @@
       "add_test_names": [
         "test_fiff_coverage"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2251,8 +2401,11 @@
       "add_test_names": [
         "test_fiff_data_types"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2280,8 +2433,12 @@
       "add_test_names": [
         "test_fiff_dig_point_python"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2309,8 +2466,11 @@
       "add_test_names": [
         "test_fiff_digitizer"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2338,8 +2498,12 @@
       "add_test_names": [
         "test_fiff_evoked_python"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2367,8 +2531,11 @@
       "add_test_names": [
         "test_fiff_extended"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2396,8 +2563,11 @@
       "add_test_names": [
         "test_fiff_fs_library"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2425,8 +2595,11 @@
       "add_test_names": [
         "test_fiff_info"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2456,8 +2629,11 @@
       "add_test_names": [
         "test_fiff_io_evoked_info"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2487,8 +2663,11 @@
       "add_test_names": [
         "test_fiff_mne_types_io"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2516,8 +2695,12 @@
       "add_test_names": [
         "test_fiff_proj_python"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 300,
       "requirements": [
         "python",
         "test-data"
@@ -2546,8 +2729,11 @@
       "add_test_names": [
         "test_fiff_raw_io"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2578,8 +2764,11 @@
       "add_test_names": [
         "test_fiff_rwr"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2607,8 +2796,10 @@
       "add_test_names": [
         "test_fiffsimulator_ssp"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration"
+      ],
+      "timeout": 60,
       "requirements": [
         "sample-data"
       ],
@@ -2636,8 +2827,11 @@
       "add_test_names": [
         "test_filter_data"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2665,8 +2859,10 @@
       "add_test_names": [
         "test_filter_kernel"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -2694,8 +2890,12 @@
       "add_test_names": [
         "test_filtering"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2723,8 +2923,10 @@
       "add_test_names": [
         "test_fine_calibration"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -2752,8 +2954,10 @@
       "add_test_names": [
         "test_fs"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -2781,8 +2985,11 @@
       "add_test_names": [
         "test_fs_annotation_labels"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2813,8 +3020,10 @@
       "add_test_names": [
         "test_fs_atlas_lookup"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration"
+      ],
+      "timeout": 60,
       "requirements": [
         "sample-data",
         "test-data"
@@ -2843,8 +3052,10 @@
       "add_test_names": [
         "test_fs_io"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -2870,8 +3081,10 @@
       "add_test_names": [
         "test_fs_surface_annotation"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -2897,8 +3110,11 @@
       "add_test_names": [
         "test_fwd_bem_data"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2929,7 +3145,11 @@
       "add_test_names": [
         "test_fwd_bem_field_computation"
       ],
-      "labels": [],
+      "labels": [
+        "integration",
+        "requires-data",
+        "slow"
+      ],
       "timeout": 1800,
       "requirements": [
         "test-data"
@@ -2958,8 +3178,10 @@
       "add_test_names": [
         "test_fwd_extended"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -2987,8 +3209,11 @@
       "add_test_names": [
         "test_fwd_library"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -3016,8 +3241,11 @@
       "add_test_names": [
         "test_fwd_models"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -3045,8 +3273,10 @@
       "add_test_names": [
         "test_fwd_sphere_settings"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -3074,8 +3304,11 @@
       "add_test_names": [
         "test_geometryinfo"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -3103,8 +3336,11 @@
       "add_test_names": [
         "test_hpiDataUpdater"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -3132,8 +3368,11 @@
       "add_test_names": [
         "test_hpiFit"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -3164,8 +3403,11 @@
       "add_test_names": [
         "test_hpiFit_integration"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "sample-data",
         "test-data"
@@ -3194,8 +3436,10 @@
       "add_test_names": [
         "test_hpiModelParameter"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -3221,8 +3465,10 @@
       "add_test_names": [
         "test_ica_label"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -3250,8 +3496,11 @@
       "add_test_names": [
         "test_interpolation"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -3279,8 +3528,11 @@
       "add_test_names": [
         "test_inv_beamformer"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 120,
       "requirements": [
         "test-data"
       ],
@@ -3311,8 +3563,10 @@
       "add_test_names": [
         "test_inv_cmne"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -3340,8 +3594,10 @@
       "add_test_names": [
         "test_inv_convenience"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -3369,8 +3625,11 @@
       "add_test_names": [
         "test_inv_dipole_rap_mne"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "sample-data",
         "test-data"
@@ -3401,7 +3660,11 @@
       "add_test_names": [
         "test_inv_loreta"
       ],
-      "labels": [],
+      "labels": [
+        "integration",
+        "requires-data",
+        "slow"
+      ],
       "timeout": 600,
       "requirements": [
         "test-data"
@@ -3430,8 +3693,11 @@
       "add_test_names": [
         "test_inv_rt_library"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -3459,8 +3725,10 @@
       "add_test_names": [
         "test_inv_sparse"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -3489,7 +3757,10 @@
       "add_test_names": [
         "test_inverse_data"
       ],
-      "labels": [],
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
       "timeout": 300,
       "requirements": [
         "test-data"
@@ -3518,8 +3789,12 @@
       "add_test_names": [
         "test_inverse_rap_dipole"
       ],
-      "labels": [],
-      "timeout": 300,
+      "labels": [
+        "integration",
+        "requires-data",
+        "slow"
+      ],
+      "timeout": 600,
       "requirements": [
         "test-data"
       ],
@@ -3547,8 +3822,10 @@
       "add_test_names": [
         "test_label_time_course"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -3576,8 +3853,10 @@
       "add_test_names": [
         "test_label_utils"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -3605,8 +3884,10 @@
       "add_test_names": [
         "test_lsl"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 120,
       "requirements": [],
       "gui": false,
       "qskip_sites": 5,
@@ -3632,8 +3913,10 @@
       "add_test_names": [
         "test_maxwell_movement_comp"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -3661,8 +3944,10 @@
       "add_test_names": [
         "test_ml_models"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -3692,8 +3977,11 @@
       "add_test_names": [
         "test_ml_trainer"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity"
+      ],
+      "timeout": 300,
       "requirements": [
         "python"
       ],
@@ -3777,8 +4065,10 @@
       "add_test_names": [
         "test_mna_graph_execution"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -3804,7 +4094,10 @@
       "add_test_names": [
         "test_mna_inverse_pipeline"
       ],
-      "labels": [],
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
       "timeout": 300,
       "requirements": [
         "test-data"
@@ -3833,8 +4126,10 @@
       "add_test_names": [
         "test_mna_io"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -3860,8 +4155,10 @@
       "add_test_names": [
         "test_mna_registry_loader"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 4,
@@ -3887,8 +4184,10 @@
       "add_test_names": [
         "test_mna_serialization"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration"
+      ],
+      "timeout": 300,
       "requirements": [
         "python"
       ],
@@ -4118,8 +4417,10 @@
       "add_test_names": [
         "test_mne_channel_selection"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -4176,8 +4477,11 @@
       "add_test_names": [
         "test_mne_cov_matrix"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4205,8 +4509,11 @@
       "add_test_names": [
         "test_mne_data_types"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "sample-data",
         "test-data"
@@ -4235,8 +4542,11 @@
       "add_test_names": [
         "test_mne_extended"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4297,8 +4607,11 @@
       "add_test_names": [
         "test_mne_forward_ops"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4326,7 +4639,11 @@
       "add_test_names": [
         "test_mne_forward_solution"
       ],
-      "labels": [],
+      "labels": [
+        "integration",
+        "requires-data",
+        "slow"
+      ],
       "timeout": 1800,
       "requirements": [
         "test-data"
@@ -4357,8 +4674,11 @@
       "add_test_names": [
         "test_mne_hemisphere_epoch"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 120,
       "requirements": [
         "test-data"
       ],
@@ -4413,8 +4733,11 @@
       "add_test_names": [
         "test_mne_inv_coverage"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 300,
       "requirements": [
         "test-data"
       ],
@@ -4442,8 +4765,11 @@
       "add_test_names": [
         "test_mne_io_coverage"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4471,8 +4797,11 @@
       "add_test_names": [
         "test_mne_library"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 300,
       "requirements": [
         "sample-data",
         "test-data"
@@ -4501,8 +4830,11 @@
       "add_test_names": [
         "test_mne_msh_display_surface_set"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4530,8 +4862,11 @@
       "add_test_names": [
         "test_mne_project_to_surface"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4559,8 +4894,11 @@
       "add_test_names": [
         "test_mne_projections"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4590,8 +4928,11 @@
       "add_test_names": [
         "test_mne_raw_proj_comp"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4648,8 +4989,12 @@
       "add_test_names": [
         "test_mne_source_analysis"
       ],
-      "labels": [],
-      "timeout": 300,
+      "labels": [
+        "integration",
+        "requires-data",
+        "slow"
+      ],
+      "timeout": 600,
       "requirements": [
         "test-data"
       ],
@@ -4677,8 +5022,11 @@
       "add_test_names": [
         "test_mne_source_data"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4708,8 +5056,12 @@
       "add_test_names": [
         "test_mne_source_space_python"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 300,
       "requirements": [
         "python",
         "test-data"
@@ -4830,8 +5182,10 @@
       "add_test_names": [
         "test_mri_io"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration"
+      ],
+      "timeout": 60,
       "requirements": [
         "sample-data"
       ],
@@ -4859,8 +5213,10 @@
       "add_test_names": [
         "test_mri_nifti_io"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -4886,8 +5242,10 @@
       "add_test_names": [
         "test_mri_slicer"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -4942,8 +5300,10 @@
       "add_test_names": [
         "test_mri_vol_data"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -4960,17 +5320,19 @@
       "name": "test_multimodal_scene",
       "cmake": "src/testframes/test_multimodal_scene/CMakeLists.txt",
       "registration": {
-        "state": "conditional",
+        "state": "unconditional",
         "via": "src/testframes/CMakeLists.txt",
         "conditions": [],
-        "early_return_guard": "Skipped when the mne_disp3D target is not built.",
+        "early_return_guard": null,
         "unregistered_reason": null
       },
       "add_test_names": [
         "test_multimodal_scene"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -4996,8 +5358,10 @@
       "add_test_names": [
         "test_network_visualization"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5023,8 +5387,10 @@
       "add_test_names": [
         "test_picard_ica"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5052,8 +5418,10 @@
       "add_test_names": [
         "test_polhemus_coregistration"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5079,8 +5447,11 @@
       "add_test_names": [
         "test_project_resume_layout"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": true,
       "qskip_sites": 0,
@@ -5106,8 +5477,10 @@
       "add_test_names": [
         "test_python_runner"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration"
+      ],
+      "timeout": 300,
       "requirements": [
         "python",
         "test-data"
@@ -5136,8 +5509,10 @@
       "add_test_names": [
         "test_report"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5165,8 +5540,10 @@
       "add_test_names": [
         "test_resolution_matrix"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5194,8 +5571,10 @@
       "add_test_names": [
         "test_rt_source_streaming"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5221,8 +5600,10 @@
       "add_test_names": [
         "test_rtcmne_cmne"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 1,
@@ -5277,8 +5658,10 @@
       "add_test_names": [
         "test_rtprocessing_extended"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5385,8 +5768,11 @@
       "add_test_names": [
         "test_sensorSet"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -5443,8 +5829,10 @@
       "add_test_names": [
         "test_sensor_streaming"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5497,8 +5885,10 @@
       "add_test_names": [
         "test_signalModel"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5524,8 +5914,10 @@
       "add_test_names": [
         "test_source_estimate_io"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5553,8 +5945,10 @@
       "add_test_names": [
         "test_source_estimate_types"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5584,8 +5978,10 @@
       "add_test_names": [
         "test_source_morph"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5613,8 +6009,12 @@
       "add_test_names": [
         "test_spectral_connectivity"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "integration",
+        "parity",
+        "requires-data"
+      ],
+      "timeout": 60,
       "requirements": [
         "test-data"
       ],
@@ -5646,8 +6046,10 @@
       "add_test_names": [
         "test_standard_montage"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5675,8 +6077,10 @@
       "add_test_names": [
         "test_sts_cluster"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5705,8 +6109,10 @@
       "add_test_names": [
         "test_sts_cov_estimators"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5965,8 +6371,10 @@
       "add_test_names": [
         "test_surface_laplacian"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -5994,8 +6402,10 @@
       "add_test_names": [
         "test_tf_mxne"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -6435,8 +6845,10 @@
       "add_test_names": [
         "test_trap_music"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -6464,8 +6876,10 @@
       "add_test_names": [
         "test_utils_circularbuffer"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -6491,8 +6905,10 @@
       "add_test_names": [
         "test_utils_ioutils"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -6518,8 +6934,10 @@
       "add_test_names": [
         "test_utils_kmeans"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -6547,8 +6965,10 @@
       "add_test_names": [
         "test_utils_layout_selection"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 4,
@@ -6574,8 +6994,10 @@
       "add_test_names": [
         "test_utils_logger"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -6601,8 +7023,10 @@
       "add_test_names": [
         "test_utils_mnemath"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -6630,8 +7054,10 @@
       "add_test_names": [
         "test_utils_observer_pattern"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -6657,8 +7083,10 @@
       "add_test_names": [
         "test_utils_spectral"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -6684,8 +7112,10 @@
       "add_test_names": [
         "test_utils_sphere"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,
@@ -6713,8 +7143,10 @@
       "add_test_names": [
         "test_utils_warp"
       ],
-      "labels": [],
-      "timeout": null,
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
       "requirements": [],
       "gui": false,
       "qskip_sites": 0,

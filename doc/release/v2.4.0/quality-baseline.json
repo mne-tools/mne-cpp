@@ -12,10 +12,10 @@
   "gates": {
     "G1_test_integrity": {
       "registered": 230,
-      "conditional": 14,
+      "conditional": 13,
       "unregistered": 3,
-      "without_labels": 223,
-      "without_timeout": 213,
+      "without_labels": 48,
+      "without_timeout": 45,
       "ci_executed": {
         "macos-26": 229,
         "ubuntu-24.04": 229,

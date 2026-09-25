@@ -47,4 +47,8 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
 
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+mne_add_test(${PROJECT_NAME}
+    LABELS integration parity
+    TIMEOUT 300
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample)

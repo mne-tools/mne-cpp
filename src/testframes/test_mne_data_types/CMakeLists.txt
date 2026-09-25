@@ -44,4 +44,10 @@ endif()
 
 # Register with CTest
 enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+mne_add_test(${PROJECT_NAME}
+    LABELS integration
+    TIMEOUT 60
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample
+        mne-cpp-test-data/Result
+        mne-cpp-test-data/subjects/sample)

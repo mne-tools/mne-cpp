@@ -21,8 +21,8 @@
   },
   "ratchet": {
     "$comment": "Counts of registered tests still missing metadata. These numbers may only decrease. Labels and timeouts become mandatory once the CTest registration helper (T1.1) lands and the leaf tests are migrated (T1.2/T1.3).",
-    "max_tests_without_labels": 223,
-    "max_tests_without_timeout": 213
+    "max_tests_without_labels": 48,
+    "max_tests_without_timeout": 45
   },
   "$conditional_comment": "Tests whose add_test() sits behind an early return(), so they vanish from CTest whenever the guard fires. Each needs a reason naming the guard. This list is a defect inventory, not an approved pattern: T1.1 is expected to replace these guards with a declarative registration helper so the skip is visible in the run instead of silent.",
   "conditional": {
@@ -33,7 +33,6 @@
     "test_electrodes_plugin": "Skipped when the inspect_electrodes target is not built.",
     "test_mne_inspect_multimodal": "Skipped unless inspect_electrodes, inspect_mri_slices, mne_disp3D and mne_inspect_app_core are all built.",
     "test_mri_slices_plugin": "Skipped when the inspect_mri_slices target is not built.",
-    "test_multimodal_scene": "Skipped when the mne_disp3D target is not built.",
     "test_scmeas_measurements": "Skipped when the scan_writetofile target is not built.",
     "test_writetofile_status": "Skipped when the scan_writetofile target is not built."
   },

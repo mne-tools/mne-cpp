@@ -46,9 +46,10 @@ if(QT_VERSION_MAJOR EQUAL 6)
 endif()
 
 enable_testing()
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
-set_tests_properties(${PROJECT_NAME} PROPERTIES ENVIRONMENT
-    "QT_QPA_PLATFORM=offscreen")
+mne_add_test(${PROJECT_NAME}
+    LABELS unit gui
+    TIMEOUT 60
+    ENVIRONMENT QT_QPA_PLATFORM=offscreen)
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)

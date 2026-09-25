@@ -23,4 +23,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_fs
 )
 
-add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+mne_add_test(${PROJECT_NAME}
+    LABELS integration
+    TIMEOUT 60
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample
+        mne-cpp-test-data/Result)

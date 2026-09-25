@@ -57,7 +57,6 @@ if(NOT BUILD_SHARED_LIBS)
     )
 endif()
 
-add_test(
-    NAME ${PROJECT_NAME}
-    COMMAND ${PROJECT_NAME}
-)
+mne_add_test(${PROJECT_NAME}
+    LABELS unit
+    TIMEOUT 60)

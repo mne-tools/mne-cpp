@@ -7,11 +7,11 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/33441161302 (comm
 ## Registration
 
 - Test directories: 233
-- Registered unconditionally: 216
-- Registered behind a CMake condition or early `return()`: 14
+- Registered unconditionally: 217
+- Registered behind a CMake condition or early `return()`: 13
 - Not registered: 3
-- Registered without `LABELS`: 223
-- Registered without explicit `TIMEOUT`: 213
+- Registered without `LABELS`: 48
+- Registered without explicit `TIMEOUT`: 45
 - Duplicate `add_test` names: 0
 
 ## CI execution
@@ -49,7 +49,6 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/33441161302 (comm
 | `test_mne_inspect_multimodal` | conditional | Skipped unless inspect_electrodes, inspect_mri_slices, mne_disp3D and mne_inspect_app_core are all built. |
 | `test_mne_watershed_bem` | conditional | BUILD_MNE_WATERSHED_BEM |
 | `test_mri_slices_plugin` | conditional | Skipped when the inspect_mri_slices target is not built. |
-| `test_multimodal_scene` | conditional | Skipped when the mne_disp3D target is not built. |
 | `test_scmeas_measurements` | conditional | Skipped when the scan_writetofile target is not built. |
 | `test_wasm_multi_draw` | unregistered | Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case. |
 | `test_wasm_multi_pass` | unregistered | Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case. |
