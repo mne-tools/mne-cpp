@@ -1,28 +1,52 @@
 # MNE-CPP v2.4.0 coverage baseline
 
-Commit: `7122ccb773617012b014fb066875f3f8e32b4c39`
-Coverage source: https://github.com/mne-tools/mne-cpp/actions/runs/33441161302
+Commit: `96413f7ccc7dabed2c6d40a511960ce8805e0407`
+Coverage source: https://github.com/mne-tools/mne-cpp/actions/runs/36243010551
 
 ## Totals
 
-- Lines: 65,400 / 138,608 (47.18%)
+- Lines: 60,091 / 123,014 (48.85%)
 - Branches: 0 / 0 (not reported)
-- Files: 1,566
-- Generated-code candidates: 339 files and 15,600 lines
-
-Generated-code candidates are included in the measured totals above. No exclusions are applied.
+- Files: 1,227
+- Codecov model (partials as hits): 60,091 / 123,014 (48.85%)
 
 ## Scope
 
 | Scope | Lines | Coverage | Branches | Branch coverage |
 |---|---:|---:|---:|---:|
-| `src/libraries` | 43,011 / 69,836 | 61.59% | 0 / 0 | not reported |
-| `src/applications` | 12,573 / 52,477 | 23.96% | 0 / 0 | not reported |
-| `src/tools` | 9,816 / 16,295 | 60.24% | 0 / 0 | not reported |
+| `src/libraries` | 39,652 / 63,199 | 62.74% | 0 / 0 | not reported |
+| `src/applications` | 11,137 / 44,733 | 24.90% | 0 / 0 | not reported |
+| `src/tools` | 9,302 / 15,082 | 61.68% | 0 / 0 | not reported |
+
+## Exclusions
+
+| Pattern | Reported files | Reported lines | Reason |
+|---|---:|---:|---|
+| `*_autogen/*` | 339 | 15,600 | Generated in the build tree by Qt AUTOMOC/AUTOUIC/AUTORCC; not maintained source, not in the repository, and not mappable by Codecov. |
+| `src/applications/mne_scan/plugins/brainamp/*` | 0 | 0 | Built only with -DWITH_BRAINAMP=ON; the driver needs Windows device I/O (windows.h, CreateFileA) and a BrainAmp amplifier. |
+| `src/applications/mne_scan/plugins/eegosports/*` | 0 | 0 | Built only with -DWITH_EEGO=ON; needs the proprietary eemagine SDK and an eego amplifier. |
+| `src/applications/mne_scan/plugins/gusbamp/*` | 0 | 0 | Built only with -DWITH_GUSBAMP=ON; needs the g.tec gUSBamp SDK and device. |
+| `src/applications/mne_scan/plugins/tmsi/*` | 0 | 0 | Built only with -DWITH_TMSI=ON; needs Windows (windows.h), the TMSi SDK DLL and a TMSi amplifier. |
+| `src/applications/mne_scan/plugins/dummytoolbox/*` | 0 | 0 | Template for plugin authors; no CMakeLists.txt adds its directory, so no target compiles it. |
+| `src/applications/mne_analyze/plugins/sampleplugin/*` | 0 | 0 | Template for plugin authors; its add_subdirectory() is commented out in mne_analyze/plugins/CMakeLists.txt. |
+| `src/applications/mne_analyze/plugins/view3d/3dview.cpp` | 0 | 0 | Orphan: in no target's sources, and not compilable ('using namespace 3DVIEWPLUGIN' is not an identifier). |
+| `src/applications/mne_browse/Utils/mnxproject.cpp` | 0 | 0 | Orphan: in no target's sources. |
+| `src/applications/mne_browse/Utils/newparksmcclellan.cpp` | 0 | 0 | Orphan: in no target's sources. |
+
+## Completeness
+
+740 of 792 tracked translation units are in the report and 43 are excluded. 9 contain no executable code; 0 are missing; 0 reported files are untracked.
+- no executable code: `src/applications/mne_scan/libs/scShared/Management/mna_scan_types.cpp`
+- no executable code: `src/libraries/inv/dipole_fit/inv_dipole_forward.cpp`
+- no executable code: `src/libraries/inv/minimum_norm/inv_cmne_settings.cpp`
+- no executable code: `src/libraries/mne/mne_mgh_tag.cpp`
+- no executable code: `src/libraries/mne/mne_mgh_tag_group.cpp`
+- no executable code: `src/libraries/mne/mne_mne_data.cpp`
+- no executable code: `src/libraries/mne/mne_msh_eyes.cpp`
+- no executable code: `src/libraries/mne/mne_msh_light_set.cpp`
+- no executable code: `src/libraries/utils/ioutils.cpp`
 
 ## Priority files
-
-Generated-code candidates are omitted from this ranking but remain in all totals.
 
 | Uncovered lines | Covered / found | File |
 |---:|---:|---|

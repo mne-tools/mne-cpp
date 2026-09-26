@@ -1,5 +1,47 @@
 {
-  "$comment": "Line-coverage gate enforced by tools/quality/check_coverage_gate.py in the staging and main Tests jobs (release gate G2, doc/dev-notes/v2.4.0-requirements.md). The floor is a ratchet: it sits just below the measured combined coverage and may only rise, towards the G2 release minimum of 60%. The regression tolerance is the G2 value.",
-  "line_floor_percent": 47.0,
-  "max_regression_points": 0.1
+  "$comment": "Coverage policy for release gate G2 (doc/dev-notes/v2.4.0-requirements.md). check_coverage_gate.py enforces the floor and regression tolerance on the filtered report; the floor is a ratchet just below the measured combined coverage and may only rise, towards the G2 release minimum of 60%. summarize_coverage.py applies the exclusions: each needs a reason, patterns are fnmatch globs on repository-relative paths ('*' also crosses '/'), and one that matches no tracked or reported file is an error.",
+  "line_floor_percent": 48.5,
+  "max_regression_points": 0.1,
+  "exclusions": [
+    {
+      "pattern": "*_autogen/*",
+      "reason": "Generated in the build tree by Qt AUTOMOC/AUTOUIC/AUTORCC; not maintained source, not in the repository, and not mappable by Codecov."
+    },
+    {
+      "pattern": "src/applications/mne_scan/plugins/brainamp/*",
+      "reason": "Built only with -DWITH_BRAINAMP=ON; the driver needs Windows device I/O (windows.h, CreateFileA) and a BrainAmp amplifier."
+    },
+    {
+      "pattern": "src/applications/mne_scan/plugins/eegosports/*",
+      "reason": "Built only with -DWITH_EEGO=ON; needs the proprietary eemagine SDK and an eego amplifier."
+    },
+    {
+      "pattern": "src/applications/mne_scan/plugins/gusbamp/*",
+      "reason": "Built only with -DWITH_GUSBAMP=ON; needs the g.tec gUSBamp SDK and device."
+    },
+    {
+      "pattern": "src/applications/mne_scan/plugins/tmsi/*",
+      "reason": "Built only with -DWITH_TMSI=ON; needs Windows (windows.h), the TMSi SDK DLL and a TMSi amplifier."
+    },
+    {
+      "pattern": "src/applications/mne_scan/plugins/dummytoolbox/*",
+      "reason": "Template for plugin authors; no CMakeLists.txt adds its directory, so no target compiles it."
+    },
+    {
+      "pattern": "src/applications/mne_analyze/plugins/sampleplugin/*",
+      "reason": "Template for plugin authors; its add_subdirectory() is commented out in mne_analyze/plugins/CMakeLists.txt."
+    },
+    {
+      "pattern": "src/applications/mne_analyze/plugins/view3d/3dview.cpp",
+      "reason": "Orphan: in no target's sources, and not compilable ('using namespace 3DVIEWPLUGIN' is not an identifier)."
+    },
+    {
+      "pattern": "src/applications/mne_browse/Utils/mnxproject.cpp",
+      "reason": "Orphan: in no target's sources."
+    },
+    {
+      "pattern": "src/applications/mne_browse/Utils/newparksmcclellan.cpp",
+      "reason": "Orphan: in no target's sources."
+    }
+  ]
 }

@@ -224,94 +224,48 @@ echo ""
 if [ "$WITH_COVERAGE" = "true" ]; then
   echo "── [6/6] Generating coverage report ──────────────────────────────"
 
+  COVERAGE_TOOL=""
   if command -v fastcov &>/dev/null; then
+    COVERAGE_TOOL="fastcov"
     echo "  Using fastcov …"
-    fastcov --process-gcno -d "$BUILD_DIR" -o "${BUILD_DIR}/coverage.json"
-    fastcov -C "${BUILD_DIR}/coverage.json" --lcov -o "${BUILD_DIR}/coverage.info"
-    fastcov -C "${BUILD_DIR}/coverage.json" --lcov -o "${BUILD_DIR}/coverage_filtered.info" \
+    fastcov --process-gcno --branch-coverage -d "$BUILD_DIR" -o "${BUILD_DIR}/coverage.json"
+    fastcov -C "${BUILD_DIR}/coverage.json" --lcov -o "${BUILD_DIR}/coverage_raw.info" \
       --include src/libraries/ src/applications/ src/tools/ \
       --exclude /usr Qt eigen
-
-    # Extract summary
-    TOTAL_LINES=$(grep -c "^DA:" "${BUILD_DIR}/coverage_filtered.info" 2>/dev/null || echo "0")
-    HIT_LINES=$(grep "^DA:" "${BUILD_DIR}/coverage_filtered.info" | awk -F, '$2 > 0' | wc -l 2>/dev/null || echo "0")
-    TOTAL_LINES=$(echo "$TOTAL_LINES" | tr -d ' ')
-    HIT_LINES=$(echo "$HIT_LINES" | tr -d ' ')
-    if [ "$TOTAL_LINES" -gt 0 ]; then
-      COVERAGE=$(awk "BEGIN {printf \"%.2f\", $HIT_LINES * 100.0 / $TOTAL_LINES}")
-    else
-      COVERAGE="0.00"
-    fi
-
-    echo ""
-    echo "  ════════════════════════════════════════════════"
-    echo "  Coverage Summary (libraries, applications, and tools)"
-    echo "  ════════════════════════════════════════════════"
-    echo "  Lines hit  : $HIT_LINES / $TOTAL_LINES"
-    echo "  Coverage   : ${COVERAGE}%"
-    echo "  ════════════════════════════════════════════════"
-    echo ""
-    echo "  Reports:"
-    echo "    Full   : ${BUILD_DIR}/coverage.info"
-    echo "    Filtered: ${BUILD_DIR}/coverage_filtered.info"
-    echo ""
-
-    python3 "${BASE_DIR}/tools/quality/summarize_coverage.py" \
-      "${BUILD_DIR}/coverage_filtered.info" \
-      --json "${BUILD_DIR}/coverage-baseline.json" \
-      --markdown "${BUILD_DIR}/coverage-baseline.md"
-    echo "  Baseline: ${BUILD_DIR}/coverage-baseline.{json,md}"
-    echo ""
-
-    # HTML report if genhtml is available
-    if command -v genhtml &>/dev/null; then
-      COVERAGE_HTML="${BUILD_DIR}/coverage_html"
-      genhtml "${BUILD_DIR}/coverage_filtered.info" \
-        --output-directory "$COVERAGE_HTML" --quiet
-      echo "  HTML report: ${COVERAGE_HTML}/index.html"
-      echo ""
-    fi
-
   elif command -v lcov &>/dev/null; then
+    COVERAGE_TOOL="lcov"
     echo "  Using lcov (slower — consider installing fastcov) …"
-    lcov --capture --directory "$BUILD_DIR" \
+    lcov --capture --initial --directory "$BUILD_DIR" --rc lcov_branch_coverage=1 \
+      --output-file "${BUILD_DIR}/coverage_base.info" --quiet
+    lcov --capture --directory "$BUILD_DIR" --rc lcov_branch_coverage=1 \
+      --output-file "${BUILD_DIR}/coverage_run.info" --quiet
+    lcov --add-tracefile "${BUILD_DIR}/coverage_base.info" \
+      --add-tracefile "${BUILD_DIR}/coverage_run.info" --rc lcov_branch_coverage=1 \
       --output-file "${BUILD_DIR}/coverage.info" --quiet
     lcov --extract "${BUILD_DIR}/coverage.info" \
-      '*/src/libraries/*' '*/src/applications/*' '*/src/tools/*' \
-      --output-file "${BUILD_DIR}/coverage_filtered.info" --quiet
+      '*/src/libraries/*' '*/src/applications/*' '*/src/tools/*' --rc lcov_branch_coverage=1 \
+      --output-file "${BUILD_DIR}/coverage_raw.info" --quiet
+  fi
 
-    TOTAL_LINES=$(grep -c "^DA:" "${BUILD_DIR}/coverage_filtered.info" 2>/dev/null || echo "0")
-    HIT_LINES=$(grep "^DA:" "${BUILD_DIR}/coverage_filtered.info" | awk -F, '$2 > 0' | wc -l 2>/dev/null || echo "0")
-    TOTAL_LINES=$(echo "$TOTAL_LINES" | tr -d ' ')
-    HIT_LINES=$(echo "$HIT_LINES" | tr -d ' ')
-    if [ "$TOTAL_LINES" -gt 0 ]; then
-      COVERAGE=$(awk "BEGIN {printf \"%.2f\", $HIT_LINES * 100.0 / $TOTAL_LINES}")
-    else
-      COVERAGE="0.00"
-    fi
-
-    echo ""
-    echo "  ════════════════════════════════════════════════"
-    echo "  Coverage Summary (libraries, applications, and tools)"
-    echo "  ════════════════════════════════════════════════"
-    echo "  Lines hit  : $HIT_LINES / $TOTAL_LINES"
-    echo "  Coverage   : ${COVERAGE}%"
-    echo "  ════════════════════════════════════════════════"
-    echo ""
-    echo "  Report: ${BUILD_DIR}/coverage_filtered.info"
-    echo ""
-
+  if [ -n "$COVERAGE_TOOL" ]; then
+    # Same normalisation, exclusions and completeness check as CI.
     python3 "${BASE_DIR}/tools/quality/summarize_coverage.py" \
-      "${BUILD_DIR}/coverage_filtered.info" \
+      "${BUILD_DIR}/coverage_raw.info" \
+      --repo-root "$BASE_DIR" \
+      --lcov-out "${BUILD_DIR}/coverage_filtered.info" \
       --json "${BUILD_DIR}/coverage-baseline.json" \
-      --markdown "${BUILD_DIR}/coverage-baseline.md"
-    echo "  Baseline: ${BUILD_DIR}/coverage-baseline.{json,md}"
+      --markdown "${BUILD_DIR}/coverage-baseline.md" || true
+    python3 "${BASE_DIR}/tools/quality/check_coverage_gate.py" \
+      "${BUILD_DIR}/coverage_filtered.info" || true
+    echo ""
+    echo "  Filtered report: ${BUILD_DIR}/coverage_filtered.info"
+    echo "  Summary        : ${BUILD_DIR}/coverage-baseline.{json,md}"
     echo ""
 
     if command -v genhtml &>/dev/null; then
       COVERAGE_HTML="${BUILD_DIR}/coverage_html"
-      genhtml "${BUILD_DIR}/coverage_filtered.info" \
-        --output-directory "$COVERAGE_HTML" --quiet
+      (cd "$BASE_DIR" && genhtml "${BUILD_DIR}/coverage_filtered.info" --branch-coverage \
+        --output-directory "$COVERAGE_HTML" --quiet)
       echo "  HTML report: ${COVERAGE_HTML}/index.html"
       echo ""
     fi

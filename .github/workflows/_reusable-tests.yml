@@ -277,37 +277,29 @@ jobs:
       if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage
       run: pip install fastcov
 
+    # --process-gcno keeps compiled-but-never-run files in the report at 0%.
+    # summarize_coverage.py then makes paths repository-relative, applies the
+    # reasoned exclusions in coverage_policy.json, and fails if a tracked
+    # translation unit is missing from the report or an exclusion is stale.
     - name: Generate coverage report (fastcov)
-      id: lcov
       if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage
       run: |
-        echo "=== Coverage diagnostics ==="
-        echo "gcno files: $(find build -name '*.gcno' 2>/dev/null | wc -l)"
-        echo "gcda files: $(find build -name '*.gcda' 2>/dev/null | wc -l)"
-        # Collect coverage data with fastcov (10-100x faster than lcov).
-        # --process-gcno includes .gcno files without .gcda counterparts
-        # so that untested source files appear in the report at 0% instead
-        # of being silently omitted.  This tracks ALL instrumented lines
-        # across libraries, applications, and tools.
-        fastcov --process-gcno -d build -o coverage.json
-        # Filtered report: MNE-CPP libraries, applications, and tools
-        fastcov -C coverage.json --lcov -o coverage_filtered.info \
+        echo "gcno files: $(find build -name '*.gcno' | wc -l)"
+        echo "gcda files: $(find build -name '*.gcda' | wc -l)"
+        fastcov --process-gcno --branch-coverage -d build -o coverage.json
+        fastcov -C coverage.json --lcov -o coverage_raw.info \
              --include src/libraries/ src/applications/ src/tools/ \
              --exclude /usr Qt eigen
-        # Extract total line coverage percentage from lcov format
-        TOTAL_LINES=$(grep -c "^DA:" coverage_filtered.info 2>/dev/null || echo "0")
-        HIT_LINES=$(grep "^DA:" coverage_filtered.info | awk -F, '$2 > 0' | wc -l 2>/dev/null || echo "0")
-        if [ "$TOTAL_LINES" -gt 0 ]; then
-          COVERAGE=$(awk "BEGIN {printf \"%.2f\", $HIT_LINES * 100.0 / $TOTAL_LINES}")
-        else
-          COVERAGE="0"
-        fi
-        echo "Total line coverage: ${COVERAGE}%"
-        echo "Total lines:         ${TOTAL_LINES}"
-        echo "Hit lines:           ${HIT_LINES}"
-        echo "coverage=${COVERAGE}" >> "$GITHUB_OUTPUT"
+        python tools/quality/summarize_coverage.py coverage_raw.info \
+             --repo-root . --lcov-out coverage_filtered.info \
+             --commit "${{ github.sha }}" \
+             --source-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+             --json coverage-summary.json --markdown coverage-summary.md
+        cat coverage-summary.md >> "$GITHUB_STEP_SUMMARY"
 
     # ── Coverage: Codecov upload ──────────────────────────────────────────
+    # File fixes would drop brace-only lines that gcov counts, so Codecov's
+    # totals would no longer match the report the gate measured.
     - name: Upload coverage to Codecov
       if: matrix.os == 'ubuntu-24.04' && inputs.upload_codecov
       uses: codecov/codecov-action@v6
@@ -315,6 +307,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: coverage_filtered.info
         disable_search: true
+        disable_file_fixes: true
         fail_ci_if_error: true
 
     # ── Coverage: floor & regression gate (tools/quality/coverage_policy.json) ──
@@ -349,4 +342,6 @@ jobs:
         name: coverage-report
         path: |
           coverage_filtered.info
+          coverage-summary.json
+          coverage-summary.md
         retention-days: 30

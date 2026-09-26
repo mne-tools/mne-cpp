@@ -1,3 +1,8 @@
+# Codecov configuration for release gate G2 (doc/dev-notes/v2.4.0-requirements.md).
+# CI uploads coverage_filtered.info from tools/quality/summarize_coverage.py:
+# repository-relative paths, reasoned exclusions already applied
+# (tools/quality/coverage_policy.json), and no uploader file fixes, so the
+# totals here are the totals the CI gate measured.
 codecov:
   require_ci_to_pass: yes
   branch: staging
@@ -5,37 +10,194 @@ codecov:
 coverage:
   precision: 2
   round: down
-  range: 0..100
+  range: "50..90"
   status:
-    patch:
-      default:
-        target: auto
-        threshold: 2%
-    changes: no
     project:
       default:
         target: auto
-        threshold: 2%
+        threshold: 0.1%
+    patch:
+      default:
+        target: 90%
+    changes: no
 
+# Codecov scores a line with branch counters by its branches; counting a partly
+# taken line as a hit keeps its line coverage aligned with gcov's.  Branch
+# coverage itself is reported by tools/quality/summarize_coverage.py.
 parsers:
-  gcov:
-    branch_detection:
-      conditional: yes
-      loop: yes
-      method: no
-      macro: no
+  lcov:
+    partials_as_hits: true
 
 comment:
-  layout: "reach,diff,flags,tree"
+  layout: "reach, diff, components, tree"
   behavior: default
   require_changes: no
 
-# Coverage is filtered to src/libraries, src/applications, src/tools by
-# lcov before upload.  Files outside those directories are excluded from
-# the coverage_filtered.info report uploaded by the CI workflow.
-fixes:
-  - "/home/runner/work/mne-cpp/mne-cpp/::"
-
-ignore:
-  - "src/testframes/**"
-  - "src/external/**"
+# One component per scope (with a status) and per module (for trends).
+# tools/quality/tests/test_summarize_coverage.py keeps this list complete.
+component_management:
+  individual_components:
+    - component_id: libraries
+      name: Libraries
+      paths:
+        - src/libraries/**
+      statuses:
+        - type: project
+          target: auto
+          threshold: 0.1%
+    - component_id: applications
+      name: Applications
+      paths:
+        - src/applications/**
+      statuses:
+        - type: project
+          target: auto
+          threshold: 0.1%
+    - component_id: tools
+      name: Tools
+      paths:
+        - src/tools/**
+      statuses:
+        - type: project
+          target: auto
+          threshold: 0.1%
+    - component_id: libraries_bids
+      name: libraries/bids
+      paths:
+        - src/libraries/bids/**
+    - component_id: libraries_com
+      name: libraries/com
+      paths:
+        - src/libraries/com/**
+    - component_id: libraries_connectivity
+      name: libraries/connectivity
+      paths:
+        - src/libraries/connectivity/**
+    - component_id: libraries_decoding
+      name: libraries/decoding
+      paths:
+        - src/libraries/decoding/**
+    - component_id: libraries_disp
+      name: libraries/disp
+      paths:
+        - src/libraries/disp/**
+    - component_id: libraries_disp3D
+      name: libraries/disp3D
+      paths:
+        - src/libraries/disp3D/**
+    - component_id: libraries_dsp
+      name: libraries/dsp
+      paths:
+        - src/libraries/dsp/**
+    - component_id: libraries_fiff
+      name: libraries/fiff
+      paths:
+        - src/libraries/fiff/**
+    - component_id: libraries_fs
+      name: libraries/fs
+      paths:
+        - src/libraries/fs/**
+    - component_id: libraries_fwd
+      name: libraries/fwd
+      paths:
+        - src/libraries/fwd/**
+    - component_id: libraries_inv
+      name: libraries/inv
+      paths:
+        - src/libraries/inv/**
+    - component_id: libraries_lsl
+      name: libraries/lsl
+      paths:
+        - src/libraries/lsl/**
+    - component_id: libraries_math
+      name: libraries/math
+      paths:
+        - src/libraries/math/**
+    - component_id: libraries_ml
+      name: libraries/ml
+      paths:
+        - src/libraries/ml/**
+    - component_id: libraries_mna
+      name: libraries/mna
+      paths:
+        - src/libraries/mna/**
+    - component_id: libraries_mne
+      name: libraries/mne
+      paths:
+        - src/libraries/mne/**
+    - component_id: libraries_mri
+      name: libraries/mri
+      paths:
+        - src/libraries/mri/**
+    - component_id: libraries_sts
+      name: libraries/sts
+      paths:
+        - src/libraries/sts/**
+    - component_id: libraries_utils
+      name: libraries/utils
+      paths:
+        - src/libraries/utils/**
+    - component_id: applications_mne_align
+      name: applications/mne_align
+      paths:
+        - src/applications/mne_align/**
+    - component_id: applications_mne_analyze
+      name: applications/mne_analyze
+      paths:
+        - src/applications/mne_analyze/**
+    - component_id: applications_mne_analyze_studio
+      name: applications/mne_analyze_studio
+      paths:
+        - src/applications/mne_analyze_studio/**
+    - component_id: applications_mne_browse
+      name: applications/mne_browse
+      paths:
+        - src/applications/mne_browse/**
+    - component_id: applications_mne_dipole_fit
+      name: applications/mne_dipole_fit
+      paths:
+        - src/applications/mne_dipole_fit/**
+    - component_id: applications_mne_inspect
+      name: applications/mne_inspect
+      paths:
+        - src/applications/mne_inspect/**
+    - component_id: applications_mne_scan
+      name: applications/mne_scan
+      paths:
+        - src/applications/mne_scan/**
+    - component_id: tools_conversion
+      name: tools/conversion
+      paths:
+        - src/tools/conversion/**
+    - component_id: tools_forward
+      name: tools/forward
+      paths:
+        - src/tools/forward/**
+    - component_id: tools_info
+      name: tools/info
+      paths:
+        - src/tools/info/**
+    - component_id: tools_inverse
+      name: tools/inverse
+      paths:
+        - src/tools/inverse/**
+    - component_id: tools_preprocessing
+      name: tools/preprocessing
+      paths:
+        - src/tools/preprocessing/**
+    - component_id: tools_server
+      name: tools/server
+      paths:
+        - src/tools/server/**
+    - component_id: tools_simulation
+      name: tools/simulation
+      paths:
+        - src/tools/simulation/**
+    - component_id: tools_surface
+      name: tools/surface
+      paths:
+        - src/tools/surface/**
+    - component_id: tools_visualization
+      name: tools/visualization
+      paths:
+        - src/tools/visualization/**

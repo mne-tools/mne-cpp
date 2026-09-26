@@ -31,17 +31,17 @@
       "retry_paths": 0
     },
     "G2_coverage": {
-      "commit": "7122ccb773617012b014fb066875f3f8e32b4c39",
-      "source": "https://github.com/mne-tools/mne-cpp/actions/runs/33441161302",
-      "line_combined": 47.18,
-      "line_libraries": 61.59,
-      "line_applications": 23.96,
-      "line_tools": 60.24,
+      "commit": "96413f7ccc7dabed2c6d40a511960ce8805e0407",
+      "source": "https://github.com/mne-tools/mne-cpp/actions/runs/36243010551",
+      "line_combined": 48.85,
+      "line_libraries": 62.74,
+      "line_applications": 24.9,
+      "line_tools": 61.68,
       "branch_reported": false,
-      "lines_to_combined_target": 17765,
+      "lines_to_combined_target": 13717,
       "lines_to_scope_targets": {
-        "libraries": 5874,
-        "applications": 13666,
+        "libraries": 4587,
+        "applications": 11230,
         "tools": 0
       }
     },
