@@ -64,8 +64,8 @@ endif()
 enable_testing()
 # See test_fwd_bem_field_computation: this one takes over five minutes in a
 # coverage build. Note the ctest timeout is not the only limit, QTest aborts a
-# single test function after five minutes regardless, which scripts/test/
-# test_all.bat raises through QTEST_FUNCTION_TIMEOUT.
+# single test function after five minutes unless QTEST_FUNCTION_TIMEOUT is raised
+# (the CI test workflow does).
 mne_add_test(${PROJECT_NAME}
     LABELS integration slow
     TIMEOUT 1800

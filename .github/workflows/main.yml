@@ -73,6 +73,12 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  TestsMinQt:
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+    uses: ./.github/workflows/_reusable-tests.yml
+    with:
+      qt_version: min
+
   # ── Doxygen API documentation (production) ───────────────────────────────
   Doxygen:
     if: ${{ !startsWith(github.ref, 'refs/tags/') }}

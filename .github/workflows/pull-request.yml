@@ -53,6 +53,11 @@ jobs:
       with_code_coverage: false
       upload_codecov: false
 
+  TestsMinQt:
+    uses: ./.github/workflows/_reusable-tests.yml
+    with:
+      qt_version: min
+
   # ── Doxygen build check ─────────────────────────────────────────────────
   Doxygen:
     runs-on: ubuntu-24.04

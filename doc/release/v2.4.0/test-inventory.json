@@ -24,46 +24,8 @@
     },
     "gui": 33,
     "with_qskip": 71,
-    "ci_excluded": {
-      "test_mne_flash_bem": [
-        "windows-2025-vs2026"
-      ],
-      "test_mne_watershed_bem": [
-        "windows-2025-vs2026"
-      ]
-    },
-    "retry_paths": [
-      {
-        "path": "scripts/test/test_all.bat",
-        "line": 89,
-        "text": "@REM Re-run failed tests: if a test passes on retry it is treated as a"
-      },
-      {
-        "path": "scripts/test/test_all.bat",
-        "line": 95,
-        "text": "ECHO ======= Re-running FAILED tests ^(retry once^) ===================="
-      },
-      {
-        "path": "scripts/test/test_all.bat",
-        "line": 111,
-        "text": "ECHO ---- %%~nxf PASSED on retry ^(flaky^) ----"
-      },
-      {
-        "path": "scripts/test/test_all.bat",
-        "line": 291,
-        "text": "# Re-run failed tests: if a test passes on retry it is treated as a"
-      },
-      {
-        "path": "scripts/test/test_all.bat",
-        "line": 297,
-        "text": "echo \"======= Re-running FAILED tests (retry once) ======================\""
-      },
-      {
-        "path": "scripts/test/test_all.bat",
-        "line": 314,
-        "text": "echo \"---- $testName PASSED on retry (flaky) ----\""
-      }
-    ],
+    "ci_excluded": {},
+    "retry_paths": [],
     "ci": {
       "macos-26": {
         "executed": 229,
@@ -4641,9 +4603,7 @@
       "gui": false,
       "qskip_sites": 11,
       "spawns_processes": true,
-      "ci_excluded_on": [
-        "windows-2025-vs2026"
-      ],
+      "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
         "ubuntu-24.04": "run",
@@ -5224,9 +5184,7 @@
       "gui": false,
       "qskip_sites": 10,
       "spawns_processes": true,
-      "ci_excluded_on": [
-        "windows-2025-vs2026"
-      ],
+      "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
         "ubuntu-24.04": "run",

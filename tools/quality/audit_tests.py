@@ -54,7 +54,7 @@ REPO_ROOT = vti.REPO_ROOT
 TESTFRAMES_DIR = vti.TESTFRAMES_DIR
 CI_EVIDENCE = REPO_ROOT / "doc" / "release" / "v2.4.0" / "ci-test-results.json"
 TEST_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "_reusable-tests.yml"
-RETRY_SCAN_GLOBS = ("scripts/test/*", ".github/workflows/*.yml")
+RETRY_SCAN_GLOBS = ("scripts/test/*", "scripts/build/*", ".github/workflows/*.yml")
 
 _IF_RE = re.compile(r"^\s*(if|elseif)\s*\((.*)\)\s*$", re.IGNORECASE)
 _ELSE_RE = re.compile(r"^\s*else\s*\(.*\)\s*$", re.IGNORECASE)

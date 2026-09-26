@@ -131,6 +131,11 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  TestsMinQt:
+    uses: ./.github/workflows/_reusable-tests.yml
+    with:
+      qt_version: min
+
   # ── Doxygen API documentation (dev) ──────────────────────────────────────
   Doxygen:
     runs-on: ubuntu-24.04

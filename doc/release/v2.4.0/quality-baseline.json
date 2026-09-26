@@ -22,15 +22,8 @@
         "windows-2025-vs2026": 227
       },
       "ci_failures": 0,
-      "ci_platform_exclusions": {
-        "test_mne_flash_bem": [
-          "windows-2025-vs2026"
-        ],
-        "test_mne_watershed_bem": [
-          "windows-2025-vs2026"
-        ]
-      },
-      "retry_paths": 6
+      "ci_platform_exclusions": {},
+      "retry_paths": 0
     },
     "G2_coverage": {
       "commit": "7122ccb773617012b014fb066875f3f8e32b4c39",

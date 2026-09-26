@@ -11,6 +11,11 @@ name: Reusable Tests
 on:
   workflow_call:
     inputs:
+      qt_version:
+        description: "Qt toolchain to test against: 'max' (QT_VERSION) or 'min' (QT_MIN_VERSION)"
+        required: false
+        default: max
+        type: string
       with_code_coverage:
         description: "Enable gcov code coverage instrumentation (Linux only)"
         required: false
@@ -77,7 +82,7 @@ jobs:
 
     - name: Load external dependency versions
       shell: bash
-      run: ./scripts/ci/load_external_deps.sh
+      run: ./scripts/ci/load_external_deps.sh "${{ inputs.qt_version }}"
 
     - name: Download Qt toolchain (Linux|MacOS)
       if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'
@@ -86,7 +91,7 @@ jobs:
       run: |
         ./scripts/ci/download_toolchain.sh \
           --kind qt \
-          --version "$QT_VERSION" \
+          --version "$QT_BUILD_VERSION" \
           --linkage dynamic \
           --output-dir "$RUNNER_TEMP/qt"
 
@@ -120,7 +125,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind qt --version "%QT_VERSION%" --linkage dynamic --output-dir "%RUNNER_TEMP%\qt"
+        call scripts\ci\download_toolchain.bat --kind qt --version "%QT_BUILD_VERSION%" --linkage dynamic --output-dir "%RUNNER_TEMP%\qt"
 
     - name: Download Eigen package (Windows)
       if: matrix.os == 'windows-2025-vs2026'
@@ -199,7 +204,14 @@ jobs:
     # There is deliberately no retry: gate G1 forbids an automatic re-run from
     # turning a failure into a pass.  A flaky test must be fixed or quarantined
     # by name.  --no-tests=error makes an empty suite a failure rather than a
-    # silent success.
+    # silent success.  Passed-test output is kept (CTest trims it to 1 KB by
+    # default) so QSKIP reasons reach the JUnit file and the run summary.
+    - name: Cross-check CTest inventory
+      shell: bash
+      run: |
+        ctest --test-dir build -C Release --show-only=json-v1 > ctest-inventory.json
+        python tools/quality/validate_test_inventory.py --ctest-json ctest-inventory.json
+
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-24.04'
       env:
@@ -212,6 +224,7 @@ jobs:
               --output-on-failure \
               --no-tests=error \
               --output-junit test-results.xml \
+              --test-output-size-passed 262144 \
               --timeout ${{ inputs.with_code_coverage && 3600 || 1800 }}
 
     - name: Run tests (MacOS)
@@ -226,10 +239,11 @@ jobs:
               --output-on-failure \
               --no-tests=error \
               --output-junit test-results.xml \
+              --test-output-size-passed 262144 \
               --timeout 1800
 
-    # mne_flash_bem/mne_watershed_bem shell out to FreeSurfer tools
-    # (mri_convert, mri_watershed) that Windows runners do not have.
+    # test_mne_flash_bem/test_mne_watershed_bem declare PLATFORMS Linux Darwin,
+    # so CTest reports them as skipped here instead of needing an exclusion.
     - name: Run tests (Windows)
       if: matrix.os == 'windows-2025-vs2026'
       env:
@@ -242,14 +256,23 @@ jobs:
               --output-on-failure `
               --no-tests=error `
               --output-junit test-results.xml `
-              --timeout 1800 `
-              -E "test_mne_flash_bem|test_mne_watershed_bem"
+              --test-output-size-passed 262144 `
+              --timeout 1800
+
+    # Every not-run test and every QSKIP must carry a reason (gate G1).
+    - name: Summarize test run
+      if: always() && hashFiles('build/test-results.xml') != ''
+      shell: bash
+      run: |
+        python tools/quality/summarize_test_run.py build/test-results.xml \
+          --platform "${{ matrix.os }} (Qt ${{ inputs.qt_version }})" \
+          --require-reasons >> "$GITHUB_STEP_SUMMARY"
 
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: test-results-${{ matrix.os }}
+        name: test-results-${{ matrix.os }}${{ inputs.qt_version == 'min' && '-qt-min' || '' }}
         path: build/test-results.xml
         retention-days: 30
         if-no-files-found: warn
