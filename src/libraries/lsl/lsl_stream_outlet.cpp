@@ -222,6 +222,8 @@ private:
             if (elapsed >= BROADCAST_INTERVAL_MS) {
                 QByteArray datagram(discoveryPayload.c_str(), static_cast<int>(discoveryPayload.size()));
                 udpSocket.writeDatagram(datagram, DISCOVERY_MULTICAST_GROUP, DISCOVERY_PORT);
+                // Same-host listeners still find the stream when multicast is unrouted (VPNs, CI VMs).
+                udpSocket.writeDatagram(datagram, QHostAddress(QHostAddress::LocalHost), DISCOVERY_PORT);
                 lastBroadcast = now;
             }
 
