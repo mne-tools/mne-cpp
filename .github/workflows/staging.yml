@@ -119,15 +119,14 @@ jobs:
       qt_version: max
 
   # ── Tests with coverage threshold & regression checks ────────────────────
-  # Add [skip-coverage] to your commit message to skip coverage analysis.
   # Coverage is only collected on Ubuntu; macOS/Windows always run without it.
+  # Floor and regression tolerance come from tools/quality/coverage_policy.json.
   Tests:
     uses: ./.github/workflows/_reusable-tests.yml
     with:
-      with_code_coverage: ${{ !contains(github.event.head_commit.message, '[skip-coverage]') }}
-      upload_codecov: ${{ !contains(github.event.head_commit.message, '[skip-coverage]') }}
-      coverage_threshold: ${{ contains(github.event.head_commit.message, '[skip-coverage]') && 0 || 20 }}
-      fail_on_coverage_regression: ${{ !contains(github.event.head_commit.message, '[skip-coverage]') }}
+      with_code_coverage: true
+      upload_codecov: true
+      enforce_coverage_gate: true
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 

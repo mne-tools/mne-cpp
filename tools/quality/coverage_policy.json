@@ -1,0 +1,5 @@
+{
+  "$comment": "Line-coverage gate enforced by tools/quality/check_coverage_gate.py in the staging and main Tests jobs (release gate G2, doc/dev-notes/v2.4.0-requirements.md). The floor is a ratchet: it sits just below the measured combined coverage and may only rise, towards the G2 release minimum of 60%. The regression tolerance is the G2 value.",
+  "line_floor_percent": 47.0,
+  "max_regression_points": 0.1
+}

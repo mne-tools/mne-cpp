@@ -26,13 +26,8 @@ on:
         required: false
         default: false
         type: boolean
-      coverage_threshold:
-        description: "Minimum coverage % — workflow fails if below this (0 = disabled)"
-        required: false
-        default: 0
-        type: number
-      fail_on_coverage_regression:
-        description: "Fail if coverage drops compared to previous baseline"
+      enforce_coverage_gate:
+        description: "Fail below the floor or on regression, as set in tools/quality/coverage_policy.json"
         required: false
         default: false
         type: boolean
@@ -322,71 +317,26 @@ jobs:
         disable_search: true
         fail_ci_if_error: true
 
-    # ── Coverage: threshold & regression check ─────────────────────────────
+    # ── Coverage: floor & regression gate (tools/quality/coverage_policy.json) ──
+    # Saved keys carry the run id, so the exact key never matches; the prefix in
+    # restore-keys picks the most recent baseline for this branch.
     - name: Restore previous coverage baseline
       id: prev-coverage
-      if: matrix.os == 'ubuntu-24.04' && inputs.fail_on_coverage_regression
+      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.enforce_coverage_gate
       uses: actions/cache/restore@v5
       with:
         path: .coverage-baseline
-        key: coverage-baseline-v2-${{ github.ref_name }}
+        key: coverage-baseline-v2-${{ github.ref_name }}-${{ github.run_id }}
+        restore-keys: |
+          coverage-baseline-v2-${{ github.ref_name }}-
 
-    - name: Check coverage threshold & regression
-      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.coverage_threshold > 0
-      env:
-        CURRENT: ${{ steps.lcov.outputs.coverage }}
-        THRESHOLD: ${{ inputs.coverage_threshold }}
-        CHECK_REGRESSION: ${{ inputs.fail_on_coverage_regression }}
-      run: |
-        echo "═══════════════════════════════════════════════════"
-        echo "  Coverage Report"
-        echo "═══════════════════════════════════════════════════"
-        echo "  Current coverage : ${CURRENT}%"
-        echo "  Minimum threshold: ${THRESHOLD}%"
-
-        FAILED=false
-
-        # --- Threshold check ---
-        if [ "$THRESHOLD" != "0" ]; then
-          if (( $(echo "${CURRENT} < ${THRESHOLD}" | bc -l) )); then
-            echo "  ❌ FAIL: Coverage ${CURRENT}% is below threshold ${THRESHOLD}%"
-            FAILED=true
-          else
-            echo "  ✅ PASS: Coverage is above threshold"
-          fi
-        fi
-
-        # --- Regression check (allow up to 2% drop) ---
-        if [ "$CHECK_REGRESSION" = "true" ] && [ -f .coverage-baseline ]; then
-          PREVIOUS=$(cat .coverage-baseline)
-          echo "  Previous coverage: ${PREVIOUS}%"
-          ALLOWED_DROP="2.0"
-          LIMIT=$(echo "${PREVIOUS} - ${ALLOWED_DROP}" | bc -l)
-          if (( $(echo "${CURRENT} < ${LIMIT}" | bc -l) )); then
-            DELTA=$(echo "${PREVIOUS} - ${CURRENT}" | bc -l)
-            echo "  ❌ FAIL: Coverage dropped by ${DELTA}% (${PREVIOUS}% → ${CURRENT}%), exceeds ${ALLOWED_DROP}% tolerance"
-            FAILED=true
-          else
-            if (( $(echo "${CURRENT} < ${PREVIOUS}" | bc -l) )); then
-              DELTA=$(echo "${PREVIOUS} - ${CURRENT}" | bc -l)
-              echo "  ⚠️  WARN: Coverage dropped by ${DELTA}% (within ${ALLOWED_DROP}% tolerance)"
-            else
-              echo "  ✅ PASS: Coverage did not regress"
-            fi
-          fi
-        fi
-
-        echo "═══════════════════════════════════════════════════"
-
-        # Update baseline for next run
-        echo "${CURRENT}" > .coverage-baseline
-
-        if [ "$FAILED" = "true" ]; then
-          exit 1
-        fi
+    - name: Check coverage gate
+      id: coverage-gate
+      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.enforce_coverage_gate
+      run: python tools/quality/check_coverage_gate.py coverage_filtered.info --baseline .coverage-baseline
 
     - name: Save coverage baseline
-      if: matrix.os == 'ubuntu-24.04' && inputs.fail_on_coverage_regression && always()
+      if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.enforce_coverage_gate && steps.coverage-gate.outcome == 'success'
       uses: actions/cache/save@v5
       with:
         path: .coverage-baseline

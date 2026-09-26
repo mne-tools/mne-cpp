@@ -105,6 +105,7 @@ def build_dashboard(sections: dict[str, dict[str, Any]]) -> dict[str, Any]:
             "without_labels": tests["without_labels"],
             "without_timeout": tests["without_timeout"],
             "ci_executed": {p: d["executed"] for p, d in tests["ci"].items()},
+            "ci_skipped": {p: d["skipped"] for p, d in tests["ci"].items()},
             "ci_failures": sum(d["failures"] for d in tests["ci"].values()),
             "ci_platform_exclusions": tests["ci_excluded"],
             "retry_paths": len(tests["retry_paths"]),
@@ -174,7 +175,8 @@ def render_dashboard(report: dict[str, Any]) -> str:
 
     rows = [
         ("G1", "Every registered test runs in CI", f"{g1['registered']} registered; CI ran "
-         + ", ".join(f"{n} on {p}" for p, n in g1["ci_executed"].items()),
+         + ", ".join(f"{n} on {p}" + (f" ({g1['ci_skipped'][p]} declared skips)" if g1["ci_skipped"].get(p) else "")
+                     for p, n in g1["ci_executed"].items()),
          status(all(n >= g1["registered"] - len(g1["ci_platform_exclusions"]) for n in g1["ci_executed"].values()))),
         ("G1", "Tests carry labels and timeouts", f"{g1['without_labels']} unlabelled, {g1['without_timeout']} untimed",
          status(g1["without_labels"] == 0 and g1["without_timeout"] == 0)),

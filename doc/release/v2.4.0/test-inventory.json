@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "tools/quality/audit_tests.py",
   "ci_source": {
-    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/33441161302",
-    "commit": "7122ccb773617012b014fb066875f3f8e32b4c39"
+    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/36243010551",
+    "commit": "96413f7ccc7dabed2c6d40a511960ce8805e0407"
   },
   "summary": {
     "directories": 233,
@@ -28,32 +28,24 @@
     "retry_paths": [],
     "ci": {
       "macos-26": {
-        "executed": 229,
+        "executed": 230,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [
-          "test_mne_testing_helper"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": []
       },
       "ubuntu-24.04": {
-        "executed": 229,
+        "executed": 230,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [
-          "test_mne_testing_helper"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": []
       },
       "windows-2025-vs2026": {
-        "executed": 227,
+        "executed": 230,
         "failures": 0,
-        "skipped": 0,
-        "registered_not_executed": [
-          "test_mne_flash_bem",
-          "test_mne_testing_helper",
-          "test_mne_watershed_bem"
-        ],
+        "skipped": 2,
+        "registered_not_executed": [],
         "executed_not_in_inventory": []
       }
     }
@@ -4607,7 +4599,7 @@
       "ci": {
         "macos-26": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "absent"
+        "windows-2025-vs2026": "skipped"
       },
       "registry_classes": []
     },
@@ -5152,9 +5144,9 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "ubuntu-24.04": "run",
+        "windows-2025-vs2026": "run"
       },
       "registry_classes": []
     },
@@ -5188,7 +5180,7 @@
       "ci": {
         "macos-26": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "absent"
+        "windows-2025-vs2026": "skipped"
       },
       "registry_classes": []
     },

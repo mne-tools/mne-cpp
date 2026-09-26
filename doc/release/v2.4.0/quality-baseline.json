@@ -17,9 +17,14 @@
       "without_labels": 0,
       "without_timeout": 0,
       "ci_executed": {
-        "macos-26": 229,
-        "ubuntu-24.04": 229,
-        "windows-2025-vs2026": 227
+        "macos-26": 230,
+        "ubuntu-24.04": 230,
+        "windows-2025-vs2026": 230
+      },
+      "ci_skipped": {
+        "macos-26": 0,
+        "ubuntu-24.04": 0,
+        "windows-2025-vs2026": 2
       },
       "ci_failures": 0,
       "ci_platform_exclusions": {},

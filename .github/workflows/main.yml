@@ -70,6 +70,7 @@ jobs:
     with:
       with_code_coverage: true
       upload_codecov: true
+      enforce_coverage_gate: true
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
