@@ -155,12 +155,19 @@ bool PythonRunner::isPackageAvailable(const QString& packageName) const
         return false;
     }
 
+    // find_spec locates the package without executing it; a full import of e.g.
+    // sklearn can exceed the timeout on a loaded machine and read as "not installed".
     QProcess proc;
     proc.start(m_config.pythonExe,
                {QStringLiteral("-c"),
-                QStringLiteral("import %1").arg(packageName)});
-    return proc.waitForFinished(10000) &&
-           proc.exitStatus() == QProcess::NormalExit &&
+                QStringLiteral("import importlib.util, sys; "
+                               "sys.exit(0 if importlib.util.find_spec('%1') else 1)").arg(packageName)});
+    if (!proc.waitForFinished(10000)) {
+        proc.kill();
+        proc.waitForFinished(1000);
+        return false;
+    }
+    return proc.exitStatus() == QProcess::NormalExit &&
            proc.exitCode() == 0;
 }
 

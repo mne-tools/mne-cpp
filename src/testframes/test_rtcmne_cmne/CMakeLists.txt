@@ -47,6 +47,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
   MACOSX_BUNDLE FALSE
 )
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+  MNE_CMNE_SMOKE_MODEL="${CMAKE_CURRENT_SOURCE_DIR}/cmne_smoke.onnx")
+
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()

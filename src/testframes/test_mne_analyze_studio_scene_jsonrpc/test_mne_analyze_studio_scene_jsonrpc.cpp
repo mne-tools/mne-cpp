@@ -542,9 +542,15 @@ private slots:
 
     void testFiffBufferProperties()
     {
-        QString sampleFile = QString("%1/%2").arg(
-            qgetenv("MNE_SAMPLE_DATA_PATH").constData(),
-            "MEG/sample/sample_audvis_trunc_raw.fif");
+        // The truncated raw file ships with mne-cpp-test-data, not with MNE sample data.
+        QString sampleFile = QCoreApplication::applicationDirPath()
+            + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+
+        if(!QFile::exists(sampleFile)) {
+            sampleFile = QString("%1/%2").arg(
+                qgetenv("MNE_SAMPLE_DATA_PATH").constData(),
+                "MEG/sample/sample_audvis_trunc_raw.fif");
+        }
 
         if(!QFile::exists(sampleFile)) {
             sampleFile = QDir::homePath() + "/mne_data/MNE-sample-data/MEG/sample/sample_audvis_trunc_raw.fif";

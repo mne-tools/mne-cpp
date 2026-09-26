@@ -11,9 +11,8 @@
  *           inverse plugin. The plugin itself can only be exercised in a full MNE Scan
  *           runtime, so this test focuses on the algorithmic dispatch: it drives the
  *           InvCMNE solver through the same compute() entry-point used by the plugin
- *           and validates the result shape. When no model checkpoint is available the
- *           test is SKIPPED via QSKIP rather than failing — CMNE requires a trained
- *           ONNX model that is not shipped with the repository.
+ *           and validates the result shape. Without CMNE_MODEL_CHECKPOINT it runs the
+ *           untrained cmne_smoke.onnx (see make_cmne_smoke_model.py).
  */
 
 //=============================================================================================================
@@ -101,7 +100,8 @@ QString TestRtcMneCmne::resolveModelCheckpoint() const
     if(!sFromEnv.isEmpty() && QFileInfo::exists(sFromEnv)) {
         return sFromEnv;
     }
-    return QString();
+    const QString sShipped = QStringLiteral(MNE_CMNE_SMOKE_MODEL);
+    return QFileInfo::exists(sShipped) ? sShipped : QString();
 }
 
 //=============================================================================================================
@@ -176,6 +176,14 @@ void TestRtcMneCmne::testCmneInverseSmoke()
     QVERIFY(res.matKernelDspm.cols() == nChannels);
     QVERIFY(res.stcDspm.data.rows() == nSources || res.stcDspm.data.rows() == 0);
     QVERIFY(res.stcCmne.data.rows() == nSources || res.stcCmne.data.rows() == 0);
+
+#ifdef MNE_USE_ONNXRUNTIME
+    // A model that fails to load falls back to the moving average silently, so prove inference ran.
+    const MatrixXd matSources = MatrixXd::Random(nSources, nTimes).cwiseAbs();
+    const MatrixXd matLstm = InvCMNE::applyLstmCorrection(matSources, sCheckpoint, settings.lookBack);
+    const MatrixXd matMovingAverage = InvCMNE::applyLstmCorrection(matSources, QString(), settings.lookBack);
+    QVERIFY(!matLstm.rightCols(nTimes - settings.lookBack).isApprox(matMovingAverage.rightCols(nTimes - settings.lookBack)));
+#endif
 }
 
 //=============================================================================================================

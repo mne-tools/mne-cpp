@@ -525,7 +525,34 @@ void TestDispViewers2::bidsView_lifecycle()
 
 void TestDispViewers2::channelSelectionView_lifecycle()
 {
-    QSKIP("ChannelSelectionView requires layout files that are not guaranteed present in test environment");
+    const QString layoutPath = QCoreApplication::applicationDirPath()
+        + QStringLiteral("/../resources/general/2DLayouts/Vectorview-all.lout");
+    if (!QFile::exists(layoutPath)) {
+        QSKIP("Vectorview-all.lout not available in test environment");
+    }
+
+    auto info = createBrowserTestInfo();
+    ChannelInfoModel::SPtr infoModel(new ChannelInfoModel);
+    infoModel->setFiffInfo(info);
+
+    ChannelSelectionView view(QStringLiteral("test_disp_viewers2_lifecycle"),
+                              nullptr,
+                              infoModel,
+                              Qt::Widget);
+    view.setGuiMode(AbstractView::GuiMode::Research);
+    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
+    view.setCurrentLayoutFile(QStringLiteral("Vectorview-all.lout"));
+    view.newFiffFileLoaded(info);
+    QVERIFY(!view.getLayoutMap().isEmpty());
+
+    view.selectChannels(QStringList{info->ch_names.first()});
+    view.updateBadChannels();
+    view.updateDataView();
+    view.saveSettings();
+    view.loadSettings();
+    view.clearView();
+
+    QApplication::processEvents();
 }
 
 //=============================================================================================================
@@ -1007,7 +1034,27 @@ void TestDispViewers2::rtFiffRawView_lifecycle()
 
 void TestDispViewers2::dipoleFitView_lifecycle()
 {
-    QSKIP("DipoleFitView accesses a null pointer during UI construction in headless mode");
+    DipoleFitView view;
+    view.setGuiMode(AbstractView::GuiMode::Research);
+    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
+
+    view.addMeas(QStringLiteral("sample_audvis-ave.fif"));
+    view.addBem(QStringLiteral("sample-5120-bem-sol.fif"));
+    view.addMri(QStringLiteral("all-trans.fif"));
+    view.addNoise(QStringLiteral("sample_audvis-cov.fif"));
+    view.removeModel(QStringLiteral("all-trans.fif"), 3);
+
+    QSignalSpy timeSpy(&view, &DipoleFitView::timeChanged);
+    QSignalSpy sphereSpy(&view, &DipoleFitView::sphereChanged);
+    view.requestParams();
+    QCOMPARE(timeSpy.count(), 1);
+    QCOMPARE(sphereSpy.count(), 1);
+
+    view.saveSettings();
+    view.loadSettings();
+    view.clearView();
+
+    QApplication::processEvents();
 }
 
 //=============================================================================================================

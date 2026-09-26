@@ -218,6 +218,9 @@ void TestPythonRunner::testIsPackageAvailable()
 
     // A definitely-not-installed package
     QVERIFY(!runner.isPackageAvailable("nonexistent_package_xyz_12345"));
+
+    QVERIFY(runner.isPackageAvailable("importlib.util"));
+    QVERIFY(!runner.isPackageAvailable("nonexistent_package_xyz_12345.sub"));
 }
 
 //=============================================================================================================

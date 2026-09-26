@@ -290,7 +290,14 @@ void DipoleFitView::initGui()
 #else
             auto skip = Qt::SkipEmptyParts;
 #endif
-            QString sName = sFileName.split(".",skip).at(0);
+            // clear() reports an empty selection, which has no name to derive.
+            const QStringList parts = sFileName.split(".",skip);
+            if(parts.isEmpty()){
+                m_pUi->lineEdit_name->clear();
+                emit selectedMeas(sFileName);
+                return;
+            }
+            QString sName = parts.at(0);
             if(sName.endsWith("-ave") || sName.endsWith("_ave") || sName.endsWith("-raw") || sName.endsWith("_raw")){
                 sName.chop(4);
             }

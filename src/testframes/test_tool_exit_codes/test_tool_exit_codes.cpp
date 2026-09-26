@@ -136,7 +136,9 @@ QString TestToolExitCodes::findTool(const QString& name) const
     const QStringList candidates = {
         appDir + "/" + name + suffix,
         appDir + "/../apps/" + name + suffix,
-        appDir + "/../bin/" + name + suffix
+        appDir + "/../bin/" + name + suffix,
+        // Tools with a GUI mode are macOS app bundles when BUILD_MAC_APP_BUNDLE is on.
+        appDir + "/../bin/" + name + ".app/Contents/MacOS/" + name
     };
 
     for (const QString& path : candidates) {
