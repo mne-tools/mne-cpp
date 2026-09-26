@@ -81,6 +81,8 @@ QString TestUtilsLogger::readLog() const
 
 void TestUtilsLogger::initTestCase()
 {
+    QFAIL("AC-T1.5-2: deliberately injected failure; must turn CI red.");
+
     QFile::remove(m_sLogFile);
     qInstallMessageHandler(MNELogger::customLogWriter);
 }
