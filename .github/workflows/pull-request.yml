@@ -66,16 +66,24 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v5
 
-    - name: Install Doxygen and Graphviz
+    # Pinned like staging/main: the warning ratchet compares Doxygen's exact texts.
+    - name: Install Doxygen 1.16.1 and Graphviz
       run: |
         sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
         sudo apt-get update -qq
-        sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
+        sudo apt-get install -qq qttools5-dev-tools graphviz
+        wget -q https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
+        tar xzf doxygen-1.16.1.linux.bin.tar.gz
+        sudo install -m 755 doxygen-1.16.1/bin/doxygen /usr/local/bin/doxygen
 
     - name: Run Doxygen (build check only — no deploy)
       run: |
         cd doc/doxygen
         doxygen mne-cpp_doxyfile
+
+    # Gate G3: API XML with no Doxygen warning outside the shrink-only allowlist.
+    - name: Build API docs (strict)
+      run: doc/build-api-docs.sh --no-site
 
     # The @snippet contract: headers reference named regions in src/examples.
     - name: Check Doxygen snippets

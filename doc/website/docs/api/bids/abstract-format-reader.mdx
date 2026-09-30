@@ -25,6 +25,8 @@ Subclasses implement format-specific parsing and expose the data uniformly as FI
 classDiagram
     AbstractFormatReader <|-- BrainVisionReader
     click BrainVisionReader "/docs/api/bids/brain-vision-reader"
+    AbstractFormatReader <|-- EDFReader
+    click EDFReader "/docs/api/bids/edf-reader"
 ```
 
 ---

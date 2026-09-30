@@ -40,8 +40,20 @@ EXTRACT_STATIC         = NO
 EXTRACT_LOCAL_CLASSES  = NO
 HIDE_UNDOC_MEMBERS     = YES
 HIDE_UNDOC_CLASSES     = YES
+
+# ---------------------------------------------------------------------------
+# Warnings (gate G3). Every warning goes to WARN_LOGFILE, and
+# tools/quality/check_doxygen_warnings.py fails on any that is not in the
+# shrink-only tools/quality/doxygen_warning_allowlist.json. Doxygen itself
+# does not fail, so the whole list is reported in one run.
+# ---------------------------------------------------------------------------
+WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_IF_INCOMPLETE_DOC = YES
+WARN_NO_PARAMDOC       = YES
 WARN_FORMAT            = "$file:$line: $text"
+WARN_LOGFILE           = xml_out/doxygen-warnings.log
 WARN_AS_ERROR          = NO
 QUIET                  = YES
 

@@ -26,8 +26,8 @@
  * iEEG channels emerge in volts, matching the MNE-CPP @c FIFFLIB
  * convention.
  *
- * Format reference: Kemp & Olivan, ``European data format 'plus'
- * (EDF+)'', Clin. Neurophysiol. 114 (2003) 1755–1761; spec at
+ * Format reference: Kemp & Olivan, "European data format 'plus'
+ * (EDF+)", Clin. Neurophysiol. 114 (2003) 1755–1761; spec at
  * https://www.edfplus.info/specs/edf.html.
  */
 
