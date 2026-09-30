@@ -73,6 +73,7 @@ class TestSnippetReferences(unittest.TestCase):
         text = (REPO_ROOT / "doc" / "Doxyfile").read_text(encoding="utf-8")
         self.assertRegex(text, r"(?m)^EXAMPLE_PATH\s*=\s*\.\./src/examples\s*$")
         self.assertRegex(text, r"(?m)^EXAMPLE_RECURSIVE\s*=\s*YES\s*$")
+        self.assertRegex(text, r"(?m)^CASE_SENSE_NAMES\s*=\s*NO\s*$")
 
     def test_references_are_qualified_and_resolve(self) -> None:
         """AC-T3.1-3: every example is main.cpp, so a reference must name its directory."""
@@ -111,9 +112,12 @@ class TestDoxygenXml(unittest.TestCase):
         return result, tmp / "out" / "xml"
 
     def listings(self, xml_dir: Path) -> list[ET.Element]:
-        compound = xml_dir / "class_f_i_f_f_l_i_b_1_1_fiff_raw_data.xml"
-        self.assertTrue(compound.is_file(), "FiffRawData is not documented inside FIFFLIB")
-        return list(ET.parse(compound).getroot().iter("programlisting"))
+        # Compound file names depend on the platform's CASE_SENSE_NAMES default, so match by name.
+        for path in xml_dir.glob("class*.xml"):
+            compound = ET.parse(path).getroot().find("compounddef")
+            if compound is not None and compound.findtext("compoundname") == "FIFFLIB::FiffRawData":
+                return list(compound.iter("programlisting"))
+        self.fail("FiffRawData is not documented inside FIFFLIB")
 
     def test_xml_contains_exactly_the_named_regions(self) -> None:
         """AC-T3.1-1 and AC-T3.1-2: each listing is its region, line for line, and nothing else."""

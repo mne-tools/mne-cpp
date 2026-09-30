@@ -64,6 +64,8 @@ DISTRIBUTE_GROUP_DOC   = YES
 JAVADOC_AUTOBRIEF      = YES
 QT_AUTOBRIEF           = YES
 MARKDOWN_SUPPORT       = YES
+# The default is platform-dependent; doxy2mdx expects class_*/struct_* file names.
+CASE_SENSE_NAMES       = NO
 
 # ---------------------------------------------------------------------------
 # Preprocessor — strip Qt and per-library DLL export macros so they do
