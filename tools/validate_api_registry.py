@@ -11,7 +11,10 @@ Enforces the following invariants:
 2. Every 'header' path exists under 'src/libraries/' (relative).
 3. Every 'test' (when not null) corresponds to a directory under 'src/testframes/'.
 4. No entry with skigen_candidate: true AND status: "done" lacks a skigen_target.
-5. Cross-reference with src/external/skigen/doc/api_registry.json if present.
+5. Example evidence (v2.4.0 T3.2): example targets, snippets, modes, data,
+   screenshots and exemptions; eligible entries without an example are errors
+   unless listed in the shrink-only example_debt of api_evidence_policy.json.
+6. Cross-reference with src/external/skigen/doc/api_registry.json if present.
 
 Exit codes:
   0 - all validations passed
@@ -20,9 +23,20 @@ Exit codes:
 
 import argparse
 import json
+import re
 import sys
+from collections import Counter
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
+
+EXAMPLE_MODES = {"run", "compile"}
+DATASETS = {"mne-cpp-test-data", "MNE-sample-data"}
+EVIDENCE_POLICY = Path("tools") / "quality" / "api_evidence_policy.json"
+SCREENSHOT_MANIFEST = Path("doc") / "website" / "screenshots" / "manifest.json"
+_SNIPPET_RE = re.compile(r"[@\\]snippet\s+(\S+)\s+(\S+)")
+_MARKER_RE = re.compile(r"^\s*//!\s*\[([^\]]+)\]\s*$")
+_SUBDIR_RE = re.compile(r"^\s*add_subdirectory\s*\(\s*([A-Za-z0-9_./+-]+)", re.MULTILINE)
+_PROJECT_RE = re.compile(r"^\s*project\s*\(\s*([A-Za-z0-9_]+)", re.MULTILINE | re.IGNORECASE)
 
 
 def load_json(path: Path) -> Optional[Dict[str, Any]]:
@@ -201,6 +215,152 @@ def validate_parity_block(registry: Dict[str, Any]) -> Tuple[bool, List[str]]:
     return (len(issues) == 0, issues)
 
 
+def example_markers(examples_dir: Path) -> Tuple[Dict[str, Counter], List[str]]:
+    """Region-marker counts per example file, and every marker not used exactly twice."""
+    markers: Dict[str, Counter] = {}
+    issues: List[str] = []
+    for source in sorted(examples_dir.rglob("*")):
+        if source.suffix not in {".cpp", ".h"}:
+            continue
+        lines = source.read_text(encoding="utf-8", errors="replace").splitlines()
+        counts = Counter(m.group(1) for m in map(_MARKER_RE.match, lines) if m)
+        relative = source.relative_to(examples_dir).as_posix()
+        markers[relative] = counts
+        issues += [f"src/examples/{relative}: marker [{name}] appears {n} times, expected 2"
+                   for name, n in sorted(counts.items()) if n != 2]
+    return markers, issues
+
+
+def header_snippets(libraries_dir: Path) -> Dict[str, Set[str]]:
+    """Header (relative to src/libraries) -> '<path>#<region>' @snippet references."""
+    refs: Dict[str, Set[str]] = {}
+    for header in sorted(libraries_dir.rglob("*.h")):
+        found = _SNIPPET_RE.findall(header.read_text(encoding="utf-8", errors="replace"))
+        if found:
+            refs[header.relative_to(libraries_dir).as_posix()] = {f"{p}#{r}" for p, r in found}
+    return refs
+
+
+def example_targets(examples_dir: Path) -> Dict[str, str]:
+    """Example directory added by src/examples/CMakeLists.txt -> its CMake project (target) name."""
+    cmake = examples_dir / "CMakeLists.txt"
+    targets: Dict[str, str] = {}
+    if not cmake.is_file():
+        return targets
+    for directory in _SUBDIR_RE.findall(cmake.read_text(encoding="utf-8")):
+        leaf = examples_dir / directory / "CMakeLists.txt"
+        match = _PROJECT_RE.search(leaf.read_text(encoding="utf-8")) if leaf.is_file() else None
+        if match:
+            targets[directory] = match.group(1)
+    return targets
+
+
+def policy_exemption(name: str, header: str, policy: Dict[str, Any]) -> Optional[str]:
+    for prefix, reason in policy.get("exempt_header_prefixes", {}).items():
+        if header.startswith(prefix):
+            return reason
+    for suffix, reason in policy.get("exempt_name_suffixes", {}).items():
+        if name.endswith(suffix):
+            return reason
+    return None
+
+
+def validate_examples(repo_root: Path, registry: Dict[str, Any],
+                      policy: Dict[str, Any], manifest: Dict[str, Any]) -> Tuple[bool, List[str], Dict[str, int]]:
+    """Enforce the example-evidence fields of v2.4.0 T3.2.
+
+    Optional per-class fields: ``example`` (directory under src/examples),
+    ``example_snippet`` (list of ``<example>/<file>#<region>``), ``example_mode``
+    (run|compile), ``required_data`` (dataset names), ``example_exempt`` with
+    ``example_exempt_reason``, and ``screenshots`` (manifest ids).
+    """
+    examples_dir = repo_root / "src" / "examples"
+    markers, issues = example_markers(examples_dir)
+    snippets_in_headers = header_snippets(repo_root / "src" / "libraries")
+    targets = example_targets(examples_dir)
+    shots = {shot.get("id") for shot in manifest.get("shots", [])}
+    debt = policy.get("example_debt", {}).get("names", [])
+    ceiling = policy.get("example_debt", {}).get("ceiling", 0)
+    if len(debt) != len(set(debt)):
+        issues.append("example_debt lists a name twice")
+    if len(debt) > ceiling:
+        issues.append(f"example_debt has {len(debt)} names, above its ceiling of {ceiling}; the list may only shrink")
+    debt_set = set(debt)
+    claimed: Set[Tuple[str, str]] = set()
+    stats = {"eligible": 0, "backed": 0, "exempt": 0, "debt": 0}
+
+    for cls in registry.get("classes", []):
+        name, header = cls.get("name", "UNNAMED"), cls.get("header", "")
+        example = cls.get("example")
+        snippets = cls.get("example_snippet", [])
+        exempt = cls.get("example_exempt", False)
+        reason = cls.get("example_exempt_reason")
+        where = f"'{name}'"
+
+        if not isinstance(exempt, bool):
+            issues.append(f"{where}: 'example_exempt' must be boolean")
+        if exempt and (not isinstance(reason, str) or not reason.strip()):
+            issues.append(f"{where}: 'example_exempt' requires a non-empty 'example_exempt_reason'")
+        if reason is not None and not exempt:
+            issues.append(f"{where}: 'example_exempt_reason' without 'example_exempt: true'")
+        if exempt and example:
+            issues.append(f"{where}: exempt but names example '{example}'")
+
+        if example:
+            if example not in targets:
+                issues.append(f"{where}: example '{example}' is not a CMake target added by src/examples/CMakeLists.txt")
+            if cls.get("example_mode", "compile") not in EXAMPLE_MODES:
+                issues.append(f"{where}: 'example_mode' must be one of {sorted(EXAMPLE_MODES)}")
+        else:
+            for key in ("example_snippet", "example_mode", "required_data"):
+                if key in cls:
+                    issues.append(f"{where}: '{key}' requires 'example'")
+
+        if not isinstance(snippets, list):
+            issues.append(f"{where}: 'example_snippet' must be a list")
+            snippets = []
+        for ref in snippets:
+            path, _, region = str(ref).partition("#")
+            if not region or path.split("/")[0] != example or "/" not in path:
+                issues.append(f"{where}: snippet '{ref}' must be '{example}/<file>#<region>'")
+            elif markers.get(path, Counter())[region] != 2:
+                issues.append(f"{where}: snippet '{ref}' has no balanced region in src/examples/{path}")
+            elif ref not in snippets_in_headers.get(header, set()):
+                issues.append(f"{where}: snippet '{ref}' is not referenced by @snippet in {header}")
+            claimed.add((header, ref))
+
+        data = cls.get("required_data", [])
+        if not isinstance(data, list) or any(item not in DATASETS for item in data):
+            issues.append(f"{where}: 'required_data' must list datasets from {sorted(DATASETS)}")
+        for shot in cls.get("screenshots", []):
+            if shot not in shots:
+                issues.append(f"{where}: screenshot '{shot}' is not in {SCREENSHOT_MANIFEST.as_posix()}")
+
+        if exempt or policy_exemption(name, header, policy):
+            stats["exempt"] += 1
+            if name in debt_set:
+                issues.append(f"{where}: exempt, remove it from example_debt")
+            continue
+        stats["eligible"] += 1
+        backed = bool(example) and example in targets and bool(snippets)
+        if backed:
+            stats["backed"] += 1
+            if name in debt_set:
+                issues.append(f"{where}: now has an example and snippet, remove it from example_debt")
+        elif name in debt_set:
+            stats["debt"] += 1
+        else:
+            issues.append(f"{where}: example-eligible but has no built example with an example_snippet")
+
+    registered = {cls.get("name") for cls in registry.get("classes", [])}
+    issues += [f"example_debt: '{name}' is not a registry class" for name in sorted(debt_set - registered)]
+    for header, refs in sorted(snippets_in_headers.items()):
+        for ref in sorted(refs):
+            if (header, ref) not in claimed:
+                issues.append(f"{header}: @snippet '{ref}' is not listed in any registry 'example_snippet'")
+    return (len(issues) == 0, issues, stats)
+
+
 def validate_skigen_cross_reference(
     repo_root: Path,
     mne_cpp_registry: Dict[str, Any],
@@ -262,13 +422,13 @@ def main() -> int:
     all_passed = True
     total = len(registry.get("classes", []))
 
-    print("[1/7] JSON well-formed...")
+    print("[1/8] JSON well-formed...")
     if not validate_json_wellformed(registry):
         all_passed = False
     else:
         print("  OK")
 
-    print("[2/7] Header paths under src/libraries/...")
+    print("[2/8] Header paths under src/libraries/...")
     ok, missing = validate_headers(repo_root, registry)
     if not ok:
         all_passed = False
@@ -277,7 +437,7 @@ def main() -> int:
     else:
         print(f"  OK ({total} entries)")
 
-    print("[3/7] Test directories under src/testframes/...")
+    print("[3/8] Test directories under src/testframes/...")
     ok, missing = validate_tests(repo_root, registry)
     if not ok:
         all_passed = False
@@ -287,7 +447,7 @@ def main() -> int:
         with_tests = sum(1 for c in registry.get("classes", []) if c.get("test"))
         print(f"  OK ({with_tests} entries with test)")
 
-    print("[4/7] skigen_target presence on done candidates...")
+    print("[4/8] skigen_target presence on done candidates...")
     ok, issues = validate_skigen_targets(registry)
     if not ok:
         all_passed = False
@@ -296,7 +456,7 @@ def main() -> int:
     else:
         print("  OK")
 
-    print("[5/7] documented flag + sidebar invariants (TASK 18.3)...")
+    print("[5/8] documented flag + sidebar invariants (TASK 18.3)...")
     ok, issues = validate_documented_flag(registry)
     if not ok:
         all_passed = False
@@ -307,7 +467,7 @@ def main() -> int:
                         if c.get("documented", False))
         print(f"  OK ({doc_count} documented entries)")
 
-    print("[6/7] Parity block invariants (TASK T7.0/T7.3)...")
+    print("[6/8] Parity block invariants (TASK T7.0/T7.3)...")
     ok, issues = validate_parity_block(registry)
     if not ok:
         all_passed = False
@@ -317,7 +477,19 @@ def main() -> int:
         parity_count = len(registry.get("parity", {}).get("records", []))
         print(f"  OK ({parity_count} parity records)")
 
-    print("[7/7] Cross-reference with skigen registry...")
+    print("[7/8] Example evidence (TASK T3.2)...")
+    policy = load_json(repo_root / EVIDENCE_POLICY) or {}
+    manifest = load_json(repo_root / SCREENSHOT_MANIFEST) or {}
+    ok, issues, stats = validate_examples(repo_root, registry, policy, manifest)
+    if not ok:
+        all_passed = False
+        for i in issues:
+            print(f"  VIOLATION: {i}")
+    else:
+        print(f"  OK ({stats['backed']} of {stats['eligible']} eligible entries backed, "
+              f"{stats['debt']} in example_debt, {stats['exempt']} exempt)")
+
+    print("[8/8] Cross-reference with skigen registry...")
     ok, _ = validate_skigen_cross_reference(repo_root, registry, args.skigen_registry, args.strict)
     if not ok:
         all_passed = False

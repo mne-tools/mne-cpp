@@ -89,3 +89,21 @@ step blocks merge.
     user-guide page.
   * `python_equiv` / `python_url` — emits a `:::info[Python equivalent]`
     admonition cross-referencing MNE-Python.
+
+## Example evidence fields (v2.4.0 T3.2)
+
+`tools/validate_api_registry.py` enforces these per-class fields:
+
+| Field | Meaning |
+|---|---|
+| `example` | Directory under `src/examples/` that `src/examples/CMakeLists.txt` adds as a CMake target. |
+| `example_snippet` | List of `<example>/<file>#<region>`. Each region is marked `//! [<region>]` exactly twice in the example, and the class header references it with `@snippet <example>/<file> <region>`. Every `@snippet` in a header must be listed here. |
+| `example_mode` | `run` (deterministic, runs under CTest) or `compile` (built only). Defaults to `compile`. |
+| `required_data` | Datasets the example reads: `mne-cpp-test-data`, `MNE-sample-data`. |
+| `example_exempt` / `example_exempt_reason` | Exemption for a class that has no meaningful console example; the reason is mandatory. |
+| `screenshots` | Ids from `doc/website/screenshots/manifest.json` that show the class. |
+
+An example-eligible class (not exempted here or by the rules in
+`tools/quality/api_evidence_policy.json`) must have an `example` and at least
+one `example_snippet`. Classes that do not yet are listed in the policy's
+`example_debt`; that list and its `ceiling` may only shrink.

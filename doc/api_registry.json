@@ -209,6 +209,14 @@
       "sklearn": null,
       "test": "test_fiff_raw_io",
       "example": "ex_read_raw",
+      "example_snippet": [
+        "ex_read_raw/main.cpp#fiff_raw_data_open",
+        "ex_read_raw/main.cpp#fiff_raw_data_read_segment"
+      ],
+      "example_mode": "compile",
+      "required_data": [
+        "MNE-sample-data"
+      ],
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
