@@ -1,22 +1,22 @@
 # MNE-CPP v2.4.0 coverage baseline
 
-Commit: `96413f7ccc7dabed2c6d40a511960ce8805e0407`
-Coverage source: https://github.com/mne-tools/mne-cpp/actions/runs/36243010551
+Commit: `5053fe099fe1c7ad72d6a16a07ec0e6fe53ee4ad`
+Coverage source: https://github.com/mne-tools/mne-cpp/actions/runs/36266179374
 
 ## Totals
 
-- Lines: 60,091 / 123,014 (48.85%)
-- Branches: 0 / 0 (not reported)
+- Lines: 60,096 / 123,014 (48.85%)
+- Branches: 24,699 / 71,328 (34.63%)
 - Files: 1,227
-- Codecov model (partials as hits): 60,091 / 123,014 (48.85%)
+- Codecov model (partials as hits): 59,285 / 123,014 (48.19%)
 
 ## Scope
 
 | Scope | Lines | Coverage | Branches | Branch coverage |
 |---|---:|---:|---:|---:|
-| `src/libraries` | 39,652 / 63,199 | 62.74% | 0 / 0 | not reported |
-| `src/applications` | 11,137 / 44,733 | 24.90% | 0 / 0 | not reported |
-| `src/tools` | 9,302 / 15,082 | 61.68% | 0 / 0 | not reported |
+| `src/libraries` | 39,657 / 63,199 | 62.75% | 18,341 / 42,757 | 42.90% |
+| `src/applications` | 11,137 / 44,733 | 24.90% | 3,175 / 21,022 | 15.10% |
+| `src/tools` | 9,302 / 15,082 | 61.68% | 3,183 / 7,549 | 42.16% |
 
 ## Exclusions
 

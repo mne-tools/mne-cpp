@@ -21,9 +21,9 @@ coverage:
         target: 90%
     changes: no
 
-# Codecov scores a line with branch counters by its branches; counting a partly
-# taken line as a hit keeps its line coverage aligned with gcov's.  Branch
-# coverage itself is reported by tools/quality/summarize_coverage.py.
+# Codecov scores a line with branch counters by its branches, so a partly taken
+# line counts as a hit; an executed line whose branches were never taken still
+# counts as a miss, which puts Codecov slightly below the gate's line figure.
 parsers:
   lcov:
     partials_as_hits: true

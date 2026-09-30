@@ -118,6 +118,7 @@ def build_dashboard(sections: dict[str, dict[str, Any]]) -> dict[str, Any]:
             "line_applications": scopes["applications"]["line_percent"],
             "line_tools": scopes["tools"]["line_percent"],
             "branch_reported": coverage["totals"]["branches_found"] > 0,
+            "branch_libraries": scopes["libraries"]["branch_percent"],
             "lines_to_combined_target": max(
                 0, round(THRESHOLDS["coverage_line_combined"] / 100 * coverage["totals"]["lines_found"]
                          - coverage["totals"]["lines_hit"])),
@@ -190,7 +191,8 @@ def render_dashboard(report: dict[str, Any]) -> str:
         ("G2", f"Tools >= {t['coverage_line_tools']}% line", f"{g2['line_tools']}%",
          status(g2["line_tools"] >= t["coverage_line_tools"])),
         ("G2", f"Libraries >= {t['coverage_branch_libraries']}% branch",
-         "branch counters not collected" if not g2["branch_reported"] else "reported", status(False)),
+         f"{g2['branch_libraries']}%" if g2["branch_reported"] else "branch counters not collected",
+         status(g2["branch_reported"] and g2["branch_libraries"] >= t["coverage_branch_libraries"])),
         ("G3", "Eligible APIs have an executable example", f"{g3['eligible_backed_percent']}% of "
          f"{g3['example_eligible']}; {g3['snippets']} snippets", status(g3["eligible_backed_percent"] == 100.0)),
         ("G3", "Exported API is registered", f"{g3['exported_not_registered']} exported classes unregistered",
