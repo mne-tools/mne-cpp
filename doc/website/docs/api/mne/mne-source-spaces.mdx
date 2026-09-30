@@ -40,6 +40,23 @@ Copy constructor.
 
 ---
 
+### operator=(other)
+
+Copy assignment.
+
+Every member has value semantics, so the compiler-generated member-wise assignment is correct. It is declared explicitly because declaring a copy constructor and/or a destructor deprecates the implicitly generated one.
+
+**Parameters:**
+
+- **other** : *const [MNESourceSpaces](/docs/api/mne/mne-source-spaces) &*
+  Object to assign from.
+
+**Returns:**
+
+- *[MNESourceSpaces](/docs/api/mne/mne-source-spaces) &* — reference to this object.
+
+---
+
 ### ~MNESourceSpaces()
 
 Destroys the [`MNE`](/docs/api/mne/mne-class) forward solution.

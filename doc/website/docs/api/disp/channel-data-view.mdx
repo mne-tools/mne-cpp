@@ -63,13 +63,13 @@ Initialise the view from a [FiffInfo](/docs/api/fiff/fiff-info) (channel names, 
 
 ---
 
-### setData(data, firstSample)
+### setData(matData, firstSample)
 
 Replace all buffered data.
 
 **Parameters:**
 
-- **data** : *const Eigen::MatrixXd &*
+- **data**
   Channels × samples matrix.
 
 - **firstSample** : *int*
@@ -77,13 +77,13 @@ Replace all buffered data.
 
 ---
 
-### addData(data)
+### addData(matData)
 
 Append new samples (real-time streaming use-case).
 
 **Parameters:**
 
-- **data** : *const Eigen::MatrixXd &*
+- **data**
   Channels × new-samples matrix.
 
 ---

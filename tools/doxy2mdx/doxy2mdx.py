@@ -64,6 +64,14 @@ _XREF_RE: Optional[re.Pattern] = None
 # Doxygen refid → short class name, populated from XML.
 _REFID_MAP: Dict[str, str] = {}
 
+# @snippet support (v2.4.0 T3.3).  Set by main(); listings whose ``filename``
+# attribute names a file under src/examples are named regions.
+_EXAMPLES_DIR: Optional[Path] = None
+_RENDERED_SNIPPETS: List[str] = []   # '<file>#<region>' rendered for the current page
+_SNIPPET_ERRORS: List[str] = []
+_MARKER_RE = re.compile(r"^\s*//!\s*\[([^\]]+)\]\s*$")
+GITHUB_TREE = "https://github.com/mne-tools/mne-cpp/tree/staging"
+
 # Namespaces we never document, even if they appear in the XML.
 _EXCLUDED_NAMESPACES = {
     "std", "Eigen", "boost", "qt", "Qt",
@@ -400,23 +408,61 @@ def render_table(table_el) -> str:
     return "\n" + "\n".join(lines) + "\n\n"
 
 
+def _codeline_text(codeline) -> str:
+    parts: List[str] = []
+    for hl in codeline:
+        t = hl.text or ""
+        for sub in hl:
+            if sub.tag == "sp":
+                t += " "
+            else:
+                t += sub.text or ""
+            if sub.tail:
+                t += sub.tail
+        parts.append(t)
+        if hl.tail:
+            parts.append(hl.tail)
+    return "".join(parts)
+
+
+def example_regions(source: Path) -> Dict[str, List[str]]:
+    """Balanced ``//! [name]`` regions of an example file: name -> lines between the markers."""
+    lines = source.read_text(encoding="utf-8").splitlines()
+    marks: Dict[str, List[int]] = defaultdict(list)
+    for index, line in enumerate(lines):
+        match = _MARKER_RE.match(line)
+        if match:
+            marks[match.group(1)].append(index)
+    return {name: lines[at[0] + 1:at[1]] for name, at in marks.items() if len(at) == 2}
+
+
+def render_snippet(filename: str, code: List[str]) -> str:
+    """Render an @snippet listing after checking it is exactly one named region of *filename*.
+
+    The rendered block is the source region with its common indentation
+    removed (``textwrap.dedent``); that is the only normalisation.
+    """
+    source = _EXAMPLES_DIR / filename if _EXAMPLES_DIR else None
+    if not code:
+        _SNIPPET_ERRORS.append(f"@snippet {filename}: empty listing (missing region or ambiguous file name)")
+        return ""
+    if source is None or not source.is_file():
+        _SNIPPET_ERRORS.append(f"@snippet {filename}: no such file under src/examples")
+        return ""
+    matches = [name for name, lines in example_regions(source).items() if lines == code]
+    if len(matches) != 1:
+        _SNIPPET_ERRORS.append(f"@snippet {filename}: listing matches {len(matches)} regions of the source, expected 1")
+        return ""
+    _RENDERED_SNIPPETS.append(f"{filename}#{matches[0]}")
+    body = textwrap.dedent("\n".join(code)).strip("\n")
+    return f'\n```cpp title="src/examples/{filename}"\n{body}\n```\n\n'
+
+
 def render_code_block(listing_el) -> str:
-    lines: List[str] = []
-    for codeline in listing_el.findall("codeline"):
-        parts: List[str] = []
-        for hl in codeline:
-            t = hl.text or ""
-            for sub in hl:
-                if sub.tag == "sp":
-                    t += " "
-                else:
-                    t += sub.text or ""
-                if sub.tail:
-                    t += sub.tail
-            parts.append(t)
-            if hl.tail:
-                parts.append(hl.tail)
-        lines.append("".join(parts))
+    lines = [_codeline_text(codeline) for codeline in listing_el.findall("codeline")]
+    filename = listing_el.get("filename")
+    if filename and not filename.startswith("."):
+        return render_snippet(filename, lines)
     return f"\n```cpp\n" + "\n".join(lines) + "\n```\n\n"
 
 
@@ -772,72 +818,54 @@ def _escape_mdx_bare_lt(content: str) -> str:
     return "".join(out)
 
 
+_DATASET_LABELS = {
+    "mne-cpp-test-data": "[mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)",
+    "MNE-sample-data": "[MNE sample data](https://mne.tools/stable/documentation/datasets.html#sample)",
+}
+
+
 def _render_example_section(reg_entry: dict,
                             repo_root: Path,
                             lines: List[str]) -> None:
-    """Append an ``## Example`` section sourced from
-    ``src/examples/<example>/main.cpp`` when the registry entry has a
-    non-null ``example`` field.  Always emits the section header so the
-    right-hand table of contents stays consistent across pages."""
+    """Append an ``## Example`` section linking the registry entry's example.
+
+    Code is never copied here: it appears only as verified @snippet regions
+    in the class description.
+    """
     example = reg_entry.get("example")
     if not example:
         return
     ex_dir = repo_root / "src" / "examples" / example
-    main_cpp = ex_dir / "main.cpp"
-    gh_url = (f"https://github.com/mne-tools/mne-cpp/tree/staging/"
-              f"src/examples/{example}")
     lines.append("## Example")
     lines.append("")
-    if not main_cpp.exists():
+    if not (ex_dir / "main.cpp").exists():
         lines.append(f":::warning[Example `{example}` not found]")
         lines.append(f"The registry references `src/examples/{example}/` but no")
         lines.append("`main.cpp` was found at that path.")
         lines.append(":::")
         lines.append("")
         return
-    try:
-        body = main_cpp.read_text(encoding="utf-8", errors="replace")
-    except OSError:
-        return
-    # Strip the SPDX/license header block (everything up to and
-    # including the first blank line after the leading comment block).
-    snippet = _strip_leading_comment(body)
-    lines.append(f"Source: [`src/examples/{example}/main.cpp`]({gh_url}/main.cpp)")
+    mode = reg_entry.get("example_mode", "compile")
+    lines.append(f"- Full source: [`src/examples/{example}/main.cpp`]"
+                 f"({GITHUB_TREE}/src/examples/{example}/main.cpp)")
+    lines.append(f"- Build target: `{example}`"
+                 + (" (runs under CTest)" if mode == "run" else " (compiled in CI)"))
+    data = [_DATASET_LABELS.get(item, f"`{item}`") for item in reg_entry.get("required_data", [])]
+    if data:
+        lines.append(f"- Data: {', '.join(data)}")
+    if reg_entry.get("guide"):
+        lines.append(f"- Guide: [{reg_entry['guide']}]({reg_entry['guide']})")
     lines.append("")
-    lines.append("```cpp")
-    lines.append(snippet.rstrip())
-    lines.append("```")
-    lines.append("")
+    for shot in reg_entry.get("screenshots", []):
+        lines.append(f"![{shot}](/img/manual/auto/{shot}.png)")
+        lines.append("")
 
 
-def _strip_leading_comment(src: str) -> str:
-    """Remove leading SPDX / license / banner comments from a C++ source
-    file so the inlined example focuses on the runnable code. Loops over
-    contiguous blank lines, ``//`` line comments and ``/* ... */`` block
-    comments at the very top of the file.
-
-    Stops when a non-empty, non-comment line is reached or when an
-    ``#include`` directive appears (whichever comes first).
-    """
-    lines = src.splitlines()
-    i, n = 0, len(lines)
-    while i < n:
-        stripped = lines[i].lstrip()
-        if not stripped:
-            i += 1
-            continue
-        if stripped.startswith("//"):
-            i += 1
-            continue
-        if stripped.startswith("/*"):
-            # Consume the whole block comment.
-            while i < n and "*/" not in lines[i]:
-                i += 1
-            i += 1  # past the closing */
-            continue
-        # First real code line.
-        break
-    return "\n".join(lines[i:])
+def _check_registered_snippets(name: str, reg_entry: dict) -> None:
+    """Every registry ``example_snippet`` must have been rendered on the page."""
+    for ref in reg_entry.get("example_snippet", []):
+        if ref not in _RENDERED_SNIPPETS:
+            _SNIPPET_ERRORS.append(f"{name}: registry snippet '{ref}' is not rendered from the Doxygen XML")
 
 
 def generate_class_mdx(compounddef,
@@ -846,9 +874,11 @@ def generate_class_mdx(compounddef,
                        reg_entry: dict,
                        repo_root: Path) -> Path:
     short_name = compound_name.split("::")[-1]
+    _RENDERED_SNIPPETS.clear()
     brief = text_of(compounddef.find("briefdescription")).strip()
     detail_el = compounddef.find("detaileddescription")
     body_text = extract_body_text(detail_el) if detail_el is not None else ""
+    _check_registered_snippets(compound_name, reg_entry)
 
     # Resolve source path for SPDX scraping.  Doxygen is configured
     # with ``INPUT = src/libraries`` (relative to ``doc/``), so the
@@ -1146,9 +1176,11 @@ def generate_module_mdx(xml_dir: Path,
     """Render a header-level MDX page for a free-function module."""
     short_name = reg_entry["name"]
     header_rel = reg_entry["header"]
+    _RENDERED_SNIPPETS.clear()
     brief = text_of(file_compounddef.find("briefdescription")).strip()
     detail_el = file_compounddef.find("detaileddescription")
     body_text = extract_body_text(detail_el) if detail_el is not None else ""
+    _check_registered_snippets(short_name, reg_entry)
 
     src_path = repo_root / "src" / "libraries" / header_rel
     authors = read_spdx_authors(src_path)
@@ -1971,9 +2003,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         format="%(levelname)s %(name)s: %(message)s",
     )
 
+    global _EXAMPLES_DIR
     _load_registry(args.registry)
     _build_xref_map(args.xml_dir)
     repo_root = (args.repo_root or args.registry.resolve().parent.parent).resolve()
+    _EXAMPLES_DIR = repo_root / "src" / "examples"
+    _SNIPPET_ERRORS.clear()
 
     if not args.xml_dir.exists():
         LOG.error("XML directory not found: %s", args.xml_dir)
@@ -2132,6 +2167,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         else:
             sidebar_out = args.out_dir.resolve().parent.parent / "sidebars.api.generated.ts"
         generate_sidebar_fragment(sidebar_out, args.out_dir, repo_root)
+
+    if _SNIPPET_ERRORS:
+        raise SystemExit(
+            f"ERROR: {len(_SNIPPET_ERRORS)} @snippet problem(s); example code "
+            "must render from a verified named region:\n  - "
+            + "\n  - ".join(_SNIPPET_ERRORS)
+        )
 
     if _FILES_WITHOUT_AUTHOR:
         raise SystemExit(

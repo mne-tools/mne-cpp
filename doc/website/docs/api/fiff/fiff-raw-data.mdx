@@ -1,6 +1,6 @@
 ---
 id: fiff-raw-data
-title: "FiffRawData"
+title: "FIFFLIB::FiffRawData"
 sidebar_label: FiffRawData
 sidebar_position: 2
 ---
@@ -16,7 +16,53 @@ sidebar_position: 2
 `#include <fiff/fiff_raw_data.h>`
 
 ```cpp
-class FiffRawData
+class FIFFLIB::FiffRawData
+```
+
+Continuous FIFF raw recording: [`FiffInfo`](/docs/api/fiff/fiff-info) plus a random-access directory of `FIFF_DATA_BUFFER` tags.
+
+The directory built into [`FiffRawDir`](/docs/api/fiff/fiff-raw-dir) lets segment reads jump straight to the buffers covering the requested sample window, decode them through the channel cals and active projectors and return a contiguous channel × sample Eigen matrix without rescanning the file.
+
+Open a recording and pick the MEG channels plus the trigger channel:
+
+```cpp title="src/examples/ex_read_raw/main.cpp"
+//
+//   Setup for reading the raw data
+//
+FiffRawData raw(t_fileRaw);
+
+//
+//   Set up pick list: MEG + STI 014 - bad channels
+//
+QStringList include;
+include << "STI 014";
+bool want_meg   = true;
+bool want_eeg   = false;
+bool want_stim  = false;
+
+RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+```
+
+Read a window of the picked channels, in seconds or in samples:
+
+```cpp title="src/examples/ex_read_raw/main.cpp"
+//
+//   Read a data segment
+//   times output argument is optional
+//
+bool readSuccessful = false;
+MatrixXd data;
+MatrixXd times;
+if (in_samples)
+    readSuccessful = raw.read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
+else
+    readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
+
+if (!readSuccessful)
+{
+    qWarning("Could not read raw segment.\n");
+    return -1;
+}
 ```
 
 ---
@@ -37,6 +83,23 @@ Copy constructor.
 
 - **p_FiffRawData** : *const FiffRawData &*
   FIFF raw measurement which should be copied.
+
+---
+
+### operator=(other)
+
+Copy assignment.
+
+Every member has value semantics, so the compiler-generated member-wise assignment is correct. It is declared explicitly because declaring a copy constructor and/or a destructor deprecates the implicitly generated one.
+
+**Parameters:**
+
+- **other** : *const [FiffRawData](/docs/api/fiff/fiff-raw-data) &*
+  Object to assign from.
+
+**Returns:**
+
+- *[FiffRawData](/docs/api/fiff/fiff-raw-data) &* — reference to this object.
 
 ---
 
@@ -67,7 +130,7 @@ Constructs fiff raw data, by reading from a IO device with specified endianness.
 
 ### ~FiffRawData()
 
-Destroys the [FiffInfo](/docs/api/fiff/fiff-info).
+Destroys the [`FiffInfo`](/docs/api/fiff/fiff-info).
 
 ---
 
@@ -202,189 +265,9 @@ Ported from save.c (MNE-C).
 
 ## Example
 
-Source: [`src/examples/ex_read_raw/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_read_raw/main.cpp)
-
-```cpp
-#include <iostream>
-#include <vector>
-#include <math.h>
-
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <utils/generics/mne_logger.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtCore/QCoreApplication>
-#include <QCommandLineParser>
-#include <QFile>
-
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace UTILSLIB;
-using namespace Eigen;
-
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
-
-//=============================================================================================================
-
-/**
- * The function main marks the entry point of the program.
- * By default, main has the storage class extern.
- *
- * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
- * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
- * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
- */
-int main(int argc, char *argv[])
-{
-    qInstallMessageHandler(MNELogger::customLogWriter);
-    QCoreApplication app(argc, argv);
-
-    // Command Line Parser
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Read Raw Example");
-    parser.addHelpOption();
-
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QCommandLineOption fromOption("from", "Read data from <from> (in seconds).", "from", "42.956");
-    QCommandLineOption toOption("to", "Read data from <to> (in seconds).", "to", "320.670");
-    QCommandLineOption inSamplesOption("inSamples", "Timing is set in samples.", "inSamples", "false");
-    QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
-
-    parser.addOption(inputOption);
-    parser.addOption(fromOption);
-    parser.addOption(toOption);
-    parser.addOption(inSamplesOption);
-    parser.addOption(keepCompOption);
-
-    parser.process(app);
-
-    QFile t_fileRaw(parser.value(inputOption));
-
-    float from = parser.value(fromOption).toFloat();
-    float to = parser.value(toOption).toFloat();
-
-    bool in_samples = false;
-    if(parser.value(inSamplesOption) == "false" || parser.value(inSamplesOption) == "0") {
-        in_samples = false;
-    } else if(parser.value(inSamplesOption) == "true" || parser.value(inSamplesOption) == "1") {
-        in_samples = true;
-    }
-
-    bool keep_comp = false;
-    if(parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
-        keep_comp = false;
-    } else if(parser.value(keepCompOption) == "true" || parser.value(keepCompOption) == "1") {
-        keep_comp = true;
-    }
-
-    //
-    //   Setup for reading the raw data
-    //
-    FiffRawData raw(t_fileRaw);
-
-    //
-    //   Set up pick list: MEG + STI 014 - bad channels
-    //
-    //
-    QStringList include;
-    include << "STI 014";
-    bool want_meg   = true;
-    bool want_eeg   = false;
-    bool want_stim  = false;
-
-    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
-
-    //
-    //   Set up projection
-    //
-    qint32 k = 0;
-    if (raw.info.projs.size() == 0)
-        qInfo("No projector specified for these data\n");
-    else
-    {
-        //
-        //   Activate the projection items
-        //
-        for (k = 0; k < raw.info.projs.size(); ++k)
-            raw.info.projs[k].active = true;
-
-        qInfo("%lld projection items activated\n",
-              static_cast<long long>(raw.info.projs.size()));
-        //
-        //   Create the projector
-        //
-        fiff_int_t nproj = raw.info.make_projector(raw.proj);
-
-        if (nproj == 0)
-            qWarning("The projection vectors do not apply to these channels\n");
-        else
-            qInfo("Created an SSP operator (subspace dimension = %d)\n",nproj);
-    }
-
-    //
-    //   Set up the CTF compensator
-    //
-    qint32 current_comp = raw.info.get_current_comp();
-    qint32 dest_comp = 0;
-
-    if (current_comp > 0)
-        qInfo("Current compensation grade : %d\n",current_comp);
-
-    if (keep_comp)
-        dest_comp = current_comp;
-
-    if (current_comp != dest_comp)
-    {
-        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
-        {
-            raw.info.set_current_comp(dest_comp);
-            qInfo("Appropriate compensator added to change to grade %d.\n",dest_comp);
-        }
-        else
-        {
-            qWarning("Could not make the compensator\n");
-            return -1;
-        }
-    }
-    //
-    //   Read a data segment
-    //   times output argument is optional
-    //
-    bool readSuccessful = false;
-    MatrixXd data;
-    MatrixXd times;
-    if (in_samples)
-        readSuccessful = raw.read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
-    else
-        readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
-
-    if (!readSuccessful)
-    {
-        qWarning("Could not read raw segment.\n");
-        return -1;
-    }
-
-    qInfo("Read %d samples.\n",(qint32)data.cols());
-
-    std::cout << data.block(0,0,10,10) << std::endl;
-
-    return app.exec();
-}
-
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================
-```
+- Full source: [`src/examples/ex_read_raw/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_read_raw/main.cpp)
+- Build target: `ex_read_raw` (compiled in CI)
+- Data: [MNE sample data](https://mne.tools/stable/documentation/datasets.html#sample)
 
 ## Authors of this file
 

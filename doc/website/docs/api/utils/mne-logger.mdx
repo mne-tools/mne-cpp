@@ -40,6 +40,29 @@ Customized logWriter to colorize type of the message in the terminal.
 
 ---
 
+### setLogFile(sFilePath)
+
+Additionally writes every message to a log file.
+
+Console output is unaffected. The file is opened in append mode and each line is prefixed with a timestamp and the message level, without the terminal colour codes. Passing an empty path stops file logging.
+
+**Parameters:**
+
+- **sFilePath** : *const QString &*
+  Path of the log file, or an empty string to disable.
+
+**Returns:**
+
+- *bool* — True if the file could be opened for writing.
+
+---
+
+### logFile()
+
+Returns the path of the current log file, empty if file logging is off.
+
+---
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

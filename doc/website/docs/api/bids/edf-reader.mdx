@@ -1,6 +1,6 @@
 ---
 id: edf-reader
-title: "BIDSLIB::EDFReader"
+title: "EDFReader"
 sidebar_label: EDFReader
 sidebar_position: 6
 ---
@@ -12,10 +12,10 @@ sidebar_position: 6
 `#include <bids/bids_edf_reader.h>`
 
 ```cpp
-class BIDSLIB::EDFReader
+class EDFReader
 ```
 
-The [`EDFReader`](/docs/api/bids/edf-reader) reads European Data Format (EDF/EDF+) files and exposes them through the [`AbstractFormatReader`](/docs/api/bids/abstract-format-reader) interface.
+The [`EDFReader`](/docs/api/bids/edf-reader) reads European Data Format (EDF/EDF+) files and exposes them through the [AbstractFormatReader](/docs/api/bids/abstract-format-reader) interface.
 
 The EDF specification stores data as 16-bit little-endian integers in fixed-duration "data records", with channels interleaved within each record.
 
@@ -48,97 +48,37 @@ classDiagram
 
 ### open(sFilePath)
 
-Open and parse the file header.
-
-Must be called before reading data.
-
-**Parameters:**
-
-- **sFilePath** : *const QString &*
-  Absolute path to the primary data file.
-
-**Returns:**
-
-- *bool* — True if the file was opened and parsed successfully.
-
 ---
 
 ### getInfo()
-
-Return measurement metadata as [FiffInfo](/docs/api/fiff/fiff-info).
-
-**Returns:**
-
-- *[FiffInfo](/docs/api/fiff/fiff-info)* — FiffInfo populated from the native format header.
 
 ---
 
 ### readRawSegment(iStartSampleIdx, iEndSampleIdx)
 
-Read a segment of raw data.
-
-**Parameters:**
-
-- **iStartSampleIdx** : *int*
-  First sample index (0-based, inclusive).
-
-- **iEndSampleIdx** : *int*
-  Last sample index (0-based, exclusive).
-
-**Returns:**
-
-- *Eigen::MatrixXf* — Matrix of shape (n_channels x n_samples) with calibrated physical values.
-
 ---
 
 ### getSampleCount()
-
-Return total number of samples across the recording.
 
 ---
 
 ### getFrequency()
 
-Return the sampling frequency in Hz.
-
 ---
 
 ### getChannelCount()
-
-Return the number of measurement channels.
 
 ---
 
 ### toFiffRawData()
 
-Convert the entire dataset to a [FiffRawData](/docs/api/fiff/fiff-raw-data) structure.
-
-**Returns:**
-
-- *FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data)* — FiffRawData populated with info, calibrations, and sample bounds.
-
 ---
 
 ### formatName()
 
-Return a descriptive name for the format (e.g.
-
-"EDF", "BrainVision").
-
 ---
 
 ### supportsExtension(sExtension)
-
-Check whether this reader can handle the given file extension.
-
-**Parameters:**
-
-- **sExtension** : *const QString &*
-  File extension including dot (e.g. ".edf", ".vhdr").
-
-**Returns:**
-
-- *bool* — True if this reader supports the extension.
 
 ---
 

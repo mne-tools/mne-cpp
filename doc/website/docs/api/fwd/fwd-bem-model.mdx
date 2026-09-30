@@ -68,7 +68,7 @@ Find a surface of the given kind in this BEM model.
 
 ---
 
-### fwd_bem_load_solution(name, bem_method)
+### fwd_bem_load_solution(name, bemMethod)
 
 Load a pre-computed BEM solution from a FIFF file.
 
@@ -79,7 +79,7 @@ Reads the solution matrix from disk and stores it in this model. The solution mu
 - **name** : *const QString &*
   Path to the solution FIFF file.
 
-- **bem_method** : *int*
+- **bemMethod** : *int*
   Required BEM method (FWD_BEM_CONSTANT_COLL or FWD_BEM_LINEAR_COLL).
 
 **Returns:**
@@ -123,13 +123,13 @@ Compute the constant-collocation BEM solution for this model.
 
 ---
 
-### fwd_bem_compute_solution(bem_method)
+### fwd_bem_compute_solution(bemMethod)
 
 Compute the BEM solution matrix using the specified method.
 
 **Parameters:**
 
-- **bem_method** : *int*
+- **bemMethod** : *int*
   BEM method (FWD_BEM_CONSTANT_COLL or FWD_BEM_LINEAR_COLL).
 
 **Returns:**
@@ -138,7 +138,7 @@ Compute the BEM solution matrix using the specified method.
 
 ---
 
-### fwd_bem_load_recompute_solution(name, bem_method, force_recompute)
+### fwd_bem_load_recompute_solution(name, bemMethod, force_recompute)
 
 Load a BEM solution from file, recomputing if necessary.
 
@@ -149,7 +149,7 @@ Attempts to read the pre-computed solution; if it is missing or force_recompute 
 - **name** : *const QString &*
   Path to the BEM model file.
 
-- **bem_method** : *int*
+- **bemMethod** : *int*
   Required BEM method.
 
 - **force_recompute** : *int*

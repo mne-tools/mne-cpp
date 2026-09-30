@@ -204,7 +204,7 @@ Project a point onto the nearest triangle of the surface.
 
 ---
 
-### find_closest_on_surface_approx(r, np, nearest_tri, dist, nstep)
+### find_closest_on_surface_approx(r, np, nearest_tri, distances, nstep)
 
 For each point, find the closest point on the surface using neighborhood-restricted search.
 
@@ -219,7 +219,7 @@ For each point, find the closest point on the surface using neighborhood-restric
 - **nearest_tri** : *Eigen::VectorXi &*
   Best triangle index for each point.
 
-- **dist** : *Eigen::VectorXf &*
+- **dist**
   Distance to the surface for each point.
 
 - **nstep** : *int*

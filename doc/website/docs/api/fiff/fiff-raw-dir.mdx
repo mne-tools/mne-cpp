@@ -40,6 +40,23 @@ Copy constructor.
 
 ---
 
+### operator=(other)
+
+Copy assignment.
+
+Every member has value semantics, so the compiler-generated member-wise assignment is correct. It is declared explicitly because declaring a copy constructor and/or a destructor deprecates the implicitly generated one.
+
+**Parameters:**
+
+- **other** : *const [FiffRawDir](/docs/api/fiff/fiff-raw-dir) &*
+  Object to assign from.
+
+**Returns:**
+
+- *[FiffRawDir](/docs/api/fiff/fiff-raw-dir) &* — reference to this object.
+
+---
+
 ### ~FiffRawDir()
 
 Destroys the raw Directory entry.

@@ -97,6 +97,72 @@ Monotonic counter, incremented on every `setFrame()` call.
 
 ---
 
+### upHint()
+
+Hint direction used as the quad's "up" axis.
+
+When set (non-zero), the quad's long edge is perpendicular to this direction instead of using the default world-up billboard.
+
+---
+
+### setUpHint(dir)
+
+---
+
+### isDepthEnabled()
+
+**Returns:**
+
+- *bool* — Whether depth-based parallax relief is enabled.
+
+---
+
+### setDepthEnabled(enabled)
+
+---
+
+### setDepthFrame(image)
+
+Push a new monocular depth map (single-channel or RGBA grayscale).
+
+---
+
+### depthFrame()
+
+---
+
+### hasDepthFrame()
+
+---
+
+### depthFrameGeneration()
+
+---
+
+### depthScale()
+
+**Returns:**
+
+- *float* — POM displacement scale in UV space [0..1].
+
+---
+
+### setDepthScale(scale)
+
+---
+
+### depthSteps()
+
+**Returns:**
+
+- *int* — Number of POM ray-march steps (quality vs. performance).
+
+---
+
+### setDepthSteps(steps)
+
+---
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

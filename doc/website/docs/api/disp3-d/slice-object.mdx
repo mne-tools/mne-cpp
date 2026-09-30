@@ -47,6 +47,26 @@ Set the slice image data and orientation.
 
 ---
 
+### setSliceToWorld(image, orientation, sliceIndex, imageToWorld)
+
+Set the slice image data with an explicit image-to-world transform.
+
+**Parameters:**
+
+- **image** : *const QImage &*
+  Greyscale slice image (QImage::Format_Grayscale8 or 16).
+
+- **orientation** : *SliceOrientation*
+  Anatomical orientation of the slice.
+
+- **sliceIndex** : *int*
+  Index along the perpendicular voxel axis.
+
+- **imageToWorld** : *const Eigen::Matrix4d &*
+  4x4 transform from image coordinates (column, row, 0) to RAS.
+
+---
+
 ### orientation()
 
 **Returns:**

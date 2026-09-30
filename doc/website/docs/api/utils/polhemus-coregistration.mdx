@@ -53,11 +53,19 @@ classDiagram
 
 ---
 
+### setProbeStation(station)
+
+---
+
 ### trackerStation()
 
 ---
 
 ### penStation()
+
+---
+
+### probeStation()
 
 ---
 
@@ -159,6 +167,38 @@ Discard all calibration samples and reset the optical calibration.
 
 ---
 
+### captureObjectiveCenter()
+
+Capture the current pen position as the objective lens center.
+
+Touch the pen stylus to the center of the OPMI objective lens while the tracker is live. The point is stored in the tracker's local frame and used by the solver as a direct measurement of the optical center, replacing the sphere-distance constraint.
+
+**Returns:**
+
+- *bool* — `true` on success, `false` if pen or tracker data unavailable.
+
+---
+
+### hasObjectiveCenter()
+
+**Returns:**
+
+- *bool* — Whether an objective center has been captured.
+
+---
+
+### clearObjectiveCenter()
+
+Clear the captured objective center.
+
+---
+
+### objectiveCenterLocal()
+
+Captured objective center in tracker body frame (metres).
+
+---
+
 ### solveOpticalCalibration()
 
 Fit a 3D line through the focus points in tracker-local frame.
@@ -168,6 +208,18 @@ Requires at least 2 samples. Computes the optical axis direction and the optical
 **Returns:**
 
 - *bool* — `true` on success; `false` if insufficient or degenerate data.
+
+---
+
+### setKnownTrackerToObjectiveDistance(metres)
+
+Set the known perpendicular distance from tracker sensor to the objective center (metres).
+
+When nonzero, the solver constrains the optical center to lie at this distance from the tracker origin, vastly improving accuracy. Default: 0.200 m (~200 mm for ZEISS Kinevo). Set to 0 to disable.
+
+---
+
+### knownTrackerToObjectiveDistance()
 
 ---
 
@@ -203,6 +255,50 @@ Depth spread of calibration samples along the optical axis (mm).
 
 ---
 
+### applyOpticalAxisFineAdjust(targetWorldPos, correctionDeg)
+
+Fine-adjust the optical axis so it passes through a known world-frame point (e.g.
+
+the probe tip touched with the stylus).
+
+The correction rotates `m_opticalAxisLocal` in the tracker body frame so that a ray from the optical center would pass through *targetWorldPos* at the current tracker pose.
+
+**Parameters:**
+
+- **targetWorldPos** : *const QVector3D &*
+  Desired focus point in Polhemus world frame.
+
+- **correctionDeg** : *float &*
+  Angle of the applied correction (degrees).
+
+**Returns:**
+
+- *bool* — `true` on success; `false` if calibration or tracker data is unavailable, or the correction would exceed 10°.
+
+---
+
+### opticalFineAdjustApplied()
+
+**Returns:**
+
+- *bool* — Whether a fine adjustment has been applied.
+
+---
+
+### opticalFineAdjustDeg()
+
+**Returns:**
+
+- *float* — The angle of the last fine adjustment (degrees).
+
+---
+
+### clearOpticalFineAdjust()
+
+Undo the last fine adjustment, restoring the original solved axis.
+
+---
+
 ### opticalRayInWorld(origin, direction)
 
 Compute the current optical axis ray in Polhemus world frame.
@@ -214,6 +310,23 @@ Compute the current optical axis ray in Polhemus world frame.
 
 - **direction** : *QVector3D &*
   Ray direction (optical axis in world frame, unit vector).
+
+**Returns:**
+
+- *bool* — `true` if tracker data and calibration are available.
+
+---
+
+### opticalUpInWorld(up)
+
+Returns the "up" direction of the optical path in world coordinates.
+
+This is the tracker's local Y axis rotated into the world frame, orthogonalised against the optical axis so it can be used directly as an orientation hint for projected overlays.
+
+**Parameters:**
+
+- **up** : *QVector3D &*
+  Unit vector pointing "up" in the microscope view.
 
 **Returns:**
 
@@ -303,6 +416,14 @@ Call this when the user clears all fiducials.
 
 ---
 
+### saveSessionState(settings, prefix)
+
+---
+
+### restoreSessionState(settings, prefix)
+
+---
+
 ### registrationValid()
 
 ---
@@ -332,6 +453,18 @@ Call this when the user clears all fiducials.
 ---
 
 ### haveLivePenPosition()
+
+---
+
+### probePosition()
+
+---
+
+### probeOrientation()
+
+---
+
+### haveLiveProbePosition()
 
 ---
 

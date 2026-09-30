@@ -103,7 +103,7 @@ Read the epochs from a raw file based on provided events.
 
 **Parameters:**
 
-- **raw** : *const FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
+- **raw** : *const [FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data.
 
 - **events** : *const Eigen::MatrixXi &*
@@ -158,11 +158,11 @@ Checks the givven matrix for artifacts beyond a threshold value.
 
 averageCategories
 
-Multi-category offline averaging. Reads epochs from raw data for multiple event types and returns an `FiffEvokedSet` with one [FiffEvoked](/docs/api/fiff/fiff-evoked) per category. Ported from average.c (MNE-C).
+Multi-category offline averaging. Reads epochs from raw data for multiple event types and returns an FiffEvokedSet with one [FiffEvoked](/docs/api/fiff/fiff-evoked) per category. Ported from average.c (MNE-C).
 
 **Parameters:**
 
-- **raw** : *const FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
+- **raw** : *const [FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data.
 
 - **events** : *const Eigen::MatrixXi &*
@@ -191,7 +191,7 @@ Multi-category offline averaging. Reads epochs from raw data for multiple event 
 
 **Returns:**
 
-- *FIFFLIB::FiffEvokedSet* — `FiffEvokedSet` containing one FiffEvoked per category.
+- *FIFFLIB::FiffEvokedSet* — FiffEvokedSet containing one FiffEvoked per category.
 
 ---
 
@@ -201,7 +201,7 @@ Convenience function: reads epochs, optionally applies baseline correction and a
 
 **Parameters:**
 
-- **raw** : *const FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
+- **raw** : *const [FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   The raw data.
 
 - **matEvents** : *const Eigen::MatrixXi &*

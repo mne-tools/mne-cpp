@@ -50,6 +50,23 @@ Copy constructor.
 
 ---
 
+### operator=(other)
+
+Copy assignment.
+
+Every member has value semantics, so the compiler-generated member-wise assignment is correct. It is declared explicitly because declaring a copy constructor and/or a destructor deprecates the implicitly generated one.
+
+**Parameters:**
+
+- **other** : *const [MNEBemSurface](/docs/api/mne/mne-bem-surface) &*
+  Object to assign from.
+
+**Returns:**
+
+- *[MNEBemSurface](/docs/api/mne/mne-bem-surface) &* — reference to this object.
+
+---
+
 ### ~MNEBemSurface()
 
 Destroys the BEM surface.

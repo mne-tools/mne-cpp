@@ -116,6 +116,23 @@ Writes a stc file
 
 ---
 
+### writeHemispherePair(sBasePath)
+
+Write the estimate as an MNE-C / MNE-Python compatible hemisphere pair.
+
+MNE-Python expects a surface source estimate to be stored as two files, "&lt;base&gt;-lh.stc" and "&lt;base&gt;-rh.stc", each containing only the vertices of its own hemisphere. This writes exactly that, splitting at `nVerticesLh`.
+
+**Parameters:**
+
+- **sBasePath** : *const QString &*
+  Path without the "-lh.stc"/"-rh.stc" suffix. A trailing "-lh.stc", "-rh.stc" or ".stc" is stripped if present.
+
+**Returns:**
+
+- *bool* — true when both files were written, false otherwise. Fails when nVerticesLh is unknown (-1) or out of range, since the split point cannot then be determined.
+
+---
+
 ### write_w(path)
 
 Write the first time point of this source estimate to a .w file.

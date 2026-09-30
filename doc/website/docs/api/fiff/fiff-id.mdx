@@ -40,6 +40,23 @@ Copy constructor.
 
 ---
 
+### operator=(other)
+
+Copy assignment.
+
+Every member has value semantics, so the compiler-generated member-wise assignment is correct. It is declared explicitly because declaring a copy constructor and/or a destructor deprecates the implicitly generated one.
+
+**Parameters:**
+
+- **other** : *const [FiffId](/docs/api/fiff/fiff-id) &*
+  Object to assign from.
+
+**Returns:**
+
+- *[FiffId](/docs/api/fiff/fiff-id) &* — reference to this object.
+
+---
+
 ### ~FiffId()
 
 Destroys the universially unique identifier.
@@ -129,11 +146,11 @@ Returns a default [`FiffId`](/docs/api/fiff/fiff-id) object to be used as a muta
 
 ### storageSize()
 
-Size of the old struct (fiffIdRec) 5*int = 5*4 = 20.
+Size of the old struct (`fiffIdRec`) 5*int = 5*4 = 20.
 
 **Returns:**
 
-- *qint32* — the size of the old struct fiffIdRec.
+- *qint32* — the size of the old struct `fiffIdRec`.
 
 ---
 

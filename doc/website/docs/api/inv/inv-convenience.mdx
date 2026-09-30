@@ -73,7 +73,7 @@ For each epoch (data matrix), applies the minimum norm inverse and returns a lis
 ### applyInverseRaw(raw, inverse, lambda2, method, from, to, pickNormal)
 
 ```cpp
-[InvSourceEstimate](/docs/api/inv/inv-source-estimate) applyInverseRaw(const FIFFLIB::FiffRawData & raw, const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) & inverse, float lambda2, const QString & method, int from, int to, bool pickNormal);
+[InvSourceEstimate](/docs/api/inv/inv-source-estimate) applyInverseRaw(const [FiffRawData](/docs/api/fiff/fiff-raw-data) & raw, const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) & inverse, float lambda2, const QString & method, int from, int to, bool pickNormal);
 ```
 
 Apply inverse operator to raw data in blocks.
@@ -82,7 +82,7 @@ Reads and processes the raw data in chunks, applying the inverse operator to pro
 
 **Parameters:**
 
-- **raw** : *const FIFFLIB::[FiffRawData](/docs/api/fiff/fiff-raw-data) &*
+- **raw** : *const [FiffRawData](/docs/api/fiff/fiff-raw-data) &*
   Raw data object.
 
 - **inverse** : *const [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) &*

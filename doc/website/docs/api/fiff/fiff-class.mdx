@@ -17,7 +17,7 @@ class FIFFLIB::Fiff
 
 MATLAB-style static facade re-exporting every public `FIFFLIB` reader/writer for parity with the mne-matlab toolbox.
 
-Only wrappers — no state. Each method forwards to the matching method on [`FiffStream`](/docs/api/fiff/fiff-stream) / [FiffRawData](/docs/api/fiff/fiff-raw-data) / [`FiffEvoked`](/docs/api/fiff/fiff-evoked) / `FiffEvokedSet` / [`FiffCov`](/docs/api/fiff/fiff-cov) / [`FiffInfo`](/docs/api/fiff/fiff-info). Prefer the underlying classes for new code; this class exists so Matlab-style ports compile unchanged.
+Only wrappers — no state. Each method forwards to the matching method on [`FiffStream`](/docs/api/fiff/fiff-stream) / [`FiffRawData`](/docs/api/fiff/fiff-raw-data) / [`FiffEvoked`](/docs/api/fiff/fiff-evoked) / `FiffEvokedSet` / [`FiffCov`](/docs/api/fiff/fiff-cov) / [`FiffInfo`](/docs/api/fiff/fiff-info). Prefer the underlying classes for new code; this class exists so Matlab-style ports compile unchanged.
 
 ---
 
@@ -476,7 +476,7 @@ Wrapper for the [`FiffStream`](/docs/api/fiff/fiff-stream) read_proj member func
 
 fiff_read_raw_segment
 
-Wrapper for the [FiffRawData](/docs/api/fiff/fiff-raw-data) read_raw_segment member function
+Wrapper for the [`FiffRawData`](/docs/api/fiff/fiff-raw-data) read_raw_segment member function
 
 Read a specific raw data segment
 
@@ -510,7 +510,7 @@ Read a specific raw data segment
 
 fiff_read_raw_segment
 
-Wrapper for the [FiffRawData](/docs/api/fiff/fiff-raw-data) read_raw_segment member function
+Wrapper for the [`FiffRawData`](/docs/api/fiff/fiff-raw-data) read_raw_segment member function
 
 Read a specific raw data segment
 

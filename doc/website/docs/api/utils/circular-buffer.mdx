@@ -12,7 +12,7 @@ sidebar_position: 7
 `#include <utils/circularbuffer.h>`
 
 ```cpp
-template <typename _Tp>
+template <typename T>
 class UTILSLIB::CircularBuffer
 ```
 
@@ -47,7 +47,7 @@ Adds a whole array at the end buffer.
 
 **Parameters:**
 
-- **pArray** : *const _Tp **
+- **pArray** : *const T **
   pointer to an Array which should be apend to the end.
 
 - **size** : *unsigned int*
@@ -61,7 +61,7 @@ Adds an element at the end of the buffer.
 
 **Parameters:**
 
-- **newElement** : *const _Tp &*
+- **newElement** : *const T &*
   pointer to an Array which should be apend to the end.
 
 ---

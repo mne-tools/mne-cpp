@@ -65,7 +65,7 @@ fwd_multi_spherepot.c Get the model depended weighting factor for n
 
 ---
 
-### fwd_setup_eeg_sphere_model(rad, fit_berg_scherg, nfit)
+### fwd_setup_eeg_sphere_model(rad, fit_berg_scherg, nFit)
 
 fwd_eeg_sphere_models.c
 
@@ -86,7 +86,7 @@ Setup the EEG sphere model calculations
 
 ---
 
-### fwd_eeg_fit_berg_scherg(nterms, nfit, rv)
+### fwd_eeg_fit_berg_scherg(nTerms, nFit, rv)
 
 Fit Berg-Scherg equivalent spherical model parameters (mu and lambda) by minimizing the difference between actual and approximated series expansions using simplex optimization.
 
@@ -94,10 +94,10 @@ On success, updates the internal mu and lambda member vectors.
 
 **Parameters:**
 
-- **nterms** : *int*
+- **nterms**
   Number of terms in the series expansion.
 
-- **nfit** : *int*
+- **nfit**
   Number of equivalent dipoles to fit (must be &gt;= 2).
 
 - **rv** : *float &*

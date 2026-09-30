@@ -114,7 +114,19 @@ Following FreeSurfer convention: M = Mdc * diag(xsize, ysize, zsize) P0 = c_ras 
 
 **Returns:**
 
-- *Eigen::Matrix4f* — The 4×4 voxel-to-surface-RAS transform in meters.
+- *Eigen::Matrix4f* — The 4×4 voxel-to-scanner-RAS transform in meters.
+
+---
+
+### computeVox2RasTkr()
+
+Builds the voxel-to-surface-RAS (tkRAS / tkregister) 4×4 transform.
+
+Identical to `computeVox2Ras()` but forces c_ras = (0,0,0), producing the coordinate system used by FreeSurfer surfaces (lh.white, etc.).
+
+**Returns:**
+
+- *Eigen::Matrix4f* — The 4×4 voxel-to-tkRAS transform in meters.
 
 ---
 

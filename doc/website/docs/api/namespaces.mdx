@@ -11,14 +11,14 @@ All public namespaces in the MNE-CPP library tree.
 
 | Namespace | Classes | Description |
 |-----------|---------|-------------|
-| [`BIDSLIB`](/docs/api/bids/) | 14 | BIDS dataset reading, writing, path construction, and sidecar metadata handling for iEEG/EEG/MEG. |
+| [`BIDSLIB`](/docs/api/bids/) | 12 | BIDS dataset reading, writing, path construction, and sidecar metadata handling for iEEG/EEG/MEG. |
 | `COMLIB` | 8 | Real-time client/server communication primitives for talking to `mne_rt_server`. |
 | [`CONNECTIVITYLIB`](/docs/api/connectivity/) | 21 | Functional connectivity metrics (coherence, PLV, cross-correlation, etc.). |
 | [`DECODINGLIB`](/docs/api/decoding/) | 5 | Supervised and unsupervised spatial-filter decompositions for M/EEG decoding. |
 | [`DISP3DLIB`](/docs/api/disp3-d/) | 14 | 3-D brain visualisation using the Qt RHI rendering backend. |
 | [`DISPLIB`](/docs/api/disp/) | 69 | 2-D display widgets and visualisation helpers (charts, topography, colour maps). |
 | `DSPLIB` | 0 | Digital signal processing (filtering, spectrograms, real-time averaging, HPI, noise reduction). |
-| [`FIFFLIB`](/docs/api/fiff/) | 29 | FIFF file I/O, in-memory data structures and high-level readers/writers. |
+| [`FIFFLIB`](/docs/api/fiff/) | 37 | FIFF file I/O, in-memory data structures and high-level readers/writers. |
 | [`FSLIB`](/docs/api/fs/) | 8 | FreeSurfer surface, annotation and parcellation I/O for mne-cpp. |
 | [`FWDLIB`](/docs/api/fwd/) | 14 | Forward modelling — BEM solver, spherical models, sensor/coil definitions and the lead-field assembly that links current dipoles to MEG/EEG sensor readings. |
 | `INVLIB` | 54 | Inverse source estimation (MNE, dSPM, sLORETA, dipole fitting). |
@@ -26,7 +26,7 @@ All public namespaces in the MNE-CPP library tree.
 | [`MATHLIB`](/docs/api/math/) | 0 | Mathematical algorithms and geometry (linear algebra, optimization, spectral estimation). |
 | [`MLLIB`](/docs/api/ml/) | 4 | Tensors, model abstraction, ONNX Runtime inference and Python training drivers used across mne-cpp. |
 | [`MNALIB`](/docs/api/mna/) | 22 | MNE Analysis Container Format (mna/mnx). |
-| [`MNELIB`](/docs/api/mne/) | 65 | Core [`MNE`](/docs/api/mne/mne-class) data structures (source spaces, source estimates, hemispheres). |
+| [`MNELIB`](/docs/api/mne/) | 68 | Core [`MNE`](/docs/api/mne/mne-class) data structures (source spaces, source estimates, hemispheres). |
 | [`MRILIB`](/docs/api/mri/) | 8 | Volume I/O, voxel geometry and slice resampling for structural MRI data inside mne-cpp. |
 | [`RTPROCESSINGLIB`](/docs/api/dsp/) | 15 |  |
 | `STSLIB` | 10 | Statistical testing (t-tests, F-tests, cluster permutation, multiple comparison correction). |
@@ -50,8 +50,6 @@ All public namespaces in the MNE-CPP library tree.
 - `BrainVisionChannelInfo`
 - `BrainVisionMarker`
 - [BrainVisionReader](/docs/api/bids/brain-vision-reader)
-- `EDFChannelInfo`
-- [EDFReader](/docs/api/bids/edf-reader)
 
 ### COMLIB
 
@@ -187,6 +185,8 @@ All public namespaces in the MNE-CPP library tree.
 
 ### FIFFLIB
 
+- `AverageCategory`
+- `AverageDescription`
 - [Fiff](/docs/api/fiff/fiff-class)
 - `FiffAnnotation`
 - [FiffAnnotations](/docs/api/fiff/fiff-annotations)
@@ -202,20 +202,26 @@ All public namespaces in the MNE-CPP library tree.
 - [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data)
 - [FiffDirEntry](/docs/api/fiff/fiff-dir-entry)
 - [FiffDirNode](/docs/api/fiff/fiff-dir-node)
+- `FiffEpochData`
+- [FiffEpochs](/docs/api/fiff/fiff-epochs)
 - [FiffEvents](/docs/api/fiff/fiff-events)
 - [FiffEvoked](/docs/api/fiff/fiff-evoked)
+- `FiffEvokedSet`
 - `FiffExplainEntry`
 - [FiffFileSharer](/docs/api/fiff/fiff-file-sharer)
+- `FiffIO`
 - [FiffId](/docs/api/fiff/fiff-id)
 - [FiffInfo](/docs/api/fiff/fiff-info)
 - [FiffInfoBase](/docs/api/fiff/fiff-info-base)
 - [FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix)
 - [FiffProj](/docs/api/fiff/fiff-proj)
+- [FiffRawData](/docs/api/fiff/fiff-raw-data)
 - [FiffRawDir](/docs/api/fiff/fiff-raw-dir)
 - [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix)
 - [FiffStream](/docs/api/fiff/fiff-stream)
 - [FiffTag](/docs/api/fiff/fiff-tag)
 - [FiffTime](/docs/api/fiff/fiff-time)
+- `RejectionParams`
 
 ### FSLIB
 
@@ -343,6 +349,8 @@ All public namespaces in the MNE-CPP library tree.
 ### MNELIB
 
 - `ArtifactRejectionData`
+- `AverageCategory`
+- `AverageDescription`
 - `CovDefinition`
 - `CovDescription`
 - `FilterSettings`
@@ -407,6 +415,7 @@ All public namespaces in the MNE-CPP library tree.
 - `RegionDataOut`
 - `RegionMT`
 - `RegionMTOut`
+- `RejectionParams`
 
 ### MRILIB
 

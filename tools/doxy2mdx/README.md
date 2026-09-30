@@ -103,6 +103,14 @@ step blocks merge.
 | `example_exempt` / `example_exempt_reason` | Exemption for a class that has no meaningful console example; the reason is mandatory. |
 | `screenshots` | Ids from `doc/website/screenshots/manifest.json` that show the class. |
 
+`doxy2mdx.py` renders each `@snippet` listing as a `cpp` block titled with its
+source file, after checking that the listing equals exactly one `//! [region]`
+of that file. The only normalisation is removing the region's common
+indentation. An empty listing (missing region or ambiguous file name), a
+listing that matches no region, and a registry `example_snippet` that is not
+rendered all abort generation. The `## Example` section links the full source
+and lists the build target, mode, data and screenshots; it never copies code.
+
 An example-eligible class (not exempted here or by the rules in
 `tools/quality/api_evidence_policy.json`) must have an `example` and at least
 one `example_snippet`. Classes that do not yet are listed in the policy's

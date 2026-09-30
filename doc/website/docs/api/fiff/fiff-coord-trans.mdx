@@ -55,6 +55,23 @@ Copy constructor.
 
 ---
 
+### operator=(p_FiffCoordTrans)
+
+Copy assignment.
+
+All members are values, so the compiler-generated member-wise assignment is correct. It has to be declared explicitly because declaring the copy constructor and destructor above deprecates the implicit one.
+
+**Parameters:**
+
+- **p_FiffCoordTrans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
+  Coordinate transformation description which should be assigned.
+
+**Returns:**
+
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &* — reference to this object.
+
+---
+
 ### FiffCoordTrans(from, to, rot, move)
 
 Constructs a coordinate transformation from a rotation matrix and translation vector.

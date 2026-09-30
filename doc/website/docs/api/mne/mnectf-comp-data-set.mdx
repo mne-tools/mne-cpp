@@ -48,22 +48,22 @@ Destructor.
 
 ---
 
-### make_comp(chs, nch, compchs, ncomp)
+### make_comp(chList, nChan, compchs, nCompChan)
 
 Build the current compensation operator for the given channel set by locating the matching compensation matrix and constructing pre/post-selection sparse matrices.
 
 **Parameters:**
 
-- **chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
+- **chs**
   Channels to compensate (may include non-MEG channels).
 
-- **nch** : *int*
+- **nch**
   Number of channels.
 
 - **compchs** : *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt;*
   Compensation input channels (may include non-reference channels).
 
-- **ncomp** : *int*
+- **ncomp**
   Number of compensation input channels.
 
 **Returns:**
@@ -129,7 +129,7 @@ Apply or revert CTF compensation across multiple time samples (channels x sample
 
 ---
 
-### set_compensation(compensate_to, chs, nchan, comp_chs, ncomp_chan)
+### set_compensation(compensate_to, chList, nchan, comp_chs, ncomp_chan)
 
 Configure the full compensation pipeline: determine current compensation, build undo and target operators, and update channel coil types accordingly.
 
@@ -138,7 +138,7 @@ Configure the full compensation pipeline: determine current compensation, build 
 - **compensate_to** : *int*
   Desired compensation grade.
 
-- **chs** : *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
+- **chs**
   Channels to compensate (coil_type is updated).
 
 - **nchan** : *int*

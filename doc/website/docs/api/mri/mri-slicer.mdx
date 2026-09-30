@@ -50,6 +50,68 @@ Extract a 2D slice from a 3D volume stored as a flat array.
 
 ---
 
+### voxelAxisForOrientation(vox2ras, orientation)
+
+Return the voxel axis used as the fixed slicing axis for an anatomical orientation.
+
+Uses the voxel-to-RAS transform to map anatomical planes onto the source volume's storage axes. For FreeSurfer tkRAS volumes, axial maps to voxel Y and coronal maps to voxel Z, while an identity transform keeps the conventional Z/Y/X mapping.
+
+**Parameters:**
+
+- **vox2ras** : *const Eigen::Matrix4f &*
+  4x4 voxel-to-RAS transform.
+
+- **orientation** : *SliceOrientation*
+  Anatomical slice orientation.
+
+**Returns:**
+
+- *int* — Voxel axis index: 0 = X, 1 = Y, 2 = Z.
+
+---
+
+### dimensionForOrientation(dims, vox2ras, orientation)
+
+Return the volume dimension used by an anatomical slice orientation.
+
+**Parameters:**
+
+- **dims** : *const QVector&lt; int &gt; &*
+  Volume dimensions \{dimX, dimY, dimZ\}.
+
+- **vox2ras** : *const Eigen::Matrix4f &*
+  4x4 voxel-to-RAS transform.
+
+- **orientation** : *SliceOrientation*
+  Anatomical slice orientation.
+
+**Returns:**
+
+- *int* — Number of slices along the orientation's fixed voxel axis.
+
+---
+
+### sliceIndexForOrientation(vox2ras, orientation, voxel)
+
+Return the slice index for an anatomical orientation from a voxel coordinate.
+
+**Parameters:**
+
+- **vox2ras** : *const Eigen::Matrix4f &*
+  4x4 voxel-to-RAS transform.
+
+- **orientation** : *SliceOrientation*
+  Anatomical slice orientation.
+
+- **voxel** : *const Eigen::Vector3i &*
+  Voxel coordinate.
+
+**Returns:**
+
+- *int* — The voxel component that indexes the requested anatomical slice stack.
+
+---
+
 ### extractOrthogonal(volData, dims, vox2ras, rasPoint)
 
 Extract all three orthogonal slices at a given RAS point.
@@ -128,6 +190,24 @@ Extract a 2D slice from an [`MriVolData`](/docs/api/mri/mri-vol-data) volume.
 **Returns:**
 
 - *MriSliceImage* — The extracted slice image.
+
+---
+
+### voxelAxisForOrientation(vol, orientation)
+
+Return the voxel axis used as the fixed slicing axis for an anatomical orientation.
+
+---
+
+### dimensionForOrientation(vol, orientation)
+
+Return the volume dimension used by an anatomical slice orientation.
+
+---
+
+### sliceIndexForOrientation(vol, orientation, voxel)
+
+Return the slice index for an anatomical orientation from a voxel coordinate.
 
 ---
 
