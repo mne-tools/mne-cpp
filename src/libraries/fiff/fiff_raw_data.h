@@ -13,7 +13,7 @@
  * @date     September 2012
  * @brief    FIFF continuous raw recording: FiffInfo plus a directory of FIFF_DATA_BUFFER tags for random-access sample reads.
  *
- * @ref FiffRawData represents a continuous (``raw'') Neuromag recording
+ * @ref FiffRawData represents a continuous ("raw") Neuromag recording
  * as stored under @c FIFFB_RAW_DATA / @c FIFFB_CONTINUOUS_DATA: a
  * @ref FiffInfo describing the channels and acquisition setup, a list of
  * @ref FiffRawDir entries pointing at each @c FIFF_DATA_BUFFER tag, the
@@ -70,6 +70,14 @@ class FiffRawData;
  * straight to the buffers covering the requested sample window, decode
  * them through the channel cals and active projectors and return a
  * contiguous channel × sample Eigen matrix without rescanning the file.
+ *
+ * Open a recording and pick the MEG channels plus the trigger channel:
+ *
+ * @snippet ex_read_raw/main.cpp fiff_raw_data_open
+ *
+ * Read a window of the picked channels, in seconds or in samples:
+ *
+ * @snippet ex_read_raw/main.cpp fiff_raw_data_read_segment
  */
 class FIFFSHARED_EXPORT FiffRawData
 {

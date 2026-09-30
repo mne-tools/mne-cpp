@@ -13,7 +13,7 @@ Coverage from `5053fe099` (https://github.com/mne-tools/mne-cpp/actions/runs/362
 | G2 | Applications >= 50.0% line | 24.9% | **open** |
 | G2 | Tools >= 50.0% line | 61.68% | met |
 | G2 | Libraries >= 55.0% branch | 42.9% | **open** |
-| G3 | Eligible APIs have an executable example | 4.97% of 382; 0 snippets | **open** |
+| G3 | Eligible APIs have an executable example | 4.97% of 382; 1 snippets | **open** |
 | G3 | Exported API is registered | 141 exported classes unregistered | **open** |
 | G4 | Documentation images generated in CI | 21 referenced, 9 without producer, placeholders in 3 workflows | **open** |
 | G4 | Visual regression compares to goldens | 0 golden comparisons | **open** |

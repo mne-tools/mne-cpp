@@ -14,8 +14,8 @@
  * @brief    High-level convenience reader/writer that loads a whole FIFF measurement file into FIFFLIB containers in one call.
  *
  * Most callers want to open a FIFF file and immediately get back a
- * @ref FiffRawData (for ``*-raw.fif''), a @ref FiffEvokedSet (for
- * ``*-ave.fif''), a @ref FiffCov (for ``*-cov.fif''), or the
+ * @ref FiffRawData (for "*-raw.fif"), a @ref FiffEvokedSet (for
+ * "*-ave.fif"), a @ref FiffCov (for "*-cov.fif"), or the
  * appropriate combination without micromanaging @ref FiffStream and the
  * directory tree. @ref FiffIO provides exactly that one-call facade: it
  * sniffs the top-level FIFF blocks (@c FIFFB_RAW_DATA, @c FIFFB_EVOKED,

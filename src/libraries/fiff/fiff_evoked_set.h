@@ -22,7 +22,7 @@
  * The header additionally ports the three batch-averaging descriptor
  * structs from MNE-C's @c browser_types.h (@ref RejectionParams,
  * @ref AverageCategory, @ref AverageDescription) so the @c mne_browse_raw
- * ``ave description'' files can be parsed and consumed verbatim. Together
+ * "ave description" files can be parsed and consumed verbatim. Together
  * they describe artifact-rejection thresholds, per-category timing and
  * trigger logic, and the file-level output settings used by the
  * @c mne_process_raw averaging pipeline.
@@ -74,7 +74,7 @@ class FiffRawData;
  * Field-for-field port of @c rejDataRec from MNE-C @c browser_types.h.
  * Used by @ref AverageDescription to drive @c mne_process_raw's
  * peak-to-peak and flatness rejection when computing batch evokeds; the
- * default values match the MNE-C defaults so existing ``ave description''
+ * default values match the MNE-C defaults so existing "ave description"
  * files keep producing identical results.
  */
 struct FIFFSHARED_EXPORT RejectionParams {

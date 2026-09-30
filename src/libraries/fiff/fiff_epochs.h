@@ -14,7 +14,7 @@
  * fixed step), and a time window (@c tmin, @c tmax), it returns a
  * 3D (nepoch × nchan × nsamples) stack along with the associated
  * @ref FiffInfo. Bad-segment rejection (via @ref FiffAnnotation
- * ``BAD_*'' entries) and peak-to-peak / flatness rejection
+ * "BAD_*" entries) and peak-to-peak / flatness rejection
  * (via @ref RejectionParams in @ref fiff_evoked_set.h) are applied as
  * the epochs are cut.
  */

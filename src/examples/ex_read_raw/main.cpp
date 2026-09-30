@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
         keep_comp = true;
     }
 
+    //! [fiff_raw_data_open]
     //
     //   Setup for reading the raw data
     //
@@ -106,7 +107,6 @@ int main(int argc, char *argv[])
     //
     //   Set up pick list: MEG + STI 014 - bad channels
     //
-    //
     QStringList include;
     include << "STI 014";
     bool want_meg   = true;
@@ -114,6 +114,7 @@ int main(int argc, char *argv[])
     bool want_stim  = false;
 
     RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+    //! [fiff_raw_data_open]
 
     //
     //   Set up projection
@@ -167,6 +168,7 @@ int main(int argc, char *argv[])
             return -1;
         }
     }
+    //! [fiff_raw_data_read_segment]
     //
     //   Read a data segment
     //   times output argument is optional
@@ -184,6 +186,7 @@ int main(int argc, char *argv[])
         qWarning("Could not read raw segment.\n");
         return -1;
     }
+    //! [fiff_raw_data_read_segment]
 
     qInfo("Read %d samples.\n",(qint32)data.cols());
 

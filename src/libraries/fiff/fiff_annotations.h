@@ -10,7 +10,7 @@
  * @brief    FIFF / MNE annotations: time-tagged textual marks (BAD_*, EDGE, custom) with onset, duration and description.
  *
  * Annotations are time-localized comments attached to a continuous
- * recording: rejected segments (``BAD_*''), recording edges (``EDGE''),
+ * recording: rejected segments ("BAD_*"), recording edges ("EDGE"),
  * and arbitrary user-supplied marks. MNE-Python stores them as the
  * @c mne.Annotations type and writes them under
  * @c FIFFB_MNE_ANNOTATIONS; this header is the C++ mirror.

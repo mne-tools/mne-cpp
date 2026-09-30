@@ -10,7 +10,7 @@
  * @brief    @ref BIDSLIB::AbstractFormatReader implementation for European Data Format (EDF / EDF+) files.
  *
  * EDF stores a recording as a fixed-size ASCII header followed by a
- * stream of @c duration_seconds-long ``data records''; inside each
+ * stream of @c duration_seconds-long "data records"; inside each
  * record the channels appear in order, with each channel contributing
  * @c samples_per_record little-endian @c int16 samples. The header
  * additionally lists per-channel physical / digital min / max which

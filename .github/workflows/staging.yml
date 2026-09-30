@@ -158,6 +158,12 @@ jobs:
         cd doc/doxygen
         doxygen mne-cpp_doxyfile
 
+    # The @snippet contract: headers reference named regions in src/examples.
+    - name: Check Doxygen snippets
+      env:
+        MNE_REQUIRE_DOXYGEN: '1'
+      run: python3 -m unittest tools/quality/tests/test_doxygen_snippets.py
+
     - name: Deploy qch to dev_build release
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
