@@ -12,11 +12,7 @@
       "scene_only",
       "widget_mockup"
     ],
-    "placeholder_workflows": [
-      ".github/workflows/main.yml",
-      ".github/workflows/pull-request.yml",
-      ".github/workflows/staging.yml"
-    ],
+    "placeholder_workflows": [],
     "doc_shots_run_in_ci": false,
     "regression_jobs": [
       {

@@ -47,6 +47,7 @@ import audit_maintainability  # noqa: E402
 import audit_parity_baseline  # noqa: E402
 import audit_tests  # noqa: E402
 import audit_visual_assets  # noqa: E402
+import render_quality_pages  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RELEASE_DIR = REPO_ROOT / "doc" / "release" / "v2.4.0"
@@ -272,6 +273,8 @@ def main(argv: list[str] | None = None) -> int:
     for path, text in outputs.items():
         path.write_text(text, encoding="utf-8")
         print(f"wrote {path}")
+    if out_dir == RELEASE_DIR:
+        render_quality_pages.main([])
     return 0
 
 

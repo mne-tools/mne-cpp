@@ -191,22 +191,14 @@ jobs:
         path: ${{ runner.temp }}/quality
         retention-days: 30
 
-    - name: Generate placeholder screenshots
-      run: |
-        cd doc/website
-        grep -roh '/img/manual/auto/[^ )"]*\.png' docs/manual/ 2>/dev/null | sort -u | while read -r p; do
-          f="static${p}"
-          if [ ! -f "$f" ]; then
-            mkdir -p "$(dirname "$f")"
-            printf '\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDATx\x9cc\xf8\x0f\x00\x00\x01\x01\x00\x05\x18\xd8N\x00\x00\x00\x00IEND\xaeB`\x82' > "$f"
-            echo "Created placeholder: $f"
-          fi
-        done
-
     - name: Generate contributor data
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: bash tools/generate_contributors.sh
+
+    # Gate G3: the quality page must match doc/release/v2.4.0/*.json.
+    - name: Check quality page
+      run: python3 tools/quality/render_quality_pages.py --check
 
     - name: Build Docusaurus site (production)
       env:
@@ -215,6 +207,10 @@ jobs:
         cd doc/website
         npm ci
         npm run build
+
+    # Broken links/anchors/images already fail the build (docusaurus.config.ts).
+    - name: Check website version routing
+      run: python3 tools/quality/check_website_build.py doc/website/build --channel stable
 
     - name: Deploy to mne-cpp.github.io
       env:

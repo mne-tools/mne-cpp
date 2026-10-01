@@ -261,6 +261,7 @@ const sidebars: SidebarsConfig = {
                 'development/contr-git',
                 'development/contr-docuimprovements',
                 'development/writingtest',
+                'development/quality',
             ],
         },
         {
