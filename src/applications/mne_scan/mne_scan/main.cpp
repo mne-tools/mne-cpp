@@ -102,6 +102,9 @@ Q_IMPORT_PLUGIN(TMSI)
  */
 int main(int argc, char* argv[])
 {
+    // mne_scan.qrc lives in the static mne_scan_app_core library, whose resource initializer the linker may drop.
+    Q_INIT_RESOURCE(mne_scan);
+
 // When building a static version of MNE Scan we have to init all resource (.qrc) files here manually
 #ifdef STATICBUILD
     Q_INIT_RESOURCE(babymeg);

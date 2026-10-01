@@ -1,0 +1,95 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+# ---------------------------------------------------------------------------
+# Reusable workflow: generate the documentation screenshots (T5.3).
+# Builds mne_doc_shots, renders every entry of doc/website/screenshots/manifest.json
+# from the real applications, validates the PNGs and uploads them as the
+# `doc-screenshots` artifact for the website jobs. Called by main.yml,
+# staging.yml and pull-request.yml.
+# ---------------------------------------------------------------------------
+name: Reusable Doc Screenshots
+
+on:
+  workflow_call:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  DocShots:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    - name: Install system dependencies
+      run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
+        sudo apt-get update -q
+        sudo apt-get install -q libgl1-mesa-dev libxkbcommon-dev
+
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh max
+
+    - name: Download Qt toolchain
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind qt \
+          --version "$QT_BUILD_VERSION" \
+          --linkage dynamic \
+          --output-dir "$RUNNER_TEMP/qt"
+
+    - name: Download Eigen package
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind eigen \
+          --version "$EIGEN_VERSION" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+
+    - name: Download ONNX Runtime
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind onnxruntime \
+          --version "$ONNXRUNTIME_VERSION" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
+
+    - name: Clone Skigen
+      run: ./scripts/ci/clone_skigen.sh
+
+    # Only the screenshot tool and what it links or loads (app cores, MNE Scan plugins).
+    - name: Build mne_doc_shots
+      run: |
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DUSE_ONNXRUNTIME=ON -DMNE_WARNINGS_AS_ERRORS=ON \
+          -DBUILD_TESTS=OFF
+        cmake --build build --target mne_doc_shots --parallel "$(nproc)"
+
+    - name: Generate screenshots
+      env:
+        QT_QPA_PLATFORM: offscreen
+      run: |
+        rm -rf doc/website/static/img/manual/auto
+        cmake --build build --target doc-shots
+
+    # Gate G4: every manifest shot exists, decodes, has its declared size and is
+    # neither blank nor transparent; every guide image has a producer.
+    - name: Validate screenshots
+      run: python3 tools/quality/validate_screenshots.py
+
+    - name: Upload screenshots
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: doc-screenshots
+        path: doc/website/static/img/manual/auto
+        if-no-files-found: error
+        retention-days: 30

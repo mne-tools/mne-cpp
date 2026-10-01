@@ -37,7 +37,7 @@ find_package(Eigen3 REQUIRED)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Gui Widgets SerialPort)
+set(QT_REQUIRED_COMPONENTS Core Gui Widgets SerialPort Concurrent Network)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
@@ -84,6 +84,34 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_fiff
     Eigen3::Eigen
 )
+
+# Every app core exports its own mainwindow.h; the new kinds include theirs by path from here.
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/applications)
+
+# Optional kinds: each app can be switched off, and the manifest then fails with "Unknown shot kind".
+if(TARGET mne_scan_app_core)
+    target_sources(${PROJECT_NAME} PRIVATE shot_mne_scan_app.cpp shot_mne_scan_app.h)
+    target_link_libraries(${PROJECT_NAME} PRIVATE mne_scan_app_core)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        MNE_DOC_SHOTS_HAVE_SCAN
+        MNE_SCAN_PLUGIN_DIR="$<TARGET_FILE_DIR:scan_writetofile>")
+    # The plugins are loaded at run time from their own directory.
+    foreach(_plugin scan_fiffsimulator scan_writetofile scan_averaging scan_covariance scan_noisereduction
+                    scan_rtcmne scan_hpi scan_rtfwd scan_neuronalconnectivity scan_ftbuffer scan_natus
+                    scan_babymeg scan_lsladapter)
+        if(TARGET ${_plugin})
+            add_dependencies(${PROJECT_NAME} ${_plugin})
+        endif()
+    endforeach()
+endif()
+if(TARGET mne_analyze_studio_app_core)
+    target_sources(${PROJECT_NAME} PRIVATE shot_mne_analyze_studio_app.cpp shot_mne_analyze_studio_app.h)
+    target_link_libraries(${PROJECT_NAME} PRIVATE mne_analyze_studio_app_core)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        MNE_DOC_SHOTS_HAVE_STUDIO
+        MNE_DOC_SHOTS_REPO_ROOT="${CMAKE_SOURCE_DIR}"
+        MNE_ANALYZE_STUDIO_WORKFLOWS_DIR="${CMAKE_SOURCE_DIR}/src/applications/mne_analyze_studio/examples/workflows")
+endif()
 
 # Match the runtime library used by src/ libraries (dynamic CRT on MSVC)
 if(MSVC)

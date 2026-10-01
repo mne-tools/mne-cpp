@@ -135,13 +135,19 @@ MainWindow::~MainWindow()
     }
 
     delete m_pDynamicPluginToolBar;
+
+    // PluginGui saves the scene on destruction through the plugin managers, which are members and die before
+    // QWidget deletes the child widgets.
+    qDeleteAll(findChildren<QDockWidget*>(Qt::FindDirectChildrenOnly));
 }
 
 //=============================================================================================================
 
 void MainWindow::setupPlugins()
 {
-    m_pPluginManager->loadPlugins(qApp->applicationDirPath() + pluginDir);
+    // Tools that embed this window (mne_doc_shots) do not live next to the plugin directory.
+    const QString overrideDir = qEnvironmentVariable("MNE_SCAN_PLUGIN_DIR");
+    m_pPluginManager->loadPlugins(overrideDir.isEmpty() ? qApp->applicationDirPath() + pluginDir : overrideDir);
 }
 
 //=============================================================================================================

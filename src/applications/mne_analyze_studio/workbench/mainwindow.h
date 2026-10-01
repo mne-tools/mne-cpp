@@ -70,6 +70,15 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     void openInitialFiles(const QStringList& filePaths);
 
+    /**
+     * Show the graph of the workflow file @p filePath in the Workflow Map and the center Workflow Graph tab
+     * without executing it. Used where no skill host runs, e.g. by mne_doc_shots.
+     *
+     * @param[in] filePath   Workflow (.mna/.mne) file.
+     * @return               Empty on success, otherwise the parse error.
+     */
+    QString previewWorkflowFile(const QString& filePath);
+
 protected:
     void closeEvent(QCloseEvent* event) override;
 
@@ -343,6 +352,7 @@ private:
     QString m_activePipelineLastStatus;
     bool m_isAdvancingPipeline;
     bool m_isShuttingDown;
+    bool m_isOffline; /**< MNE_ANALYZE_STUDIO_OFFLINE: no keychain, no backend processes. */
     QJsonArray m_cachedKernelToolDefinitions;
     QJsonArray m_cachedExtensionToolDefinitions;
     QJsonArray m_cachedExtensionResources;

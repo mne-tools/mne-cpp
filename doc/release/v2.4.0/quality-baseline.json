@@ -55,9 +55,9 @@
       "registered_test_percent": 27.12
     },
     "G4_screenshots": {
-      "referenced_images": 21,
-      "referenced_without_producer": 9,
-      "doc_shots_run_in_ci": false,
+      "referenced_images": 19,
+      "referenced_without_producer": 0,
+      "doc_shots_run_in_ci": true,
       "placeholder_workflows": 0,
       "golden_comparisons": 0
     },

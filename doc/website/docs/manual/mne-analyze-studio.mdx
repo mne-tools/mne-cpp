@@ -11,6 +11,10 @@ This walkthrough targets the `staging` branch of MNE Analyze Studio (v2.3.0). Fo
 architectural overview of the Workbench, Neuro Kernel and Skill Host, see
 [MNE Analyze Studio](analyze-studio). For the on-disk format used by the workflow
 files referenced below, see [MNA Format](mna-format).
+
+The Skill Host currently registers only `mne.skills.temporal_filter`. The MNA project
+skills described below are implemented but not yet offered by the Skill Host, so they
+do not appear in the Skills sidebar.
 :::
 
 This page is an end-user walkthrough of MNE Analyze Studio. It uses the three demo
@@ -108,10 +112,8 @@ pre-computed inverse operator to produce distributed source timecourses.
    `MnaGraphExecutor` runs `bandpass` first, hands its `filtered_data` output
    to `source_est` via the inputs map, and finally publishes
    `source_est_out`. The skill returns `node_count: 2` and the result keys
-   for both nodes; the Studio's Analysis Results widget will pick the STC up
-   for cortical-surface rendering.
-
-![Source Estimation result rendered on the cortex after running filter_then_source_estimation_demo.mna](/img/manual/auto/mne-analyze-studio/filter-then-source-estimation-demo.png)
+   for both nodes. The source estimate is written as an STC file; the
+   Workbench does not render STC files on the cortex yet.
 
 ## Demo 3 — `source_estimation_multimodal_demo.mna`
 
@@ -226,8 +228,6 @@ Executes the pipeline of an MNA project end-to-end.
   `MnaGraph`. If `MnaGraph::validate` fails the skill returns `status:
   "error"` with the validation messages; otherwise it reports
   `status: "completed"` together with the result summary above.
-
-![Skill inspector panel showing the schema for mne.skills.run_mna_graph](/img/manual/auto/mne-analyze-studio/skill-run-mna-graph.png)
 
 ## See also
 

@@ -15,20 +15,19 @@ set(QT_REQUIRED_COMPONENTS Core Concurrent Network Widgets)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-set(SOURCES
+set(CORE_SOURCES
     analysisresultwidget.cpp
     agentchatdockwidget.cpp
     editortabbar.cpp
     extensionsettingswidget.cpp
     extensionhostedviewwidget.cpp
     llmsettingsdialog.cpp
-    main.cpp
     mainwindow.cpp
     pillselectorwidget.cpp
     workflowminimapwidget.cpp
 )
 
-set(HEADERS
+set(CORE_HEADERS
     analysisresultwidget.h
     agentchatdockwidget.h
     editortabbar.h
@@ -41,20 +40,14 @@ set(HEADERS
     workflowminimapwidget.h
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS})
-else()
-    add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-endif()
-
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE
+# The workbench window as a static library, so mne_doc_shots can build the live widget tree.
+# The executable only owns main.cpp.
+add_library(mne_analyze_studio_app_core STATIC ${CORE_SOURCES} ${CORE_HEADERS})
+target_include_directories(mne_analyze_studio_app_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(mne_analyze_studio_app_core PUBLIC
     ${QT_REQUIRED_COMPONENT_LIBS}
     mne_analyze_studio_analysis_results_extension_widgets
     mne_analyze_studio_core
@@ -72,6 +65,15 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_utils
     Eigen3::Eigen
 )
+set_target_properties(mne_analyze_studio_app_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION main.cpp)
+else()
+    add_executable(${PROJECT_NAME} main.cpp)
+endif()
+
+target_link_libraries(${PROJECT_NAME} PRIVATE mne_analyze_studio_app_core)
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})

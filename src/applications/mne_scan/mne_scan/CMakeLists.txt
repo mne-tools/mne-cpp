@@ -16,32 +16,64 @@ set(QT_REQUIRED_COMPONENTS Core Widgets Concurrent Network)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-set(SOURCES
-    main.cpp 
-    mainsplashscreencloser.cpp 
-    startupwidget.cpp 
-    mainsplashscreen.cpp 
-    pluginscene.cpp 
-    pluginitem.cpp 
-    plugingui.cpp 
-    arrow.cpp 
+set(MNE_SCAN_CORE_SOURCES
+    mainsplashscreencloser.cpp
+    startupwidget.cpp
+    mainsplashscreen.cpp
+    pluginscene.cpp
+    pluginitem.cpp
+    plugingui.cpp
+    arrow.cpp
     mainwindow.cpp
+    mne_scan.qrc
 )
 
-set(HEADERS
-    info.h 
-    mainsplashscreencloser.h 
-    startupwidget.h 
-    mainsplashscreen.h 
-    pluginscene.h 
-    pluginitem.h 
-    plugingui.h 
-    arrow.h 
+set(MNE_SCAN_CORE_HEADERS
+    info.h
+    mainsplashscreencloser.h
+    startupwidget.h
+    mainsplashscreen.h
+    pluginscene.h
+    pluginitem.h
+    plugingui.h
+    arrow.h
     mainwindow.h
 )
 
+set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
+list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
+
+set(MNE_LIBS_REQUIRED
+    mne_dsp
+    mne_connectivity
+    mne_inv
+    mne_fwd
+    mne_mne
+    mne_fiff
+    mne_fs
+    mne_utils
+    mne_math
+    mne_events
+    mne_disp
+    mne_disp3D
+    mne_mna
+)
+
+# The main window and plugin GUI as a static library, so mne_doc_shots can build the live widget tree
+# without a second copy of the sources. The executable only owns main.cpp.
+add_library(mne_scan_app_core STATIC ${MNE_SCAN_CORE_SOURCES} ${MNE_SCAN_CORE_HEADERS})
+target_include_directories(mne_scan_app_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(mne_scan_app_core PUBLIC
+    ${QT_REQUIRED_COMPONENT_LIBS}
+    ${MNE_LIBS_REQUIRED}
+    Eigen3::Eigen
+    scDisp
+    scShared
+    scMeas
+)
+set_target_properties(mne_scan_app_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 set(RESOURCES
-    mne_scan.qrc
     images/appIcons/mne_scan.icns
 )
 
@@ -49,38 +81,12 @@ set_source_files_properties(images/appIcons/mne_scan.icns PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS} ${RESOURCES})
+    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION main.cpp ${RESOURCES})
 else()
-    add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
+    add_executable(${PROJECT_NAME} main.cpp ${RESOURCES})
 endif()
 
-set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
-list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
-
-set(MNE_LIBS_REQUIRED 
-  mne_dsp
-  mne_connectivity
-  mne_inv
-  mne_fwd
-  mne_mne
-  mne_fiff
-  mne_fs
-  mne_utils
-    mne_math
-  mne_events
-  mne_disp
-  mne_disp3D
-  mne_mna
-)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE
-  ${QT_REQUIRED_COMPONENT_LIBS}
-  ${MNE_LIBS_REQUIRED}
-  Eigen3::Eigen
-  scDisp
-  scShared
-  scMeas
-)
+target_link_libraries(${PROJECT_NAME} PRIVATE mne_scan_app_core)
 
 if(NOT BUILD_SHARED_LIBS)
     target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -96,8 +102,8 @@ if(NOT BUILD_SHARED_LIBS)
         scan_rtcmne
         scan_rtfwd
         scan_writetofile)
-    
-        target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+
+    target_compile_definitions(mne_scan_app_core PUBLIC STATICBUILD)
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

@@ -65,14 +65,14 @@ Keep a per-site copy of every calibration file under version control alongside t
 
 The `writetofile` plugin produces one FIFF file per pipeline *Run*. Recommended handling:
 
-- **Naming.** Configure the file pattern to embed subject ID, session ID, and a UTC timestamp; avoid local time to prevent ambiguous filenames around DST transitions.
+- **Naming.** Recordings are stored per project and subject. Pick both in the *Write To File* tab of the Quick Control view before pressing *Run*; it appears once data reaches the plugin. Use one subject entry per participant and session so file names stay unambiguous.
 - **Atomicity.** A FIFF file is only valid after the operator presses *Stop* (the closing tags are flushed at that point). Treat any file produced by a non-graceful shutdown as truncated and re-record if possible.
 - **Integrity check.** Run `mne_show_fiff <file>` immediately after Stop. The output must end with `FIFF_BLOCK_END` for the top-level `FIFFB_MEAS`. Truncated files will report a parser error and should be quarantined.
 - **Retention.** Keep raw FIFFs at the source-of-truth resolution for the lifetime defined by your site's data-management policy (typical research lab: indefinite; clinical-adjacent: at least the regulatory minimum for the study). Derived files (averages, source estimates) can be regenerated and should never be the only stored copy.
 - **Backup.** At least one off-host copy. FIFF files are append-only during a recording but become read-only afterwards, so a daily rsync of the output directory is sufficient.
 - **Provenance.** Archive the MNE-CPP version (`mne_scan --version`), the plugin set in `plugins/mne_scan/`, and the calibration file set used. Without these, a recording is not reproducible.
 
-![writetofile Preferences tab showing the file-pattern field](/img/manual/auto/mne-scan/writetofile-prefs.png)
+![Write To File selected in the pipeline, with its configuration panel on the right](/img/manual/auto/mne-scan/writetofile-setup.png)
 
 ## Troubleshooting Common Runtime Errors
 

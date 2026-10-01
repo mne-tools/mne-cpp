@@ -36,6 +36,12 @@
 #include "shot_kinds.h"
 #include "shot_mne_align_app.h"
 #include "shot_mne_inspect_app.h"
+#ifdef MNE_DOC_SHOTS_HAVE_SCAN
+#include "shot_mne_scan_app.h"
+#endif
+#ifdef MNE_DOC_SHOTS_HAVE_STUDIO
+#include "shot_mne_analyze_studio_app.h"
+#endif
 
 #include <QByteArray>
 #include <QDir>
@@ -135,6 +141,16 @@ bool ShotRunner::renderShot(const ShotSpec& spec, const QString& outPath,
     if (spec.kind == QLatin1String("mne_align_app")) {
         return DOCSHOTS::renderMneAlignApp(spec, outPath, skipped, err);
     }
+#ifdef MNE_DOC_SHOTS_HAVE_SCAN
+    if (spec.kind == QLatin1String("mne_scan_app")) {
+        return DOCSHOTS::renderMneScanApp(spec, outPath, skipped, err);
+    }
+#endif
+#ifdef MNE_DOC_SHOTS_HAVE_STUDIO
+    if (spec.kind == QLatin1String("mne_analyze_studio_app")) {
+        return DOCSHOTS::renderMneAnalyzeStudioApp(spec, outPath, skipped, err);
+    }
+#endif
     err = QStringLiteral("Unknown shot kind: %1").arg(spec.kind);
     return false;
 }

@@ -72,10 +72,10 @@ const config: Config = {
         mermaid: true,
         hooks: {
             onBrokenMarkdownLinks: 'throw',
-            // Only the generated manual screenshots (/img/manual/auto/, built by
-            // mne_doc_shots, TASK 5) may be absent; any other missing image fails.
+            // Every missing image fails. CI generates /img/manual/auto/ with mne_doc_shots first; a local
+            // build without them may opt out with MNECPP_ALLOW_MISSING_SCREENSHOTS=1.
             onBrokenMarkdownImages: ({url, sourceFilePath}) => {
-                if (url.startsWith('/img/manual/auto/')) {
+                if (url.startsWith('/img/manual/auto/') && process.env.MNECPP_ALLOW_MISSING_SCREENSHOTS === '1') {
                     console.warn(`[WARNING] generated screenshot ${url} not built (${sourceFilePath})`);
                     return;
                 }

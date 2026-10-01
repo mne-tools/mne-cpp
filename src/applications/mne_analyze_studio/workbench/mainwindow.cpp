@@ -32,6 +32,7 @@
 #include <iresultrendererfactory.h>
 #include <iresultrendererwidget.h>
 #include <jsonrpcmessage.h>
+#include <pipelineparser.h>
 #include <resultrendererfactoryregistry.h>
 #include <viewproviderregistry.h>
 
@@ -1374,6 +1375,7 @@ MainWindow::MainWindow(QWidget* parent)
 , m_activePipelineTotalSteps(0)
 , m_isAdvancingPipeline(false)
 , m_isShuttingDown(false)
+, m_isOffline(qEnvironmentVariableIsSet("MNE_ANALYZE_STUDIO_OFFLINE"))
 , m_llmPlanner(this)
 , m_sceneRegistry(this)
 , m_viewProviderRegistry(new ViewProviderRegistry(this))
@@ -1387,7 +1389,9 @@ MainWindow::MainWindow(QWidget* parent)
 
     createLayout();
     createConnections();
-    loadAgentSettings();
+    if (!m_isOffline) {
+        loadAgentSettings();
+    }
     restoreWorkspace();
     applyWorkbenchStyle();
     refreshAgentPlannerStatus();
@@ -1441,6 +1445,9 @@ MainWindow::MainWindow(QWidget* parent)
     configureBackendProcess(m_kernelProcess, "Neuro-Kernel");
     configureBackendProcess(m_extensionHostProcess, "Extension Host");
 
+    if (m_isOffline) {
+        return;
+    }
     ensureBackendConnection(m_kernelSocket,
                             QString::fromLatin1(kKernelSocketName),
                             QStringLiteral("mne_analyze_studio_neuro_kernel"),
@@ -1451,6 +1458,22 @@ MainWindow::MainWindow(QWidget* parent)
                             QStringLiteral("mne_analyze_studio_skill_host"),
                             m_extensionHostProcess,
                             QStringLiteral("Extension Host"));
+}
+
+QString MainWindow::previewWorkflowFile(const QString& filePath)
+{
+    QJsonObject result;
+    try {
+        result.insert(QStringLiteral("graph"), PipelineParser().parseFile(filePath).toJson());
+    } catch (const std::exception& error) {
+        return QString::fromUtf8(error.what());
+    }
+    result.insert(QStringLiteral("tool_name"), QStringLiteral("studio.workflow.load"));
+    result.insert(QStringLiteral("source_file"), QFileInfo(filePath).absoluteFilePath());
+    adoptWorkflowGraph(result, filePath);
+    switchPrimarySidebar(QStringLiteral("workflow"));
+    openWorkflowCenterView(true);
+    return QString();
 }
 
 void MainWindow::openInitialFiles(const QStringList& filePaths)
@@ -2631,7 +2654,7 @@ void MainWindow::openWorkspaceItem(QTreeWidgetItem* item)
 
 void MainWindow::openFileInView(const QString& filePath)
 {
-    if (isWorkflowAnalysisFile(filePath)) {
+    if (isWorkflowAnalysisFile(filePath) && !m_isOffline) {
         requestWorkflowLoad(filePath);
     }
 

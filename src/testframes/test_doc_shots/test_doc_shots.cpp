@@ -191,11 +191,19 @@ void TestDocShots::producesDeclaredSizeDeterministically()
          "setup": {"wizard_step": 1, "simulate_capture": {"kind": "fiducial", "count": 2}}},
         {"id": "inspect/pick", "kind": "mne_inspect_app", "size": [1440, 900],
          "setup": {"load_demo_electrodes": true, "focus_dock": "pick",
-                   "simulate_pick": {"kind": "contact", "target": ["LA", "LA2"]}}}
+                   "simulate_pick": {"kind": "contact", "target": ["LA", "LA2"]}}},
+        {"id": "scan/pipeline", "kind": "mne_scan_app", "size": [1280, 800],
+         "setup": {"pipeline": [{"plugin": "Fiff Simulator", "x": -150, "y": 0},
+                                {"plugin": "Write To File", "x": 150, "y": 0}],
+                   "select": "Write To File"}},
+        {"id": "studio/graph", "kind": "mne_analyze_studio_app", "size": [1440, 900],
+         "setup": {"workflow": "temporal_filter_demo.mna", "open_editor": true}}
     ])"));
     const QList<QPair<QString, QSize>> shots{{QStringLiteral("mockup"), QSize(800, 600)},
                                              {QStringLiteral("align/fiducials"), QSize(1100, 700)},
-                                             {QStringLiteral("inspect/pick"), QSize(1440, 900)}};
+                                             {QStringLiteral("inspect/pick"), QSize(1440, 900)},
+                                             {QStringLiteral("scan/pipeline"), QSize(1280, 800)},
+                                             {QStringLiteral("studio/graph"), QSize(1440, 900)}};
 
     const ToolRun first = runTool(manifest, tmp.filePath(QStringLiteral("first")));
     QVERIFY2(first.exitCode == 0, qPrintable(first.out + first.err));

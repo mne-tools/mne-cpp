@@ -2,18 +2,20 @@
   "schema_version": 1,
   "generated_by": "tools/quality/audit_visual_assets.py",
   "summary": {
-    "manifest_shots": 12,
-    "referenced_images": 21,
-    "referenced_without_producer": 9,
+    "manifest_shots": 19,
+    "referenced_images": 19,
+    "referenced_without_producer": 0,
     "produced_without_consumer": 0,
     "implemented_kinds": [
       "mne_align_app",
+      "mne_analyze_studio_app",
       "mne_inspect_app",
+      "mne_scan_app",
       "scene_only",
       "widget_mockup"
     ],
     "placeholder_workflows": [],
-    "doc_shots_run_in_ci": false,
+    "doc_shots_run_in_ci": true,
     "regression_jobs": [
       {
         "workflow": ".github/workflows/screenshot-regression.yml",
@@ -28,8 +30,8 @@
       "id": "inspect-multimodal/load-electrodes",
       "kind": "mne_inspect_app",
       "size": [
-        1280,
-        800
+        1440,
+        900
       ],
       "producer": "implemented",
       "consumers": [
@@ -40,8 +42,8 @@
       "id": "inspect-multimodal/load-mri",
       "kind": "mne_inspect_app",
       "size": [
-        1280,
-        800
+        1440,
+        900
       ],
       "producer": "implemented",
       "consumers": [
@@ -52,8 +54,8 @@
       "id": "inspect-multimodal/overview",
       "kind": "mne_inspect_app",
       "size": [
-        1280,
-        800
+        1440,
+        900
       ],
       "producer": "implemented",
       "consumers": [
@@ -64,8 +66,8 @@
       "id": "inspect-multimodal/pick-dock",
       "kind": "mne_inspect_app",
       "size": [
-        1280,
-        800
+        1440,
+        900
       ],
       "producer": "implemented",
       "consumers": [
@@ -169,82 +171,85 @@
       ]
     },
     {
-      "id": "mne-analyze-studio/filter-then-source-estimation-demo",
-      "kind": null,
-      "size": null,
-      "producer": "none",
-      "consumers": [
-        "doc/website/docs/manual/mne-analyze-studio.mdx"
-      ]
-    },
-    {
-      "id": "mne-analyze-studio/skill-run-mna-graph",
-      "kind": null,
-      "size": null,
-      "producer": "none",
-      "consumers": [
-        "doc/website/docs/manual/mne-analyze-studio.mdx"
-      ]
-    },
-    {
       "id": "mne-analyze-studio/source-estimation-multimodal-demo",
-      "kind": null,
-      "size": null,
-      "producer": "none",
+      "kind": "mne_analyze_studio_app",
+      "size": [
+        1440,
+        900
+      ],
+      "producer": "implemented",
       "consumers": [
         "doc/website/docs/manual/mne-analyze-studio.mdx"
       ]
     },
     {
       "id": "mne-analyze-studio/temporal-filter-demo",
-      "kind": null,
-      "size": null,
-      "producer": "none",
+      "kind": "mne_analyze_studio_app",
+      "size": [
+        1440,
+        900
+      ],
+      "producer": "implemented",
       "consumers": [
         "doc/website/docs/manual/mne-analyze-studio.mdx"
       ]
     },
     {
       "id": "mne-analyze-studio/workbench-overview",
-      "kind": null,
-      "size": null,
-      "producer": "none",
+      "kind": "mne_analyze_studio_app",
+      "size": [
+        1440,
+        900
+      ],
+      "producer": "implemented",
       "consumers": [
         "doc/website/docs/manual/mne-analyze-studio.mdx"
       ]
     },
     {
       "id": "mne-scan/main-window",
-      "kind": null,
-      "size": null,
-      "producer": "none",
+      "kind": "mne_scan_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
       "consumers": [
         "doc/website/docs/manual/mne-scan-quickstart.mdx"
       ]
     },
     {
       "id": "mne-scan/pipeline-fiffsim-writetofile",
-      "kind": null,
-      "size": null,
-      "producer": "none",
+      "kind": "mne_scan_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
       "consumers": [
         "doc/website/docs/manual/mne-scan-quickstart.mdx"
       ]
     },
     {
       "id": "mne-scan/plugin-toolbar",
-      "kind": null,
-      "size": null,
-      "producer": "none",
+      "kind": "mne_scan_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
       "consumers": [
         "doc/website/docs/manual/mne-scan-hardware.mdx"
       ]
     },
     {
-      "id": "mne-scan/writetofile-prefs",
-      "kind": null,
-      "size": null,
-      "producer": "none",
+      "id": "mne-scan/writetofile-setup",
+      "kind": "mne_scan_app",
+      "size": [
+        1280,
+        800
+      ],
+      "producer": "implemented",
       "consumers": [
         "doc/website/docs/manual/mne-scan-deployment.mdx"
       ]

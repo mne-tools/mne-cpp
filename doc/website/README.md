@@ -89,7 +89,7 @@ window can actually take. A failed shot exits non-zero and leaves no PNG
 behind. Every run prints the capture environment, so two differing images
 can be traced to their environment.
 
-Today only `mne_inspect_app` is wired up. Its `setup` schema:
+`mne_inspect_app` builds the mne_inspect main window. Its `setup` schema:
 
 | Key                     | Type / values                                | Effect |
 |-------------------------|----------------------------------------------|--------|
@@ -116,7 +116,35 @@ entries in `screenshots/manifest.json` are the current real grabs.
 The eight `mne-align/{overview,step1-setup,step2-fiducials,step3-eeg-cap,step4-head-shape,step5-verify,step6-save,step7-done}`
 entries in `screenshots/manifest.json` are the corresponding real grabs.
 
-Follow-up sessions will add `mne_scan_app` and `mne_analyze_studio_app`
-kinds on top of the same `shot_app_common` infrastructure (each app
-exposes its `MainWindow` via a small static `*_app_core` library,
-mirroring `mne_inspect_app_core` and `mne_align_app_core`).
+`mne_scan_app` builds the MNE Scan main window with the plugins of the build
+(loaded from the `mne_scan_plugins` directory next to the built `mne_scan`):
+
+| Key         | Type / values                                  | Effect |
+|-------------|------------------------------------------------|--------|
+| `pipeline`  | array of `{ plugin, x, y }`                    | Places the plugins (by display name, e.g. `"Fiff Simulator"`) at the scene positions; consecutive entries are connected. |
+| `select`    | plugin display name                            | Selects that plugin, so its setup widget is shown. |
+| `open_menu` | `"sensor"` \| `"algorithm"`                    | Paints the open plugin menu next to its tool button. |
+
+`mne_analyze_studio_app` builds the Analyze Studio workbench in offline mode
+(`MNE_ANALYZE_STUDIO_OFFLINE`: no Neuro Kernel / Skill Host processes, no
+keychain access) and previews a workflow graph without executing it:
+
+| Key           | Type / values                | Effect |
+|---------------|------------------------------|--------|
+| `workflow`    | file name                    | Workflow from `src/applications/mne_analyze_studio/examples/workflows/`. |
+| `open_editor` | bool                         | Also opens the file in an editor tab. |
+| `center`      | `"graph"` \| `"editor"`       | Which center tab is in front (default `graph`). |
+
+Each app exposes its window through a static `*_app_core` library
+(`mne_inspect_app_core`, `mne_align_app_core`, `mne_scan_app_core`,
+`mne_analyze_studio_app_core`).
+
+## Screenshots in CI
+
+The `DocShots` job ([`_reusable-doc-shots.yml`](../../.github/workflows/_reusable-doc-shots.yml))
+builds `mne_doc_shots`, renders the whole manifest, runs
+`tools/quality/validate_screenshots.py` and uploads the PNGs as the
+`doc-screenshots` artifact. The website jobs of pull requests, `staging` and
+`main` wait for it and download the PNGs before `npm run build`. A missing
+image fails the site build; for a local build without the screenshots set
+`MNECPP_ALLOW_MISSING_SCREENSHOTS=1`.
