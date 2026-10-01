@@ -97,6 +97,8 @@ void installDeduplicatingMessageHandler()
 void prepareProcessEnvironment()
 {
     qputenv("QT_QPA_PLATFORM", "offscreen");
+    // Without a console, Windows Qt logs to OutputDebugString and CI would show no diagnostics.
+    qputenv("QT_FORCE_STDERR_LOGGING", "1");
     qputenv("QT_ENABLE_HIGHDPI_SCALING", "0");
     qputenv("QT_SCALE_FACTOR", "1");
     qputenv("QT_FONT_DPI", "96");
@@ -128,8 +130,10 @@ bool applyDeterministicTheme(QApplication& app, QString& err)
     font.setHintingPreference(QFont::PreferNoHinting);
     QApplication::setFont(font);
     if (QFontInfo(QApplication::font()).family() != family) {
-        err = QStringLiteral("application font resolves to '%1' instead of the bundled '%2'")
-                  .arg(QFontInfo(QApplication::font()).family(), family);
+        err = QStringLiteral("application font resolves to '%1' instead of the bundled '%2' (platform %3, %4 "
+                             "families available)")
+                  .arg(QFontInfo(QApplication::font()).family(), family, QGuiApplication::platformName())
+                  .arg(QFontDatabase::families().size());
         return false;
     }
 

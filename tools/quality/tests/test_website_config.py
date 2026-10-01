@@ -140,7 +140,9 @@ class TestVersionRouting(unittest.TestCase):
 
     def test_site_version_matches_the_project(self) -> None:
         config = (_WEBSITE / "docusaurus.config.ts").read_text(encoding="utf-8")
-        declared = re.search(r"export const stableVersion = '([^']+)'", config).group(1)
+        declared = re.search(r"^const stableVersion = '([^']+)'", config, re.MULTILINE).group(1)
+        # Docusaurus validates every named export of the config module as a config field.
+        self.assertNotRegex(config, r"(?m)^export (?!default)")
         self.assertEqual(build_check.project_version(), declared)
         self.assertNotRegex(config.replace(f"'{declared}'", ""), r"\b\d+\.\d+\.\d+\b(?!-)")
 

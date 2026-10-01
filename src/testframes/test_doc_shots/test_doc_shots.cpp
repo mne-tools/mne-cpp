@@ -31,6 +31,8 @@
 #include <QWidget>
 #include <QtTest/QtTest>
 
+#include <cstdio>
+
 namespace
 {
 
@@ -251,7 +253,7 @@ int main(int argc, char* argv[])
     QApplication app(argc, argv);
     QString err;
     if (!DOCSHOTS::applyDeterministicTheme(app, err)) {
-        qCritical("%s", qPrintable(err));
+        std::fprintf(stderr, "test_doc_shots: cannot pin the capture theme: %s\n", qPrintable(err));
         return 1;
     }
     TestDocShots test;

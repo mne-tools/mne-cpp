@@ -8,7 +8,7 @@ import rehypeKatex from 'rehype-katex';
 const siteEnv = process.env.MNECPP_SITE_ENV || 'stable';
 const isDev = siteEnv === 'dev';
 // Latest release; tools/quality/tests/test_website_config.py keeps it equal to src/CMakeLists.txt.
-export const stableVersion = '2.3.0';
+const stableVersion = '2.3.0';
 const versionLabel = isDev ? 'dev (latest)' : `v${stableVersion}`;
 
 const config: Config = {
