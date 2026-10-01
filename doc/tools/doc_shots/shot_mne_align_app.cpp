@@ -38,6 +38,7 @@
 #include "shot_mne_align_app.h"
 
 #include "shot_app_common.h"
+#include "shot_capture.h"
 #include "shot_runner.h"
 
 #include "align_wizard.h"
@@ -50,7 +51,6 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonValue>
-#include <QPixmap>
 #include <QString>
 #include <QVector>
 
@@ -95,7 +95,6 @@ bool renderMneAlignApp(const ShotSpec& spec,
     }
 
     MneAlign mw;
-    mw.resize(spec.size.isValid() ? spec.size : QSize(1280, 800));
 
     // Switch every QRhiWidget under the window to the Null backend BEFORE
     // showing — otherwise BrainView will try to bring up Metal/Vulkan/OpenGL
@@ -135,9 +134,9 @@ bool renderMneAlignApp(const ShotSpec& spec,
     // Optional generic fixture hooks (for future apps that register loaders).
     const QJsonArray extras = setup.value(QStringLiteral("fixtures")).toArray();
     for (const QJsonValue& v : extras) {
-        const QString name = v.toString();
-        if (!name.isEmpty()) {
-            AppFixtureLoaders::apply(name, &mw);
+        if (!AppFixtureLoaders::apply(v.toString(), &mw)) {
+            err = QStringLiteral("unknown fixture '%1'").arg(v.toString());
+            return false;
         }
     }
 
@@ -148,19 +147,7 @@ bool renderMneAlignApp(const ShotSpec& spec,
         }
     }
 
-    mw.show();
-    pumpUntilIdle(&mw, 250);
-
-    const QPixmap pm = mw.grab();
-    if (pm.isNull()) {
-        err = QStringLiteral("MneAlign::grab() returned a null pixmap");
-        return false;
-    }
-    if (!pm.save(outPath, "PNG")) {
-        err = QStringLiteral("Could not write PNG to %1").arg(outPath);
-        return false;
-    }
-    return true;
+    return showAtSize(mw, spec.size, err) && captureWindow(mw, spec.size, outPath, err);
 }
 
 }  // namespace DOCSHOTS

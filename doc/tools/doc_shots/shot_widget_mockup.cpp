@@ -34,10 +34,10 @@
  *           the event loop, and saves the grab as PNG.
  */
 
+#include "shot_capture.h"
 #include "shot_kinds.h"
 
 #include <QApplication>
-#include <QCoreApplication>
 #include <QDockWidget>
 #include <QImage>
 #include <QJsonArray>
@@ -46,7 +46,6 @@
 #include <QListWidget>
 #include <QMainWindow>
 #include <QPainter>
-#include <QPixmap>
 #include <QStatusBar>
 #include <QString>
 #include <QStringList>
@@ -153,13 +152,6 @@ void addToolbar(QMainWindow* mw, const QJsonObject& setup)
     }
 }
 
-void pumpEvents()
-{
-    for (int i = 0; i < 6; ++i) {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 30);
-    }
-}
-
 }  // namespace
 
 bool renderWidgetMockup(const ShotSpec& spec, const QString& outPath, QString& err)
@@ -178,20 +170,7 @@ bool renderWidgetMockup(const ShotSpec& spec, const QString& outPath, QString& e
         mw.statusBar()->showMessage(statusText);
     }
 
-    mw.resize(spec.size);
-    mw.show();
-    pumpEvents();
-
-    const QPixmap pm = mw.grab();
-    if (pm.isNull()) {
-        err = QStringLiteral("QWidget::grab() returned a null pixmap");
-        return false;
-    }
-    if (!pm.save(outPath, "PNG")) {
-        err = QStringLiteral("Failed to save PNG to %1").arg(outPath);
-        return false;
-    }
-    return true;
+    return showAtSize(mw, spec.size, err) && captureWindow(mw, spec.size, outPath, err);
 }
 
 }  // namespace DOCSHOTS

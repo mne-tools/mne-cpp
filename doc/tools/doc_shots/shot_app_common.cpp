@@ -14,8 +14,6 @@
 
 #include "shot_app_common.h"
 
-#include <QApplication>
-#include <QElapsedTimer>
 #include <QHash>
 #include <QRhiWidget>
 #include <QWidget>
@@ -36,27 +34,6 @@ bool forceQRhiNullOnRhiWidgets(QWidget* root)
         rw->setApi(QRhiWidget::Api::Null);
     }
     return true;
-}
-
-void pumpUntilIdle(QWidget* w, int msecs)
-{
-    if (w) {
-        w->update();
-    }
-    if (msecs <= 0) {
-        QCoreApplication::processEvents(QEventLoop::AllEvents);
-        return;
-    }
-    QElapsedTimer t;
-    t.start();
-    while (t.elapsed() < msecs) {
-        // Drain whatever is queued. We can't ask Qt "are you idle?" in
-        // Qt6 (hasPendingEvents was removed), so we just spin the bounded
-        // pump until the wall-clock budget is exhausted; the per-tick
-        // maxtime keeps the loop responsive without busy-waiting.
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
-        QCoreApplication::sendPostedEvents();
-    }
 }
 
 namespace {

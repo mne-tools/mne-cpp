@@ -32,36 +32,25 @@
  * @brief    Entry point for the mne_doc_shots screenshot generator.
  */
 
+#include "shot_capture.h"
 #include "shot_runner.h"
 
+#include <QApplication>
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFileInfo>
+#include <QTextStream>
 #ifndef Q_OS_WIN
 #include <QTimer>
 #endif
 
-// Force the offscreen Qt platform plugin BEFORE QApplication is constructed.
-// This is required so the tool can run on CI / docs builds with no display.
-namespace {
-struct OffscreenPlatformGuard {
-    OffscreenPlatformGuard()
-    {
-        if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM")) {
-            qputenv("QT_QPA_PLATFORM", "offscreen");
-        }
-    }
-};
-static const OffscreenPlatformGuard g_offscreenGuard;
-}
-
-#include <QApplication>
-
 int main(int argc, char* argv[])
 {
+    DOCSHOTS::prepareProcessEnvironment();
+    DOCSHOTS::installDeduplicatingMessageHandler();
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("mne_doc_shots"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("2.3.0"));
+    QCoreApplication::setApplicationVersion(QStringLiteral("2.4.0"));
 
     QCommandLineParser parser;
     parser.setApplicationDescription(
@@ -88,6 +77,13 @@ int main(int argc, char* argv[])
     if (positional.size() != 1) {
         parser.showHelp(2);
     }
+
+    QString themeErr;
+    if (!DOCSHOTS::applyDeterministicTheme(app, themeErr)) {
+        QTextStream(stderr) << "[mne_doc_shots] ERROR: " << themeErr << "\n";
+        return 1;
+    }
+    QTextStream(stdout) << "[mne_doc_shots] environment: " << DOCSHOTS::environmentSummary() << "\n";
 
     DOCSHOTS::RunnerOptions opts;
     opts.manifestPath = QFileInfo(positional.first()).absoluteFilePath();

@@ -29,9 +29,9 @@
  * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * @brief    Shared helpers for real-app screenshot kinds: QRhi → Null fallback,
- *           bounded event-loop pump, and a tiny named-fixture registry that
- *           per-app shot files use to advertise their setup-JSON hooks.
+ * @brief    Shared helpers for real-app screenshot kinds: QRhi → Null fallback
+ *           and a tiny named-fixture registry that per-app shot files use to
+ *           advertise their setup-JSON hooks.
  *
  *           To add fixtures for another app (e.g. mne_align): in
  *           `shot_mne_align_app.cpp` call
@@ -72,19 +72,6 @@ namespace DOCSHOTS
  *                  on a null @p root.
  */
 bool forceQRhiNullOnRhiWidgets(QWidget* root);
-
-//=============================================================================================================
-/**
- * Spin the application event loop for up to @p msecs milliseconds, returning
- * early once the loop reports no further pending events. Used after `show()`
- * to give Qt a chance to lay out the dock widgets, populate the toolbar,
- * resize child widgets, etc. before we call `grab()`.
- *
- * @param[in] w      Widget whose `update()` is requested at the start.
- *                   Pass `nullptr` to skip the update request.
- * @param[in] msecs  Hard upper bound on the pump duration.
- */
-void pumpUntilIdle(QWidget* w, int msecs = 250);
 
 //=============================================================================================================
 /**

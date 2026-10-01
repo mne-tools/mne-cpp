@@ -47,14 +47,17 @@ set(SOURCES
     shot_widget_mockup.cpp
     shot_scene_only.cpp
     shot_app_common.cpp
+    shot_capture.cpp
     shot_mne_inspect_app.cpp
     shot_mne_align_app.cpp
+    fonts/fonts.qrc
 )
 
 set(HEADERS
     shot_runner.h
     shot_kinds.h
     shot_app_common.h
+    shot_capture.h
     shot_mne_inspect_app.h
     shot_mne_align_app.h
 )

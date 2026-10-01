@@ -39,6 +39,7 @@
  *           stays unblocked.
  */
 
+#include "shot_capture.h"
 #include "shot_kinds.h"
 
 #include <QFont>
@@ -102,11 +103,7 @@ bool renderSceneOnly(const ShotSpec& spec, const QString& outPath,
 
     p.end();
 
-    if (!img.save(outPath, "PNG")) {
-        err = QStringLiteral("Failed to save PNG to %1").arg(outPath);
-        return false;
-    }
-    return true;
+    return savePng(img, outPath, err);
 }
 
 }  // namespace DOCSHOTS

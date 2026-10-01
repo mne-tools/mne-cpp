@@ -38,6 +38,7 @@
 #include "shot_mne_inspect_app.h"
 
 #include "shot_app_common.h"
+#include "shot_capture.h"
 #include "shot_runner.h"
 
 #include "fixtures/inspect_demo_fixtures.h"
@@ -54,7 +55,6 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonValue>
-#include <QPixmap>
 #include <QString>
 #include <QVector3D>
 
@@ -123,7 +123,6 @@ bool renderMneInspectApp(const ShotSpec& spec,
     }
 
     MainWindow mw;
-    mw.resize(spec.size.isValid() ? spec.size : QSize(1280, 800));
 
     // Switch every QRhiWidget under the MainWindow to the Null backend BEFORE
     // showing — otherwise BrainView will try to bring up Metal/Vulkan/OpenGL
@@ -145,39 +144,32 @@ bool renderMneInspectApp(const ShotSpec& spec,
     // Optional generic fixture hooks (for future apps that register loaders).
     const QJsonArray extras = setup.value(QStringLiteral("fixtures")).toArray();
     for (const QJsonValue& v : extras) {
-        const QString name = v.toString();
-        if (!name.isEmpty()) {
-            AppFixtureLoaders::apply(name, &mw);
+        if (!AppFixtureLoaders::apply(v.toString(), &mw)) {
+            err = QStringLiteral("unknown fixture '%1'").arg(v.toString());
+            return false;
         }
     }
 
-    mw.show();
-    pumpUntilIdle(&mw, 250);
+    if (!showAtSize(mw, spec.size, err)) {
+        return false;
+    }
 
     if (setup.contains(QStringLiteral("focus_dock"))) {
         const QString focus = setup.value(QStringLiteral("focus_dock")).toString();
-        if (QDockWidget* d = dockByName(mw, focus)) {
-            d->show();
-            d->raise();
-            pumpUntilIdle(&mw, 100);
+        QDockWidget* d = dockByName(mw, focus);
+        if (!d) {
+            err = QStringLiteral("unknown focus_dock '%1' (expected pick, layers or overlay)").arg(focus);
+            return false;
         }
+        d->show();
+        d->raise();
     }
 
     if (setup.contains(QStringLiteral("simulate_pick"))) {
         injectPick(mw, setup.value(QStringLiteral("simulate_pick")).toObject());
-        pumpUntilIdle(&mw, 100);
     }
 
-    const QPixmap pm = mw.grab();
-    if (pm.isNull()) {
-        err = QStringLiteral("MainWindow::grab() returned a null pixmap");
-        return false;
-    }
-    if (!pm.save(outPath, "PNG")) {
-        err = QStringLiteral("Could not write PNG to %1").arg(outPath);
-        return false;
-    }
-    return true;
+    return captureWindow(mw, spec.size, outPath, err);
 }
 
 }  // namespace DOCSHOTS

@@ -97,13 +97,15 @@ bool ShotRunner::loadManifest(QString& outDir, QVector<ShotSpec>& shots, QString
         s.id = o.value(QStringLiteral("id")).toString();
         s.kind = o.value(QStringLiteral("kind")).toString();
         const QJsonArray sz = o.value(QStringLiteral("size")).toArray();
-        if (sz.size() == 2) {
-            s.size = QSize(sz.at(0).toInt(1280), sz.at(1).toInt(800));
-        }
+        s.size = sz.size() == 2 ? QSize(sz.at(0).toInt(0), sz.at(1).toInt(0)) : QSize();
         s.setup = o.value(QStringLiteral("setup")).toObject();
         s.requiresSampleData = o.value(QStringLiteral("requires_sample_data")).toBool(false);
         if (s.id.isEmpty() || s.kind.isEmpty()) {
             err = QStringLiteral("Manifest entry missing 'id' or 'kind'");
+            return false;
+        }
+        if (s.size.isEmpty()) {
+            err = QStringLiteral("Manifest entry '%1' needs 'size': [width, height]").arg(s.id);
             return false;
         }
         shots.append(s);
@@ -184,6 +186,7 @@ bool ShotRunner::run()
             }
         } else {
             failed++;
+            QFile::remove(outPath);
             errOut << "[mne_doc_shots] FAIL    " << spec.id << ": " << err << "\n";
         }
     }

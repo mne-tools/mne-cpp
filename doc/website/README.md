@@ -75,8 +75,19 @@ Some manifest entries use a shot `kind` that constructs the full application
 `MainWindow` under the offscreen QPA and grabs it. Shared plumbing lives in
 [`doc/tools/doc_shots/shot_app_common.{h,cpp}`](../tools/doc_shots/) —
 it forces every `QRhiWidget` descendant onto the Null backend (so the grab
-works on headless macOS/CI without Metal) and pumps the event loop until the
-window is laid out.
+works on headless macOS/CI without Metal).
+
+Captures are deterministic ([`shot_capture.{h,cpp}`](../tools/doc_shots/)):
+offscreen platform, device pixel ratio 1, 96 DPI, `en_US` locale, Fusion
+style with its light palette, the bundled DejaVu Sans 2.35 at 13 px
+(`doc/tools/doc_shots/fonts/`, Bitstream Vera licence), no cursor blink or
+UI animations. Each shot waits until no thread-pool job is running and
+the window has rendered identically for 300 ms (at most 15 s), then must be
+exactly the declared `size`. A window that cannot shrink to that size fails
+and names the widgets whose minimum size prevents it, so pick a `size` the
+window can actually take. A failed shot exits non-zero and leaves no PNG
+behind. Every run prints the capture environment, so two differing images
+can be traced to their environment.
 
 Today only `mne_inspect_app` is wired up. Its `setup` schema:
 
