@@ -12,11 +12,11 @@
  * The detectors in this header scan continuous MEG / EEG data and emit
  * @ref FIFFLIB::FiffAnnotation intervals marking time segments that
  * should be excluded from downstream averaging, ICA fitting or PSD
- * estimation. @ref annotateMuscleZscore band-pass filters the signal in
+ * estimation. @c annotateMuscleZscore band-pass filters the signal in
  * the 110–140 Hz range (typical EMG band), takes the smoothed envelope
  * across channels and z-scores it against the global median absolute
  * deviation; samples whose z-score exceeds a user threshold are merged
- * into BAD_muscle annotations. @ref annotateAmplitude flags two boundary
+ * into BAD_muscle annotations. @ref UTILSLIB::annotateAmplitude "annotateAmplitude" flags two boundary
  * conditions instead: per-channel peak-to-peak amplitude exceeding an
  * upper limit ("high-amplitude" artefact) and amplitude falling below a
  * lower limit for longer than a minimum duration ("flat" / dead channel).

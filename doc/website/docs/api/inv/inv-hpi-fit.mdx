@@ -41,7 +41,7 @@ Constructs the HPI from a `InvSensorSet`.
 
 **Parameters:**
 
-- **InvSensorSet**
+- **sensorSet** : *const InvSensorSet &*
   The MEG sensorSet used for the hpi fitting.
 
 ---
@@ -52,7 +52,7 @@ Checks if `InvSensorSet` has changed and updates member `InvSensorSet`.
 
 **Parameters:**
 
-- **InvSensorSet**
+- **sensorSet** : *const InvSensorSet &*
   The MEG sensorSet used for the hpi fitting.
 
 ---
@@ -74,9 +74,6 @@ Perform one single HPI fit.
 
 - **matCoilsHead** : *const Eigen::MatrixXd &*
   The hpi coil locations in head space.
-
-- **bOrderFrequencies**
-  Order Hpi coils yes/no.
 
 - **hpiFitResult** : *HpiFitResult &*
   The fitting results.

@@ -16,13 +16,13 @@
  * JSON/CBOR serialisers, the op-registry loader and the executor all
  * agree on the canonical spelling.
  *
- * @ref MnaFileRole classifies the semantic purpose of a file within a
+ * @ref MNALIB::MnaFileRole "MnaFileRole" classifies the semantic purpose of a file within a
  * project (Raw, Forward, Inverse, Covariance, …) so a viewer can pick
- * the right reader without sniffing magic bytes. @ref MnaDataKind
+ * the right reader without sniffing magic bytes. @ref MNALIB::MnaDataKind "MnaDataKind"
  * describes the runtime payload travelling through a graph port
  * (FiffRaw, Epochs, SourceEstimate, RealTimeStream, …) and is what
- * @ref MnaGraph::validate uses to reject incompatible connections.
- * @ref MnaPortDir and @ref MnaNodeExecMode (Batch/Stream/Ipc/Script)
+ * @ref MNALIB::MnaGraph::validate "MnaGraph::validate" uses to reject incompatible connections.
+ * @ref MNALIB::MnaPortDir "MnaPortDir" and @ref MNALIB::MnaNodeExecMode "MnaNodeExecMode" (Batch/Stream/Ipc/Script)
  * complete the surface needed by the graph executor.
  *
  * The inline @c xxxToString / @c xxxFromString helpers are the single
@@ -132,6 +132,10 @@ enum class MnaNodeExecMode {
 
 /**
  * Convert MnaFileRole to its string representation.
+ *
+ * @param[in] role   File role to convert.
+ *
+ * @return Lower-case snake_case name such as "raw" or "source_estimate"; "custom" for unknown values.
  */
 inline QString mnaFileRoleToString(MnaFileRole role)
 {
@@ -158,6 +162,10 @@ inline QString mnaFileRoleToString(MnaFileRole role)
 
 /**
  * Convert a string to MnaFileRole.
+ *
+ * @param[in] str   Lower-case snake_case role name as produced by mnaFileRoleToString().
+ *
+ * @return The matching role, or MnaFileRole::Custom if str is not recognized.
  */
 inline MnaFileRole mnaFileRoleFromString(const QString& str)
 {
@@ -182,6 +190,10 @@ inline MnaFileRole mnaFileRoleFromString(const QString& str)
 
 /**
  * Convert MnaDataKind to its string representation.
+ *
+ * @param[in] kind   Data kind to convert.
+ *
+ * @return CamelCase name such as "FiffRaw" or "SourceEstimate"; "Custom" for unknown values.
  */
 inline QString mnaDataKindToString(MnaDataKind kind)
 {
@@ -209,6 +221,10 @@ inline QString mnaDataKindToString(MnaDataKind kind)
 
 /**
  * Convert a string to MnaDataKind.
+ *
+ * @param[in] str   CamelCase or snake_case kind name, e.g. "SourceEstimate" or "source_estimate".
+ *
+ * @return The matching kind, or MnaDataKind::Custom if str is not recognized.
  */
 inline MnaDataKind mnaDataKindFromString(const QString& str)
 {

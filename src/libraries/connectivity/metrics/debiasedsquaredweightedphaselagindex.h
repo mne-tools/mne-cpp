@@ -13,7 +13,7 @@
  * @date     April 2018
  * @brief    Debiased squared Weighted Phase Lag Index (Vinck et al., 2011) between every channel pair.
  *
- * The plain @ref WeightedPhaseLagIndex is still positively biased for
+ * The plain @ref CONNECTIVITYLIB::WeightedPhaseLagIndex is still positively biased for
  * small numbers of trials @c N because the squared expectation in the
  * numerator picks up a diagonal variance term. Vinck, Oostenveld, van
  * Wingerden, Battaglia and Pennartz (NeuroImage 2011) derived the
@@ -119,9 +119,9 @@ protected:
      * Computes the DSWPLI values. This function gets called in parallel.
      *
      * @param[in] inputData              The input data.
-     * @param[out]vecPairCsdSum          The sum of all CSD matrices for each trial.
-     * @param[out]vecPairCsdImagAbsSum   The sum of all imag abs CSD matrices for each trial.
-     * @param[out]vecPairCsdImagSqrdSum  The sum of all imag aqrd CSD matrices for each trial.
+     * @param[out] vecPairCsdSum          The sum of all CSD matrices for each trial.
+     * @param[out] vecPairCsdImagAbsSum   The sum of all imag abs CSD matrices for each trial.
+     * @param[out] vecPairCsdImagSqrdSum  The sum of all imag aqrd CSD matrices for each trial.
      * @param[in] mutex                  The mutex used to safely access vecPairCsdSum.
      * @param[in] iNRows                 The number of rows.
      * @param[in] iNFreqs                The number of frequenciy bins.

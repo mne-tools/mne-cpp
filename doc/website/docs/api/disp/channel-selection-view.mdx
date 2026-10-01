@@ -37,11 +37,17 @@ Constructs a [`ChannelSelectionView`](/docs/api/disp/channel-selection-view) whi
 
 **Parameters:**
 
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
 - **parent** : *QWidget **
   pointer to parent widget; If parent is 0, the new [`ChannelSelectionView`](/docs/api/disp/channel-selection-view) becomes a window. If parent is another widget, [`ChannelSelectionView`](/docs/api/disp/channel-selection-view) becomes a child window inside parent. [`ChannelSelectionView`](/docs/api/disp/channel-selection-view) is deleted when its parent is deleted.
 
 - **pChannelInfoModel** : *QSharedPointer&lt;[ChannelInfoModel](/docs/api/disp/channel-info-model)&gt;*
   pointer to the channel info model.
+
+- **f** : *Qt::WindowType*
+  Qt window flags passed to the QWidget constructor.
 
 ---
 
@@ -72,7 +78,7 @@ Highlight channels This function highlights channels which were selected outside
 
 **Parameters:**
 
-- **channelList**
+- **channelIndexList** : *QModelIndexList*
   channels which are be to set as selected.
 
 ---
@@ -92,6 +98,10 @@ Select channels This function selects channels which were selected outside this 
 
 Current selected channels This function returns the current channel selection.
 
+**Returns:**
+
+- *QStringList* — Names of the user-defined channels, or of the visible group channels if none were user-defined.
+
 ---
 
 ### getItemForChName(listWidget, channelName)
@@ -106,17 +116,30 @@ gets the item corresponding to text in listWidget
 - **channelName** : *const QString &*
   the corresponding channel name.
 
+**Returns:**
+
+- *QListWidgetItem ** — Matching list item, or a newly allocated empty item owned by the caller if none matches.
+
 ---
 
 ### getLayoutMap()
 
 returns the current layout map.
 
+**Returns:**
+
+- *const QMap&lt; QString, QPointF &gt; &* — Map from channel name to its 2-D layout position.
+
 ---
 
 ### newFiffFileLoaded(pFiffInfo)
 
 call this whenever a new file was loaded.
+
+**Parameters:**
+
+- **pFiffInfo** : *QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt; &*
+  Measurement info of the new file (currently unused; the layout is reloaded).
 
 ---
 

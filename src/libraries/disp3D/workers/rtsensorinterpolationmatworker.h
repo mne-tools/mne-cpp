@@ -12,7 +12,7 @@
  * Owns the inputs to the field-map kernel &mdash; evoked info, head
  * and helmet surface geometry, MRI / head coordinate transforms,
  * channel picks and SSP projectors. Whenever any of these change
- * via the (mutex-protected) setters, @ref computeMapping rebuilds
+ * via the (mutex-protected) setters, @ref DISP3DLIB::RtSensorInterpolationMatWorker::computeMapping "computeMapping" rebuilds
  * the dense (n_vertices x n_channels) matrix and emits it back to
  * the data worker, so the streaming pipeline never stalls.
  */

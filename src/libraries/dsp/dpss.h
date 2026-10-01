@@ -16,7 +16,7 @@
  * taper basis (Slepian, 1978; Thomson, 1982); their direct eigen-
  * concentrations λ_k determine the leakage of every taper.
  *
- * Used by @ref MultitaperPsd and @ref MultitaperTfr to suppress spectral
+ * Used by @ref UTILSLIB::MultitaperPsd and @ref UTILSLIB::MultitaperTfr to suppress spectral
  * bias while keeping the variance penalty of windowing under control. The
  * implementation diagonalises the tri-diagonal Slepian matrix — numerically
  * far better-behaved than working with the sinc kernel directly — and

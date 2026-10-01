@@ -346,7 +346,7 @@ Update the SPHARA operator.
 
 **Parameters:**
 
-- **sSystemType**
+- **sSytemType** : *const QString &*
   The current acquisition system type (VectorView, BabyMEG, EEG).
 
 - **nBaseFctsFirst** : *int*
@@ -418,11 +418,11 @@ markChBad marks the selected channels as bad/good in m_chInfolist
 
 **Parameters:**
 
-- **chlist**
+- **ch** : *QModelIndex*
   index that is selected for marking.
 
 - **status** : *bool*
-  -&gt; mark as bad, status=0 -&gt; mark as good.
+  Mark as bad when true, as good when false.
 
 ---
 
@@ -436,7 +436,7 @@ markChBad marks the selected channels as bad/good in m_chInfolist
   is the list of indices that are selected for marking.
 
 - **status** : *bool*
-  -&gt; mark as bad, status=0 -&gt; mark as good.
+  Mark as bad when true, as good when false.
 
 ---
 
@@ -449,7 +449,7 @@ markChBad marks the selected channels as bad/good in m_chInfolist
 - **colorMap** : *const QMap&lt; double, QColor &gt; &*
   color for each trigger channel.
 
-- **activ**
+- **active** : *bool*
   real time trigger detection active.
 
 - **triggerCh** : *QString*
@@ -615,8 +615,8 @@ range value in [FiffChInfo](/docs/api/fiff/fiff-ch-info) does not seem to contai
 
 **Parameters:**
 
-- **Row**
-  of the model
+- **row** : *int*
+  Row of the model.
 
 **Returns:**
 
@@ -630,7 +630,8 @@ Adds event based on input parameters.
 
 **Parameters:**
 
-- ****
+- **iSample** : *int*
+  Sample of the new event.
 
 ---
 

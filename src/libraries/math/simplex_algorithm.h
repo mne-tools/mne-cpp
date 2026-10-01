@@ -114,6 +114,16 @@ public:
     //=========================================================================================================
     /**
      * Overload without report function (no reporting).
+     *
+     * @param[in,out] p       The initial simplex (npar+1 x npar). On return, row 0 is the best vertex.
+     * @param[in,out] y       Function values at the vertices.
+     * @param[in] ftol        Relative convergence tolerance.
+     * @param[in] stol        Absolute spatial convergence tolerance (0 to disable).
+     * @param[in] func        The cost function to be evaluated.
+     * @param[in] max_eval    Maximum number of function evaluations.
+     * @param[out] neval      Number of function evaluations performed.
+     *
+     * @return True when minimization succeeded, false otherwise.
      */
     template <typename T, typename CostFunc>
     static bool simplex_minimize(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& p,

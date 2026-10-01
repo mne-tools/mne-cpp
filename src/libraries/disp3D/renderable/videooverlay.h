@@ -69,7 +69,11 @@ public:
     const QImage &frame() const { return m_frame; }
     bool hasFrame() const { return !m_frame.isNull(); }
 
-    /** Push a new video frame; bumps the generation counter so the GPU re-uploads. */
+    /**
+     * Push a new video frame; bumps the generation counter so the GPU re-uploads.
+     *
+     * @param[in] image   New video frame; null images are ignored.
+     */
     void setFrame(const QImage &image)
     {
         if (image.isNull())
@@ -78,7 +82,11 @@ public:
         ++m_frameGeneration;
     }
 
-    /** Monotonic counter, incremented on every setFrame() call. */
+    /**
+     * Monotonic counter, incremented on every setFrame() call.
+     *
+     * @return Current video frame generation.
+     */
     quint64 frameGeneration() const { return m_frameGeneration; }
 
     /** @return Overall opacity of the overlay [0..1]. */
@@ -89,6 +97,8 @@ public:
      * @brief Hint direction used as the quad's "up" axis.
      * When set (non-zero), the quad's long edge is perpendicular to this
      * direction instead of using the default world-up billboard.
+     *
+     * @return Up-hint direction, or a zero vector if unset.
      */
     QVector3D upHint() const { return m_upHint; }
     void setUpHint(const QVector3D &dir) { m_upHint = dir; }
@@ -99,7 +109,11 @@ public:
     bool isDepthEnabled() const { return m_depthEnabled; }
     void setDepthEnabled(bool enabled) { m_depthEnabled = enabled; }
 
-    /** Push a new monocular depth map (single-channel or RGBA grayscale). */
+    /**
+     * Push a new monocular depth map (single-channel or RGBA grayscale).
+     *
+     * @param[in] image   New depth map; null images are ignored.
+     */
     void setDepthFrame(const QImage &image)
     {
         if (image.isNull())

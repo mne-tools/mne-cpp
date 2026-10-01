@@ -119,6 +119,10 @@ public:
     //=========================================================================================================
     /**
      * @brief Get the number of electrodes in a montage.
+     *
+     * @param[in] system  The montage system.
+     *
+     * @return Number of electrode positions defined for the montage.
      */
     static int electrodeCount(System system);
 

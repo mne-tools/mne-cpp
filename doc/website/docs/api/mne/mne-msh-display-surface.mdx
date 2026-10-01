@@ -55,9 +55,6 @@ Align MEG and MRI coordinate systems using fiducial points and ICP.
 - **mri_dig** : *const [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) &*
   MRI digitizer data with fiducial locations.
 
-- **head_surf**
-  The scalp surface used for ICP.
-
 - **niter** : *int*
   Number of ICP iterations.
 
@@ -80,11 +77,34 @@ Align MEG and MRI coordinate systems using fiducial points and ICP.
 
 Compute a uniform head scale factor by fitting spheres.
 
+**Parameters:**
+
+- **dig** : *[FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) &*
+  Digitizer data; points with positive z are used for the sphere fit.
+
+- **mri_fid** : *const Eigen::Matrix3f &*
+  MRI fiducial locations (LPA, nasion, RPA rows), in m.
+
+- **scales** : *Eigen::Vector3f &*
+  Receives the per-axis scale factors (all set to 1 if a sphere fit fails).
+
 ---
 
 ### discard_outlier_digitizer_points(d, maxdist)
 
 Mark digitizer points whose distance to the head surface exceeds maxdist.
+
+**Parameters:**
+
+- **d** : *[FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) &*
+  Digitizer data; its discard flags and distances are updated.
+
+- **maxdist** : *float*
+  Maximum allowed distance to the surface, in m; cardinal and HPI points are never discarded.
+
+**Returns:**
+
+- *int* — Number of points discarded.
 
 ---
 
@@ -92,11 +112,40 @@ Mark digitizer points whose distance to the head surface exceeds maxdist.
 
 Compute the distance from each active digitizer point to the head surface.
 
+**Parameters:**
+
+- **dig** : *[FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) &*
+  Digitizer data; dist, closest and closest_point are updated.
+
+- **do_all** : *bool*
+  If true, include inactive and discarded points.
+
+- **do_approx** : *bool*
+  If true, start the closest-point search from the previously found triangles.
+
 ---
 
 ### iterate_alignment_once(dig, nasion_weight, nasion_mri, last_step)
 
 Perform one iteration of ICP-like alignment.
+
+**Parameters:**
+
+- **dig** : *[FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) &*
+  Digitizer data; head_mri_t_adj and distances are updated.
+
+- **nasion_weight** : *int*
+  Weight of the nasion point in the Procrustes fit.
+
+- **nasion_mri** : *const std::optional&lt; Eigen::Vector3f &gt; &*
+  Optional fixed MRI location of the nasion, in m.
+
+- **last_step** : *int*
+  Non-zero if this is the final iteration (enables exact distances).
+
+**Returns:**
+
+- *int* — OK on success, FAIL if no adjustable transform exists, fewer than 3 points are active, or the fit fails.
 
 ---
 
@@ -104,11 +153,25 @@ Perform one iteration of ICP-like alignment.
 
 Compute the RMS distance from active digitizer points to the head surface.
 
+**Parameters:**
+
+- **dig** : *[FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) &*
+  Digitizer data; distances are recomputed if not valid.
+
+**Returns:**
+
+- *float* — RMS distance of the active, non-discarded points, in m.
+
 ---
 
 ### scale(scales)
 
 Scale a display surface's bounding box and all vertex positions.
+
+**Parameters:**
+
+- **scales** : *const Eigen::Vector3f &*
+  Per-axis scale factors (x, y, z).
 
 ---
 

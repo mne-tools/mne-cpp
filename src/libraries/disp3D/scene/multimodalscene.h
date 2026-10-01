@@ -11,7 +11,7 @@
  *
  * MultimodalScene composes the disp3D primitives into a single
  * depth-sorted layer stack so the GUI shell does not need to know
- * the per-modality render order. Each @ref SceneLayer carries its
+ * the per-modality render order. Each @ref DISP3DLIB::SceneLayer carries its
  * renderable, a sort key and a visibility flag; the controller
  * iterates layers in order and issues the corresponding draw calls.
  *
@@ -72,9 +72,9 @@ enum class SceneLayerKind {
  *
  * The payload is owned by the caller (e.g. the plugin that loaded the data)
  * and supplied as a `std::shared_ptr<void>` so the scene neither owns nor
- * inspects it. The scene only needs the @ref kind, the @ref id, and the
+ * inspects it. The scene only needs the @c DISP3DLIB::SceneLayer::kind "kind", the @ref id, and the
  * generic visibility / opacity flags to drive draw order; the renderer
- * downcasts the payload by @ref kind.
+ * downcasts the payload by @c DISP3DLIB::SceneLayer::kind "kind".
  *
  * This indirection keeps `disp3D/scene/` free of QRhi includes and means
  * new renderables (sEEG, ECoG, future fNIRS optodes, …) plug in without
@@ -166,12 +166,18 @@ public:
     //=========================================================================================================
     /**
      * Toggle visibility of a layer. No-op if the id is unknown.
+     *
+     * @param[in] id        Layer id.
+     * @param[in] visible   True to show the layer, false to hide it.
      */
     void setLayerVisible(const QString& id, bool visible);
 
     //=========================================================================================================
     /**
      * Set per-layer opacity in [0, 1]. No-op if the id is unknown.
+     *
+     * @param[in] id        Layer id.
+     * @param[in] opacity   Opacity, clamped to [0, 1].
      */
     void setLayerOpacity(const QString& id, float opacity);
 
@@ -186,6 +192,8 @@ public:
     /**
      * Set the current time index. Emits @ref timeSampleChanged if it
      * actually changes. Negative values are clamped to -1.
+     *
+     * @param[in] sample   New time sample index, or -1 for no time-resolved data.
      */
     void setCurrentTimeSample(int sample);
 
@@ -202,6 +210,8 @@ public:
     /**
      * Set the shared time cursor in seconds. Emits @ref timeCursorChanged
      * if the value actually changes.
+     *
+     * @param[in] seconds   New time cursor position in seconds.
      */
     void setTimeCursor(double seconds);
 
@@ -229,6 +239,10 @@ public:
      * data-driven Overlay dock and the renderables it drives. The values
      * are clamped to fmin <= fmid <= fmax. Emits
      * @ref overlayThresholdsChanged if any value actually changes.
+     *
+     * @param[in] fmin   Minimum threshold.
+     * @param[in] fmid   Mid threshold, raised to fmin if smaller.
+     * @param[in] fmax   Maximum threshold, raised to fmid if smaller.
      */
     void setOverlayThresholds(float fmin, float fmid, float fmax);
 
@@ -244,15 +258,20 @@ public:
      * Report a pick result from a layer's renderer or hit-tester. Emits
      * @ref picked. Used by both real ray-cast picking and synthetic picks
      * (e.g. wizard "show this contact" navigation).
+     *
+     * @param[in] pick   Pick result to store as the last pick and broadcast.
      */
     void reportPick(const PickResult& pick);
 
     //=========================================================================================================
     /**
-     * @return Scene-wide axis-aligned bounding box union of all visible
-     *         layers, computed by the supplied per-kind extractor. The
+     * Scene-wide axis-aligned bounding box union of all visible
+     * layers, computed by the supplied per-kind extractor. The
      *         scene itself does not know how to read each payload type;
      *         the host registers extractors via @ref registerBoundsFn.
+     *
+     * @param[out] bbMin   Minimum corner of the union box; (-1, -1, -1) if no layer contributed.
+     * @param[out] bbMax   Maximum corner of the union box; (1, 1, 1) if no layer contributed.
      */
     void worldBounds(QVector3D& bbMin, QVector3D& bbMax) const;
 
@@ -271,6 +290,9 @@ public:
     /**
      * Register an AABB extractor for a given layer kind. Replaces any
      * previously registered fn for that kind.
+     *
+     * @param[in] kind   Layer kind the extractor handles.
+     * @param[in] fn     Extractor returning false when the layer has no bounds.
      */
     void registerBoundsFn(SceneLayerKind kind, BoundsFn fn);
 

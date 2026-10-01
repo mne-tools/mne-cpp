@@ -13,9 +13,9 @@
  * response coefficients of a low-pass, high-pass, band-pass or notch filter
  * together with their zero-padded FFT and applies them to incoming data via
  * overlap-add convolution. Two design back-ends are supported — the
- * cosine-tapered raised-cosine design (@ref CosineFilter, fast, smooth
+ * cosine-tapered raised-cosine design (@ref UTILSLIB::CosineFilter, fast, smooth
  * roll-off) and the Parks–McClellan equiripple design
- * (@ref ParksMcClellan, optimal minimax behaviour). Both produce Type-I
+ * (@ref UTILSLIB::ParksMcClellan, optimal minimax behaviour). Both produce Type-I
  * linear-phase responses, so the kernel can be applied either as a single
  * forward pass with a fixed group delay of @c (NumTaps-1)/2 samples or in
  * zero-phase forward / time-reverse mode.
@@ -134,13 +134,13 @@ public:
      * Constructs a FilterKernel object
      *
      * @param[in] sFilterName      Defines the name of the generated filter.
-     * @param[in] type             Tyep of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType).
+     * @param[in] iFilterType             Tyep of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType).
      * @param[in] iOrder           Represents the order of the filter, the higher the higher is the stopband attenuation.
      * @param[in] dCenterfreq      Determines the center of the frequency - normed to sFreq/2 (nyquist).
      * @param[in] dBandwidth       Ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband - normed to sFreq/2 (nyquist).
      * @param[in] dParkswidth      Determines the width of the filter slopes (steepness) - normed to sFreq/2 (nyquist).
      * @param[in] dSFreq           The sampling frequency.
-     * @param[in] designMethod     Specifies the design method to use. Choose between Cosind and Tschebyscheff.
+     * @param[in] iDesignMethod     Specifies the design method to use. Choose between Cosind and Tschebyscheff.
      **/
     FilterKernel(const QString &sFilterName,
                  int  iFilterType,
@@ -183,8 +183,6 @@ public:
      * @param[in, out] vecData              Holds the data to be filtered. Gets overwritten with its filtered result.
      * @param[in] bKeepOverhead            Whether the result should still include the overhead information in front and back of the data.
      *                                      Default is set to false.
-     *
-     * @return the filtered data in form of a RowVectorXd.
      */
     void applyFftFilter(Eigen::RowVectorXd& vecData,
                         bool bKeepOverhead = false);

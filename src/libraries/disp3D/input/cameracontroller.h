@@ -79,10 +79,18 @@ public:
 
     // ── Scene geometry ─────────────────────────────────────────────────
 
-    /** Set the scene center (centroid of visible objects). */
+    /**
+     * Set the scene center (centroid of visible objects).
+     *
+     * @param[in] center   Scene centroid in world coordinates.
+     */
     void setSceneCenter(const QVector3D &center) { m_sceneCenter = center; }
 
-    /** Set the scene size (extent of visible objects). */
+    /**
+     * Set the scene size (extent of visible objects).
+     *
+     * @param[in] size   Scene extent in world units; values at or below 0.01 fall back to 0.3.
+     */
     void setSceneSize(float size)                { m_sceneSize = (size > 0.01f) ? size : 0.3f; }
 
     QVector3D sceneCenter() const { return m_sceneCenter; }
@@ -90,11 +98,19 @@ public:
 
     // ── Single-view camera state ───────────────────────────────────────
 
-    /** Set user rotation for single-view. */
+    /**
+     * Set user rotation for single-view.
+     *
+     * @param[in] q   Camera rotation quaternion.
+     */
     void setRotation(const QQuaternion &q) { m_cameraRotation = q; }
     QQuaternion rotation() const           { return m_cameraRotation; }
 
-    /** Single-view zoom level. */
+    /**
+     * Single-view zoom level.
+     *
+     * @param[in] z   Zoom level; each unit moves the camera 5% of the scene size closer.
+     */
     void  setZoom(float z)     { m_zoom = z; }
     float zoom() const         { return m_zoom; }
 

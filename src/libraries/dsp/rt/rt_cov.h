@@ -17,7 +17,7 @@
  * samples minus one. Computation is offloaded to a worker @c QThread so
  * the acquisition pipeline never blocks on the dense matrix multiply.
  *
- * The @ref RtCovComputeResult bundle carries both the matrix and the
+ * The @ref RTPROCESSINGLIB::RtCovComputeResult bundle carries both the matrix and the
  * sample count, which lets downstream consumers combine partial estimates,
  * apply rank-corrections, or convert to a @ref FIFFLIB::FiffCov for
  * persistence and inverse-operator construction.
@@ -92,7 +92,10 @@ public:
     /**
      * Perform actual covariance estimation.
      *
-     * @param[in] inputData  Data to estimate the covariance from.
+     * @param[in] matData  Data to estimate the covariance from.
+     * @param[in] iNewMaxSamples Number of samples to accumulate before a covariance is estimated.
+     *
+     * @return Noise covariance of the MEG/EEG channels, or an empty FiffCov while fewer than iNewMaxSamples samples are accumulated or if no FiffInfo was set.
      */
     FIFFLIB::FiffCov estimateCovariance(const Eigen::MatrixXd& matData,
                                         int iNewMaxSamples);

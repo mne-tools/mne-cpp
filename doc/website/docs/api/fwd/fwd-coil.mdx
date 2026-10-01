@@ -27,6 +27,11 @@ Single MEG sensor coil or EEG electrode — stores the coil-local frame and the 
 
 Constructs the Forward Coil.
 
+**Parameters:**
+
+- **p_np** : *int*
+  Number of integration points; rmag, cosmag and w are zero-initialized to this size.
+
 ---
 
 ### FwdCoil(p_FwdCoil)
@@ -90,11 +95,29 @@ Checks if this is an EEG electrode.
 
 Return a read-only map to the j-th integration point position (3 contiguous floats).
 
+**Parameters:**
+
+- **j** : *int*
+  Integration point index (0 to np - 1).
+
+**Returns:**
+
+- *Eigen::Map&lt; const Eigen::Vector3f &gt;* — Read-only view of row j of rmag, in m.
+
 ---
 
 ### dir(j)
 
 Return a read-only map to the j-th integration point direction cosine.
+
+**Parameters:**
+
+- **j** : *int*
+  Integration point index (0 to np - 1).
+
+**Returns:**
+
+- *Eigen::Map&lt; const Eigen::Vector3f &gt;* — Read-only view of row j of cosmag (unit direction vector).
 
 ---
 

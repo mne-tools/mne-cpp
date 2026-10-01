@@ -7,22 +7,22 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Stateless executor that runs an @ref MnaGraph in topological order, in batch or stream mode, and reports progress.
+ * @brief    Stateless executor that runs an @ref MNALIB::MnaGraph in topological order, in batch or stream mode, and reports progress.
  *
- * @ref MnaGraphExecutor is the bridge between the declarative
- * @ref MnaGraph and the live op functions registered with
- * @ref MnaOpRegistry. @ref execute walks the topologically-sorted
- * node list, feeds each one its inputs from the @ref Context
+ * @ref MNALIB::MnaGraphExecutor is the bridge between the declarative
+ * @ref MNALIB::MnaGraph and the live op functions registered with
+ * @ref MNALIB::MnaOpRegistry. @ref MNALIB::MnaGraphExecutor::execute "execute" walks the topologically-sorted
+ * node list, feeds each one its inputs from the @ref MNALIB::MnaGraphExecutor::Context
  * result map (keyed by @c nodeId::portName) plus the @c graphInputs
  * map, invokes the registered op function and stores the outputs
- * back into the context; @ref executeIncremental restricts the
+ * back into the context; @ref MNALIB::MnaGraphExecutor::executeIncremental "executeIncremental" restricts the
  * walk to dirty nodes and their downstream dependents so a
  * parameter tweak does not re-run the whole pipeline.
  *
- * Stream mode (@ref startStream / @ref stopStream) targets MNE Scan:
+ * Stream mode (@ref MNALIB::MnaGraphExecutor::startStream "startStream" / @ref MNALIB::MnaGraphExecutor::stopStream "stopStream") targets MNE Scan:
  * instead of calling op functions, the executor asks a host-supplied
- * @ref PluginFactory for a live @c QObject per node, applies
- * @ref MnaParamTree values to the plugin's attributes, and wires
+ * @ref MNALIB::MnaGraphExecutor::PluginFactory "PluginFactory" for a live @c QObject per node, applies
+ * @ref MNALIB::MnaParamTree values to the plugin's attributes, and wires
  * up port connections so the graph drives a continuously-running
  * real-time pipeline. The mna library deliberately holds plugins
  * as @c QObject* to avoid pulling in MNE Scan as a dependency.
@@ -134,6 +134,7 @@ public:
 
     /**
      * Set a progress callback invoked for each node execution.
+     * @param cb        Callback receiving the node id and its 1-based index out of the total; an empty callback disables reporting.
      */
     static void setProgressCallback(ProgressCallback cb);
 

@@ -94,13 +94,21 @@ public:
 
     const QVector<DigitizedPoint>& points() const { return m_points; }
 
-    /** Append a new point and emit @ref pointsChanged. */
+    /**
+     * Append a new point and emit @c UTILSLIB::AcquiredPoints::pointsChanged "pointsChanged".
+     *
+     * @param[in] p Captured point to append.
+     */
     void append(const DigitizedPoint& p) {
         m_points.append(p);
         emit pointsChanged();
     }
 
-    /** Remove the most recently captured point matching @p kind, if any. */
+    /**
+     * Remove the most recently captured point matching @p kind, if any.
+     *
+     * @param[in] kind Point kind whose most recent entry is removed.
+     */
     void undoLast(PointKind kind) {
         for (int i = m_points.size() - 1; i >= 0; --i) {
             if (m_points[i].kind == kind) {
@@ -119,7 +127,12 @@ public:
     }
 
     /** Convenience accessor: returns the captured fiducial position for
-     *  @p id, or a default-constructed @c QVector3D if not yet captured. */
+     *  @p id, or a default-constructed @c QVector3D if not yet captured.
+     *
+     * @param[in] id Fiducial to look up.
+     *
+     * @return Captured fiducial position, or a zero vector if not yet captured.
+     */
     QVector3D fiducial(FiducialId id) const {
         for (const auto& p : m_points) {
             if (p.kind == PointKind::Fiducial && p.identNumber == static_cast<int>(id)) {
@@ -129,7 +142,13 @@ public:
         return {};
     }
 
-    /** True iff a fiducial of the given id has been captured. */
+    /**
+     * True iff a fiducial of the given id has been captured.
+     *
+     * @param[in] id Fiducial to check.
+     *
+     * @return True if the fiducial has been captured, false otherwise.
+     */
     bool hasFiducial(FiducialId id) const {
         for (const auto& p : m_points) {
             if (p.kind == PointKind::Fiducial && p.identNumber == static_cast<int>(id)) {
@@ -139,7 +158,11 @@ public:
         return false;
     }
 
-    /** Remove a previously captured fiducial so it can be re-recorded. */
+    /**
+     * Remove a previously captured fiducial so it can be re-recorded.
+     *
+     * @param[in] id Fiducial whose captured points are all removed.
+     */
     void removeFiducial(FiducialId id) {
         for (int i = m_points.size() - 1; i >= 0; --i) {
             if (m_points[i].kind == PointKind::Fiducial
@@ -150,7 +173,11 @@ public:
         emit pointsChanged();
     }
 
-    /** True iff all three cardinal fiducials have been captured. */
+    /**
+     * True iff all three cardinal fiducials have been captured.
+     *
+     * @return True if NAS, LPA, and RPA have all been captured.
+     */
     bool hasAllFiducials() const {
         return hasFiducial(FiducialId::NAS)
             && hasFiducial(FiducialId::LPA)

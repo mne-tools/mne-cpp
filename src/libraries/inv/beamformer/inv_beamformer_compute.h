@@ -16,7 +16,7 @@
  * per-source max-power orientation search, the regularised symmetric
  * pseudo-inverse used to invert the data covariance / CSD, and the
  * rank-reduction step for radially-deficient MEG sphere models. Pulling
- * this code out keeps @ref InvLCMV and @ref InvDICS as thin
+ * this code out keeps @ref INVLIB::InvLCMV and @ref INVLIB::InvDICS as thin
  * orchestration layers and ensures both algorithms share the same
  * numerically-robust kernel.
  *

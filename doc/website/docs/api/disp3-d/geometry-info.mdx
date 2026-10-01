@@ -33,6 +33,24 @@ This class holds static methods for sensor-to-mesh mapping and surface constrain
 
 scdc Calculates surface constrained distances on a mesh.
 
+**Parameters:**
+
+- **matVertices** : *const Eigen::MatrixX3f &*
+  Vertex positions (nVertices x 3).
+
+- **vecNeighborVertices** : *const std::vector&lt; Eigen::VectorXi &gt; &*
+  Adjacency list for each vertex.
+
+- **vecVertSubset** : *Eigen::VectorXi &*
+  Source vertex indices; if empty it is filled with all vertex indices.
+
+- **dCancelDist** : *double*
+  Maximum geodesic distance to explore, in vertex coordinate units.
+
+**Returns:**
+
+- *QSharedPointer&lt;Eigen::MatrixXd&gt;* — Distance table (nVertices x nSubset); entries beyond dCancelDist stay infinite.
+
 ---
 
 ### scdcInterpolationMat(matVertices, vecNeighborVertices, vecVertSubset, interpolationFunction, dCancelDist, progressCallback, cancelledFlag)
@@ -74,11 +92,38 @@ Produces identical results to `scdc()` + `Interpolation::createInterpolationMat(
 
 projectSensors Calculates the nearest neighbor vertex to each sensor.
 
+**Parameters:**
+
+- **matVertices** : *const Eigen::MatrixX3f &*
+  Vertex positions (nVertices x 3).
+
+- **matSensorPositions** : *const Eigen::MatrixX3f &*
+  Sensor positions (nSensors x 3) in the same coordinate frame.
+
+**Returns:**
+
+- *Eigen::VectorXi* — Index of the nearest mesh vertex for each sensor.
+
 ---
 
 ### filterBadChannels(matDistanceTable, fiffInfo, iSensorType)
 
 filterBadChannels Filters bad channels from distance table.
+
+**Parameters:**
+
+- **matDistanceTable** : *QSharedPointer&lt;Eigen::MatrixXd&gt;*
+  Distance table whose bad-channel columns are set to infinity.
+
+- **fiffInfo** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
+  Measurement info providing channel list and bad channel names.
+
+- **iSensorType** : *qint32*
+  FIFF channel kind selecting the sensors that form the table columns.
+
+**Returns:**
+
+- *Eigen::VectorXi* — Column indices of the bad channels that were found.
 
 ---
 

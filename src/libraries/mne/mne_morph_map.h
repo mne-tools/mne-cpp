@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    Sparse linear operator that morphs a source estimate between two subjects.
  *
- * @ref MNELIB::MNEMorphMap composes a left and a right @ref MNECorticalMap
- * into the rectangular sparse matrix used by @ref INVERSELIB::MneMorph
- * to project a @ref MNESourceEstimate from a subject's native cortex to
+ * @ref MNELIB::MNEMorphMap composes a left and a right @ref MNELIB::MNECorticalMap
+ * into the rectangular sparse matrix used by @c INVERSELIB::MneMorph
+ * to project a @c MNESourceEstimate from a subject's native cortex to
  * a target (typically @c fsaverage) cortex. Backed by
  * @ref MNELIB::MNESparseNamedMatrix so that the row/column hemisphere
  * layout is preserved.

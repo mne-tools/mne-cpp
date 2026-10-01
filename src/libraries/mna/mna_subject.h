@@ -9,7 +9,7 @@
  * @date     April 2026
  * @brief    One participant in an MNA project — owner of measurement sessions and link to the FreeSurfer anatomy.
  *
- * @ref MnaSubject is the root of the per-participant subtree in an
+ * @ref MNALIB::MnaSubject is the root of the per-participant subtree in an
  * MNA project. It binds together all sessions/recordings that
  * belong to one person and pins their structural MRI reconstruction
  * via @c freeSurferDir, a project-relative path to the matching
@@ -21,7 +21,7 @@
  * The @c id mirrors the BIDS @c sub-XX convention and is the key
  * downstream consumers (forward modelling, source estimation,
  * group statistics) use to look the subject up. @c sessions holds
- * the ordered @ref MnaSession list, and @c extras preserves any
+ * the ordered @ref MNALIB::MnaSession list, and @c extras preserves any
  * demographic, clinical or consent-tracking fields that newer
  * tooling may attach so older MNALIB builds can still read and
  * re-write the project without data loss.
@@ -67,24 +67,36 @@ struct MNASHARED_EXPORT MnaSubject
     //=========================================================================================================
     /**
      * Serialize to QJsonObject.
+     *
+     * @return JSON object with the subject id, FreeSurfer directory, sessions and preserved extras.
      */
     QJsonObject toJson() const;
 
     //=========================================================================================================
     /**
      * Deserialize from QJsonObject.
+     *
+     * @param[in] json   JSON object as produced by toJson().
+     *
+     * @return The subject; missing keys take default values and unknown keys go to extras.
      */
     static MnaSubject fromJson(const QJsonObject& json);
 
     //=========================================================================================================
     /**
      * Serialize to QCborMap.
+     *
+     * @return CBOR map with the subject id, FreeSurfer directory, sessions and preserved extras.
      */
     QCborMap toCbor() const;
 
     //=========================================================================================================
     /**
      * Deserialize from QCborMap.
+     *
+     * @param[in] cbor   CBOR map as produced by toCbor().
+     *
+     * @return The subject; missing keys take default values and unknown keys go to extras.
      */
     static MnaSubject fromCbor(const QCborMap& cbor);
 };

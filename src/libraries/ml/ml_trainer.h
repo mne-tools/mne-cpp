@@ -17,7 +17,7 @@
  * or linking against @c libpython.
  *
  * The class adds three things on top of the generic
- * @ref UTILSLIB::PythonRunner: prerequisite checking via
+ * @ref UTILSLIB::PythonRunner "PythonRunner": prerequisite checking via
  * @c isPackageAvailable so callers can fail fast with a useful message,
  * automatic delegation to @c runInVenv when a @c venvDir is configured
  * (which creates and updates the venv before the script runs), and

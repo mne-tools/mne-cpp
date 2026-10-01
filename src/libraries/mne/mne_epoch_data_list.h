@@ -91,8 +91,11 @@ public:
      * @param[in] tmin           The start time relative to the event in seconds.
      * @param[in] tmax           The end time relative to the event in seconds.
      * @param[in] event          The event kind.
+     * @param[in, out] mapReject Peak-to-peak rejection thresholds per channel type (e.g. "grad", "mag", "eeg").
      * @param[in] lExcludeChs    List of channel names to exclude.
      * @param[in] picks          Which channels to pick.
+     *
+     * @return List of epochs with rejection flags set; empty if no matching events are found.
      */
     static MNEEpochDataList readEpochs(const FIFFLIB::FiffRawData& raw,
                                        const Eigen::MatrixXi& events,
@@ -107,11 +110,13 @@ public:
     /**
      * Averages epoch list. Note that no baseline correction performed.
      *
-     * @param[in] info     measurement info.
+     * @param[in] p_info     measurement info.
      * @param[in] first    First time sample.
      * @param[in] last     Last time sample.
      * @param[in] sel      Which epochs should be averaged (optional).
      * @param[in] proj     Apply SSP projection vectors (optional, default = false).
+     *
+     * @return Averaged evoked response; aspect_kind is FIFFV_ASPECT_STD_ERR with no data if the list is empty.
      */
     FIFFLIB::FiffEvoked average(const FIFFLIB::FiffInfo &p_info,
                                 FIFFLIB::fiff_int_t first,

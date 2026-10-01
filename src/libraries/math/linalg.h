@@ -242,6 +242,10 @@ public:
     //=========================================================================================================
     /**
      * Compares two index-value-pairs (greater-than).
+     *
+     * @param[in] lhs    Left index-value pair.
+     * @param[in] rhs    Right index-value pair.
+     * @return True if the value of lhs is greater than the value of rhs.
      */
     template<typename T>
     static inline bool compareIdxValuePairBiggerThan(const std::pair<int,T>& lhs,
@@ -250,6 +254,10 @@ public:
     //=========================================================================================================
     /**
      * Compares two index-value-pairs (less-than).
+     *
+     * @param[in] lhs    Left index-value pair.
+     * @param[in] rhs    Right index-value pair.
+     * @return True if the value of lhs is less than the value of rhs.
      */
     template<typename T>
     static inline bool compareIdxValuePairSmallerThan(const std::pair<int,T>& lhs,
@@ -258,6 +266,10 @@ public:
     //=========================================================================================================
     /**
      * Compares triplet first entry (row).
+     *
+     * @param[in] lhs    Left triplet.
+     * @param[in] rhs    Right triplet.
+     * @return True if the row index of lhs is less than that of rhs.
      */
     template<typename T>
     static inline bool compareTripletFirstEntry(const Eigen::Triplet<T>& lhs,
@@ -266,6 +278,10 @@ public:
     //=========================================================================================================
     /**
      * Compares triplet second entry (column).
+     *
+     * @param[in] lhs    Left triplet.
+     * @param[in] rhs    Right triplet.
+     * @return True if the column index of lhs is less than that of rhs.
      */
     template<typename T>
     static inline bool compareTripletSecondEntry(const Eigen::Triplet<T>& lhs,

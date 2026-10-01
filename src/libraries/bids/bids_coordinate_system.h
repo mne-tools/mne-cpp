@@ -15,11 +15,11 @@
  * the unit of the @c x/@c y/@c z columns in the matching
  * @c _electrodes.tsv (@c m, @c mm or @c cm) and an optional 4×4 affine
  * linking that frame to an associated anatomical image. @ref
- * BidsCoordinateSystem is the value object that captures those fields
+ * BIDSLIB::BidsCoordinateSystem is the value object that captures those fields
  * plus the recommended free-text description / processing-description /
  * @c IntendedFor pointer.
  *
- * @ref BidsCoordinateSystem::toFiffCoordTrans bridges the parsed affine
+ * @ref BIDSLIB::BidsCoordinateSystem::toFiffCoordTrans "BidsCoordinateSystem::toFiffCoordTrans" bridges the parsed affine
  * into a @c FIFFLIB::FiffCoordTrans so downstream MNE-CPP code (forward
  * solution, source localisation, visualisation) can treat a BIDS
  * dataset's coordinate metadata exactly like a FIFF MRI↔head transform.

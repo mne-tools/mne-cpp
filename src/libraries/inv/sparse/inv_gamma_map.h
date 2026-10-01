@@ -16,7 +16,7 @@
  * EM / fixed-point update to iteratively re-estimate the @f$\gamma@f$
  * vector from the data; sources whose @f$\gamma_{i}@f$ collapses below
  * threshold are pruned, leaving a sparse active set. Output is an
- * @ref InvGammaMapResult carrying the @ref InvSourceEstimate, the
+ * @ref INVLIB::InvGammaMapResult carrying the @ref INVLIB::InvSourceEstimate, the
  * surviving active-vertex list, the final @f$\gamma@f$ vector,
  * iteration count and residual norm.
  */

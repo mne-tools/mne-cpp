@@ -15,7 +15,7 @@
  * human-readable name and an RGBA tuple used by @c tkmedit, @c freeview
  * and downstream tooling. The same table is also embedded directly inside
  * @c .annot files via the @c TAG_OLD_COLORTABLE and @c TAG_NEW_COLORTABLE
- * blocks parsed by @ref FsAnnotation.
+ * blocks parsed by @ref FSLIB::FsAnnotation.
  *
  * This class is the binary-friendly in-memory form of either source:
  * - @c struct_names — region name per entry, indexed by row

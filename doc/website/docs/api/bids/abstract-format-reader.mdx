@@ -88,17 +88,29 @@ Read a segment of raw data.
 
 Return total number of samples across the recording.
 
+**Returns:**
+
+- *long* — Number of samples per channel in the whole recording.
+
 ---
 
 ### getFrequency()
 
 Return the sampling frequency in Hz.
 
+**Returns:**
+
+- *float* — Sampling frequency in Hz.
+
 ---
 
 ### getChannelCount()
 
 Return the number of measurement channels.
+
+**Returns:**
+
+- *int* — Number of measurement channels (rows returned by readRawSegment).
 
 ---
 
@@ -117,6 +129,10 @@ Convert the entire dataset to a [FiffRawData](/docs/api/fiff/fiff-raw-data) stru
 Return a descriptive name for the format (e.g.
 
 "EDF", "BrainVision").
+
+**Returns:**
+
+- *QString* — Human-readable format name.
 
 ---
 

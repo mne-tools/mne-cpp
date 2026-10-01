@@ -151,6 +151,39 @@ Extracts channel information, sampling frequency, filter parameters, coordinate 
 
 This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. Overload that does not return the measurement start time.
 
+**Parameters:**
+
+- **stream** : *[FIFFLIB::FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
+  Open FIFF stream to read tags from.
+
+- **node** : *[FIFFLIB::FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
+  Starting directory node (typically the raw data node).
+
+- **id** : *std::unique_ptr&lt; [FiffId](/docs/api/fiff/fiff-id) &gt; &*
+  Measurement ID (managed via unique_ptr). Reset if absent.
+
+- **nchan** : *int **
+  Number of channels.
+
+- **sfreq** : *float **
+  Sampling frequency in Hz.
+
+- **highpass** : *float **
+  Highpass filter cutoff frequency in Hz.
+
+- **lowpass** : *float **
+  Lowpass filter cutoff frequency in Hz.
+
+- **chp** : *QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
+  List of channel information structures, one per channel.
+
+- **trans** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
+  Device-to-head coordinate transformation.
+
+**Returns:**
+
+- *int* — 0 on success, -1 on failure.
+
 ---
 
 ### load(name, allow_maxshield, infop)

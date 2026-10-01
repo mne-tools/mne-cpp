@@ -18,7 +18,7 @@
  * forward gain matrices, MNE noise-covariance whiteners, ...). The
  * on-disk representation is a @c FIFF_MNE_NROW + @c FIFF_MNE_NCOL pair
  * plus a dense or sparse matrix tag plus two string-list tags with the
- * row and column names. @ref FiffNamedMatrix bundles all of that into a
+ * row and column names. @ref FIFFLIB::FiffNamedMatrix bundles all of that into a
  * single object: the Eigen matrix and the two @c QStringList name
  * vectors, with the same default-construction semantics as
  * @c numpy.zeros + name lists in @c mne.SourceEstimate / @c mne.Forward.
@@ -157,7 +157,8 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param[in] a    The object which should be compared to.
+     * @param[in] b Right-hand named matrix.
      *
      * @return true if equal, false otherwise.
      */

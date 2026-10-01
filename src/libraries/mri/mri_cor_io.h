@@ -13,17 +13,17 @@
  * before MGH became the default. A subject's @c mri/T1 (and
  * historically @c mri/orig, @c mri/brain, ...) directory contains
  * 256 files named @c COR-001 through @c COR-256, each a flat
- * 65 536-byte (256\u00d7256 unsigned char) coronal slice. While
+ * 65 536-byte (256×256 unsigned char) coronal slice. While
  * modern FreeSurfer prefers MGH, COR-format trees still appear
  * in legacy subject directories and in mne-c tutorial data, so
  * mne-cpp must read them to keep round-trip parity with the
  * original MNE C tooling.
  *
- * The reader fans the 256 files into an @ref MriSlice vector
+ * The reader fans the 256 files into an @ref MRILIB::MriSlice vector
  * with the canonical coronal-to-surface-RAS coordinate transform:
  *
  * - Origin offset (mm): (128, -128, 128)
- * - Axis permutation:   x \u2192 -x,  y \u2192 z,  z \u2192 y
+ * - Axis permutation:   x → -x,  y → z,  z → y
  *
  * which matches the convention emitted by @c make_cor_set() in
  * the original @c mne_make_cor_set C tool and is what every

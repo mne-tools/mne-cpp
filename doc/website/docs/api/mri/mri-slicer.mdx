@@ -197,17 +197,56 @@ Extract a 2D slice from an [`MriVolData`](/docs/api/mri/mri-vol-data) volume.
 
 Return the voxel axis used as the fixed slicing axis for an anatomical orientation.
 
+**Parameters:**
+
+- **vol** : *const [MriVolData](/docs/api/mri/mri-vol-data) &*
+  Loaded MRI volume whose vox2ras-tkr transform defines the axes.
+
+- **orientation** : *SliceOrientation*
+  Slice orientation.
+
+**Returns:**
+
+- *int* — Voxel axis index (0, 1 or 2) held fixed for this orientation.
+
 ---
 
 ### dimensionForOrientation(vol, orientation)
 
 Return the volume dimension used by an anatomical slice orientation.
 
+**Parameters:**
+
+- **vol** : *const [MriVolData](/docs/api/mri/mri-vol-data) &*
+  Loaded MRI volume.
+
+- **orientation** : *SliceOrientation*
+  Slice orientation.
+
+**Returns:**
+
+- *int* — Number of voxels along the slicing axis, i.e. the number of available slices.
+
 ---
 
 ### sliceIndexForOrientation(vol, orientation, voxel)
 
 Return the slice index for an anatomical orientation from a voxel coordinate.
+
+**Parameters:**
+
+- **vol** : *const [MriVolData](/docs/api/mri/mri-vol-data) &*
+  Loaded MRI volume.
+
+- **orientation** : *SliceOrientation*
+  Slice orientation.
+
+- **voxel** : *const Eigen::Vector3i &*
+  Voxel coordinate (column, row, slice).
+
+**Returns:**
+
+- *int* — Component of voxel along the slicing axis for this orientation.
 
 ---
 

@@ -111,6 +111,8 @@ public:
     //=========================================================================================================
     /**
      * Request Fiff Info
+     *
+     * @return Reference to the shared pointer holding the measurement info received from the server.
      */
     inline FIFFLIB::FiffInfo::SPtr& getFiffInfo();
 

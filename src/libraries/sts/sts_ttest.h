@@ -131,6 +131,11 @@ public:
     /**
      * Regularized incomplete beta function I_x(a, b).
      * Public because it is also used by StatsFtest.
+     *
+     * @param[in] x   Upper integration limit in [0, 1].
+     * @param[in] a   First shape parameter (positive).
+     * @param[in] b   Second shape parameter (positive).
+     * @return I_x(a, b) in [0, 1]; 0 for x at or below 0 and 1 for x at or above 1.
      */
     static double regularizedBeta(double x, double a, double b);
 

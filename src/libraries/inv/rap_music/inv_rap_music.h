@@ -16,8 +16,8 @@
  * the largest subspace-correlation, projects that pair out of the
  * signal subspace, and repeats until the desired number of sources is
  * found or the correlation drops below the user-supplied threshold.
- * Outputs are returned as both an @ref InvSourceEstimate (dense grid
- * with active vertices populated) and a list of @ref InvDipolePair
+ * Outputs are returned as both an @ref INVLIB::InvSourceEstimate (dense grid
+ * with active vertices populated) and a list of @ref INVLIB::InvDipolePair
  * records carrying per-iteration orientation and correlation diagnostics.
  */
 
@@ -120,7 +120,7 @@ public:
     /**
      * Constructor which initializes the InvRapMusic algorithm with the given model.
      *
-     * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding grid matrix.
+     * @param[in] p_pFwd          The model which contains the gain matrix and its corresponding grid matrix.
      * @param[in] p_bSparsed     True when sparse matrices should be used.
      * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with.
      *                           the strongest.
@@ -134,7 +134,7 @@ public:
     /**
      * Initializes the RAP MUSIC algorithm with the given model.
      *
-     * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding Grid matrix.
+     * @param[in] p_pFwd          The model which contains the gain matrix and its corresponding Grid matrix.
      * @param[in] p_bSparsed     True when sparse matrices should be used.
      * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with.
      *                           the strongest.
@@ -167,7 +167,7 @@ protected:
     /**
      * Computes the signal subspace Phi_s out of the measurement F.
      *
-     * @param[in] p_pMatMeasurement  The current measured data to process (for best performance it should have.
+     * @param[in] p_matMeasurement  The current measured data to process (for best performance it should have.
                                     the dimension channels x samples with samples = number of channels)
      * @param[out] p_pMatPhi_s   The calculated signal subspace.
      * @return   The rank of the measurement F (named r lt. Mosher 1998, 1999).
@@ -183,7 +183,7 @@ protected:
      * @param[in] p_matProj_G    The projected Lead Field combination. This is a m x 6 matrix composed of the.
      *                           Lead Field combination of two Points for all m channels and 3 orthogonal
      *                           components (x y z).
-     * @param[in] p_matU_B       The matrix U is the subspace projection of the orthogonal projected Phi_s.
+     * @param[in] p_pMatU_B       The matrix U is the subspace projection of the orthogonal projected Phi_s.
      * @return   The maximal correlation c_1 of the subspace correlation of the current projected Lead Field.
      *           combination and the projected measurement.
      */
@@ -238,7 +238,7 @@ protected:
      *
      * @param[in] p_iNumPoints   The number of Lead Field points -> for dimension check.
      * @param[in] p_iNumCombinations The number of pair index combinations.
-     * @param[out] p_ppPairIdxCombinations   The destination which contains pointer to pointer of index.
+     * @param[out] p_pairIdxCombinations   The destination which contains pointer to pointer of index.
      *                                       combinations of Lead Field indices -> Number of pointers =
      *                                       Combination (number of grid points over 2 = Num + 1 C 2)
      */
@@ -332,6 +332,8 @@ protected:
      * @param[in] p_matSigma_src The singular values of the matrix.
      * @param[out] p_matFull_Rank    The corresponding full rank matrix.
      * @param[in] type   Whether p_Mat is transposed, than rows and columns are changed.
+     *
+     * @return The rank r used to truncate p_Mat.
      */
     static inline int useFullRank( const MatrixXT& p_Mat,
                             const MatrixXT& p_matSigma_src,

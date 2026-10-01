@@ -7,12 +7,12 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Base @ref QStandardItem with check-state, visibility, transform, colour and alpha roles shared by every disp3D scene item.
+ * @brief    Base @c QStandardItem with check-state, visibility, transform, colour and alpha roles shared by every disp3D scene item.
  *
  * AbstractTreeItem centralises the data roles every scene object
  * needs (@c VisibleRole, @c TransformRole, @c ColorRole,
  * @c AlphaRole) so the renderer can read render state directly
- * from the model without per-type if-chains. The @ref ItemType enum
+ * from the model without per-type if-chains. The @c AbstractTreeItem::ItemType "ItemType" enum
  * drives type-safe down-casts at the few sites that need them
  * (picking, persistence).
  */

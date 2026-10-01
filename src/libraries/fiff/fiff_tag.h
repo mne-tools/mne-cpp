@@ -21,7 +21,7 @@
  * (@c FIFFFS_MATRIX == 0x40) — and the matrix variants additionally carry
  * a coding flag in the low bits selecting dense (@c MATRIX_CODING_DENSE),
  * column-compressed sparse (@c MATRIX_CODING_CCS) or row-compressed
- * sparse (@c MATRIX_CODING_RCS) storage. @ref FiffTag is the C++ wrapper
+ * sparse (@c MATRIX_CODING_RCS) storage. @ref FIFFLIB::FiffTag is the C++ wrapper
  * that holds the header fields, the raw payload bytes and a small set of
  * typed accessors (@c toInt, @c toFloat, @c toMatrix, @c toCoordTrans,
  * @c toChInfo, ...) that decode the payload on demand into the relevant
@@ -181,18 +181,28 @@ public:
     //=========================================================================================================
     /**
      * Move constructor.
+     *
+     * @param[in] other   FiffTag to move from; left in a valid but unspecified state.
      */
     FiffTag(FiffTag&& other) = default;
 
     //=========================================================================================================
     /**
      * Copy assignment operator.
+     *
+     * @param[in] other   FiffTag to copy.
+     *
+     * @return Reference to this object.
      */
     FiffTag& operator=(const FiffTag& other) = default;
 
     //=========================================================================================================
     /**
      * Move assignment operator.
+     *
+     * @param[in] other   FiffTag to move from; left in a valid but unspecified state.
+     *
+     * @return Reference to this object.
      */
     FiffTag& operator=(FiffTag&& other) = default;
 
@@ -440,6 +450,8 @@ public:
      *
      * Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN.
      * The last choice means that the native byte order value will be substituted here before proceeding
+     *
+     * @param[in, out] tag   Matrix tag whose dimensions, indices and data are byte-swapped in place; non-matrix tags are left untouched.
      */
     static void convert_matrix_from_file_data(const FiffTag::UPtr& tag);
 

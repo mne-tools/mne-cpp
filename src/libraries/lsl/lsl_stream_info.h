@@ -101,12 +101,18 @@ public:
     //=========================================================================================================
     /**
      * Copy constructor.
+     *
+     * @param[in] other             stream_info to copy.
      */
     stream_info(const stream_info& other) = default;
 
     //=========================================================================================================
     /**
      * Copy assignment operator.
+     *
+     * @param[in] other             stream_info to copy.
+     *
+     * @return Reference to this object.
      */
     stream_info& operator=(const stream_info& other) = default;
 
@@ -114,22 +120,46 @@ public:
     /** @name Core Stream Properties
      *  @{ */
 
-    /** @brief Name of the stream. */
+    /**
+     * @brief Name of the stream.
+     *
+     * @return The stream name, e.g. "EEG"; empty for a default-constructed object.
+     */
     [[nodiscard]] std::string name() const noexcept;
 
-    /** @brief Content type of the stream. */
+    /**
+     * @brief Content type of the stream.
+     *
+     * @return The content type, e.g. "EEG" or "Markers".
+     */
     [[nodiscard]] std::string type() const noexcept;
 
-    /** @brief Number of channels. */
+    /**
+     * @brief Number of channels.
+     *
+     * @return The number of channels per sample.
+     */
     [[nodiscard]] int channel_count() const noexcept;
 
-    /** @brief Nominal sampling rate in Hz. 0.0 means irregular. */
+    /**
+     * @brief Nominal sampling rate in Hz. 0.0 means irregular.
+     *
+     * @return The nominal sampling rate in Hz, or 0.0 for irregular streams.
+     */
     [[nodiscard]] double nominal_srate() const noexcept;
 
-    /** @brief Data format of a channel. */
+    /**
+     * @brief Data format of a channel.
+     *
+     * @return The per-channel sample format.
+     */
     [[nodiscard]] ChannelFormat channel_format() const noexcept;
 
-    /** @brief Unique source identifier. */
+    /**
+     * @brief Unique source identifier.
+     *
+     * @return The device or source identifier; may be empty if none was given.
+     */
     [[nodiscard]] std::string source_id() const noexcept;
 
     /** @} */
@@ -138,10 +168,18 @@ public:
     /** @name Network / Identity Properties
      *  @{ */
 
-    /** @brief A unique identifier for this particular stream instance (auto-generated). */
+    /**
+     * @brief A unique identifier for this particular stream instance (auto-generated).
+     *
+     * @return The instance UUID as a string without braces; empty for a default-constructed object.
+     */
     [[nodiscard]] std::string uid() const noexcept;
 
-    /** @brief Hostname of the machine from which the stream originates. */
+    /**
+     * @brief Hostname of the machine from which the stream originates.
+     *
+     * @return The local host name captured at construction time.
+     */
     [[nodiscard]] std::string hostname() const noexcept;
 
     /** @} */
@@ -150,16 +188,32 @@ public:
     /** @name Network Endpoint (internal, set during discovery)
      *  @{ */
 
-    /** @brief TCP data port of the outlet. */
+    /**
+     * @brief TCP data port of the outlet.
+     *
+     * @return The TCP port number, or 0 if not yet assigned.
+     */
     [[nodiscard]] int data_port() const noexcept;
 
-    /** @brief Host address of the outlet (IP, set from UDP sender address during discovery). */
+    /**
+     * @brief Host address of the outlet (IP, set from UDP sender address during discovery).
+     *
+     * @return The outlet host address, or an empty string if not yet discovered.
+     */
     [[nodiscard]] std::string data_host() const noexcept;
 
-    /** @brief Set the TCP data port (used internally during discovery / outlet creation). */
+    /**
+     * @brief Set the TCP data port (used internally during discovery / outlet creation).
+     *
+     * @param[in] port              TCP port number on which the outlet serves data.
+     */
     void set_data_port(int port);
 
-    /** @brief Set the data host (used internally during discovery). */
+    /**
+     * @brief Set the data host (used internally during discovery).
+     *
+     * @param[in] host              IP address or host name of the outlet.
+     */
     void set_data_host(const std::string& host);
 
     /** @} */
@@ -168,10 +222,20 @@ public:
     /** @name Serialization (used for network discovery)
      *  @{ */
 
-    /** @brief Serialize stream_info into a string for network transport. */
+    /**
+     * @brief Serialize stream_info into a string for network transport.
+     *
+     * @return Pipe-delimited string starting with the MNELSL1 header followed by all fields except data_host.
+     */
     [[nodiscard]] std::string to_string() const;
 
-    /** @brief Deserialize a stream_info from a network transport string. */
+    /**
+     * @brief Deserialize a stream_info from a network transport string.
+     *
+     * @param[in] data              Pipe-delimited string as produced by to_string().
+     *
+     * @return The parsed stream_info, or a default-constructed (empty) one if the header or field count is invalid.
+     */
     [[nodiscard]] static stream_info from_string(const std::string& data);
 
     /** @} */

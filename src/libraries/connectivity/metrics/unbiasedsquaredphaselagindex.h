@@ -116,8 +116,8 @@ protected:
      * Computes the PLI values. This function gets called in parallel.
      *
      * @param[in] inputData              The input data.
-     * @param[out]vecPairCsdSum          The sum of all CSD matrices for each trial.
-     * @param[out]vecPairCsdImagSignSum  The sum of all imag sign CSD matrices for each trial.
+     * @param[out] vecPairCsdSum          The sum of all CSD matrices for each trial.
+     * @param[out] vecPairCsdImagSignSum  The sum of all imag sign CSD matrices for each trial.
      * @param[in] mutex                  The mutex used to safely access vecPairCsdSum.
      * @param[in] iNRows                 The number of rows.
      * @param[in] iNFreqs                The number of frequenciy bins.

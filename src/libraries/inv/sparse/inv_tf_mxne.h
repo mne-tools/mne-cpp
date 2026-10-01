@@ -20,7 +20,7 @@
  * enforces temporal sparsity (focal activations in time-frequency).
  * Equivalent to mne-python's
  * @c mne.inverse_sparse.tf_mixed_norm. The accompanying
- * @ref InvTfMxneParams struct exposes the Gabor frequency range,
+ * @ref INVLIB::InvTfMxneParams struct exposes the Gabor frequency range,
  * spatial / temporal regularisation, debias flag and convergence
  * controls.
  */

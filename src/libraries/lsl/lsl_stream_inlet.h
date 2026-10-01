@@ -19,12 +19,12 @@
  * symbols.
  *
  * The data path is intentionally chunked rather than
- * sample-at-a-time: @ref samples_available drains pending bytes off
- * the socket in a non-blocking pass and @ref pull_chunk returns
+ * sample-at-a-time: @ref LSLLIB::stream_inlet::samples_available "samples_available" drains pending bytes off
+ * the socket in a non-blocking pass and @ref LSLLIB::stream_inlet::pull_chunk "pull_chunk" returns
  * every fully-received multichannel sample in one call, which is the
  * pattern that real-time acquisition pipelines in mne-cpp (sensor
  * plug-ins under @c applications/mne_scan_plugins) consume most
- * efficiently. The templated @ref pull_chunk is provided purely for
+ * efficiently. The templated @ref LSLLIB::stream_inlet::pull_chunk "pull_chunk" is provided purely for
  * source-level compatibility with liblsl; in this implementation
  * only the @c float specialisation is wired up, since every mne-cpp
  * acquisition path operates on 32-bit floating-point samples.

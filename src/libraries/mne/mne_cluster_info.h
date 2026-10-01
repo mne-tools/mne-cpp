@@ -13,7 +13,7 @@
  * @brief    Bookkeeping for a label-restricted clustering of source-space leadfield columns.
  *
  * @ref MNELIB::MNEClusterInfo stores, for every cluster produced by
- * @ref MNEForwardSolution::cluster_forward_solution, the source-space
+ * @ref MNELIB::MNEForwardSolution::cluster_forward_solution "MNEForwardSolution::cluster_forward_solution", the source-space
  * vertices it contains, the representative dipole position and the
  * mean orientation. Used to compress the gain matrix into a much
  * smaller per-cluster leadfield and to expand the clustered solution
@@ -101,7 +101,8 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param[in] a    The object which should be compared to.
+     * @param[in] b Right-hand cluster info.
      *
      * @return true if equal, false otherwise.
      */

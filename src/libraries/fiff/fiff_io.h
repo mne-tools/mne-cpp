@@ -14,10 +14,10 @@
  * @brief    High-level convenience reader/writer that loads a whole FIFF measurement file into FIFFLIB containers in one call.
  *
  * Most callers want to open a FIFF file and immediately get back a
- * @ref FiffRawData (for "*-raw.fif"), a @ref FiffEvokedSet (for
- * "*-ave.fif"), a @ref FiffCov (for "*-cov.fif"), or the
- * appropriate combination without micromanaging @ref FiffStream and the
- * directory tree. @ref FiffIO provides exactly that one-call facade: it
+ * @ref FIFFLIB::FiffRawData (for "*-raw.fif"), a @ref FIFFLIB::FiffEvokedSet (for
+ * "*-ave.fif"), a @ref FIFFLIB::FiffCov (for "*-cov.fif"), or the
+ * appropriate combination without micromanaging @ref FIFFLIB::FiffStream and the
+ * directory tree. @ref FIFFLIB::FiffIO provides exactly that one-call facade: it
  * sniffs the top-level FIFF blocks (@c FIFFB_RAW_DATA, @c FIFFB_EVOKED,
  * @c FIFFB_MNE_COV, ...), invokes the matching specialized reader and
  * exposes the results as ready-to-use shared pointers, with parity to
@@ -136,6 +136,8 @@ public:
      * Read data from a pIODevice.
      *
      * @param[in] pIODevice    A fiff IO device like a fiff QFile or QTCPSocket.
+     *
+     * @return false if the directory tree could not be read, true otherwise.
      */
     bool read(QIODevice& pIODevice);
 
@@ -144,6 +146,8 @@ public:
      * Read data from a QList of pIODevices.
      *
      * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket.
+     *
+     * @return true if all devices were read successfully, false otherwise.
      */
     bool read(QList<QIODevice>& p_qlistIODevices);
 

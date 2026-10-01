@@ -14,7 +14,7 @@
  * @date     June 2015
  * @brief    Boundary element model bundle (inner skull, outer skull, outer skin) loaded from -bem.fif.
  *
- * @ref MNELIB::MNEBem aggregates the @ref MNEBemSurface objects that
+ * @ref MNELIB::MNEBem aggregates the @ref MNELIB::MNEBemSurface objects that
  * make up a head conductor model produced by @c mne_setup_forward_model.
  * Depending on the model it carries one (single layer) or three
  * (three-layer EEG) surfaces in MRI coordinates. It is consumed by the
@@ -98,6 +98,8 @@ public:
     //=========================================================================================================
     /**
      * Default constructor
+     *
+     * @param[in] p_IODevice   IO device (e.g. a FIFF file) to read the BEM surfaces from; throws std::runtime_error on failure.
      */
     MNEBem(QIODevice &p_IODevice);
 
@@ -129,6 +131,7 @@ public:
      *
      * @param[in, out] p_pStream     The opened fif file.
      * @param[in] add_geom          Add geometry information to the Bem FsSurface.
+     * @param[in, out] p_Bem The BEM that receives the surfaces read.
      *
      * @return true if succeeded, false otherwise.
      */

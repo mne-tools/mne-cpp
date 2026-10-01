@@ -13,7 +13,7 @@
  * @date     July 2018
  * @brief    Interactive 2-D sensor-layout picker for building and saving channel groups.
  *
- * ChannelSelectionView shows a @ref SelectionScene of the active sensor
+ * ChannelSelectionView shows a @ref DISPLIB::SelectionScene of the active sensor
  * layout together with a list of named selection groups (loaded from
  * or saved to MNE @c .sel files). The user lassoes sensors on the
  * scene to define a group; emitted @c showSelectedChannelsOnly /
@@ -92,8 +92,10 @@ public:
     /**
      * Constructs a ChannelSelectionView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent pointer to parent widget; If parent is 0, the new ChannelSelectionView becomes a window. If parent is another widget, ChannelSelectionView becomes a child window inside parent. ChannelSelectionView is deleted when its parent is deleted.
      * @param[in] pChannelInfoModel pointer to the channel info model.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     ChannelSelectionView(const QString& sSettingsPath = "",
                          QWidget *parent = 0,
@@ -120,7 +122,7 @@ public:
      * Highlight channels
      * This function highlights channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
      *
-     * @param[in] channelList channels which are be to set as selected.
+     * @param[in] channelIndexList channels which are be to set as selected.
      */
     void highlightChannels(QModelIndexList channelIndexList);
 
@@ -137,6 +139,8 @@ public:
     /**
      * Current selected channels
      * This function returns the current channel selection
+     *
+     * @return Names of the user-defined channels, or of the visible group channels if none were user-defined.
      */
     QStringList getSelectedChannels();
 
@@ -146,6 +150,8 @@ public:
      *
      * @param[in] listWidget QListWidget which inhibits the needed item.
      * @param[in] channelName the corresponding channel name.
+     *
+     * @return Matching list item, or a newly allocated empty item owned by the caller if none matches.
      */
     QListWidgetItem* getItemForChName(QListWidget *listWidget,
                                       const QString& channelName);
@@ -153,12 +159,16 @@ public:
     //=========================================================================================================
     /**
      * returns the current layout map.
+     *
+     * @return Map from channel name to its 2-D layout position.
      */
     const QMap<QString,QPointF>& getLayoutMap();
 
     //=========================================================================================================
     /**
      * call this whenever a new file was loaded.
+     *
+     * @param[in] pFiffInfo  Measurement info of the new file (currently unused; the layout is reloaded).
      */
     void newFiffFileLoaded(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo);
 

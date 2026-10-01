@@ -33,11 +33,19 @@ Default constructor.
 
 Serialize to QJsonObject.
 
+**Returns:**
+
+- *QJsonObject* — JSON object with all project fields, subjects, pipeline nodes and preserved extras.
+
 ---
 
 ### toCbor()
 
 Serialize to QCborMap.
+
+**Returns:**
+
+- *QCborMap* — CBOR map with all project fields, subjects, pipeline nodes and preserved extras.
 
 ---
 
@@ -47,11 +55,29 @@ Serialize to QCborMap.
 
 Deserialize from QJsonObject.
 
+**Parameters:**
+
+- **json** : *const QJsonObject &*
+  JSON object as produced by `toJson()`.
+
+**Returns:**
+
+- *[MnaProject](/docs/api/mna/mna-project)* — The project; missing keys take default values and unknown keys go to extras.
+
 ---
 
 ### fromCbor(cbor)
 
 Deserialize from QCborMap.
+
+**Parameters:**
+
+- **cbor** : *const QCborMap &*
+  CBOR map as produced by `toCbor()`.
+
+**Returns:**
+
+- *[MnaProject](/docs/api/mna/mna-project)* — The project; missing keys take default values and unknown keys go to extras.
 
 ---
 

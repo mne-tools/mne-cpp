@@ -14,7 +14,7 @@
  * moment, the goodness-of-fit, the χ² value and the degrees of freedom /
  * function-evaluation count used by the optimiser. The class mirrors
  * the @c ecdRec record of MNE-C and is the atomic element collected
- * into the @ref InvEcdSet returned by @ref InvDipoleFit.
+ * into the @ref INVLIB::InvEcdSet returned by @ref INVLIB::InvDipoleFit.
  */
 
 #ifndef INV_ECD_H

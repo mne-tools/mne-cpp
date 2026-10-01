@@ -65,6 +65,20 @@ Every member has value semantics, so the compiler-generated member-wise assignme
 
 Constructor.
 
+**Parameters:**
+
+- **p_kind** : *fiff_int_t*
+  Projection kind (FIFFV_PROJ_ITEM_* constant).
+
+- **p_active** : *bool*
+  Whether the projector is already applied to the data.
+
+- **p_desc** : *QString*
+  Human-readable description of the projector.
+
+- **p_data** : *[FiffNamedMatrix](/docs/api/fiff/fiff-named-matrix) &*
+  Projection vectors with channel names; a deep copy is stored.
+
 ---
 
 ### ~FiffProj()

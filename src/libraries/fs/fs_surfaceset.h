@@ -12,12 +12,12 @@
  * Cortical analyses in FreeSurfer/MNE typically operate on a pair of
  * hemisphere surfaces of the same kind (both @c pial, both @c white, both
  * @c inflated, both @c sphere …) read from
- * @c $SUBJECTS_DIR/<id>/surf/lh.<surf> and the matching @c rh.<surf>.
- * @ref FsSurfaceSet wraps that pair as a single in-memory object so
+ * `$SUBJECTS_DIR/<id>/surf/lh.<surf>` and the matching `rh.<surf>`.
+ * @ref FSLIB::FsSurfaceSet wraps that pair as a single in-memory object so
  * downstream code (annotations, source spaces, BEM, rendering) can iterate
  * over @c {lh, rh} without re-parsing or re-resolving paths.
  *
- * The class accepts the same three locator forms as @ref FsSurface:
+ * The class accepts the same three locator forms as @ref FSLIB::FsSurface "FsSurface":
  * subject + hemi + surf resolved against @c $SUBJECTS_DIR, a direct
  * directory + hemi + surf path, or explicit @c lh / rh file paths.
  * The @c hemi argument follows the FreeSurfer/MNE convention

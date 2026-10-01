@@ -14,7 +14,7 @@
  * spanning subjects, recordings, processing pipelines, parameter
  * trees, verification checks, and provenance. The container is
  * self-describing, lossless on round-trip (unknown keys preserved
- * via @c extras) and version-tagged via @ref MnaProject::CURRENT_SCHEMA_VERSION.
+ * via @c extras) and version-tagged via @ref MNALIB::MnaProject::CURRENT_SCHEMA_VERSION "MnaProject::CURRENT_SCHEMA_VERSION".
  *
  * This header defines the @c MNASHARED_EXPORT visibility macro that
  * gates every public symbol in the library, the static-build override,
@@ -61,18 +61,24 @@ namespace MNALIB{
 //=============================================================================================================
 /**
  * Returns build date and time.
+ *
+ * @return Null-terminated string with the compile date and time of the library.
  */
 MNASHARED_EXPORT const char* buildDateTime();
 
 //=============================================================================================================
 /**
  * Returns abbreviated build git hash.
+ *
+ * @return Null-terminated string with the short git commit hash the library was built from.
  */
 MNASHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
  * Returns full build git hash.
+ *
+ * @return Null-terminated string with the full git commit hash the library was built from.
  */
 MNASHARED_EXPORT const char* buildHashLong();
 }

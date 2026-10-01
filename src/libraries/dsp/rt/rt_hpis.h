@@ -18,7 +18,7 @@
  * goodness-of-fit values.
  *
  * The continuously updated head-to-device transform is the input to
- * Maxwell movement compensation (@ref MaxwellMovementComp), to the live
+ * Maxwell movement compensation (@ref UTILSLIB::MaxwellMovementComp), to the live
  * coordinate-frame display, and to dynamic forward-solution updates. The
  * threaded design keeps the GUI responsive even when the HPI fit is run
  * at the full block rate of a multi-channel acquisition.
@@ -88,7 +88,7 @@ public:
     /**
      * Creates the real-time HPI worker object.
      *
-     * @param[in] pFiffInfo        Associated Fiff Information.
+     * @param[in] sensorSet        Associated Fiff Information.
      */
     explicit RtHpiWorker(const INVLIB::InvSensorSet sensorSet);
 
@@ -98,8 +98,8 @@ public:
      *
      * @param[in] matData            Data to estimate the HPI positions from.
      * @param[in] matProjectors      The projectors to apply. Bad channels are still included.
-     * @param[in] vFreqs             The frequencies for each coil.
-     * @param[in] pFiffInfo          Associated Fiff Information.
+     * @param[in] hpiModelParameters HPI model parameters (coil frequencies, line frequency, ...).
+     * @param[in] matCoilsHead Digitized HPI coil positions in head space.
      */
     void doWork(const Eigen::MatrixXd& matData,
                 const Eigen::MatrixXd& matProjectors,
@@ -132,7 +132,7 @@ public:
     /**
      * Creates the real-time HPIS estimation object.
      *
-     * @param[in] p_pFiffInfo        Associated Fiff Information.
+     * @param[in] sensorSet        Associated Fiff Information.
      * @param[in] parent     Parent QObject (optional).
      */
     explicit RtHpi(const INVLIB::InvSensorSet sensorSet,
@@ -156,7 +156,7 @@ public:
     /**
      * Set the coil frequencies.
      *
-     * @param[in] vCoilFreqs  The coil frequencies.
+     * @param[in] hpiModelParameters  The coil frequencies.
      */
     void setModelParameters(INVLIB::InvHpiModelParameters hpiModelParameters);
 
@@ -172,7 +172,7 @@ public:
     /**
      * Set the new projection matrix.
      *
-     * @param[in] matProjectors  The new projection matrix.
+     * @param[in] matCoilsHead  The new projection matrix.
      */
     void setHpiDigitizer(const Eigen::MatrixXd& matCoilsHead);
 
@@ -192,6 +192,8 @@ protected:
     //=========================================================================================================
     /**
      * Handles the results.
+     *
+     * @param[in] fitResult  HPI fit result from the worker, re-emitted via newHpiFitResultAvailable().
      */
     void handleResults(const INVLIB::HpiFitResult &fitResult);
 

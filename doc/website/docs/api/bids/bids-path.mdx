@@ -89,6 +89,11 @@ Constructs a [`BIDSPath`](/docs/api/bids/bids-path) with the most common entitie
 
 Copy constructor.
 
+**Parameters:**
+
+- **other** : *const BIDSPath &*
+  [`BIDSPath`](/docs/api/bids/bids-path) to copy.
+
 ---
 
 ### ~BIDSPath()
@@ -101,11 +106,21 @@ Destructor.
 
 Set the BIDS dataset root directory.
 
+**Parameters:**
+
+- **sRoot** : *const QString &*
+  Root directory of the BIDS dataset.
+
 ---
 
 ### setSubject(sSubject)
 
 Set the subject label (without "sub-" prefix).
+
+**Parameters:**
+
+- **sSubject** : *const QString &*
+  Subject label without the "sub-" prefix.
 
 ---
 
@@ -113,11 +128,21 @@ Set the subject label (without "sub-" prefix).
 
 Set the session label (without "ses-" prefix).
 
+**Parameters:**
+
+- **sSession** : *const QString &*
+  Session label without the "ses-" prefix; empty to omit the entity.
+
 ---
 
 ### setTask(sTask)
 
 Set the task label.
+
+**Parameters:**
+
+- **sTask** : *const QString &*
+  Task label; empty to omit the entity.
 
 ---
 
@@ -125,11 +150,21 @@ Set the task label.
 
 Set the acquisition label.
 
+**Parameters:**
+
+- **sAcquisition** : *const QString &*
+  Acquisition label; empty to omit the entity.
+
 ---
 
 ### setRun(sRun)
 
 Set the run index (will be zero-padded to 2 digits).
+
+**Parameters:**
+
+- **sRun** : *const QString &*
+  Run index as a numeric string (e.g. "1" becomes "01"); empty to omit the entity.
 
 ---
 
@@ -137,11 +172,21 @@ Set the run index (will be zero-padded to 2 digits).
 
 Set the processing label.
 
+**Parameters:**
+
+- **sProcessing** : *const QString &*
+  Processing label; empty to omit the entity.
+
 ---
 
 ### setSpace(sSpace)
 
 Set the space label.
+
+**Parameters:**
+
+- **sSpace** : *const QString &*
+  Space label (e.g. a coordinate system name); empty to omit the entity.
 
 ---
 
@@ -149,17 +194,32 @@ Set the space label.
 
 Set the recording label.
 
+**Parameters:**
+
+- **sRecording** : *const QString &*
+  Recording label; empty to omit the entity.
+
 ---
 
 ### setSplit(sSplit)
 
 Set the split index.
 
+**Parameters:**
+
+- **sSplit** : *const QString &*
+  Split index as a numeric string, zero-padded to 2 digits; empty to omit the entity.
+
 ---
 
 ### setDescription(sDescription)
 
 Set the description label.
+
+**Parameters:**
+
+- **sDescription** : *const QString &*
+  Description label; empty to omit the entity.
 
 ---
 
@@ -169,6 +229,11 @@ Set the BIDS datatype (e.g.
 
 "ieeg", "eeg", "meg", "anat").
 
+**Parameters:**
+
+- **sDatatype** : *const QString &*
+  BIDS datatype, used as the innermost directory name.
+
 ---
 
 ### setSuffix(sSuffix)
@@ -176,6 +241,11 @@ Set the BIDS datatype (e.g.
 Set the filename suffix (e.g.
 
 "ieeg", "channels", "electrodes", "coordsystem").
+
+**Parameters:**
+
+- **sSuffix** : *const QString &*
+  Filename suffix appended after the entities.
 
 ---
 
@@ -185,11 +255,20 @@ Set the file extension including dot (e.g.
 
 ".vhdr", ".tsv", ".json").
 
+**Parameters:**
+
+- **sExtension** : *const QString &*
+  File extension including the leading dot.
+
 ---
 
 ### root()
 
 BIDS dataset root path.
+
+**Returns:**
+
+- *QString* — Root directory of the BIDS dataset, or an empty string if unset.
 
 ---
 
@@ -197,11 +276,19 @@ BIDS dataset root path.
 
 [Subject](/docs/api/utils/subject) label (without "sub-").
 
+**Returns:**
+
+- *QString* — Subject label without the "sub-" prefix, or an empty string if unset.
+
 ---
 
 ### session()
 
 Session label (without "ses-").
+
+**Returns:**
+
+- *QString* — Session label without the "ses-" prefix, or an empty string if unset.
 
 ---
 
@@ -209,11 +296,19 @@ Session label (without "ses-").
 
 Task label.
 
+**Returns:**
+
+- *QString* — Task label, or an empty string if unset.
+
 ---
 
 ### acquisition()
 
 Acquisition label.
+
+**Returns:**
+
+- *QString* — Acquisition label, or an empty string if unset.
 
 ---
 
@@ -221,11 +316,19 @@ Acquisition label.
 
 Run index.
 
+**Returns:**
+
+- *QString* — Zero-padded run index, or an empty string if unset.
+
 ---
 
 ### processing()
 
 Processing label.
+
+**Returns:**
+
+- *QString* — Processing label, or an empty string if unset.
 
 ---
 
@@ -233,11 +336,19 @@ Processing label.
 
 Space label.
 
+**Returns:**
+
+- *QString* — Space label, or an empty string if unset.
+
 ---
 
 ### recording()
 
 Recording label.
+
+**Returns:**
+
+- *QString* — Recording label, or an empty string if unset.
 
 ---
 
@@ -245,11 +356,19 @@ Recording label.
 
 Split index.
 
+**Returns:**
+
+- *QString* — Zero-padded split index, or an empty string if unset.
+
 ---
 
 ### description()
 
 Description label.
+
+**Returns:**
+
+- *QString* — Description label, or an empty string if unset.
 
 ---
 
@@ -257,11 +376,19 @@ Description label.
 
 BIDS datatype string.
 
+**Returns:**
+
+- *QString* — BIDS datatype (e.g. "ieeg"), or an empty string if unset.
+
 ---
 
 ### suffix()
 
 Filename suffix.
+
+**Returns:**
+
+- *QString* — Filename suffix, or an empty string if unset.
 
 ---
 
@@ -269,13 +396,17 @@ Filename suffix.
 
 File extension.
 
+**Returns:**
+
+- *QString* — File extension including the leading dot, or an empty string if unset.
+
 ---
 
 ### basename()
 
 Constructs the BIDS-compliant filename (without directory).
 
-Format: sub-&lt;label&gt;[*ses-&lt;label&gt;][_task-&lt;label&gt;][_acq-&lt;label&gt;][_run-&lt;index&gt;] [_proc-&lt;label&gt;][_space-&lt;label&gt;][_rec-&lt;label&gt;][_split-&lt;index&gt;] [_desc-&lt;label&gt;]*&lt;suffix&gt;&lt;extension&gt;
+Format: `sub-<label>[_ses-<label>][_task-<label>][_acq-<label>][_run-<index>]` `[_proc-<label>][_space-<label>][_rec-<label>][_split-<index>]` `[_desc-<label>]_<`suffix`><`extension`>`
 
 **Returns:**
 
@@ -287,7 +418,7 @@ Format: sub-&lt;label&gt;[*ses-&lt;label&gt;][_task-&lt;label&gt;][_acq-&lt;labe
 
 Constructs the directory path for this entity combination.
 
-Format: &lt;root&gt;/sub-&lt;label&gt;[/ses-&lt;label&gt;]/&lt;datatype&gt;/
+Format: `<`root`>/sub-<label>[/ses-<label>]/<`datatype`>/`
 
 **Returns:**
 

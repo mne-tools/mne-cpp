@@ -15,8 +15,8 @@
  * @c mne.Annotations type and writes them under
  * @c FIFFB_MNE_ANNOTATIONS; this header is the C++ mirror.
  *
- * @ref FiffAnnotation is one entry (onset in seconds since the
- * recording start, duration, description string), @ref FiffAnnotations is
+ * @ref FIFFLIB::FiffAnnotation is one entry (onset in seconds since the
+ * recording start, duration, description string), @ref FIFFLIB::FiffAnnotations is
  * the container; together they expose JSON and CSV serialization so the
  * same annotations can be exchanged with external tools that do not
  * speak FIFF (eg. BIDS sidecar files).

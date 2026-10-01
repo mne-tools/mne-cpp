@@ -77,6 +77,8 @@ public:
     //=========================================================================================================
     /**
      * @brief Construct a report with a title.
+     *
+     * @param[in] sTitle  Report title, used for the HTML page title and main heading.
      */
     explicit Report(const QString& sTitle = "MNE-CPP Report");
 
@@ -114,18 +116,25 @@ public:
     //=========================================================================================================
     /**
      * @brief Add a preformatted code block.
+     *
+     * @param[in] sTitle  Section title.
+     * @param[in] sCode   Code text; it is HTML-escaped and wrapped in a preformatted block.
      */
     void addCode(const QString& sTitle, const QString& sCode);
 
     //=========================================================================================================
     /**
      * @brief Get the number of sections.
+     *
+     * @return Number of sections added so far.
      */
     int sectionCount() const { return m_sections.size(); }
 
     //=========================================================================================================
     /**
      * @brief Generate the full HTML string.
+     *
+     * @return Self-contained HTML document containing the title and all sections.
      */
     QString toHtml() const;
 
@@ -142,6 +151,8 @@ public:
     //=========================================================================================================
     /**
      * @brief Get the report title.
+     *
+     * @return Title passed at construction.
      */
     const QString& title() const { return m_sTitle; }
 

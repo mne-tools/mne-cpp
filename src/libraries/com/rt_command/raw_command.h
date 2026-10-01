@@ -10,11 +10,11 @@
  * @brief    Untyped intermediate produced by @ref COMLIB::CommandParser before type information is bound to parameters.
  *
  * @ref COMLIB::RawCommand is the first object the parser builds when a
- * command arrives on @ref RtCmdClient. At that point the wire payload
+ * command arrives on @ref COMLIB::RtCmdClient. At that point the wire payload
  * has been tokenised into a command keyword and a list of string
- * arguments, but the parser does not yet know which @ref Command
+ * arguments, but the parser does not yet know which @ref COMLIB::Command
  * descriptor (if any) those arguments belong to — the parameter types,
- * names and descriptions live in whichever @ref CommandManager ends up
+ * names and descriptions live in whichever @ref COMLIB::CommandManager ends up
  * accepting the request. Keeping that pre-resolution state in its own
  * class avoids forcing every observer to deal with half-populated
  * @c Command objects.
@@ -22,7 +22,7 @@
  * The class also implements @ref UTILSLIB::ICommand so it can be
  * notified through the same dispatch path as a fully-typed @c Command;
  * the @c executed(QList<QString>) signal hands the raw parameter list
- * to whichever @ref CommandManager recognises the keyword, which is
+ * to whichever @ref COMLIB::CommandManager recognises the keyword, which is
  * responsible for converting the strings into the appropriate
  * @c QVariant values and re-emitting them as a typed @c Command.
  *
@@ -138,6 +138,8 @@ public:
      * Assignment Operator
      *
      * @param[in] rhs    RawCommand which should be assigned.
+     *
+     * @return Reference to this object.
      */
     RawCommand& operator= (const RawCommand &rhs);
 

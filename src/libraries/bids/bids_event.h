@@ -14,10 +14,10 @@
  * @c duration (seconds) and a recommended @c trial_type label;
  * mne-cpp additionally tracks the original 0-based @c sample index and
  * the numeric trigger @c value so the record can round-trip back into
- * FIFF @c stim-channel land without re-deriving them. @ref BidsEvent is
- * the per-row value object and the static @ref BidsEvent::readTsv /
- * @ref BidsEvent::writeTsv functions perform the TSV round-trip via
- * @ref BidsTsv. Missing / @c n/a fields default to zero / empty so
+ * FIFF @c stim-channel land without re-deriving them. @ref BIDSLIB::BidsEvent is
+ * the per-row value object and the static @ref BIDSLIB::BidsEvent::readTsv "BidsEvent::readTsv" /
+ * @ref BIDSLIB::BidsEvent::writeTsv "BidsEvent::writeTsv" functions perform the TSV round-trip via
+ * @ref BIDSLIB::BidsTsv. Missing / @c n/a fields default to zero / empty so
  * partially-populated event files still round-trip.
  *
  * Spec: https://bids-specification.readthedocs.io/en/stable/modality-agnostic-files.html#tasks

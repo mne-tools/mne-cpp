@@ -10,11 +10,11 @@
  * @brief    Per-coil magnetic-dipole fitting workspace — Nelder-Mead optimiser plus leadfield computation for HPI coil localisation.
  *
  * @ref INVLIB::InvHpiFitData implements the inner loop of
- * @ref InvHpiFit: for every HPI coil it computes the magnetic-dipole
+ * @ref INVLIB::InvHpiFit "InvHpiFit": for every HPI coil it computes the magnetic-dipole
  * leadfield in an infinite homogeneous medium, evaluates the residual
  * between the model field and the measured projection, and runs a
  * Nelder-Mead simplex search (@c fminsearch) to refine the coil
- * position. Helper structs @ref DipFitError and @ref HPISortStruct
+ * position. Helper structs @ref INVLIB::DipFitError and @ref INVLIB::HPISortStruct
  * carry per-iteration diagnostics and the post-fit coil-ordering
  * metadata. The leadfield and fit-error routines are validated against
  * the FieldTrip @c magnetic_dipole / @c ft_compute_leadfield reference
@@ -133,6 +133,11 @@ protected:
     /**
      * magnetic_dipole leadfield for a magnetic dipole in an infinite medium.
      * The function has been compared with matlab magnetic_dipole and it gives same output.
+     *
+     * @param[in] matPos   Dipole position (1 × 3), in m.
+     * @param[in] matPnt   Sensor integration point positions (n_points × 3), in m.
+     * @param[in] matOri   Sensor integration point orientations (n_points × 3), unit vectors.
+     * @return Leadfield (n_points × 3) for unit x, y and z dipole moments.
      */
     Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd matPos,
                                     Eigen::MatrixXd matPnt,
@@ -146,6 +151,10 @@ protected:
      * distributions on all sensors for one of the x,y,z-orientations of the dipole.
      * The function has been compared with matlab ft_compute_leadfield and it gives
      * same output.
+     *
+     * @param[in] matPos   Dipole position (1 × 3), in m.
+     * @param[in] sensors  Sensor set providing integration point positions and orientations.
+     * @return Leadfield (n_points × 3) evaluated at all sensor integration points.
      */
     Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& matPos,
                                       const InvSensorSet& sensors);
@@ -156,6 +165,12 @@ protected:
      * and can be used for non-linear fitting of dipole position.
      * The function has been compared with matlab dipfit_error and it gives
      * same output
+     *
+     * @param[in] matPos         Dipole position (1 × 3), in m.
+     * @param[in] matData        Measured sensor data for one coil (n_channels values).
+     * @param[in] sensors        Sensor set used to compute the leadfield.
+     * @param[in] matProjectors  Projector matrix (n_channels × n_channels) applied to the model data.
+     * @return Relative residual error and fitted dipole moment; numIterations is set to 0.
      */
     DipFitError dipfitError(const Eigen::MatrixXd& matPos,
                             const Eigen::MatrixXd& matData,
@@ -165,6 +180,10 @@ protected:
     //=========================================================================================================
     /**
      * Compare function for sorting
+     *
+     * @param[in] a  First sort entry.
+     * @param[in] b  Second sort entry.
+     * @return True if a.base_arr is smaller than b.base_arr.
      */
     static bool compare(HPISortStruct a, HPISortStruct b);
 
@@ -173,6 +192,16 @@ protected:
      * fminsearch Multidimensional unconstrained nonlinear minimization (Nelder-Mead).
      * X = fminsearch(X0, iMaxiter, iMaxfun, iDisplay, matData, sensors) starts at X0 and
      * attempts to find a local minimizer
+     *
+     * @param[in] matPos            Initial dipole position (1 × 3), in m.
+     * @param[in] iMaxiter          Maximum number of simplex iterations.
+     * @param[in] iMaxfun           Maximum number of error function evaluations.
+     * @param[in] iDisplay          Verbosity level (currently unused).
+     * @param[in] matData           Measured sensor data for one coil.
+     * @param[in] matProjectors     Projector matrix applied to the model data.
+     * @param[in] sensors           Sensor set used to compute the leadfield.
+     * @param[out] iSimplexNumitr   Number of simplex iterations performed.
+     * @return Optimized dipole position (1 × 3), in m.
      */
     Eigen::MatrixXd fminsearch(const Eigen::MatrixXd& matPos,
                                int iMaxiter,

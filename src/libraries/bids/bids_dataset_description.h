@@ -12,7 +12,7 @@
  * Every BIDS validator refuses to walk a tree that does not have a
  * @c dataset_description.json at the root, so this is also the first
  * file mne-cpp writes when exporting a dataset and the last sanity
- * check performed on import. @ref BidsDatasetDescription captures the
+ * check performed on import. @ref BIDSLIB::BidsDatasetDescription captures the
  * two REQUIRED fields (@c Name and @c BIDSVersion) plus the two most
  * commonly populated recommended fields (@c DatasetType,
  * @c License); additional recommended/optional fields can be added

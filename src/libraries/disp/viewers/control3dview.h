@@ -80,9 +80,10 @@ public:
     /**
      * Default constructor.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent      The parent of the QObject.
      * @param[in] slFlags    The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: "Data", "View", "Light".
-     * @param[in] type.
+     * @param[in] type         Qt window type passed to the QWidget constructor.
      */
     explicit Control3DView(const QString& sSettingsPath = "",
                            QWidget* parent = 0,
@@ -115,8 +116,7 @@ public:
     /**
      * Init the control widget based on the 3D view and data model.
      *
-     * @param[in] pData3DTreeModel   The 3D data tree model.
-     * @param[in] pView3D            The view3D to bec connected to this widget.
+     * @param[in] pDataTreeModel   The 3D data tree model.
      */
     void setModel(QStandardItemModel* pDataTreeModel);
 
@@ -129,6 +129,8 @@ public:
     //=========================================================================================================
     /**
      * Slot called when an item should be removed.
+     *
+     * @param[in] index  Model index of the tree view row to remove; ignored if invalid.
      */
     void onTreeViewRemoveItem(const QModelIndex &index);
 
@@ -225,6 +227,8 @@ protected:
     //=========================================================================================================
     /**
      * Slot called when the user wants to toggle the coord axis.
+     *
+     * @param[in] checked  True to show the coordinate axis.
      */
     void onCoordAxisClicked(bool checked);
 

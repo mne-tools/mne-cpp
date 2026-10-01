@@ -81,6 +81,8 @@ public:
      * Reads the specified MNE sel file.
      * @param[in] path holds the file path of the .sel file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
+     *
+     * @return True on success, false if the path lacks a .sel extension or the file cannot be opened.
      */
     static bool readMNESelFile(QString path, QMultiMap<QString,QStringList> &selectionMap);
 
@@ -89,6 +91,8 @@ public:
      * Reads the specified MNE sel file.
      * @param[in] path holds the file path of the .sel file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
+     *
+     * @return True on success, false if the path lacks a .sel extension or the file cannot be opened.
      */
     static bool readMNESelFile(const std::string& path, std::multimap<std::string,std::vector<std::string>>& selectionMap);
 
@@ -97,6 +101,8 @@ public:
      * Reads the specified Brainstorm montage file.
      * @param[in] path holds the file path of the .mon file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
+     *
+     * @return True on success, false if the path lacks a .mon extension or the file cannot be opened.
      */
     static bool readBrainstormMonFile(QString path, QMultiMap<QString,QStringList> &selectionMap);
 
@@ -105,6 +111,8 @@ public:
      * Reads the specified Brainstorm montage file.
      * @param[in] path holds the file path of the .mon file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
+     *
+     * @return True on success, false if the path lacks a .mon extension or the file cannot be opened.
      */
     static bool readBrainstormMonFile(const std::string& path, std::multimap<std::string,std::vector<std::string>>& selectionMap);
 
@@ -113,6 +121,8 @@ public:
      * Writes the specified selection groups to a single MNE .sel file.
      * @param[in] path holds the file path of the .sel file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
+     *
+     * @return True on success, false if the path lacks a .sel extension or the file cannot be opened for writing.
      */
     static bool writeMNESelFile(QString path, const QMultiMap<QString,QStringList> &selectionMap);
 
@@ -121,6 +131,8 @@ public:
      * Writes the specified selection groups to a single MNE .sel file.
      * @param[in] path holds the file path of the .sel file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
+     *
+     * @return True on success, false if the path lacks a .sel extension or the file cannot be opened for writing.
      */
     static bool writeMNESelFile(const std::string& path, const std::map<std::string,std::vector<std::string>>& selectionMap);
 
@@ -129,6 +141,8 @@ public:
      * Writes the specified selection groups to different Brainstorm .mon files. The amount of written files depend on the number of selection groups in selectionMap
      * @param[in] path holds the file path of the .mon file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
+     *
+     * @return True if all .mon files were written, false if any file could not be opened for writing.
      */
     static bool writeBrainstormMonFiles(QString path, const QMultiMap<QString,QStringList> &selectionMap);
 
@@ -137,6 +151,8 @@ public:
      * Writes the specified selection groups to different Brainstorm .mon files. The amount of written files depend on the number of selection groups in selectionMap
      * @param[in] path holds the file path of the .mon file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
+     *
+     * @return True if all .mon files were written, false if any file could not be opened for writing.
      */
     static bool writeBrainstormMonFiles(const std::string& path, const std::map<std::string,std::vector<std::string>>& selectionMap);
 };

@@ -15,7 +15,7 @@
  * TriggerDetectionView lets the user pick the stim channel to monitor,
  * set the rising-edge threshold and reset the detected-event list.
  * Detected events feed the averaging pipeline and the
- * @ref ChannelDataView trigger overlay.
+ * @ref DISPLIB::ChannelDataView trigger overlay.
  */
 
 #ifndef TRIGGERDETECTIONVIEW_H
@@ -81,7 +81,9 @@ public:
     /**
      * Constructs a TriggerDetectionView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent        parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     TriggerDetectionView(const QString& sSettingsPath = "",
                          QWidget *parent = 0,
@@ -96,6 +98,8 @@ public:
     //=========================================================================================================
     /**
      * Init the view.
+     *
+     * @param[in] pFiffInfo  Measurement info whose STIM channels populate the trigger channel list; ignored if null.
      */
     void init(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
@@ -161,12 +165,16 @@ protected:
     //=========================================================================================================
     /**
      * Slot called when trigger detection color button was clicked
+     *
+     * @param[in] state  Checked state of the button (unused).
      */
     void onRealTimeTriggerColorChanged(bool state);
 
     //=========================================================================================================
     /**
      * Slot called when trigger type changed
+     *
+     * @param[in] value  Selected trigger type as text, used as key into the trigger colour map.
      */
     void onRealTimeTriggerColorTypeChanged(const QString& value);
 

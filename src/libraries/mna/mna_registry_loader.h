@@ -7,23 +7,23 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Declarative loader for @ref MnaOpRegistry contents — ingests @c mna-registry.json manifests and overrides them with drop-ins under @c mna-registry.d/.
+ * @brief    Declarative loader for @ref MNALIB::MnaOpRegistry contents — ingests @c mna-registry.json manifests and overrides them with drop-ins under @c mna-registry.d/.
  *
- * @ref MnaRegistryLoader is the bridge between the on-disk
+ * @ref MNALIB::MnaRegistryLoader is the bridge between the on-disk
  * representation of MNA op schemas (JSON manifests authored by
  * library and tool maintainers) and the in-memory
- * @ref MnaOpRegistry consulted by the validator and executor. A
+ * @ref MNALIB::MnaOpRegistry consulted by the validator and executor. A
  * manifest carries an @c mna_registry_version field for future-
  * proofing, a @c provider name for diagnostics, and an @c ops
- * array whose entries are deserialised into @ref MnaOpSchema
+ * array whose entries are deserialised into @ref MNALIB::MnaOpSchema
  * instances.
  *
- * @ref loadFile handles a single manifest, @ref loadDirectory
+ * @ref MNALIB::MnaRegistryLoader::loadFile "loadFile" handles a single manifest, @ref MNALIB::MnaRegistryLoader::loadDirectory "loadDirectory"
  * loads the master @c mna-registry.json first and then every
  * @c *.json drop-in from @c mna-registry.d/ in alphabetical order;
  * later files overwrite earlier definitions for the same op type,
  * which is the mechanism plug-ins use to extend or shadow built-in
- * operations. @ref saveFile re-emits the current registry to a
+ * operations. @ref MNALIB::MnaRegistryLoader::saveFile "saveFile" re-emits the current registry to a
  * canonical manifest so a running process can publish the exact
  * op surface it offers.
  */

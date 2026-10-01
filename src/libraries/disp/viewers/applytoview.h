@@ -11,7 +11,7 @@
  * @date     August 2020
  * @brief    Three-way radio selector widget choosing scope = Selected / Visible / All channels.
  *
- * ApplyToView is a tiny @ref AbstractView subclass holding a
+ * ApplyToView is a tiny @ref DISPLIB::AbstractView subclass holding a
  * @c QButtonGroup of three radios that lets the user decide whether a
  * subsequent action (filter, scaling, projection, …) should apply to
  * the currently selected channels, the visible-on-screen channels or

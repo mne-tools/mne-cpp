@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Vertical column of channel-name labels synced with @ref ChannelDataView's row geometry.
+ * @brief    Vertical column of channel-name labels synced with @ref DISPLIB::ChannelDataView's row geometry.
  *
- * ChannelLabelPanel listens to the same @ref ChannelDataModel as the
+ * ChannelLabelPanel listens to the same @ref DISPLIB::ChannelDataModel as the
  * central data view and paints each visible channel's label aligned
  * to the row centre. Bad channels are greyed out and label clicks
  * emit a channel-selection signal that the data view consumes.
@@ -65,12 +65,16 @@ public:
     //=========================================================================================================
     /**
      * Set the index of the first visible channel row (kept in sync with ChannelRhiView).
+     *
+     * @param[in] ch  Index of the first visible row in the displayed channel list.
      */
     void setFirstVisibleChannel(int ch);
 
     //=========================================================================================================
     /**
      * Set how many channel rows are simultaneously visible (kept in sync with ChannelRhiView).
+     *
+     * @param[in] count  Number of simultaneously visible channel rows.
      */
     void setVisibleChannelCount(int count);
 
@@ -88,6 +92,8 @@ public:
     /**
      * Show or hide bad-channel rows.  When @p hide is true, bad channels are
      * removed from the visible row list so the panel stays aligned with the trace view.
+     *
+     * @param[in] hide  True to hide bad-channel rows.
      */
     void setHideBadChannels(bool hide);
 

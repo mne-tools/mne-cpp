@@ -15,7 +15,7 @@
  * estimate (Dale et al., Neuron 26, 55-67, 2000), the sLORETA estimate
  * (Pascual-Marqui, Methods Find. Exp. Clin. Pharmacol. 24D, 5-12,
  * 2002) and the iterative eLORETA estimate (Pascual-Marqui, 2007) from
- * either an @c FiffEvoked or a raw data matrix. @ref doInverseSetup
+ * either an @c FiffEvoked or a raw data matrix. @ref INVLIB::InvMinimumNorm::doInverseSetup "doInverseSetup"
  * re-prepares the operator for a given number of averages and assembles
  * the kernel matrix once, after which @c calculateInverse becomes a
  * single dense matmul per input epoch.
@@ -79,8 +79,6 @@ public:
      * @param[in] p_inverseOperator  The inverse operator.
      * @param[in] lambda             The regularization factor.
      * @param[in] method             Use mininum norm, dSPM or sLORETA. ("MNE" | "dSPM" | "sLORETA").
-     *
-     * @return the prepared inverse operator.
      */
     explicit InvMinimumNorm(const MNELIB::MNEInverseOperator &p_inverseOperator, float lambda, const QString method);
 
@@ -92,8 +90,6 @@ public:
      * @param[in] lambda             The regularization factor.
      * @param[in] dSPM               Compute the noise-normalization factors for dSPM?.
      * @param[in] sLORETA            Compute the noise-normalization factors for sLORETA?.
-     *
-     * @return the prepared inverse operator.
      */
     explicit InvMinimumNorm(const MNELIB::MNEInverseOperator &p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
 

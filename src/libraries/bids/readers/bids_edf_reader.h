@@ -112,12 +112,16 @@ public:
     //=========================================================================================================
     /**
      * @brief Return all channel infos (measurement + extra).
+     *
+     * @return Infos for every signal in the EDF header, including annotation/extra channels.
      */
     QVector<EDFChannelInfo> getAllChannelInfos() const;
 
     //=========================================================================================================
     /**
      * @brief Return measurement channel infos only.
+     *
+     * @return Infos for the measurement channels only, in channel order.
      */
     QVector<EDFChannelInfo> getMeasurementChannelInfos() const;
 

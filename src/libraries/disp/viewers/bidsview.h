@@ -9,9 +9,9 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.7
  * @date     October 2020
- * @brief    Tree view of the BIDS dataset hierarchy backed by @ref BidsViewModel.
+ * @brief    Tree view of the BIDS dataset hierarchy backed by @ref DISPLIB::BidsViewModel.
  *
- * BidsView wraps a @c QTreeView around a @ref BidsViewModel so the
+ * BidsView wraps a @c QTreeView around a @ref DISPLIB::BidsViewModel so the
  * user can browse a loaded BIDS dataset (subjects → sessions →
  * runs → derivatives) and double-click items to load them into the
  * application. Context-menu actions expose import / export / convert

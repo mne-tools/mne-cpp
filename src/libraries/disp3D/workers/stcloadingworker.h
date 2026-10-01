@@ -13,7 +13,7 @@
  * background thread, parses them into an @ref
  * INVLIB::InvSourceEstimate per hemisphere and builds the sparse
  * vertex-to-source interpolation matrix using
- * @ref GeometryInfo::scdc / @ref Interpolation::createInterpolationMat
+ * @ref DISP3DLIB::GeometryInfo::scdc "GeometryInfo::scdc" / @ref DISP3DLIB::Interpolation::createInterpolationMat "Interpolation::createInterpolationMat"
  * with a configurable geodesic cancel distance.
  *
  * On completion the controller signals the GUI to attach the data

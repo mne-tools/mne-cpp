@@ -11,7 +11,7 @@
  *
  * @ref UTILSLIB::Numerics groups the scalar / per-vector numerical
  * primitives that almost every other library needs but that have no
- * natural home in Eigen or @ref UTILSLIB::Linalg: the Euclidean GCD,
+ * natural home in Eigen or @ref UTILSLIB::Linalg "Linalg": the Euclidean GCD,
  * integer log2 and @c nchoose2 combinatorics used to size connectivity
  * containers, the sparsity heuristic that decides whether a dense
  * vector should be promoted to an Eigen sparse matrix, fixed-width

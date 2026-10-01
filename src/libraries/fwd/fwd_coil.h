@@ -92,6 +92,8 @@ public:
     //=========================================================================================================
     /**
      * Constructs the Forward Coil
+     *
+     * @param[in] p_np   Number of integration points; rmag, cosmag and w are zero-initialized to this size.
      */
     FwdCoil(int p_np);
 
@@ -155,7 +157,7 @@ public:
 
 public:
     QString chname;         /**< Name of this channel. */
-    int     coord_frame;    /**< Which coordinate frame are we in?. */
+    int     coord_frame;    /**< Which coordinate frame are we in? */
     QString desc;           /**< Description for this type of a coil. */
     int     coil_class;     /**< Coil class. */
     int     type;           /**< Coil type. */
@@ -171,9 +173,19 @@ public:
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> cosmag;  /**< The corresponding direction cosines (np x 3). */
     Eigen::VectorXf w;              /**< The weighting coefficients. */
 
-    /** Return a read-only map to the j-th integration point position (3 contiguous floats). */
+    /**
+     * Return a read-only map to the j-th integration point position (3 contiguous floats).
+     *
+     * @param[in] j      Integration point index (0 to np - 1).
+     * @return Read-only view of row j of rmag, in m.
+     */
     Eigen::Map<const Eigen::Vector3f> pos(int j) const { return Eigen::Map<const Eigen::Vector3f>(rmag.row(j).data()); }
-    /** Return a read-only map to the j-th integration point direction cosine. */
+    /**
+     * Return a read-only map to the j-th integration point direction cosine.
+     *
+     * @param[in] j      Integration point index (0 to np - 1).
+     * @return Read-only view of row j of cosmag (unit direction vector).
+     */
     Eigen::Map<const Eigen::Vector3f> dir(int j) const { return Eigen::Map<const Eigen::Vector3f>(cosmag.row(j).data()); }
 };
 

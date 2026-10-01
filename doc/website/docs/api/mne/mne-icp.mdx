@@ -23,7 +23,7 @@ class; the functions live directly in the library namespace.
 
 SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
-MNELIB::MNEIcp wraps the classical point-to-surface ICP used by mne-cpp's coregistration tools to refine an initial `head` &lt;-&gt; `MRI` transformation. It projects each digitiser point onto the nearest triangle of an [MNEBemSurface](/docs/api/mne/mne-bem-surface) (via [MNEProjectToSurface](/docs/api/mne/mne-project-to-surface)), solves a rigid-body least squares with SVD and iterates until convergence.
+`MNELIB::MNEIcp` wraps the classical point-to-surface ICP used by mne-cpp's coregistration tools to refine an initial `head` &lt;-&gt; `MRI` transformation. It projects each digitiser point onto the nearest triangle of an [`MNEBemSurface`](/docs/api/mne/mne-bem-surface) (via [`MNEProjectToSurface`](/docs/api/mne/mne-project-to-surface)), solves a rigid-body least squares with SVD and iterates until convergence.
 
 ---
 

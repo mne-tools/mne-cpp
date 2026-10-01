@@ -15,7 +15,7 @@
  * normals @c cosmag, channel transforms @c tra and integration weights
  * @c w in dense Eigen matrices, plus the linear-combination matrix
  * that maps coil integration points back to channels. The
- * @ref InvSensorSetCreator helper builds an @ref InvSensorSet from an
+ * @ref INVLIB::InvSensorSetCreator helper builds an @ref INVLIB::InvSensorSet from an
  * @ref FWDLIB::FwdCoilSet, picking the requested integration accuracy
  * (high / medium / low) so the HPI cost function can run on a small
  * hot-loop-friendly data structure.
@@ -117,8 +117,9 @@ private:
     //=========================================================================================================
     /**
      * Initialize data from FwdCoilSet to the sensorset format.
-     * @param[in] iNchan   The number of channels.
-     * @param[in] iAcc     The number of integration points.
+     *
+     * @param[in] pFwdCoilSet Coil set to convert.
+     *
      */
     void initFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwdCoilSet);
 
@@ -126,7 +127,7 @@ private:
     /**
      * Initialize member matrices for specific size.
      * @param[in] iNchan   The number of channels.
-     * @param[in] iAcc     The number of integration points.
+     * @param[in] iNp     The number of integration points.
      */
     void initMatrices(int iNchan, int iNp);
 
@@ -254,8 +255,9 @@ public:
      * Update InvSensorSet from new channel list with new accuracy.
      *
      * @param[in] channelList   The channel list to create the MEG sensor set from.
-     * @param[in] iAccuracy     The accuracy level to use for the sensor set.
+     * @param[in] accuracy     The accuracy level to use for the sensor set.
      *
+     * @return Sensor set built from the MEG coil definitions, or an empty set if channelList is empty.
      */
     InvSensorSet updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
                               const Accuracy& accuracy);

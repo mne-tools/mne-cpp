@@ -24,8 +24,8 @@
  * width 0.02–0.30 (normalised to π), and odd tap counts for high-pass and
  * notch types so a linear-phase type-I structure is realisable.
  *
- * Used as one of the design back-ends of @ref FilterKernel and ultimately
- * of @ref FirFilter; cosine-tapered designs are the alternative when speed
+ * Used as one of the design back-ends of @ref UTILSLIB::FilterKernel and ultimately
+ * of @ref UTILSLIB::FirFilter; cosine-tapered designs are the alternative when speed
  * matters more than equiripple optimality.
  */
 
@@ -93,6 +93,12 @@ public:
      * e.g. NewParksMcClellan(33, 0.7, 0.2, 0.1, HPF);
      * gives a 33 tap high pass filter with 3 dB corner at 0.7 with a transition bandwidth of 0.1
      * The FIR coefficients are placed in FirCoeff, starting at index 0.
+     *
+     * @param[in] NumTaps     Number of filter taps (9 to 128; odd for HPF and NOTCH).
+     * @param[in] OmegaC      Corner (LPF/HPF) or center (BPF/NOTCH) frequency, normalized to Pi.
+     * @param[in] BW          Bandwidth for BPF and NOTCH, normalized to Pi; ignored for LPF/HPF.
+     * @param[in] ParksWidth  Width of the transition bands, normalized to Pi.
+     * @param[in] PassType    Filter type (LPF, HPF, BPF or NOTCH).
      */
     ParksMcClellan(int NumTaps,
                    double OmegaC,
@@ -106,6 +112,12 @@ public:
     /**
      * Using nothrow prevents an exception from being thrown. new will instead return NULL.
      * These array are much larger than actually needed. See the notes in the orig fortran file.
+     *
+     * @param[in] NumTaps     Number of filter taps (9 to 128; odd for HPF and NOTCH).
+     * @param[in] OmegaC      Corner (LPF/HPF) or center (BPF/NOTCH) frequency, normalized to Pi.
+     * @param[in] BW          Bandwidth for BPF and NOTCH, normalized to Pi; ignored for LPF/HPF.
+     * @param[in] ParksWidth  Width of the transition bands, normalized to Pi.
+     * @param[in] PassType    Filter type (LPF, HPF, BPF or NOTCH).
      */
     void init(int NumTaps,
               double OmegaC,
@@ -121,6 +133,11 @@ public:
     //=========================================================================================================
     /**
      * Function to calculate the lagrange interpolation coefficients for use in the function gee.
+     *
+     * @param[in] K  Index of the extremal point whose coefficient is computed.
+     * @param[in] N  Number of extremal points.
+     * @param[in] M  Stride used to interleave the product for numerical stability.
+     * @return Barycentric Lagrange coefficient for point K (denominator clamped away from zero).
      */
     double LeGrangeInterp2(int K, int N, int M);
 
@@ -128,6 +145,10 @@ public:
     /**
      * Function to evaluate the frequency response using the Lagrange interpolation
      * formula in the barycentric form.
+     *
+     * @param[in] K  Index into the dense frequency grid at which to evaluate.
+     * @param[in] N  Number of extremal points used in the interpolation.
+     * @return Interpolated frequency response at grid point K.
      */
     double GEE2(int K, int N);
 
@@ -139,6 +160,12 @@ public:
     //=========================================================================================================
     /**
      * This was added by IowaHills and is used in Remez() in 6 places.
+     *
+     * @param[in] k     Index into the dense frequency grid.
+     * @param[in] Nut   Sign (+1 or -1) of the expected error extremum.
+     * @param[in] Comp  Current comparison error magnitude.
+     * @param[out] Err  Weighted approximation error at grid point k.
+     * @return True if Nut times the error does not exceed Comp, false otherwise.
      */
     bool ErrTest(int k,
                  int Nut,

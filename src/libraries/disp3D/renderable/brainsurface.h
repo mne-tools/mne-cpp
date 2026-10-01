@@ -25,7 +25,7 @@
  *
  * The class accepts geometry from a @ref FSLIB::FsSurface, an
  * @ref MNELIB::MNEBemSurface or raw Eigen matrices, and can carry a
- * @ref TissueType tag so the renderer knows whether the mesh is a
+ * @c BrainSurface::TissueType "TissueType" tag so the renderer knows whether the mesh is a
  * cortex, skin, skull or generic shell for alpha / lighting tuning.
  */
 
@@ -251,27 +251,45 @@ public:
     //=========================================================================================================
     /**
      * Get a copy of the current vertex positions.
+     *
+     * @return Nx3 matrix of the current (possibly transformed) vertex positions.
      */
     Eigen::MatrixX3f vertexPositions() const;
 
     //=========================================================================================================
     /**
      * Get a copy of the current vertex normals.
+     *
+     * @return Nx3 matrix of the current vertex normals.
      */
     Eigen::MatrixX3f vertexNormals() const;
 
     //=========================================================================================================
     /**
      * Get the triangle index buffer.
+     *
+     * @return Copy of the index data, three vertex indices per triangle.
      */
     QVector<uint32_t> triangleIndices() const { return m_indexData; }
 
-    /** @brief Const-ref access to CPU-side vertex data (used by merged rendering). */
+    /**
+     * @brief Const-ref access to CPU-side vertex data (used by merged rendering).
+     *
+     * @return Reference to the internal vertex array, valid while this surface lives.
+     */
     const QVector<VertexData>& vertexDataRef() const { return m_vertexData; }
-    /** @brief Const-ref access to CPU-side index data (used by merged rendering). */
+    /**
+     * @brief Const-ref access to CPU-side index data (used by merged rendering).
+     *
+     * @return Reference to the internal triangle index array, valid while this surface lives.
+     */
     const QVector<uint32_t>& indexDataRef() const { return m_indexData; }
 
-    /** @brief Monotonically increasing counter bumped whenever vertex data changes. */
+    /**
+     * @brief Monotonically increasing counter bumped whenever vertex data changes.
+     *
+     * @return Current vertex data generation counter.
+     */
     quint64 vertexGeneration() const { return m_vertexGeneration; }
     
     //=========================================================================================================
@@ -309,6 +327,7 @@ public:
      *                       So ray must be transformed to local space OR vertices transformed to world.
      * @param[in] rayDir     Ray direction (normalized).
      * @param[out] dist      Distance to intersection.
+     * @param[in, out] vertexIdx Index of the vertex closest to the intersection.
      * @return True if intersected.
      */
     bool intersects(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist, int &vertexIdx) const;
@@ -374,6 +393,8 @@ public:
     //=========================================================================================================
     /**
      * Set/Get whether to use the default surface color.
+     *
+     * @param[in] useDefault   True to use the surface's default color as base, false for white.
      */
     void setUseDefaultColor(bool useDefault);
     

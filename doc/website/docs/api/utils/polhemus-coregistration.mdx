@@ -91,6 +91,14 @@ Negate X and/or Y of incoming Polhemus positions.
 
 The Polhemus Fastrak coordinate system depends on the physical placement and orientation of the transmitter. When the transmitter is oriented such that its axes are mirrored relative to the expected neuroscience convention, enable the corresponding mirror flags here.
 
+**Parameters:**
+
+- **mirrorX** : *bool*
+  True to negate the X coordinate of incoming positions.
+
+- **mirrorY** : *bool*
+  True to negate the Y coordinate of incoming positions.
+
 ---
 
 ### mirrorX()
@@ -197,6 +205,10 @@ Clear the captured objective center.
 
 Captured objective center in tracker body frame (metres).
 
+**Returns:**
+
+- *QVector3D* — Objective center in the tracker body frame in metres; only meaningful if `hasObjectiveCenter()` is true.
+
 ---
 
 ### solveOpticalCalibration()
@@ -217,6 +229,11 @@ Set the known perpendicular distance from tracker sensor to the objective center
 
 When nonzero, the solver constrains the optical center to lie at this distance from the tracker origin, vastly improving accuracy. Default: 0.200 m (~200 mm for ZEISS Kinevo). Set to 0 to disable.
 
+**Parameters:**
+
+- **metres** : *float*
+  Tracker-to-objective distance in metres; 0 disables the constraint.
+
 ---
 
 ### knownTrackerToObjectiveDistance()
@@ -235,11 +252,19 @@ When nonzero, the solver constrains the optical center to lie at this distance f
 
 Direction of the optical axis in the tracker body frame (unit vector).
 
+**Returns:**
+
+- *QVector3D* — Unit optical-axis direction in the tracker body frame; only meaningful if `opticalCalibrationValid()` is true.
+
 ---
 
 ### opticalCenterLocal()
 
 Position of the optical center in the tracker body frame (metres).
+
+**Returns:**
+
+- *QVector3D* — Optical center in the tracker body frame in metres.
 
 ---
 
@@ -247,11 +272,19 @@ Position of the optical center in the tracker body frame (metres).
 
 RMS residual of the last optical calibration (mm).
 
+**Returns:**
+
+- *float* — RMS distance of the focus points from the fitted optical axis in millimetres.
+
 ---
 
 ### opticalCalibDepthSpreadMm()
 
 Depth spread of calibration samples along the optical axis (mm).
+
+**Returns:**
+
+- *float* — Extent of the calibration focus points along the optical axis in millimetres.
 
 ---
 

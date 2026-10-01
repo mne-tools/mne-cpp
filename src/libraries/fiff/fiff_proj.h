@@ -15,12 +15,12 @@
  *
  * Signal-Space Projection (SSP) removes a low-rank subspace from MEG/EEG
  * data; the projector itself is stored under @c FIFFB_PROJ /
- * @c FIFFB_PROJ_ITEM tags. @ref FiffProj is the C++ wrapper for one such
+ * @c FIFFB_PROJ_ITEM tags. @ref FIFFLIB::FiffProj is the C++ wrapper for one such
  * item: a description, the kind (@c FIFFV_PROJ_ITEM_FIELD,
  * @c FIFFV_PROJ_ITEM_EEG_AVREF, ...), the active flag, the desired flag
  * and the named matrix carrying the projection vectors keyed by channel
- * name. The list of @ref FiffProj inside @ref FiffInfo::projs is what
- * @ref FiffRawData and @ref FiffEvoked apply (or de-apply) via
+ * name. The list of @ref FIFFLIB::FiffProj inside @ref FIFFLIB::FiffInfo::projs "FiffInfo::projs" is what
+ * @ref FIFFLIB::FiffRawData and @ref FIFFLIB::FiffEvoked apply (or de-apply) via
  * @c make_projector during raw / evoked processing, with field-for-field
  * parity to @c mne.Projection / @c mne.compute_proj_* in MNE-Python.
  */
@@ -113,6 +113,11 @@ public:
     //=========================================================================================================
     /**
      * Constructor
+     *
+     * @param[in] p_kind     Projection kind (FIFFV_PROJ_ITEM_* constant).
+     * @param[in] p_active   Whether the projector is already applied to the data.
+     * @param[in] p_desc     Human-readable description of the projector.
+     * @param[in] p_data     Projection vectors with channel names; a deep copy is stored.
      */
     explicit FiffProj(fiff_int_t p_kind,
                       bool p_active,

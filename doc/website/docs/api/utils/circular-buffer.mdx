@@ -53,6 +53,10 @@ Adds a whole array at the end buffer.
 - **size** : *unsigned int*
   number of elements containing the array.
 
+**Returns:**
+
+- *bool* — True if all elements were written, false if the buffer is paused or no space freed up within the timeout.
+
 ---
 
 ### push(newElement)
@@ -64,15 +68,24 @@ Adds an element at the end of the buffer.
 - **newElement** : *const T &*
   pointer to an Array which should be apend to the end.
 
+**Returns:**
+
+- *bool* — True if the element was written, false if the buffer is paused or no space freed up within the timeout.
+
 ---
 
 ### pop(element)
 
 Returns the first element (first in first out).
 
+**Parameters:**
+
+- **element** : *T &*
+  Receives the first element; left unchanged on failure.
+
 **Returns:**
 
-- *bool* — the first element.
+- *bool* — True if an element was popped, false if the buffer is paused or empty within the timeout.
 
 ---
 
@@ -88,17 +101,30 @@ Pauses the buffer.
 
 Skpis any incoming matrices and only pops zero matrices.
 
+**Parameters:**
+
+- **bPause**
+  True to pause the buffer, false to resume it.
+
 ---
 
 ### getFreeElementsRead()
 
 Returns the number of free elements for thread safe reading.
 
+**Returns:**
+
+- *int* — Number of elements currently available to pop.
+
 ---
 
 ### getFreeElementsWrite()
 
 Returns the number of free elements for thread safe reading.
+
+**Returns:**
+
+- *int* — Number of free slots currently available to push into.
 
 ---
 

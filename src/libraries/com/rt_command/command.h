@@ -16,7 +16,7 @@
  * @c selch, @c start), a human-readable description, a list of named
  * parameters with both their @c QVariant values and their per-parameter
  * descriptions, and a flag selecting JSON or CLI serialisation when the
- * object is pushed out through @ref RtCmdClient.
+ * object is pushed out through @ref COMLIB::RtCmdClient.
  *
  * Two construction paths matter. The data path: an incoming JSON object
  * is parsed into a fully-populated @c Command by the @c QJsonObject
@@ -25,12 +25,12 @@
  * schema. The authoring path: client code constructs an empty
  * @c Command with name, description and parameter declarations, fills
  * @c pValues() per call site, then forwards it to
- * @ref RtCmdClient::sendCommandJSON. @c toStringReadySend() and
+ * @ref COMLIB::RtCmdClient::sendCommandJSON "RtCmdClient::sendCommandJSON". @c toStringReadySend() and
  * @c toJsonObject() / @c toStringList() format the same object for the
  * different transports.
  *
  * @c Command implements @ref UTILSLIB::ICommand from the generic command
- * pattern so it can be dispatched through @ref CommandManager without
+ * pattern so it can be dispatched through @ref COMLIB::CommandManager without
  * the manager needing to know whether the receiver is local or remote;
  * the @c triggered / @c received signals are how the manager routes
  * execution back to subscribers.
@@ -145,6 +145,8 @@ public:
      * @param[in] p_qListParamNames          Parameter names.
      * @param[in] p_qListParamValues         Parameter values/types.
      * @param[in] p_vecParameterDescriptions Parameter descriptions;.
+     * @param[in] p_bIsJson Whether the command is exchanged in JSON format.
+     * @param[in] parent Parent QObject.
      */
     explicit Command(const QString &p_sCommand, const QString &p_sDescription,
                      const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, const QStringList &p_vecParameterDescriptions, bool p_bIsJson = true, QObject *parent = 0);
@@ -189,9 +191,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Inherited by ICommand
-     *
-     * @return  emits received.
+     * Inherited by ICommand. Emits received().
      */
     virtual void execute();
 
@@ -270,6 +270,8 @@ public:
      * Assignment Operator
      *
      * @param[in] rhs     Command which should be assigned.
+     *
+     * @return Reference to this object.
      */
     Command& operator= (const Command &rhs);
 

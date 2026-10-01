@@ -24,7 +24,7 @@
  * without hard-coding the parameter list locally.
  * @c requestBufsize() and @c requestConnectors() are convenience wrappers
  * around the corresponding server commands used during the
- * @ref RtClient handshake.
+ * @ref COMLIB::RtClient handshake.
  *
  * All socket reads are funnelled through @c waitForDataAvailable() and
  * accumulated into @c m_sAvailableData, which @c readAvailableData()
@@ -113,8 +113,6 @@ public:
      * Sends a command to a connected mne_rt_server
      *
      * @param[in] p_command    The command to send.
-     *
-     * @return mne_rt_server reply.
      */
     void sendCommandJSON(const Command &p_command);
 
@@ -129,6 +127,8 @@ public:
     //=========================================================================================================
     /**
      * Request buffer size from mne_rt_server
+     *
+     * @return Buffer size in samples reported by the server, or -1 if the response could not be parsed.
      */
     qint32 requestBufsize();
 

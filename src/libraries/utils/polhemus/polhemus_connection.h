@@ -95,6 +95,8 @@ public:
      * @param portName  Empty → mock backend. Non-empty → hardware backend.
      * @param cfg       Serial transport configuration; ignored by the
      *                  mock backend.
+     *
+     * @return True if connected (or already connected), false if the backend failed to open.
      */
     bool    open(const QString& portName,
                  const PolhemusSerialConfig& cfg = PolhemusSerialConfig{});
@@ -113,6 +115,8 @@ public:
      * returns just the system port names (e.g. `/dev/cu.usbserial-AB0`,
      * `COM3`) so callers can populate a combo box without pulling in
      * `QSerialPortInfo` themselves.
+     *
+     * @return System port names of all visible serial ports; empty if none.
      */
     static QStringList availablePorts();
 
@@ -125,6 +129,8 @@ public:
      * for the generic FTDI chip used in older units). This scan returns
      * the first matching port name, or an empty string if no candidate
      * is found.
+     *
+     * @return Port name of a Polhemus-vendor port, else the first FTDI port, else an empty string.
      */
     static QString  autoDetectPortName();
 
@@ -136,7 +142,7 @@ signals:
      */
     void pointReceived(int station, const QVector3D& position, const QQuaternion& orientation);
 
-    /** Emitted whenever @ref isConnected changes. */
+    /** Emitted whenever @c UTILSLIB::PolhemusConnection::isConnected "isConnected" changes. */
     void connectedChanged(bool isConnected);
 
     /** Non-fatal protocol/IO error (already logged by the backend). */

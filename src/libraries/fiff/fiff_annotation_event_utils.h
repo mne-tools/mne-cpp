@@ -10,7 +10,7 @@
  * @brief    Conversion helpers between FIFF annotations and the integer stim-channel event list used by epoching / averaging.
  *
  * Two representations coexist in MNE workflows: free-text @ref
- * FiffAnnotation entries (onset / duration / description) and integer
+ * FIFFLIB::FiffAnnotation entries (onset / duration / description) and integer
  * (sample, prev, code) event triples extracted from a stim channel or
  * fed to @c mne.Epochs. These free functions translate between the two:
  * mapping annotation descriptions to event codes via a description→code

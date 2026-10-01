@@ -12,10 +12,10 @@
  * @date     August 2016
  * @brief    Graph container that stores the result of one functional-connectivity metric as nodes (sources/sensors) and weighted edges (channel-pair couplings).
  *
- * @ref Network is the common output type returned by every estimator in
- * @c CONNECTIVITYLIB. Each @ref NetworkNode carries a 3D position (sensor coordinate
+ * @ref CONNECTIVITYLIB::Network is the common output type returned by every estimator in
+ * @c CONNECTIVITYLIB. Each @ref CONNECTIVITYLIB::NetworkNode carries a 3D position (sensor coordinate
  * for sensor-space metrics, source vertex for source-space metrics) and
- * the list of edges incident to it, and each @ref NetworkEdge stores the
+ * the list of edges incident to it, and each @ref CONNECTIVITYLIB::NetworkEdge stores the
  * full per-frequency weight matrix together with the scalar band-averaged
  * weight used for thresholding and display. The same container is reused
  * for symmetric metrics (coherence, PLV, PLI/wPLI/dwPLI, imaginary
@@ -26,7 +26,7 @@
  * The container also offers the bookkeeping operations needed by every
  * downstream visualisation and statistical layer: distance-based and
  * threshold-based edge selection, full vs. mirrored adjacency-matrix
- * extraction, and a @ref VisualizationInfo block carrying the colour-map
+ * extraction, and a @ref CONNECTIVITYLIB::VisualizationInfo block carrying the colour-map
  * choice that disp3D and the @c connectivity-estimator plugin honour when
  * rendering the graph in 3D.
  */
@@ -366,7 +366,7 @@ public:
     /**
      * Set the new sampling frequency.
      *
-     * @param[in] sFreq        The new sampling frequency.
+     * @param[in] fSFreq        The new sampling frequency.
      */
     void setSamplingFrequency(float fSFreq);
 

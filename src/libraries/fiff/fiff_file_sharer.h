@@ -11,7 +11,7 @@
  *
  * Large continuous FIFF recordings (multi-GB) are routinely opened by
  * several cooperating components at once: the GUI viewer, the realtime
- * processor, the recording dumper. @ref FiffFileSharer wraps a
+ * processor, the recording dumper. @ref FIFFLIB::FiffFileSharer wraps a
  * memory-mapped view of the file and a small refcount so each consumer
  * gets a zero-copy @c QByteArray view of the same backing pages, instead
  * of every process pulling the data through its own @c QFile read.

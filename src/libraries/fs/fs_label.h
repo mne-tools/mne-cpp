@@ -22,7 +22,7 @@
  * This class loads such a file, keeps the indices, positions and values
  * together with the hemisphere id and a human-readable label name, and
  * provides helpers to project the label back onto a triangulation
- * (@ref FsLabel::selectTris) so it can be drawn or fed into source-space
+ * (@ref FSLIB::FsLabel::selectTris "FsLabel::selectTris") so it can be drawn or fed into source-space
  * masking.
  */
 

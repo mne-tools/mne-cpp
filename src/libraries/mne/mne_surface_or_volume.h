@@ -11,7 +11,7 @@
  *
  * @ref MNELIB::MNESurfaceOrVolume is the direct port of the
  * @c mneSurfaceOrVolumeRec / @c mneSourceSpaceRec structure of MNE-C and
- * is the common base used by @ref MNESourceSpace and @ref MNEBemSurface.
+ * is the common base used by @ref MNELIB::MNESourceSpace and @ref MNELIB::MNEBemSurface.
  * It carries the union of fields used by both flavours - vertices,
  * triangles, normals, voxel size and lattice geometry - so a single
  * loader can return either kind without templated machinery.
@@ -151,8 +151,6 @@ public:
      * Populate the MNETriangle structures for both the full and in-use
      * triangulations by computing edge vectors, normals, and areas.
      * Accumulates the total surface area into tot_area.
-     *
-     * @param[in, out] s   The source space whose triangle data is filled in.
      */
     void add_triangle_data();
 
@@ -168,16 +166,12 @@ public:
 
     /**
      * Compute and store the center of mass of a surface's vertices.
-     *
-     * @param[in, out] s   The surface whose cm field is set.
      */
     void compute_surface_cm();
 
     /**
      * Compute the Euclidean distances from each vertex to its topological
      * neighbors and store them in the vert_dist array.
-     *
-     * @param[in, out] s   The source space with neighbor_vert already set.
      */
     void calculate_vertex_distances();
 
@@ -185,8 +179,6 @@ public:
      * Compute vertex normals by area-weighted accumulation of triangle
      * normals, then normalize to unit length. Also calls add_triangle_data()
      * and compute_surface_cm().
-     *
-     * @param[in, out] s   The source space to update.
      *
      * @return OK on success, FAIL on error.
      */
@@ -198,7 +190,6 @@ public:
      * distances, and center of mass. Optionally checks for topological
      * defects (excessive number of neighbors).
      *
-     * @param[in, out] s                        The source space to augment.
      * @param[in]      do_normals               If non-zero, compute vertex normals.
      * @param[in]      check_too_many_neighbors If non-zero, fail on excessive neighbor count.
      *
@@ -210,7 +201,6 @@ public:
      * Convenience overload that adds geometry information with border detection
      * disabled and excess-neighbor checking enabled.
      *
-     * @param[in, out] s            The source space to augment.
      * @param[in]      do_normals   If non-zero, compute vertex normals.
      *
      * @return OK on success, FAIL on error.
@@ -221,7 +211,6 @@ public:
      * Add geometry information with excess-neighbor checking disabled
      * (warns instead of failing when a vertex has too many neighbors).
      *
-     * @param[in, out] s            The source space to augment.
      * @param[in]      do_normals   If non-zero, compute vertex normals.
      *
      * @return OK on success, FAIL on error.
@@ -273,11 +262,26 @@ public:
     NormalsT         nn;        /**< FsSurface normals at these points (np x 3, row-major). */
     float            cm[3];     /**< Center of mass of the vertex cloud. */
 
-    /** Return a read-only map to the k-th vertex position (3 contiguous floats). */
+    /**
+     * Return a read-only map to the k-th vertex position (3 contiguous floats).
+     *
+     * @param[in] k  Vertex index (0 to np - 1).
+     * @return Read-only view of row k of rr, in m.
+     */
     Eigen::Map<const Eigen::Vector3f> point(int k) const { return Eigen::Map<const Eigen::Vector3f>(rr.row(k).data()); }
-    /** Return a mutable map to the k-th vertex position. */
+    /**
+     * Return a mutable map to the k-th vertex position.
+     *
+     * @param[in] k  Vertex index (0 to np - 1).
+     * @return Writable view of row k of rr, in m.
+     */
     Eigen::Map<Eigen::Vector3f> point(int k) { return Eigen::Map<Eigen::Vector3f>(rr.row(k).data()); }
-    /** Return a read-only map to the k-th vertex normal (3 contiguous floats). */
+    /**
+     * Return a read-only map to the k-th vertex normal (3 contiguous floats).
+     *
+     * @param[in] k  Vertex index (0 to np - 1).
+     * @return Read-only view of row k of nn (unit normal).
+     */
     Eigen::Map<const Eigen::Vector3f> normal(int k) const { return Eigen::Map<const Eigen::Vector3f>(nn.row(k).data()); }
 
     Eigen::VectorXi   inuse;    /**< Boolean array indicating whether each vertex is in use in the source space (np elements). */

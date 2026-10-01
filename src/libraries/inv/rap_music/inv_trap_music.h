@@ -17,7 +17,7 @@
  * scans the leadfield for the grid point with the largest subspace
  * correlation, projects it out, truncates the subspace and repeats
  * until the requested source count is reached or the correlation drops
- * below the user threshold. Returns a list of @ref TrapMusicDipole
+ * below the user threshold. Returns a list of @ref INVLIB::TrapMusicDipole
  * records carrying grid index, correlation, 3-D position and
  * orientation per found dipole.
  */

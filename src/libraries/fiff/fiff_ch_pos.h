@@ -15,7 +15,7 @@
  *
  * A FIFF channel info record carries a sub-record describing where the
  * sensing element sits in the device coordinate frame (@c FIFFV_COORD_DEVICE)
- * and how it is oriented. @ref FiffChPos owns that sub-record: a 3-vector
+ * and how it is oriented. @ref FIFFLIB::FiffChPos owns that sub-record: a 3-vector
  * @c r0 with the coil origin in metres plus three orthonormal 3-vectors
  * @c ex, @c ey, @c ez encoding the coil-local axes (typically used by the
  * forward solution to integrate over the coil pickup area).
@@ -112,7 +112,8 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param[in] a    The object which should be compared to.
+     * @param[in] b Right-hand channel position.
      *
      * @return true if equal, false otherwise.
      */

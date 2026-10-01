@@ -63,18 +63,24 @@ namespace DISP3DLIB{
 //=============================================================================================================
 /**
  * Returns build date and time.
+ *
+ * @return Static C string with the build timestamp.
  */
 const char* buildDateTime();
 
 //=============================================================================================================
 /**
  * Returns abbreviated build git hash.
+ *
+ * @return Static C string with the short git commit hash.
  */
 const char* buildHash();
 
 //=============================================================================================================
 /**
  * Returns full build git hash.
+ *
+ * @return Static C string with the full git commit hash.
  */
 const char* buildHashLong();
 }

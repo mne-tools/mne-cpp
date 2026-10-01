@@ -12,9 +12,9 @@
  * FIFF events are the standard integer representation of trigger / stim
  * information: each event is a @c (sample, previous_value, new_value)
  * triple, and a list of them is stored under @c FIFFB_MNE_EVENTS. The
- * @ref FiffEvents class owns one such list and exposes the operations the
+ * @ref FIFFLIB::FiffEvents class owns one such list and exposes the operations the
  * rest of FIFFLIB needs: read / write FIFF event files, detect events on
- * a stim channel of a @ref FiffRawData (parity with
+ * a stim channel of a @ref FIFFLIB::FiffRawData (parity with
  * @c mne.find_events), filter by code, and clip to a sample range.
  */
 

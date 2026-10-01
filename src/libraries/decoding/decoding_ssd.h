@@ -24,8 +24,8 @@
  * reliable and fast extraction of neuronal EEG/MEG oscillations on the
  * basis of spatio-spectral decomposition*, NeuroImage 55, 2011.
  *
- * @ref DecodingSsd mirrors @c mne.decoding.SSD and adds an explicit
- * @ref DecodingSsd::apply method that reconstructs the sensor-space
+ * @ref DECODINGLIB::DecodingSsd mirrors @c mne.decoding.SSD and adds an explicit
+ * @ref DECODINGLIB::DecodingSsd::apply "DecodingSsd::apply" method that reconstructs the sensor-space
  * signal from a chosen subset of components, providing a low-rank
  * denoised version of the input that the connectivity and inverse
  * pipelines can consume without re-filtering. The covariance of the
@@ -126,6 +126,14 @@ public:
     //=========================================================================================================
     /**
      * Fit and transform in one step.
+     *
+     * @param[in] data         Continuous data (n_channels × n_times).
+     * @param[in] sfreq        Sampling frequency in Hz.
+     * @param[in] signalLow    Lower edge of signal band (Hz).
+     * @param[in] signalHigh   Upper edge of signal band (Hz).
+     * @param[in] noiseLow     Lower edge of noise band (Hz).
+     * @param[in] noiseHigh    Upper edge of noise band (Hz).
+     * @return Filtered data (n_components × n_times).
      */
     Eigen::MatrixXd fitTransform(const Eigen::Ref<const Eigen::MatrixXd>& data,
                                  double sfreq,

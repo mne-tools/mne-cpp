@@ -18,7 +18,7 @@
  * Granger / PDC / DTF …), a windowing function and a number of
  * trials. Changes are forwarded to the connectivity-estimation
  * @c rtprocessing job, and the panel also persists its state through
- * @ref AbstractView::saveSettings.
+ * @ref DISPLIB::AbstractView::saveSettings "AbstractView::saveSettings".
  */
 
 #ifndef CONNECTIVITYSETTINGSVIEW_H
@@ -79,7 +79,9 @@ public:
     /**
      * Constructs a ConnectivitySettingsView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent        parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     ConnectivitySettingsView(const QString& sSettingsPath = "",
                              QWidget *parent = 0,

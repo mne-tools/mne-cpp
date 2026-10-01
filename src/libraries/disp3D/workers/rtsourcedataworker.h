@@ -208,6 +208,7 @@ private:
      *
      * @param[in] sourceData     Raw source values for this hemisphere.
      * @param[in] interpMat      Interpolation matrix for this hemisphere.
+     * @param[in] baseColors Per-vertex base surface colors (ABGR).
      * @return Per-vertex ABGR color array.
      */
     QVector<uint32_t> computeHemiColors(const Eigen::VectorXf &sourceData,

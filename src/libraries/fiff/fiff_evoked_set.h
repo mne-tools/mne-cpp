@@ -15,13 +15,13 @@
  *
  * A single ``*-ave.fif`` typically contains several @c FIFFB_EVOKED
  * blocks (one per stimulus condition / averaging category). @ref
- * FiffEvokedSet groups them: a shared @ref FiffInfo and a list of
- * @ref FiffEvoked instances, plus channel-picking and compensation
+ * FIFFLIB::FiffEvokedSet groups them: a shared @ref FIFFLIB::FiffInfo and a list of
+ * @ref FIFFLIB::FiffEvoked instances, plus channel-picking and compensation
  * helpers that apply uniformly to the whole set.
  *
  * The header additionally ports the three batch-averaging descriptor
- * structs from MNE-C's @c browser_types.h (@ref RejectionParams,
- * @ref AverageCategory, @ref AverageDescription) so the @c mne_browse_raw
+ * structs from MNE-C's @c browser_types.h (@ref FIFFLIB::RejectionParams,
+ * @ref FIFFLIB::AverageCategory, @ref FIFFLIB::AverageDescription) so the @c mne_browse_raw
  * "ave description" files can be parsed and consumed verbatim. Together
  * they describe artifact-rejection thresholds, per-category timing and
  * trigger logic, and the file-level output settings used by the

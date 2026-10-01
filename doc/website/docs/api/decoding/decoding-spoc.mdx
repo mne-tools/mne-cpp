@@ -79,6 +79,18 @@ Transform epoch data using the fitted SPoC filters.
 
 Fit and transform in one step.
 
+**Parameters:**
+
+- **epochs** : *const std::vector&lt; Eigen::MatrixXd &gt; &*
+  Vector of epoch matrices, each (n_channels × n_times).
+
+- **y** : *const Eigen::VectorXd &*
+  Continuous target variable (one value per epoch).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Feature matrix: (n_epochs × n_components) band powers, or stacked (n_epochs·n_components × n_times) projections in CspSpace mode.
+
 ---
 
 ### filters()

@@ -74,7 +74,7 @@ Oldest samples are dropped when the internal capacity (maxStoredSamples) is exce
 
 ---
 
-### clearData()
+### setScaleMap(scaleMap)
 
 Override the per-channel-type amplitude scale.
 
@@ -82,16 +82,27 @@ Key = FIFF channel kind constant (e.g. FIFFV_MEG_CH), value = physical amplitude
 
 **Parameters:**
 
-- **scaleMap**
-  Map from FIFF kind to amplitude max. Clear all stored sample data without affecting channel metadata. After this call totalSamples() == 0 and firstSample() == 0. Emits `dataChanged()`.
-
----
-
-### setScaleMap(scaleMap)
+- **scaleMap** : *const QMap&lt; qint32, float &gt; &*
+  Map from FIFF kind to amplitude max.
 
 ---
 
 ### setScaleMapFromStrings(scaleMap)
+
+Override the per-channel-type amplitude scale using channel-type names.
+
+**Parameters:**
+
+- **scaleMap** : *const QMap&lt; QString, double &gt; &*
+  Map from channel-type name (e.g. "MEG_grad") to amplitude max.
+
+---
+
+### clearData()
+
+Clear all stored sample data without affecting channel metadata.
+
+After this call totalSamples() == 0 and firstSample() == 0. Emits `dataChanged()`.
 
 ---
 
@@ -185,7 +196,9 @@ When enabled each channel's mean amplitude over the requested window is subtract
 
 ### sfreq()
 
-Sampling frequency in Hz; 0 if no [FiffInfo](/docs/api/fiff/fiff-info) attached.
+**Returns:**
+
+- *float* — Sampling frequency in Hz; 0 if no FiffInfo attached.
 
 ---
 

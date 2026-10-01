@@ -99,18 +99,24 @@ public:
     //=========================================================================================================
     /**
      * @brief Get the calibration entries.
+     *
+     * @return Const reference to the list of per-channel calibration entries.
      */
     const QList<FineCalEntry>& entries() const { return m_entries; }
 
     //=========================================================================================================
     /**
      * @brief Get the number of entries.
+     *
+     * @return Number of calibration entries (one per MEG channel).
      */
     int size() const { return m_entries.size(); }
 
     //=========================================================================================================
     /**
      * @brief Check if empty.
+     *
+     * @return True if no calibration entries are stored.
      */
     bool isEmpty() const { return m_entries.isEmpty(); }
 
@@ -128,6 +134,8 @@ public:
     //=========================================================================================================
     /**
      * @brief Add an entry.
+     *
+     * @param[in] entry  Calibration entry appended to the end of the list.
      */
     void addEntry(const FineCalEntry& entry) { m_entries.append(entry); }
 
@@ -147,6 +155,8 @@ public:
      * @brief Build imbalance matrix.
      *
      * Returns a matrix of cross-talk imbalance vectors (n_entries × 3).
+     *
+     * @return Imbalance matrix (n_entries × 3), one x/y/z row per entry.
      */
     Eigen::MatrixXd imbalanceMatrix() const;
 

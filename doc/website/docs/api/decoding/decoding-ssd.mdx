@@ -88,6 +88,30 @@ Apply spatial filters to data.
 
 Fit and transform in one step.
 
+**Parameters:**
+
+- **data** : *Eigen::MatrixXd*
+  Continuous data (n_channels × n_times).
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+- **signalLow** : *double*
+  Lower edge of signal band (Hz).
+
+- **signalHigh** : *double*
+  Upper edge of signal band (Hz).
+
+- **noiseLow** : *double*
+  Lower edge of noise band (Hz).
+
+- **noiseHigh** : *double*
+  Upper edge of noise band (Hz).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Filtered data (n_components × n_times).
+
 ---
 
 ### apply(data)

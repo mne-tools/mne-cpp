@@ -42,7 +42,7 @@ Constructs a [`FilterKernel`](/docs/api/dsp/filter-kernel) object.
 - **sFilterName** : *const QString &*
   Defines the name of the generated filter.
 
-- **type**
+- **iFilterType** : *int*
   Tyep of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType).
 
 - **iOrder** : *int*
@@ -60,7 +60,7 @@ Constructs a [`FilterKernel`](/docs/api/dsp/filter-kernel) object.
 - **dSFreq** : *double*
   The sampling frequency.
 
-- **designMethod**
+- **iDesignMethod** : *int*
   Specifies the design method to use. Choose between Cosind and Tschebyscheff.
 
 ---
@@ -107,10 +107,6 @@ Applies the current filter to the input data using multiplication in frequency d
 
 - **bKeepOverhead** : *bool*
   Whether the result should still include the overhead information in front and back of the data. Default is set to false.
-
-**Returns:**
-
-- *void* — the filtered data in form of a RowVectorXd.
 
 ---
 

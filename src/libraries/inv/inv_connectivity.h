@@ -13,7 +13,7 @@
  * between source-space grid points together with its measure name
  * (coherence, imCoh, PLV, PLI, wPLI, Granger, PDC, DTF, ...), direction
  * flag and frequency/time window. The struct is deliberately decoupled
- * from the connectivity library so an @ref InvSourceEstimate can carry
+ * from the connectivity library so an @ref INVLIB::InvSourceEstimate can carry
  * multiple connectivity layers (one per band / window) without pulling
  * in the full CONNECTIVITY graph machinery.
  */

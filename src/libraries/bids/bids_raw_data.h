@@ -9,19 +9,19 @@
  * @date     March 2026
  * @brief    Central container for a BIDS raw recording — the BIDS-side analogue of @c FIFFLIB::FiffRawData, bundling raw signal I/O with every electrophysiology sidecar.
  *
- * @ref BidsRawData is the top-level object exposed by BIDSLIB: a single
- * @ref BidsRawData::read call walks a @ref BIDSPath, picks the right
- * format reader via @ref BidsRawData::createReader, parses the raw data
+ * @ref BIDSLIB::BidsRawData is the top-level object exposed by BIDSLIB: a single
+ * @ref BIDSLIB::BidsRawData::read "BidsRawData::read" call walks a @ref BIDSLIB::BIDSPath, picks the right
+ * format reader via @ref BIDSLIB::BidsRawData::createReader "BidsRawData::createReader", parses the raw data
  * into a fully-populated @c FIFFLIB::FiffRawData, and then merges every
  * sidecar BIDS defines for an electrophysiology recording —
  * @c _channels.tsv (channel types, units, bad-channel marking),
  * @c _electrodes.tsv plus @c _coordsystem.json (digitizer points and
  * their reference frame), @c _events.tsv (trigger annotations) and the
- * @c _<datatype>.json sidecar (line frequency, manufacturer, reference
+ * `_<datatype>.json` sidecar (line frequency, manufacturer, reference
  * electrode, recording type) — into the resulting in-memory record.
  *
- * @ref BidsRawData::write reverses the process: it materialises the
- * @c sub-XX/[ses-YY/]<datatype>/ tree, optionally copies the source
+ * @ref BIDSLIB::BidsRawData::write "BidsRawData::write" reverses the process: it materialises the
+ * `sub-XX/[ses-YY/]<datatype>/` tree, optionally copies the source
  * raw file in, regenerates every TSV/JSON sidecar from the in-memory
  * state, and emits the mandatory @c dataset_description.json at the
  * root. Sidecar fields that are derivable from @c FiffInfo (sampling
@@ -181,6 +181,11 @@ public:
 
     /**
      * @brief Convenience overload — write with default options.
+     *
+     * @param[in] bidsPath   Target BIDSPath (root, subject, task, datatype, suffix, extension).
+     * @param[in] sourcePath Path to the original raw data file to copy; if empty, it is not copied.
+     *
+     * @return BIDSPath of the written data file, or empty BIDSPath on failure.
      */
     inline BIDSPath write(const BIDSPath& bidsPath,
                           const QString& sourcePath = QString()) const
@@ -194,11 +199,15 @@ public:
 
     /**
      * @brief Returns true if the data was loaded successfully.
+     *
+     * @return True if the data is valid, false otherwise.
      */
     bool isValid() const { return m_bIsValid; }
 
     /**
      * @brief Marks the data as valid or invalid.
+     *
+     * @param[in] bValid True to mark the data as valid, false to mark it invalid.
      */
     void setValid(bool bValid) { m_bIsValid = bValid; }
 

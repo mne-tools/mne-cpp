@@ -17,9 +17,9 @@
  * @ref MNELIB::MNE is a thin collection of @c static utilities that mirror
  * the function surface of the Python/Matlab MNE toolbox so existing
  * tutorials and scripts translate one-to-one. It exposes wrappers around
- * I/O for source spaces (@ref MNESourceSpace), BEM models (@ref MNEBem),
- * hemispheres (@ref MNEHemisphere) and epoch lists
- * (@ref MNEEpochDataList), plus algorithmic helpers for projection
+ * I/O for source spaces (@ref MNELIB::MNESourceSpace), BEM models (@ref MNELIB::MNEBem),
+ * hemispheres (@ref MNELIB::MNEHemisphere) and epoch lists
+ * (@ref MNELIB::MNEEpochDataList), plus algorithmic helpers for projection
  * application, label-based clustering of forward solutions and SSP/CTF
  * manipulation. The class never holds state; it only forwards to the
  * underlying domain objects.
@@ -303,7 +303,7 @@ public:
      * Read a list of events from an eve file
      *
      * @param[in] p_IODevice   The I/O device to read from.
-     * @param[in, out] eventList   List of events.
+     * @param[in, out] eventlist   List of events.
      *
      * @return true if succeeded, false otherwise.
      */

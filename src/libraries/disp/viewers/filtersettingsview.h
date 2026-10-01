@@ -10,12 +10,12 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    Compact filter on/off + bandwidth panel that pops up the full @ref FilterDesignView on demand.
+ * @brief    Compact filter on/off + bandwidth panel that pops up the full @ref DISPLIB::FilterDesignView on demand.
  *
  * FilterSettingsView is the small, always-visible front-end of the
  * filtering subsystem: an activation @c QCheckBox, a from / to
  * frequency display and an @c Edit button that brings up the heavier
- * @ref FilterDesignView. The two widgets are kept in sync through
+ * @ref DISPLIB::FilterDesignView. The two widgets are kept in sync through
  * @c filterChannelTypeChanged and @c filterChanged signals.
  */
 
@@ -82,7 +82,9 @@ public:
     /**
      * Constructs a FilterSettingsView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent        parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     FilterSettingsView(const QString& sSettingsPath = "",
                        QWidget *parent = 0,
@@ -97,12 +99,16 @@ public:
     //=========================================================================================================
     /**
      * Returns the filter design view used to design filters.
+     *
+     * @return Shared pointer to the owned FilterDesignView.
      */
     QSharedPointer<FilterDesignView> getFilterView();
 
     //=========================================================================================================
     /**
      * Returns true if the filters a set as active.
+     *
+     * @return True if the activate-filter check box is checked.
      */
     bool getFilterActive();
 

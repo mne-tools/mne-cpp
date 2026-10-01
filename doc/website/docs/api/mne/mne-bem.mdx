@@ -48,6 +48,11 @@ Copy constructor.
 
 Default constructor.
 
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device (e.g. a FIFF file) to read the BEM surfaces from; throws std::runtime_error on failure.
+
 ---
 
 ### ~MNEBem()
@@ -215,6 +220,9 @@ Transform the Bem using the inverse.
 
 - **add_geom** : *bool*
   Add geometry information to the Bem FsSurface.
+
+- **p_Bem** : *[MNEBem](/docs/api/mne/mne-bem) &*
+  The BEM that receives the surfaces read.
 
 **Returns:**
 

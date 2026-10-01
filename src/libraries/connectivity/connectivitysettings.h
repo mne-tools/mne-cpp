@@ -12,18 +12,18 @@
  * @date     March 2017
  * @brief    Input-data and parameter container shared by every functional-connectivity metric in @c CONNECTIVITYLIB.
  *
- * @ref ConnectivitySettings carries the per-trial time-domain matrices, the
+ * @ref CONNECTIVITYLIB::ConnectivitySettings carries the per-trial time-domain matrices, the
  * derived per-trial cross-spectral data (DPSS tapered FFTs, CSDs and the
  * imaginary-part variants needed by PLI / wPLI / dwPLI), and the
  * accumulated cross-trial sums used to normalise the final estimates.
- * Holding all of this in one object lets the dispatcher in @ref Connectivity
+ * Holding all of this in one object lets the dispatcher in @ref CONNECTIVITYLIB::Connectivity
  * compute several metrics in one pass without re-tapering and re-FFT'ing
- * the same trials: the @ref IntermediateTrialData fields are filled lazily
+ * the same trials: the @ref CONNECTIVITYLIB::ConnectivitySettings::IntermediateTrialData fields are filled lazily
  * by the first metric that needs them and reused by everyone else.
  *
  * The container also stores the spectral-domain parameters (sampling rate,
  * FFT length, taper window name) and the 3D node positions used to lay out
- * the resulting @ref Network - the latter can be sourced either from a
+ * the resulting @ref CONNECTIVITYLIB::Network - the latter can be sourced either from a
  * @c FiffInfo channel set (sensor space) or from a forward solution and
  * @c FsSurfaceSet pair (source space).
  */
@@ -82,7 +82,7 @@ namespace CONNECTIVITYLIB {
  * Mutable container that aggregates the inputs and intermediate spectral
  * results required by every metric implementation in @c CONNECTIVITYLIB.
  *
- * Each call to @ref append adds one trial; the trial matrices live in
+ * Each call to @c CONNECTIVITYLIB::ConnectivitySettings::append "append" adds one trial; the trial matrices live in
  * @ref m_trialData, while DPSS tapered spectra, cross-spectral densities
  * and their imaginary-part derivatives are filled in lazily by whichever
  * metric runs first. Cross-trial sums accumulate in @ref m_intermediateSumData

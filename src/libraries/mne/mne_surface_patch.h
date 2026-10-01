@@ -12,7 +12,7 @@
  * @ref MNELIB::MNESurfacePatch stores the vertex set, triangle subset
  * and geodesic distances of a cortical patch grown from a seed vertex.
  * Patches feed the cortical-orientation prior of the inverse operator
- * (@ref MNEPatchInfo) and are also used for source-space decimation
+ * (@ref MNELIB::MNEPatchInfo) and are also used for source-space decimation
  * quality checks.
  */
 

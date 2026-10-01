@@ -73,12 +73,14 @@ Setup the EEG sphere model calculations
 
 **Parameters:**
 
-- **rad.**
+- **rad** : *float*
+  Scalp radius in meters.
 
 - **fit_berg_scherg** : *bool*
   If Fit Berg Scherg should be performed.
 
-- **nfit.**
+- **nFit** : *int*
+  Number of Berg-Scherg equivalent dipoles to fit.
 
 **Returns:**
 
@@ -94,10 +96,10 @@ On success, updates the internal mu and lambda member vectors.
 
 **Parameters:**
 
-- **nterms**
+- **nTerms** : *int*
   Number of terms in the series expansion.
 
-- **nfit**
+- **nFit** : *int*
   Number of equivalent dipoles to fit (must be &gt;= 2).
 
 - **rv** : *float &*
@@ -319,6 +321,9 @@ This routine uses the acceleration with help of equivalent sources in the homoge
 - **Vval_vec** : *Eigen::MatrixXf &*
   The potential values Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k; Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k; Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k.
 
+- **client** : *void **
+  The [`FwdEegSphereModel`](/docs/api/fwd/fwd-eeg-sphere-model) to evaluate (passed as client data).
+
 **Returns:**
 
 - *bool* — true when successful.
@@ -344,7 +349,8 @@ This routine uses the acceleration with help of equivalent sources in the homoge
 - **Vval_vec** : *Eigen::Ref&lt; Eigen::MatrixXf &gt;*
   The potential values; Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k; Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k; Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k.
 
-- **client.**
+- **client** : *void **
+  The [`FwdEegSphereModel`](/docs/api/fwd/fwd-eeg-sphere-model) to evaluate (passed as client data).
 
 **Returns:**
 
@@ -413,7 +419,8 @@ This routine uses the acceleration with help of equivalent sources in the homoge
 - **Vval** : *Eigen::VectorXf &*
   The potential values.
 
-- **client.**
+- **client** : *void **
+  The [`FwdEegSphereModel`](/docs/api/fwd/fwd-eeg-sphere-model) to evaluate (passed as client data).
 
 **Returns:**
 
@@ -441,7 +448,8 @@ Calculate the EEG in the sphere model using the megCoil structure MEG channels a
 - **Vval** : *Eigen::Ref&lt; Eigen::VectorXf &gt;*
   The potential values.
 
-- **client.**
+- **client** : *void **
+  The [`FwdEegSphereModel`](/docs/api/fwd/fwd-eeg-sphere-model) to evaluate (passed as client data).
 
 **Returns:**
 

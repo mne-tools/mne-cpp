@@ -146,7 +146,7 @@ public:
     /**
      * Calculates the power spectral density of given tapered spectrum
      *
-     * @param[in] vecTapSpectrum    tapered spectrum, for which the PSD is calculated.
+     * @param[in] matTapSpectrum    tapered spectrum, for which the PSD is calculated.
      * @param[in] vecTapWeights     taper weights.
      * @param[in] iNfft             FFT length.
      * @param[in] dSampFreq         sampling frequency of the input data.

@@ -98,21 +98,41 @@ public:
 
     // ── Data input ─────────────────────────────────────────────────────
 
-    /** Push a single measurement vector into the streaming queue. */
+    /**
+     * Push a single measurement vector into the streaming queue.
+     *
+     * @param[in] data   One sample of sensor values; ignored if no controller exists.
+     */
     void pushData(const Eigen::VectorXf &data);
 
     // ── Parameter control ──────────────────────────────────────────────
 
-    /** Set the streaming playback interval in milliseconds. */
+    /**
+     * Set the streaming playback interval in milliseconds.
+     *
+     * @param[in] msec   Interval between streamed samples in milliseconds.
+     */
     void setInterval(int msec);
 
-    /** Enable or disable looping of the streaming queue. */
+    /**
+     * Enable or disable looping of the streaming queue.
+     *
+     * @param[in] enabled   True to replay the queue from the start when it ends.
+     */
     void setLooping(bool enabled);
 
-    /** Set the number of averages for smoothing. */
+    /**
+     * Set the number of averages for smoothing.
+     *
+     * @param[in] numAvr   Number of consecutive samples averaged per frame.
+     */
     void setAverages(int numAvr);
 
-    /** Set the colormap used for colour mapping. */
+    /**
+     * Set the colormap used for colour mapping.
+     *
+     * @param[in] name   Colormap name (e.g. "MNE", "Jet").
+     */
     void setColormap(const QString &name);
 
 signals:

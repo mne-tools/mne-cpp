@@ -13,7 +13,7 @@
  * @date     July 2018
  * @brief    Histogram widget with a cubic spline overlay and click-driven threshold markers.
  *
- * Spline draws the same class-limit / frequency data as @ref Bar but
+ * Spline draws the same class-limit / frequency data as @ref DISPLIB::Bar but
  * overlays a smoothed cubic-spline curve that follows the bin midpoints
  * and offers an interactive workflow: mouse clicks drop three vertical
  * threshold lines (left / middle / right) and emit signals carrying
@@ -185,42 +185,62 @@ protected:
     //=========================================================================================================
     /**
      * Converts data X coordinate to pixel X coordinate.
+     *
+     * @param[in] dataX  X value in data (axis) units.
+     *
+     * @return Horizontal widget pixel position; the left margin if the X axis range is empty.
      */
     double dataToPixelX(double dataX) const;
 
     //=========================================================================================================
     /**
      * Converts data Y coordinate to pixel Y coordinate.
+     *
+     * @param[in] dataY  Y value (frequency count) in data units.
+     *
+     * @return Vertical widget pixel position, scaled against the maximum frequency.
      */
     double dataToPixelY(double dataY) const;
 
     //=========================================================================================================
     /**
      * Converts pixel X coordinate to data X coordinate.
+     *
+     * @param[in] pixelX  Horizontal widget pixel position.
+     *
+     * @return X value in data units; the axis minimum if the plot area has no width.
      */
     double pixelToDataX(double pixelX) const;
 
     //=========================================================================================================
     /**
      * Returns the left margin in pixels.
+     *
+     * @return Left plot margin in pixels (60).
      */
     int leftMargin() const { return 60; }
 
     //=========================================================================================================
     /**
      * Returns the right margin in pixels.
+     *
+     * @return Right plot margin in pixels (20).
      */
     int rightMargin() const { return 20; }
 
     //=========================================================================================================
     /**
      * Returns the top margin in pixels.
+     *
+     * @return Top plot margin in pixels (30).
      */
     int topMargin() const { return 30; }
 
     //=========================================================================================================
     /**
      * Returns the bottom margin in pixels.
+     *
+     * @return Bottom plot margin in pixels (40).
      */
     int bottomMargin() const { return 40; }
 

@@ -81,6 +81,9 @@ public:
     //=========================================================================================================
     /**
      * The constructor for Bar.
+     *
+     * @param[in] title   Title drawn above the bar chart (default empty).
+     * @param[in] parent  Parent widget (default nullptr).
      */
     Bar(const QString& title = "", QWidget* parent = nullptr);
 

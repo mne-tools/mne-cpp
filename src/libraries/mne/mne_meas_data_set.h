@@ -11,7 +11,7 @@
  *
  * @ref MNELIB::MNEMeasDataSet represents either a single average or a
  * raw chunk together with its baseline, sampling info and event
- * metadata. Several sets are aggregated by @ref MNEMeasData to expose
+ * metadata. Several sets are aggregated by @ref MNELIB::MNEMeasData to expose
  * all conditions of a study through a single object.
  */
 

@@ -51,17 +51,40 @@ Copy constructor.
 
 Move constructor.
 
+**Parameters:**
+
+- **other** : *FiffTag &&*
+  [`FiffTag`](/docs/api/fiff/fiff-tag) to move from; left in a valid but unspecified state.
+
 ---
 
 ### operator=(other)
 
 Copy assignment operator.
 
+**Parameters:**
+
+- **other** : *const [FiffTag](/docs/api/fiff/fiff-tag) &*
+  [`FiffTag`](/docs/api/fiff/fiff-tag) to copy.
+
+**Returns:**
+
+- *[FiffTag](/docs/api/fiff/fiff-tag) &* — Reference to this object.
+
 ---
 
 ### operator=(other)
 
 Move assignment operator.
+
+**Parameters:**
+
+- **other** : *[FiffTag](/docs/api/fiff/fiff-tag) &&*
+  [`FiffTag`](/docs/api/fiff/fiff-tag) to move from; left in a valid but unspecified state.
+
+**Returns:**
+
+- *[FiffTag](/docs/api/fiff/fiff-tag) &* — Reference to this object.
 
 ---
 
@@ -337,6 +360,11 @@ Machine dependent data type conversions (tag info only).
 from_endian defines the byte order of the input to_endian defines the byte order of the output
 
 Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN. The last choice means that the native byte order value will be substituted here before proceeding
+
+**Parameters:**
+
+- **tag** : *const FiffTag::UPtr &*
+  Matrix tag whose dimensions, indices and data are byte-swapped in place; non-matrix tags are left untouched.
 
 ---
 

@@ -20,12 +20,12 @@
  * transform of the cross-spectrum @c S_{xy}(f). This implementation
  * therefore reuses the DPSS-tapered FFTs computed by the spectral metrics
  * and runs an @c IFFT on @c S_{xy} to obtain @c c_{xy}(tau) for all lags
- * in @c [-Nfft/2, Nfft/2); the edge weight stored on the @ref Network is
+ * in @c [-Nfft/2, Nfft/2); the edge weight stored on the @ref CONNECTIVITYLIB::Network is
  * the maximum absolute correlation over the lag axis, which gives a
  * lag-robust scalar similarity measure suitable for detecting delayed
- * coupling that zero-lag @ref Correlation would miss.
+ * coupling that zero-lag @ref CONNECTIVITYLIB::Correlation would miss.
  *
- * Like @ref Correlation this is a broadband time-domain estimator with no
+ * Like @ref CONNECTIVITYLIB::Correlation this is a broadband time-domain estimator with no
  * rejection of volume conduction or common-reference mixing; the lag at
  * which the maximum occurs can however be inspected separately and used
  * as a coarse conduction-delay estimate.

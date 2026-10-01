@@ -10,14 +10,14 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     November 2019
- * @brief    Real-time FIFF raw-data table browser backed by @ref RtFiffRawViewModel + @ref RtFiffRawViewDelegate.
+ * @brief    Real-time FIFF raw-data table browser backed by @ref DISPLIB::RtFiffRawViewModel + @ref DISPLIB::RtFiffRawViewDelegate.
  *
  * RtFiffRawView is the @c QTableView host that displays a rolling
  * window of the live @c FiffStream through the model / delegate pair
  * in @c helpers/. It owns the scrollbars, the marker / annotation
  * machinery, the trigger-channel overlay and forwards mouse-driven
  * channel selection / re-ordering events to the parent
- * @ref ChannelDataView.
+ * @ref DISPLIB::ChannelDataView.
  */
 
 #ifndef RTFIFFRAWVIEW_H
@@ -98,7 +98,9 @@ public:
     /**
      * Constructs a RtFiffRawView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent    The parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     RtFiffRawView(const QString& sSettingsPath = "",
                   QWidget* parent = 0,
@@ -138,7 +140,7 @@ public:
     /**
      * Add data to the view.
      *
-     * @param[in] data    The new data.
+     * @param[in] lMatData    The new data.
      */
     void addData(const QList<Eigen::MatrixXd>& lMatData);
 
@@ -155,8 +157,8 @@ public:
      * Is called when mouse wheel is used.
      * Function is selecting the tool (freezing/annotation);
      *
-     * @param[in] object.
-     * @param[in] event.
+     * @param[in] object Object the event was sent to.
+     * @param[in] event The intercepted event.
      *
      * @return
      */
@@ -300,7 +302,7 @@ public:
     /**
      * Update the SPHARA operator
      *
-     * @param[in] sSystemType            The current acquisition system type (VectorView, BabyMEG, EEG).
+     * @param[in] sSytemType            The current acquisition system type (VectorView, BabyMEG, EEG).
      * @param[in] nBaseFctsFirst         The new number of basis function to use for the first SPHARA operator.
      * @param[in] nBaseFctsSecond        The new number of basis function to use for the second SPHARA operator.
      */
@@ -337,7 +339,7 @@ public:
      * markChBad marks the selected channels as bad/good in m_chInfolist
      *
      * @param[in] colorMap       color for each trigger channel.
-     * @param[in] activ          real time trigger detection active.
+     * @param[in] active          real time trigger detection active.
      * @param[in] triggerCh      current trigger channel to scan.
      * @param[in] threshold      threshold for the detection process.
      */
@@ -389,6 +391,8 @@ public:
     //=========================================================================================================
     /**
      * Getter fcn for Sampling Frequency member.
+     *
+     * @return Sampling frequency in Hz.
      */
     float getSamplingFreq() const;
 

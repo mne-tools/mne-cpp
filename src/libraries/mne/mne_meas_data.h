@@ -11,7 +11,7 @@
  *
  * @ref MNELIB::MNEMeasData mirrors @c mneMeasDataRec from the original
  * MNE C tooling. It bundles an @ref FIFFLIB::FiffInfo with a list of
- * @ref MNEMeasDataSet entries (one per averaging condition) and the
+ * @ref MNELIB::MNEMeasDataSet entries (one per averaging condition) and the
  * active projection / CTF compensation state. Kept verbatim so ported
  * C utilities (@c mne_inverse_operator, @c mne_compute_raw_inverse,
  * ...) continue to operate against the same in-memory schema.

@@ -69,7 +69,7 @@ Replace all buffered data.
 
 **Parameters:**
 
-- **data**
+- **matData** : *const Eigen::MatrixXd &*
   Channels × samples matrix.
 
 - **firstSample** : *int*
@@ -83,7 +83,7 @@ Append new samples (real-time streaming use-case).
 
 **Parameters:**
 
-- **data**
+- **matData** : *const Eigen::MatrixXd &*
   Channels × new-samples matrix.
 
 ---
@@ -119,6 +119,10 @@ This adjusts samplesPerPixel to fit the requested duration.
 
 Get the current visible time window in seconds.
 
+**Returns:**
+
+- *float* — Visible window duration in seconds.
+
 ---
 
 ### setZoom(factor)
@@ -135,6 +139,10 @@ Set the zoom factor (&gt; 1 = zoom in, &lt; 1 = zoom out relative to default).
 ### zoom()
 
 Return the current zoom factor.
+
+**Returns:**
+
+- *double* — Zoom multiplier relative to the default samples-per-pixel (at least 0.001).
 
 ---
 
@@ -326,6 +334,11 @@ Set the list of annotation spans to display as translucent overlays.
 
 Enable or disable annotation span selection in the raw browser.
 
+**Parameters:**
+
+- **enabled** : *bool*
+  True to allow selecting annotation spans with the mouse.
+
 ---
 
 ### setEventsVisible(visible)
@@ -372,6 +385,11 @@ Enable or disable annotation span selection in the raw browser.
 
 Enable or disable the crosshair cursor with coordinate readout.
 
+**Parameters:**
+
+- **enabled** : *bool*
+  True to show the crosshair and its time/amplitude readout.
+
 ---
 
 ### crosshairEnabled()
@@ -382,6 +400,11 @@ Enable or disable the crosshair cursor with coordinate readout.
 
 Show or hide per-channel-type amplitude scalebars.
 
+**Parameters:**
+
+- **visible** : *bool*
+  True to draw the scalebars.
+
 ---
 
 ### scalebarsVisible()
@@ -391,6 +414,11 @@ Show or hide per-channel-type amplitude scalebars.
 ### setButterflyMode(enabled)
 
 Toggle butterfly mode (overlay all same-type channels).
+
+**Parameters:**
+
+- **enabled** : *bool*
+  True to overlay channels of the same type in one lane.
 
 ---
 
@@ -407,6 +435,11 @@ Toggle time format between float seconds and HH:MM:SS clock time.
 ### setClockTimeFormat(useClock)
 
 Set clock time format on the ruler.
+
+**Parameters:**
+
+- **useClock** : *bool*
+  True for HH:MM:SS clock time, false for float seconds.
 
 ---
 
@@ -436,6 +469,10 @@ Clears the view.
 
 Returns the first currently visible sample.
 
+**Returns:**
+
+- *int* — Absolute index of the first visible sample, or 0 if no render view exists.
+
 ---
 
 ### visibleSampleCount()
@@ -445,6 +482,10 @@ Returns the first currently visible sample.
 ### signalViewportRect()
 
 Returns the geometry of the actual QRHI signal viewport in ChannelDataView-local coordinates.
+
+**Returns:**
+
+- *QRect* — Viewport rectangle, or a null QRect if no render view exists.
 
 ---
 
@@ -483,6 +524,10 @@ Maps a ChannelDataView-local x coordinate inside the signal viewport to an absol
 Returns the underlying data model (non-owning pointer).
 
 Use for advanced configuration such as setMaxStoredSamples().
+
+**Returns:**
+
+- *[ChannelDataModel](/docs/api/disp/channel-data-model) ** — Non-owning pointer to the [`ChannelDataModel`](/docs/api/disp/channel-data-model).
 
 ---
 

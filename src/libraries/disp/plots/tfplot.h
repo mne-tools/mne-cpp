@@ -73,7 +73,7 @@ enum ColorMaps {
  *
  * Two constructors accept either a full or a frequency-cropped
  * @c MatrixXd spectrogram together with a sample rate and a
- * @ref ColorMaps enum entry; @c calc_plot() builds the cached
+ * @c DISPLIB::ColorMaps "ColorMaps" enum entry; @c calc_plot() builds the cached
  * @c QImage that subsequent @c paintEvents draw.
  */
 class DISPSHARED_EXPORT TFplot : public QWidget

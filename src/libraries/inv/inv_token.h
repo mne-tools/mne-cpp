@@ -15,8 +15,8 @@
  * / orientation labels, value-carrier tokens (amplitude, vertex,
  * position, time, correlation, ...), booleans, dimension sizes,
  * connectivity-measure names and a reserved block for external
- * quantisation bins. Also exposes the @ref InvToken value type
- * (id + continuous value) and the @ref InvTokenizeOptions knobs that
+ * quantisation bins. Also exposes the @ref INVLIB::InvToken value type
+ * (id + continuous value) and the @ref INVLIB::InvTokenizeOptions knobs that
  * control which layers are emitted and whether dense grids are
  * sub-sampled to fit a transformer's context window.
  */

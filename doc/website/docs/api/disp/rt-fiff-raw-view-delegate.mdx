@@ -83,6 +83,10 @@ Item size.
 - **index** : *const QModelIndex &*
   Used to locate data in a data model.
 
+**Returns:**
+
+- *QSize* — 20 pixels wide by the row height for column 0, the option rectangle size otherwise.
+
 ---
 
 ### markerMoved(position, activeRow)
@@ -128,7 +132,7 @@ This is used to only plot the background for the upper, visible item in the QTab
 
 **Parameters:**
 
-- **iUpperItem**
+- **iUpperItemIndex** : *int*
   The new upper item index color.
 
 ---

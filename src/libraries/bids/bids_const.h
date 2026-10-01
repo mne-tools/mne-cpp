@@ -15,10 +15,10 @@
  * five orthogonal concerns: BIDS datatype strings (@c meg, @c eeg,
  * @c ieeg, @c anat, …), per-modality raw-data file extension
  * whitelists, bidirectional FIFF-kind ↔ BIDS channel-type maps used by
- * @ref BidsChannel and @ref BidsRawData, coordinate-system name ↔
- * @c FIFFV_COORD_* maps used by @ref BidsCoordinateSystem, and the
+ * @ref BIDSLIB::BidsChannel and @ref BIDSLIB::BidsRawData, coordinate-system name ↔
+ * @c FIFFV_COORD_* maps used by @ref BIDSLIB::BidsCoordinateSystem, and the
  * canonical entity order (@c sub, @c ses, @c task, @c acq, @c run, …)
- * consumed by @ref BIDSPath when it serialises a filename.
+ * consumed by @ref BIDSLIB::BIDSPath when it serialises a filename.
  *
  * Header-only and inline so the maps are constant-folded at the call
  * sites and to avoid a hidden ODR surface for translation units that
@@ -59,13 +59,21 @@ const QString BIDS_DATATYPE_DWI   = QStringLiteral("dwi");
 const QString BIDS_DATATYPE_PERF  = QStringLiteral("perf");
 const QString BIDS_DATATYPE_BEH   = QStringLiteral("beh");
 
-/** All allowed BIDS electrophysiology datatypes. */
+/**
+ * All allowed BIDS electrophysiology datatypes.
+ *
+ * @return List containing the "meg", "eeg", and "ieeg" datatype strings.
+ */
 inline QStringList allowedElectrophysiologyDatatypes()
 {
     return {BIDS_DATATYPE_MEG, BIDS_DATATYPE_EEG, BIDS_DATATYPE_IEEG};
 }
 
-/** All allowed BIDS datatypes. */
+/**
+ * All allowed BIDS datatypes.
+ *
+ * @return List of all supported BIDS datatype strings (electrophysiology, imaging, and behavioral).
+ */
 inline QStringList allowedDatatypes()
 {
     return {BIDS_DATATYPE_MEG, BIDS_DATATYPE_EEG, BIDS_DATATYPE_IEEG,
@@ -77,7 +85,11 @@ inline QStringList allowedDatatypes()
 // BIDS file extensions for iEEG raw data
 //=============================================================================================================
 
-/** Supported raw data file extensions for iEEG in BIDS. */
+/**
+ * Supported raw data file extensions for iEEG in BIDS.
+ *
+ * @return List of lowercase extensions including the leading dot (e.g. ".vhdr", ".edf").
+ */
 inline QStringList ieegAllowedExtensions()
 {
     return {QStringLiteral(".vhdr"),    // BrainVision header
@@ -87,7 +99,11 @@ inline QStringList ieegAllowedExtensions()
             QStringLiteral(".nwb")};    // NWB
 }
 
-/** Supported raw data file extensions for EEG in BIDS. */
+/**
+ * Supported raw data file extensions for EEG in BIDS.
+ *
+ * @return List of lowercase extensions including the leading dot (e.g. ".vhdr", ".bdf").
+ */
 inline QStringList eegAllowedExtensions()
 {
     return {QStringLiteral(".vhdr"),
@@ -104,6 +120,8 @@ inline QStringList eegAllowedExtensions()
 /**
  * Maps FIFF channel kind constants to BIDS channel type strings.
  * Reference: BIDS specification Appendix VII.
+ *
+ * @return Map from FIFF channel kind (e.g. FIFFV_EEG_CH) to BIDS channel type (e.g. "EEG").
  */
 inline QMap<int, QString> fiffKindToBidsType()
 {
@@ -126,6 +144,8 @@ inline QMap<int, QString> fiffKindToBidsType()
 /**
  * Maps BIDS channel type strings back to FIFF channel kind constants.
  * Reference: BIDS specification Appendix VII.
+ *
+ * @return Map from BIDS channel type (e.g. "SEEG") to FIFF channel kind (e.g. FIFFV_SEEG_CH).
  */
 inline QMap<QString, int> bidsTypeToFiffKind()
 {
@@ -153,6 +173,8 @@ inline QMap<QString, int> bidsTypeToFiffKind()
 /**
  * Maps BIDS coordinate system names to FIFF coordinate frame constants.
  * Used for electrodes.tsv / coordsystem.json handling.
+ *
+ * @return Map from BIDS coordinate system name to FIFF coordinate frame; unknown systems map to FIFFV_COORD_UNKNOWN.
  */
 inline QMap<QString, int> bidsCoordToFiffFrame()
 {
@@ -170,6 +192,8 @@ inline QMap<QString, int> bidsCoordToFiffFrame()
 
 /**
  * Maps FIFF coordinate frame constants to BIDS coordinate system names.
+ *
+ * @return Map from FIFF coordinate frame to the BIDS coordinate system name written for it.
  */
 inline QMap<int, QString> fiffFrameToBidsCoord()
 {
@@ -185,7 +209,11 @@ inline QMap<int, QString> fiffFrameToBidsCoord()
 // Allowed coordinate systems for iEEG
 //=============================================================================================================
 
-/** Allowed coordinate systems for iEEG electrodes (BIDS-iEEG spec). */
+/**
+ * Allowed coordinate systems for iEEG electrodes (BIDS-iEEG spec).
+ *
+ * @return List of coordinate system names accepted in an iEEG coordsystem.json.
+ */
 inline QStringList ieegAllowedCoordSystems()
 {
     return {QStringLiteral("ACPC"),
@@ -208,7 +236,11 @@ inline QStringList ieegAllowedCoordSystems()
 // BIDS entity ordering (for filename construction)
 //=============================================================================================================
 
-/** Entity key ordering for BIDS filenames (per specification). */
+/**
+ * Entity key ordering for BIDS filenames (per specification).
+ *
+ * @return Entity keys (e.g. "sub", "ses", "task") in the order they must appear in a filename.
+ */
 inline QStringList bidsEntityOrder()
 {
     return {QStringLiteral("sub"),

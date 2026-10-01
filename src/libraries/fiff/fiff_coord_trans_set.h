@@ -9,10 +9,10 @@
  * @date     February 2026
  * @brief    Ordered set of FIFF coordinate transforms, the on-disk content of a FIFFB_MRI / FIFFB_HPI_MEAS block.
  *
- * Container that owns multiple @ref FiffCoordTrans instances along with the
+ * Container that owns multiple @ref FIFFLIB::FiffCoordTrans instances along with the
  * auxiliary tags that travel with them inside the FIFF tree
  * (@c FIFF_MNE_RT_COMMAND comments, fiducial points from
- * @c FIFFB_ISOTRAK, ...). Used by @ref FiffStream::read_meas_info to
+ * @c FIFFB_ISOTRAK, ...). Used by @ref FIFFLIB::FiffStream::read_meas_info "FiffStream::read_meas_info" to
  * return every device→head / head→MRI / MRI→RAS transform discovered in
  * the file, and by the registration tooling
  * (@c mne_analyze, @c mne_coregistration) to load and persist coregistered

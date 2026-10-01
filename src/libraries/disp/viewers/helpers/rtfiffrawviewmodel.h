@@ -318,7 +318,7 @@ public:
     /**
      * Update the SPHARA operator
      *
-     * @param[in] sSystemType            The current acquisition system type (VectorView, BabyMEG, EEG).
+     * @param[in] sSytemType            The current acquisition system type (VectorView, BabyMEG, EEG).
      * @param[in] nBaseFctsFirst         The new number of basis function to use for the first SPHARA operator.
      * @param[in] nBaseFctsSecond        The new number of basis function to use for the second SPHARA operator.
      */
@@ -368,8 +368,8 @@ public:
     /**
      * markChBad marks the selected channels as bad/good in m_chInfolist
      *
-     * @param[in] chlist index that is selected for marking.
-     * @param[in] status, status=1 -> mark as bad, status=0 -> mark as good.
+     * @param[in] ch index that is selected for marking.
+     * @param[in] status Mark as bad when true, as good when false.
      */
     void markChBad(QModelIndex ch, bool status);
 
@@ -378,7 +378,7 @@ public:
      * markChBad marks the selected channels as bad/good in m_chInfolist
      *
      * @param[in] chlist is the list of indices that are selected for marking.
-     * @param[in] status, status=1 -> mark as bad, status=0 -> mark as good.
+     * @param[in] status Mark as bad when true, as good when false.
      */
     void markChBad(QModelIndexList chlist, bool status);
 
@@ -387,7 +387,7 @@ public:
      * markChBad marks the selected channels as bad/good in m_chInfolist
      *
      * @param[in] colorMap       color for each trigger channel.
-     * @param[in] activ          real time trigger detection active.
+     * @param[in] active          real time trigger detection active.
      * @param[in] triggerCh      current trigger channel to scan.
      * @param[in] threshold      threshold for the detection process.
      */
@@ -515,7 +515,7 @@ public:
     /**
      * Get maximum range of respective channel type. range value in FiffChInfo does not seem to contain a reasonable value
      *
-     * @param [in] Row of the model
+     * @param[in] row Row of the model.
      * @return the max value of the y axis for the channel
      */
     double getMaxValueFromRawViewModel(int row) const;
@@ -524,7 +524,7 @@ public:
     /**
      * Adds event based on input parameters
      *
-     * @param[in]iSample    Sample of the new event.
+     * @param[in] iSample    Sample of the new event.
      */
     void addEvent(int iSample);
 

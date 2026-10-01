@@ -10,7 +10,7 @@
  * @brief    Instanced-arrow renderable for fitted equivalent current dipoles, driven by QRhi instancing.
  *
  * DipoleObject converts an @ref INVLIB::InvEcdSet into a single
- * arrow mesh (cone + shaft) plus a per-dipole @ref InstanceData
+ * arrow mesh (cone + shaft) plus a per-dipole @c DipoleObject::InstanceData
  * stream that carries the 4x4 model matrix (translation + dipole
  * orientation), the RGBA colour (mapped from goodness-of-fit by the
  * active dipole colormap) and a selected flag.

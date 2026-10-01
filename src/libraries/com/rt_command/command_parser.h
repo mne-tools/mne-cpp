@@ -22,8 +22,8 @@
  * JSON input is decoded with @c QJsonDocument and may contain either a
  * single command object or an array of commands, allowing batched
  * requests in one round-trip. In either case the result is the same
- * untyped @ref RawCommand handed to the observers — the type-aware
- * @ref Command is constructed downstream once a manager has identified
+ * untyped @ref COMLIB::RawCommand handed to the observers — the type-aware
+ * @ref COMLIB::Command is constructed downstream once a manager has identified
  * which schema applies.
  *
  * @c parse() returns @c true when at least one observer claimed the
@@ -101,6 +101,8 @@ public:
      *
      * @param[in] p_sInput               Input to parse.
      * @param[out] p_qListCommandsParsed  List of parsed commands.
+     *
+     * @return false if the input is empty, malformed JSON or an unknown CLI command, true otherwise.
      */
     bool parse(const QString &p_sInput, QStringList &p_qListCommandsParsed);
 

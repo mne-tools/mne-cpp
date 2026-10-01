@@ -77,11 +77,20 @@ This class is a passive data holder: `BrainRenderer` owns the GPU resources (ver
 
 Push a new video frame; bumps the generation counter so the GPU re-uploads.
 
+**Parameters:**
+
+- **image** : *const QImage &*
+  New video frame; null images are ignored.
+
 ---
 
 ### frameGeneration()
 
 Monotonic counter, incremented on every `setFrame()` call.
+
+**Returns:**
+
+- *quint64* — Current video frame generation.
 
 ---
 
@@ -102,6 +111,10 @@ Monotonic counter, incremented on every `setFrame()` call.
 Hint direction used as the quad's "up" axis.
 
 When set (non-zero), the quad's long edge is perpendicular to this direction instead of using the default world-up billboard.
+
+**Returns:**
+
+- *QVector3D* — Up-hint direction, or a zero vector if unset.
 
 ---
 
@@ -124,6 +137,11 @@ When set (non-zero), the quad's long edge is perpendicular to this direction ins
 ### setDepthFrame(image)
 
 Push a new monocular depth map (single-channel or RGBA grayscale).
+
+**Parameters:**
+
+- **image** : *const QImage &*
+  New depth map; null images are ignored.
 
 ---
 

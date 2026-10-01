@@ -553,6 +553,24 @@ Return a human-readable label for a BEM method.
 
 Read an integer tag from a FIFF node.
 
+**Parameters:**
+
+- **stream** : *[FIFFLIB::FiffStream](/docs/api/fiff/fiff-stream)::SPtr &*
+  Open FIFF stream to read from.
+
+- **node** : *const [FIFFLIB::FiffDirNode](/docs/api/fiff/fiff-dir-node)::SPtr &*
+  Directory node to search for the tag.
+
+- **what** : *int*
+  FIFF tag kind to look up.
+
+- **res** : *int **
+  Receives the integer value on success.
+
+**Returns:**
+
+- *int* — OK if the tag was found and is of type FIFFT_INT, FAIL otherwise.
+
 ---
 
 ### fwd_bem_load_surfaces(name, kinds)

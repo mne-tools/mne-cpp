@@ -10,7 +10,7 @@
  * @brief    Legacy MNE-C raw-recording container with per-file buffer descriptors.
  *
  * @ref MNELIB::MNERawData mirrors @c mneRawDataRec: it pairs an
- * @ref FIFFLIB::FiffInfo with the list of @ref MNERawBufDef entries that
+ * @ref FIFFLIB::FiffInfo with the list of @ref MNELIB::MNERawBufDef entries that
  * describe the on-disk layout of @c FIFF_DATA_BUFFER blocks of a @c
  * -raw.fif file. It is the data source used by the C-ported routines in
  * @c mne_browse_raw / @c mne_make_movie. New code should prefer

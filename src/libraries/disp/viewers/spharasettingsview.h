@@ -75,7 +75,9 @@ public:
     /**
      * Constructs a SpharaSettingsView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent        parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     SpharaSettingsView(const QString& sSettingsPath = "",
                        QWidget *parent = 0,
@@ -125,6 +127,8 @@ protected:
     //=========================================================================================================
     /**
      * Slot called when the sphara tool was toggled
+     *
+     * @param[in] state  True if SPHARA filtering was activated.
      */
     void onSpharaButtonClicked(bool state);
 

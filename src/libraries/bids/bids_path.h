@@ -10,22 +10,22 @@
  * @brief    Programmatic construction and matching of BIDS-compliant directories, filenames and sidecar paths.
  *
  * The BIDS specification fixes both the directory layout
- * (@c root/sub-XX/[ses-YY/]<datatype>/) and the @c <entity>-<value>
+ * (`root/sub-XX/[ses-YY/]<datatype>/`) and the `<entity>-<value>`
  * ordering of the basename (@c sub, @c ses, @c task, @c acq, @c run,
- * @c proc, @c space, @c rec, @c split, @c desc, then a @c _<suffix>
- * and a @c .<ext>). @ref BIDSPath is the value object that encodes
- * those entities and emits canonical paths via @ref BIDSPath::basename,
- * @ref BIDSPath::directory and @ref BIDSPath::filePath, mirroring the
+ * @c proc, @c space, @c rec, @c split, @c desc, then a `_<suffix>`
+ * and a `.<ext>`). @ref BIDSLIB::BIDSPath is the value object that encodes
+ * those entities and emits canonical paths via @ref BIDSLIB::BIDSPath::basename "BIDSPath::basename",
+ * @ref BIDSLIB::BIDSPath::directory "BIDSPath::directory" and @ref BIDSLIB::BIDSPath::filePath "BIDSPath::filePath", mirroring the
  * API of @c mne_bids.BIDSPath in mne-python so call sites can be
  * ported with minimal cognitive overhead.
  *
- * Beyond serialisation, @ref BIDSPath provides three orthogonal
- * conveniences: @ref BIDSPath::withSuffix and the dedicated
+ * Beyond serialisation, @ref BIDSLIB::BIDSPath provides three orthogonal
+ * conveniences: @ref BIDSLIB::BIDSPath::withSuffix "BIDSPath::withSuffix" and the dedicated
  * @c channelsTsvPath / @c electrodesTsvPath / @c coordsystemJsonPath /
  * @c eventsTsvPath / @c sidecarJsonPath helpers so a single
- * @ref BIDSPath instance can spawn every sidecar derived from a raw-data
- * BIDSPath; @ref BIDSPath::mkdirs to materialise the directory
- * hierarchy lazily on write; and @ref BIDSPath::match to enumerate
+ * @ref BIDSLIB::BIDSPath instance can spawn every sidecar derived from a raw-data
+ * BIDSPath; @ref BIDSLIB::BIDSPath::mkdirs "BIDSPath::mkdirs" to materialise the directory
+ * hierarchy lazily on write; and @ref BIDSLIB::BIDSPath::match "BIDSPath::match" to enumerate
  * actual on-disk files whose entity values complete the unset slots of
  * the current path. Entity-value validation rejects the three
  * characters BIDS forbids inside a label (@c -, @c _, @c /).
@@ -124,6 +124,8 @@ public:
     //=========================================================================================================
     /**
      * Copy constructor.
+     *
+     * @param[in] other BIDSPath to copy.
      */
     BIDSPath(const BIDSPath& other);
 
@@ -137,65 +139,135 @@ public:
     // Entity setters
     //=========================================================================================================
 
-    /** Set the BIDS dataset root directory. */
+    /**
+     * Set the BIDS dataset root directory.
+     *
+     * @param[in] sRoot Root directory of the BIDS dataset.
+     */
     void setRoot(const QString& sRoot);
 
-    /** Set the subject label (without "sub-" prefix). */
+    /**
+     * Set the subject label (without "sub-" prefix).
+     *
+     * @param[in] sSubject Subject label without the "sub-" prefix.
+     */
     void setSubject(const QString& sSubject);
 
-    /** Set the session label (without "ses-" prefix). */
+    /**
+     * Set the session label (without "ses-" prefix).
+     *
+     * @param[in] sSession Session label without the "ses-" prefix; empty to omit the entity.
+     */
     void setSession(const QString& sSession);
 
-    /** Set the task label. */
+    /**
+     * Set the task label.
+     *
+     * @param[in] sTask Task label; empty to omit the entity.
+     */
     void setTask(const QString& sTask);
 
-    /** Set the acquisition label. */
+    /**
+     * Set the acquisition label.
+     *
+     * @param[in] sAcquisition Acquisition label; empty to omit the entity.
+     */
     void setAcquisition(const QString& sAcquisition);
 
-    /** Set the run index (will be zero-padded to 2 digits). */
+    /**
+     * Set the run index (will be zero-padded to 2 digits).
+     *
+     * @param[in] sRun Run index as a numeric string (e.g. "1" becomes "01"); empty to omit the entity.
+     */
     void setRun(const QString& sRun);
 
-    /** Set the processing label. */
+    /**
+     * Set the processing label.
+     *
+     * @param[in] sProcessing Processing label; empty to omit the entity.
+     */
     void setProcessing(const QString& sProcessing);
 
-    /** Set the space label. */
+    /**
+     * Set the space label.
+     *
+     * @param[in] sSpace Space label (e.g. a coordinate system name); empty to omit the entity.
+     */
     void setSpace(const QString& sSpace);
 
-    /** Set the recording label. */
+    /**
+     * Set the recording label.
+     *
+     * @param[in] sRecording Recording label; empty to omit the entity.
+     */
     void setRecording(const QString& sRecording);
 
-    /** Set the split index. */
+    /**
+     * Set the split index.
+     *
+     * @param[in] sSplit Split index as a numeric string, zero-padded to 2 digits; empty to omit the entity.
+     */
     void setSplit(const QString& sSplit);
 
-    /** Set the description label. */
+    /**
+     * Set the description label.
+     *
+     * @param[in] sDescription Description label; empty to omit the entity.
+     */
     void setDescription(const QString& sDescription);
 
-    /** Set the BIDS datatype (e.g. "ieeg", "eeg", "meg", "anat"). */
+    /**
+     * Set the BIDS datatype (e.g. "ieeg", "eeg", "meg", "anat").
+     *
+     * @param[in] sDatatype BIDS datatype, used as the innermost directory name.
+     */
     void setDatatype(const QString& sDatatype);
 
-    /** Set the filename suffix (e.g. "ieeg", "channels", "electrodes", "coordsystem"). */
+    /**
+     * Set the filename suffix (e.g. "ieeg", "channels", "electrodes", "coordsystem").
+     *
+     * @param[in] sSuffix Filename suffix appended after the entities.
+     */
     void setSuffix(const QString& sSuffix);
 
-    /** Set the file extension including dot (e.g. ".vhdr", ".tsv", ".json"). */
+    /**
+     * Set the file extension including dot (e.g. ".vhdr", ".tsv", ".json").
+     *
+     * @param[in] sExtension File extension including the leading dot.
+     */
     void setExtension(const QString& sExtension);
 
     //=========================================================================================================
     // Entity getters
     //=========================================================================================================
 
+    /** @return Root directory of the BIDS dataset, or an empty string if unset. */
     QString root() const;               /**< BIDS dataset root path. */
+    /** @return Subject label without the "sub-" prefix, or an empty string if unset. */
     QString subject() const;            /**< Subject label (without "sub-"). */
+    /** @return Session label without the "ses-" prefix, or an empty string if unset. */
     QString session() const;            /**< Session label (without "ses-"). */
+    /** @return Task label, or an empty string if unset. */
     QString task() const;               /**< Task label. */
+    /** @return Acquisition label, or an empty string if unset. */
     QString acquisition() const;        /**< Acquisition label. */
+    /** @return Zero-padded run index, or an empty string if unset. */
     QString run() const;                /**< Run index. */
+    /** @return Processing label, or an empty string if unset. */
     QString processing() const;         /**< Processing label. */
+    /** @return Space label, or an empty string if unset. */
     QString space() const;              /**< Space label. */
+    /** @return Recording label, or an empty string if unset. */
     QString recording() const;          /**< Recording label. */
+    /** @return Zero-padded split index, or an empty string if unset. */
     QString split() const;              /**< Split index. */
+    /** @return Description label, or an empty string if unset. */
     QString description() const;        /**< Description label. */
+    /** @return BIDS datatype (e.g. "ieeg"), or an empty string if unset. */
     QString datatype() const;           /**< BIDS datatype string. */
+    /** @return Filename suffix, or an empty string if unset. */
     QString suffix() const;             /**< Filename suffix. */
+    /** @return File extension including the leading dot, or an empty string if unset. */
     QString extension() const;          /**< File extension. */
 
     //=========================================================================================================
@@ -205,9 +277,9 @@ public:
     /**
      * Constructs the BIDS-compliant filename (without directory).
      *
-     * Format: sub-<label>[_ses-<label>][_task-<label>][_acq-<label>][_run-<index>]
-     *         [_proc-<label>][_space-<label>][_rec-<label>][_split-<index>]
-     *         [_desc-<label>]_<suffix><extension>
+     * Format: `sub-<label>[_ses-<label>][_task-<label>][_acq-<label>][_run-<index>]`
+     *         `[_proc-<label>][_space-<label>][_rec-<label>][_split-<index>]`
+     *         `[_desc-<label>]_<suffix><extension>`
      *
      * @return The BIDS filename.
      */
@@ -216,7 +288,7 @@ public:
     /**
      * Constructs the directory path for this entity combination.
      *
-     * Format: <root>/sub-<label>[/ses-<label>]/<datatype>/
+     * Format: `<root>/sub-<label>[/ses-<label>]/<datatype>/`
      *
      * @return The BIDS directory path (with trailing separator).
      */

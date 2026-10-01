@@ -81,6 +81,11 @@ Execute a single node (for testing/debugging).
 
 Set a progress callback invoked for each node execution.
 
+**Parameters:**
+
+- **cb** : *ProgressCallback*
+  Callback receiving the node id and its 1-based index out of the total; an empty callback disables reporting.
+
 ---
 
 ### startStream(graph, factory)

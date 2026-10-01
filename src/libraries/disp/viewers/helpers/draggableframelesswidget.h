@@ -16,7 +16,7 @@
  * DraggableFramelessWidget removes the native window frame and
  * implements the mouse-press / mouse-move handlers needed to move
  * the window with the cursor. It is the base class of
- * @ref QuickControlView and any other floating popup that wants to
+ * @ref DISPLIB::QuickControlView and any other floating popup that wants to
  * look like an in-app palette rather than a system window.
  */
 
@@ -104,24 +104,32 @@ protected:
     //=========================================================================================================
     /**
      * Reimplmented mouseMoveEvent.
+     *
+     * @param[in] event  The mouse event; moves the widget while dragging with the left button.
      */
     void mouseMoveEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
      * Reimplmented mouseMoveEvent.
+     *
+     * @param[in] event  The mouse event; a left press stores the drag offset.
      */
     void mousePressEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
      * Reimplmented mouseReleaseEvent.
+     *
+     * @param[in] event  The mouse event; a left release ends dragging.
      */
     void mouseReleaseEvent(QMouseEvent *event);
 
     //=========================================================================================================
     /**
      * Reimplmented mouseMoveEvent.
+     *
+     * @param[in] event  The resize event (unused; the rounded-edge mask is recomputed).
      */
     void resizeEvent(QResizeEvent *event);
 

@@ -32,11 +32,17 @@ Reads the specified ANT elc-layout file.
 - **path** : *const QString &*
   holds the file path of the elc file which is to be read.
 
+- **channelNames** : *QStringList &*
+  Receives the channel names.
+
 - **location3D** : *QList&lt; QVector&lt; float &gt; &gt; &*
   holds the vector to which the read 3D positions are stored.
 
 - **location2D** : *QList&lt; QVector&lt; float &gt; &gt; &*
   holds the vector to which the read 2D positions are stored.
+
+- **unit** : *QString &*
+  Receives the unit of the positions.
 
 **Returns:**
 
@@ -53,11 +59,17 @@ Reads the specified ANT elc-layout file.
 - **path** : *const std::string &*
   holds the file path of the elc file which is to be read.
 
+- **channelNames** : *std::vector&lt; std::string &gt; &*
+  Receives the channel names.
+
 - **location3D** : *std::vector&lt; std::vector&lt; float &gt; &gt; &*
   holds the vector to which the read 3D positions are stored.
 
 - **location2D** : *std::vector&lt; std::vector&lt; float &gt; &gt; &*
   holds the vector to which the read 2D positions are stored.
+
+- **unit** : *std::string &*
+  Receives the unit of the positions.
 
 **Returns:**
 
@@ -74,8 +86,8 @@ Reads the specified [MNE](/docs/api/mne/mne-class) .lout file.
 - **path** : *const QString &*
   holds the file path of the lout file which is to be read.
 
-- **channel**
-  data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
+- **channelData** : *QMap&lt; QString, QPointF &gt; &*
+  holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
 
 **Returns:**
 
@@ -92,8 +104,8 @@ Reads the specified [MNE](/docs/api/mne/mne-class) .lout file.
 - **path** : *const std::string &*
   holds the file path of the lout file which is to be read.
 
-- **channel**
-  data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
+- **channelData** : *QMap&lt; std::string, QPointF &gt; &*
+  holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
 
 **Returns:**
 

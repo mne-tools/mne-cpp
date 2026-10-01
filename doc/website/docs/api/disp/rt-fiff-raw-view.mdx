@@ -37,8 +37,14 @@ Constructs a [`RtFiffRawView`](/docs/api/disp/rt-fiff-raw-view) which is a child
 
 **Parameters:**
 
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
 - **parent** : *QWidget **
   The parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
 
 ---
 
@@ -86,7 +92,7 @@ Add data to the view.
 
 **Parameters:**
 
-- **data**
+- **lMatData** : *const QList&lt; Eigen::MatrixXd &gt; &*
   The new data.
 
 ---
@@ -109,9 +115,11 @@ Function is selecting the tool (freezing/annotation);
 
 **Parameters:**
 
-- **object.**
+- **object** : *QObject **
+  Object the event was sent to.
 
-- **event.**
+- **event** : *QEvent **
+  The intercepted event.
 
 ---
 
@@ -299,7 +307,7 @@ Update the SPHARA operator.
 
 **Parameters:**
 
-- **sSystemType**
+- **sSytemType** : *const QString &*
   The current acquisition system type (VectorView, BabyMEG, EEG).
 
 - **nBaseFctsFirst** : *int*
@@ -352,7 +360,7 @@ markChBad marks the selected channels as bad/good in m_chInfolist
 - **colorMap** : *const QMap&lt; double, QColor &gt; &*
   color for each trigger channel.
 
-- **activ**
+- **active** : *bool*
   real time trigger detection active.
 
 - **triggerCh** : *const QString &*
@@ -411,6 +419,10 @@ Clears the view.
 ### getSamplingFreq()
 
 Getter fcn for Sampling Frequency member.
+
+**Returns:**
+
+- *float* — Sampling frequency in Hz.
 
 ---
 

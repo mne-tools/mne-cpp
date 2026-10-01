@@ -16,10 +16,10 @@
  *
  * The MNE-Matlab toolbox exposes file I/O as flat functions
  * (@c fiff_open, @c fiff_read_raw_segment, @c fiff_read_evoked, ...).
- * @ref FIFF mirrors that surface as a static-method facade so code ported
+ * @c FIFF mirrors that surface as a static-method facade so code ported
  * from Matlab compiles unchanged. New C++ code should call the
- * underlying class methods directly (@ref FiffStream, @ref FiffRawData,
- * @ref FiffEvoked, ...) — the wrapper only exists for the
+ * underlying class methods directly (@ref FIFFLIB::FiffStream, @ref FIFFLIB::FiffRawData,
+ * @ref FIFFLIB::FiffEvoked, ...) — the wrapper only exists for the
  * backwards-compatible path.
  *
  * Including @c fiff.h is also the single-include shortcut that pulls in

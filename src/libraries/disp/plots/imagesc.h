@@ -14,11 +14,11 @@
  *
  * ImageSc visualises an @c Eigen::MatrixXd / @c MatrixXf / @c MatrixXi as
  * a 2-D image, mapping the data range linearly into a selectable
- * colour map (Jet, Hot, Bone, ...) through @ref ColorMap. It inherits
- * the title / axis-label scaffolding from @ref Graph and is the canvas
+ * colour map (Jet, Hot, Bone, ...) through @ref DISPLIB::ColorMap. It inherits
+ * the title / axis-label scaffolding from @ref DISPLIB::Graph and is the canvas
  * of choice for sensor-by-sample heat maps, covariance matrices and
  * any other rectangular numeric field that benefits from a glance-able
- * false-colour rendering. Calling @ref ImageSc::updateData repaints the
+ * false-colour rendering. Calling @ref DISPLIB::ImageSc::updateData "ImageSc::updateData" repaints the
  * scaled view with new contents.
  */
 
@@ -143,7 +143,7 @@ public:
     /**
      * Updates the scaled image view with a given integer matrix.
      *
-     * @param[in] p_dMat     The integer data matrix.
+     * @param[in] p_iMat     The integer data matrix.
      */
     void updateData(Eigen::MatrixXi &p_iMat);
 

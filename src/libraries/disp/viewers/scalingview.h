@@ -13,11 +13,11 @@
  * @date     July 2018
  * @brief    Per-modality vertical-scale spinbox panel (one spin per channel type).
  *
- * ScalingView assembles a @ref ScaleControl per channel modality in
+ * ScalingView assembles a @ref DISPLIB::ScaleControl per channel modality in
  * the active @c FiffInfo (MAG in fT, GRAD in fT/cm, EEG in µV, …)
  * and emits a @c scalingChanged map every time the user nudges one.
- * Consumed by @ref RtFiffRawView, @ref ChannelDataView and
- * @ref ButterflyView to translate raw SI units into screen units.
+ * Consumed by @ref DISPLIB::RtFiffRawView, @ref DISPLIB::ChannelDataView and
+ * @ref DISPLIB::ButterflyView to translate raw SI units into screen units.
  */
 
 #ifndef SCALINGVIEW_H
@@ -114,7 +114,10 @@ public:
     /**
      * Constructs a ScalingView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent Parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
+     * @param[in] lChannelsToShow Channel types to show scaling controls for ("all" = every type).
      */
     ScalingView(const QString& sSettingsPath = "",
                 QWidget *parent = 0,
@@ -138,6 +141,8 @@ public:
     //=========================================================================================================
     /**
      * Set the current scaling map. This also recreates the GUI.
+     *
+     * @param[in] qMapChScaling  Map from FIFF channel kind/unit key to amplitude scale.
      */
     void setScaleMap(const QMap<qint32, float> &qMapChScaling);
 

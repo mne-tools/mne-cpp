@@ -50,7 +50,7 @@ Note that no baseline correction performed.
 
 **Parameters:**
 
-- **info**
+- **p_info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   measurement info.
 
 - **first** : *FIFFLIB::fiff_int_t*
@@ -64,6 +64,10 @@ Note that no baseline correction performed.
 
 - **proj** : *bool*
   Apply SSP projection vectors (optional, default = false).
+
+**Returns:**
+
+- *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — Averaged evoked response; aspect_kind is FIFFV_ASPECT_STD_ERR with no data if the list is empty.
 
 ---
 
@@ -118,11 +122,18 @@ Read the epochs from a raw file based on provided events.
 - **event** : *qint32*
   The event kind.
 
+- **mapReject** : *const QMap&lt; QString, double &gt; &*
+  Peak-to-peak rejection thresholds per channel type (e.g. "grad", "mag", "eeg").
+
 - **lExcludeChs** : *const QStringList &*
   List of channel names to exclude.
 
 - **picks** : *const Eigen::RowVectorXi &*
   Which channels to pick.
+
+**Returns:**
+
+- *[MNEEpochDataList](/docs/api/mne/mne-epoch-data-list)* — List of epochs with rejection flags set; empty if no matching events are found.
 
 ---
 

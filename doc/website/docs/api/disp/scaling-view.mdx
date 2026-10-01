@@ -37,8 +37,17 @@ Constructs a [`ScalingView`](/docs/api/disp/scaling-view) which is a child of pa
 
 **Parameters:**
 
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
 - **parent** : *QWidget **
   Parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
+
+- **lChannelsToShow** : *const QStringList &*
+  Channel types to show scaling controls for ("all" = every type).
 
 ---
 
@@ -63,6 +72,11 @@ Get the current scaling map.
 Set the current scaling map.
 
 This also recreates the GUI.
+
+**Parameters:**
+
+- **qMapChScaling** : *const QMap&lt; qint32, float &gt; &*
+  Map from FIFF channel kind/unit key to amplitude scale.
 
 ---
 

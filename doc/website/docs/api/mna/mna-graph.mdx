@@ -61,6 +61,20 @@ Connect output port of srcNode to input port of dstNode.
 
 Sets the sourceNodeId and sourcePortName on the destination input port.
 
+**Parameters:**
+
+- **srcNodeId** : *const QString &*
+  Id of the node providing the output.
+
+- **srcPortName** : *const QString &*
+  Name of the output port on the source node.
+
+- **dstNodeId** : *const QString &*
+  Id of the node receiving the input.
+
+- **dstPortName** : *const QString &*
+  Name of the input port on the destination node.
+
 **Returns:**
 
 - *bool* — true if connection was made, false if ports not found.

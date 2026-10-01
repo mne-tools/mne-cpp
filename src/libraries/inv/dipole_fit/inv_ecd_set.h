@@ -9,11 +9,11 @@
  * @date     March 2026
  * @brief    Ordered set of @ref INVLIB::InvEcd records — the result of a sequential dipole-fit run.
  *
- * @ref INVLIB::InvEcdSet collects one @ref InvEcd per fitted time bin
+ * @ref INVLIB::InvEcdSet collects one @ref INVLIB::InvEcd per fitted time bin
  * and exposes append, index access and stream-insertion as well as
  * read/write support for the canonical @c .dip text format (mrilab) and
  * the @c .bdip binary format (xfit). It is the value type returned by
- * @ref InvDipoleFit::calculateFit and serialised by the
+ * @ref INVLIB::InvDipoleFit::calculateFit "InvDipoleFit::calculateFit" and serialised by the
  * @c mne_dipole_fit driver.
  */
 
@@ -103,6 +103,8 @@ public:
     //=========================================================================================================
     /**
      * Appends an Electric Current Dipole to the set
+     *
+     * @param[in] p_ecd  Dipole to append (copied).
      */
     void addEcd(const InvEcd& p_ecd);
 
@@ -110,7 +112,9 @@ public:
     /**
      * Read dipoles from the dip format compatible with mrilab
      *
-     * @param[in] name   File name to read from.
+     * @param[in] fileName   File name to read from.
+     *
+     * @return The dipole set read from the file; empty if the file could not be read.
      */
     static InvEcdSet read_dipoles_dip(const QString& fileName);
 
@@ -119,6 +123,8 @@ public:
      * Save dipoles in the bdip format employed by xfit
      *
      * @param[in] fileName   File name to save to.
+     *
+     * @return True on success or if there is nothing to save, false if the file could not be written.
      */
     bool save_dipoles_bdip(const QString& fileName);
 
@@ -127,6 +133,8 @@ public:
      * Save dipoles in the dip format suitable for mrilab
      *
      * @param[in] fileName   File name to save to.
+     *
+     * @return True on success or if there is nothing to save, false if the file could not be written.
      */
     bool save_dipoles_dip(const QString& fileName) const;
 

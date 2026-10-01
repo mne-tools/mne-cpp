@@ -10,21 +10,21 @@
  * @brief    Surface-constrained geodesic distance and sensor-to-mesh projection helpers.
  *
  * GeometryInfo provides the geometric kernels that drive every
- * smooth source / sensor overlay in disp3D. @ref scdc runs a
+ * smooth source / sensor overlay in disp3D. @ref DISP3DLIB::GeometryInfo::scdc "scdc" runs a
  * multi-source Dijkstra on the surface adjacency graph to compute
  * geodesic (surface-constrained) distances from a set of seed
  * vertices to all vertices on the mesh; the result is used by
- * @ref Interpolation to build a sparse weight matrix that propagates
+ * @ref DISP3DLIB::Interpolation to build a sparse weight matrix that propagates
  * source / sensor values across the cortex without crossing sulci.
  *
- * @ref scdcInterpolationMat fuses the Dijkstra pass and the
+ * @ref DISP3DLIB::GeometryInfo::scdcInterpolationMat "scdcInterpolationMat" fuses the Dijkstra pass and the
  * weight-matrix construction so the dense distance table is never
  * materialised &mdash; essential for high-resolution ico-5 source spaces
  * where the dense table would exceed several gigabytes.
  *
- * @ref projectSensors performs Euclidean nearest-vertex projection
+ * @ref DISP3DLIB::GeometryInfo::projectSensors "projectSensors" performs Euclidean nearest-vertex projection
  * for MEG / EEG sensors onto the head or helmet mesh; @ref
- * filterBadChannels prunes columns of the distance table for
+ * DISP3DLIB::GeometryInfo::filterBadChannels "filterBadChannels" prunes columns of the distance table for
  * channels marked bad in the @ref FIFFLIB::FiffInfo.
  */
 
@@ -89,6 +89,12 @@ public:
     //=========================================================================================================
     /**
      * @brief scdc   Calculates surface constrained distances on a mesh.
+     *
+     * @param[in] matVertices            Vertex positions (nVertices x 3).
+     * @param[in] vecNeighborVertices    Adjacency list for each vertex.
+     * @param[in, out] vecVertSubset     Source vertex indices; if empty it is filled with all vertex indices.
+     * @param[in] dCancelDist            Maximum geodesic distance to explore, in vertex coordinate units.
+     * @return Distance table (nVertices x nSubset); entries beyond dCancelDist stay infinite.
      */
     static QSharedPointer<Eigen::MatrixXd> scdc(const Eigen::MatrixX3f &matVertices,
                                                 const std::vector<Eigen::VectorXi> &vecNeighborVertices,
@@ -123,6 +129,10 @@ public:
     //=========================================================================================================
     /**
      * @brief projectSensors   Calculates the nearest neighbor vertex to each sensor.
+     *
+     * @param[in] matVertices          Vertex positions (nVertices x 3).
+     * @param[in] matSensorPositions   Sensor positions (nSensors x 3) in the same coordinate frame.
+     * @return Index of the nearest mesh vertex for each sensor.
      */
     static Eigen::VectorXi projectSensors(const Eigen::MatrixX3f &matVertices,
                                           const Eigen::MatrixX3f &matSensorPositions);
@@ -130,6 +140,11 @@ public:
     //=========================================================================================================
     /**
      * @brief filterBadChannels   Filters bad channels from distance table.
+     *
+     * @param[in, out] matDistanceTable   Distance table whose bad-channel columns are set to infinity.
+     * @param[in] fiffInfo                Measurement info providing channel list and bad channel names.
+     * @param[in] iSensorType             FIFF channel kind selecting the sensors that form the table columns.
+     * @return Column indices of the bad channels that were found.
      */
     static Eigen::VectorXi filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
                                              const FIFFLIB::FiffInfo& fiffInfo,

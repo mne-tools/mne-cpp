@@ -12,10 +12,10 @@
  * BIDS mandates that every electrophysiology recording (MEG, EEG, iEEG)
  * ship a sibling @c _channels.tsv with one row per channel describing
  * @c name, @c type and @c units (REQUIRED) plus optional sampling /
- * filter / status / description columns. @ref BidsChannel is the in-memory
- * row record and the static @ref BidsChannel::readTsv /
- * @ref BidsChannel::writeTsv functions perform the TSV round-trip via
- * @ref BidsTsv. The BIDS channel-type vocabulary (@c MEGMAG, @c EEG,
+ * filter / status / description columns. @ref BIDSLIB::BidsChannel is the in-memory
+ * row record and the static @ref BIDSLIB::BidsChannel::readTsv "BidsChannel::readTsv" /
+ * @ref BIDSLIB::BidsChannel::writeTsv "BidsChannel::writeTsv" functions perform the TSV round-trip via
+ * @ref BIDSLIB::BidsTsv. The BIDS channel-type vocabulary (@c MEGMAG, @c EEG,
  * @c ECOG, @c SEEG, @c DBS, @c TRIG, …) maps to FIFF channel kinds
  * through the tables in @ref bids_const.h, so a channel record read
  * from a BIDS dataset can be merged into a @c FIFFLIB::FiffInfo without

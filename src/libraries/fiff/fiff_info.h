@@ -14,19 +14,19 @@
  * @date     September 2012
  * @brief    Full FIFF measurement metadata: everything from FIFFB_MEAS / FIFFB_MEAS_INFO needed to interpret a recording.
  *
- * @ref FiffInfo is the C++ counterpart of MNE-Python's
+ * @ref FIFFLIB::FiffInfo is the C++ counterpart of MNE-Python's
  * @c mne.Info dictionary. It collects everything stored under
  * @c FIFFB_MEAS / @c FIFFB_MEAS_INFO of a FIFF file: per-channel
- * descriptors (@ref FiffChInfo via @ref FiffInfoBase), sampling frequency,
+ * descriptors (@ref FIFFLIB::FiffChInfo via @ref FIFFLIB::FiffInfoBase), sampling frequency,
  * lowpass / highpass filter cutoffs, line frequency, measurement date,
- * subject info, experimenter, projector list (@ref FiffProj), CTF
- * software compensation list (@ref FiffCtfComp), HPI fit results, the
+ * subject info, experimenter, projector list (@ref FIFFLIB::FiffProj), CTF
+ * software compensation list (@ref FIFFLIB::FiffCtfComp), HPI fit results, the
  * device→head and CTF compensation transforms, the @c FIFFB_ISOTRAK
- * digitization (@ref FiffDigPoint), and the per-channel calibration vectors.
+ * digitization (@ref FIFFLIB::FiffDigPoint), and the per-channel calibration vectors.
  *
- * Every higher-level container in FIFFLIB (@ref FiffRawData,
- * @ref FiffEvoked, @ref FiffCov, @ref FiffEvokedSet) carries a
- * @ref FiffInfo so that downstream consumers (filtering, source
+ * Every higher-level container in FIFFLIB (@ref FIFFLIB::FiffRawData,
+ * @ref FIFFLIB::FiffEvoked, @ref FIFFLIB::FiffCov, @ref FIFFLIB::FiffEvokedSet) carries a
+ * @ref FIFFLIB::FiffInfo so that downstream consumers (filtering, source
  * localization, plotting, BIDS export) can interpret the data without
  * re-reading the file.
  */
@@ -210,7 +210,7 @@ public:
      *
      * Set the current compensation value in the channel info structures
      *
-     * @param[in] chs    fiff channel info list.
+     * @param[in] listFiffChInfo    fiff channel info list.
      * @param[in] value  compensation value.
      *
      * @return the current compensation.
@@ -264,7 +264,7 @@ private:
      * Create a compensation matrix to bring the data from one compensation state to another
      *
      * @param[in] kind               Compensation in the input data.
-     * @param[out] comp              Compensation Matrix.
+     * @param[out] this_comp              Compensation Matrix.
      *
      * @return true if succeeded, false otherwise.
      */

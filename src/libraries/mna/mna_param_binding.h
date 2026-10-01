@@ -9,7 +9,7 @@
  * @date     April 2026
  * @brief    Formula-driven binding that recomputes one MNA parameter from an expression whenever its triggers fire.
  *
- * @ref MnaParamBinding turns the otherwise static @ref MnaParamTree
+ * @ref MNALIB::MnaParamBinding turns the otherwise static @ref MNALIB::MnaParamTree
  * into a reactive system. Each binding links a @c targetPath
  * (typically @c nodeId/attrKey) to an @c expression that references
  * upstream results or other parameters through the @c ref("…")

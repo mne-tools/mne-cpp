@@ -40,8 +40,15 @@ Perform actual covariance estimation.
 
 **Parameters:**
 
-- **inputData**
+- **matData** : *const Eigen::MatrixXd &*
   Data to estimate the covariance from.
+
+- **iNewMaxSamples** : *int*
+  Number of samples to accumulate before a covariance is estimated.
+
+**Returns:**
+
+- *[FiffCov](/docs/api/fiff/fiff-cov)* — Noise covariance of the MEG/EEG channels, or an empty FiffCov while fewer than iNewMaxSamples samples are accumulated or if no FiffInfo was set.
 
 ---
 

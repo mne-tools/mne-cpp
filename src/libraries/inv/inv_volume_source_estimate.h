@@ -7,15 +7,15 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Volume (voxel-grid) source estimate that augments @ref InvSourceEstimate with 3-D grid shape information.
+ * @brief    Volume (voxel-grid) source estimate that augments @ref INVLIB::InvSourceEstimate with 3-D grid shape information.
  *
  * @ref INVLIB::InvVolumeSourceEstimate represents an inverse solution
  * on a regular voxel grid — used by volume MNE, beamformers in volume
  * mode and Gamma-MAP on volumetric source spaces. In addition to the
  * inherited vertex/data/time fields it stores an @c (nx, ny, nz) grid
- * shape and exposes @ref toVolume to materialise a dense 3-D volume at
+ * shape and exposes @ref INVLIB::InvVolumeSourceEstimate::toVolume "toVolume" to materialise a dense 3-D volume at
  * one time index (filling inactive voxels with zero) and
- * @ref centreOfMass for a quick activity centroid — both feeding directly
+ * @ref INVLIB::InvVolumeSourceEstimate::centreOfMass "centreOfMass" for a quick activity centroid — both feeding directly
  * into the @c MRILIB volume viewers.
  */
 
@@ -81,12 +81,16 @@ public:
     //=========================================================================================================
     /**
      * Get the 3D grid shape.
+     *
+     * @return Grid dimensions {nx, ny, nz}; empty if no shape was set.
      */
     const QVector<int>& shape() const { return m_shape; }
 
     //=========================================================================================================
     /**
      * Check whether the grid shape has been set.
+     *
+     * @return True if the shape holds exactly three dimensions.
      */
     bool hasShape() const { return m_shape.size() == 3; }
 

@@ -18,12 +18,12 @@
  * (@c scanno / @c logno), what kind of sensor it is
  * (@c FIFFV_MEG_CH / @c FIFFV_EEG_CH / @c FIFFV_STIM_CH / ...), the
  * calibration constants @c cal and @c range that map ADC counts to SI
- * units, the coil-frame transform encoded in the @ref FiffChPos sub-record,
+ * units, the coil-frame transform encoded in the @ref FIFFLIB::FiffChPos sub-record,
  * the coil type (@c FIFFV_COIL_VV_PLANAR_T1, @c FIFFV_COIL_VV_MAG_T1,
  * @c FIFFV_COIL_CTF_GRAD, ...) and the SI unit + multiplier of the
  * calibrated samples.
  *
- * @ref FiffChInfo wraps that record. Exact field-for-field parity with the
+ * @ref FIFFLIB::FiffChInfo wraps that record. Exact field-for-field parity with the
  * @c ch_info dict consumed by @c mne.io.meas_info in MNE-Python is
  * mandatory: forward models, source localizers and CTF compensators all
  * key on these fields and silently produce wrong topographies if any
@@ -147,7 +147,8 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param[in] a    The object which should be compared to.
+     * @param[in] b Right-hand channel info.
      *
      * @return true if equal, false otherwise.
      */

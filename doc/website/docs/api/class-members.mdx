@@ -44,7 +44,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **add_bem_surface** `[fn]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Read a BEM surface from a FIFF file, optionally validate that it is topologically closed (via solid-angle check), and add it to this set.
 - **add_filter_response** `[fn]` in [MNERawData](/docs/api/mne/mne-raw-data) — Create a frequency-domain filter response from the current filter definition and sampling frequency, replacing any existing response.
 - **add_geometry_info** `[fn]` in [MNEBemSurface](/docs/api/mne/mne-bem-surface) — Add vertex normals and neighbourhood information.
-- **add_geometry_info** `[fn]` in [MNEHemisphere](/docs/api/mne/mne-hemisphere) — Add vertex normals and neighbourhood information.
+- **add_geometry_info** `[fn]` in [MNEHemisphere](/docs/api/mne/mne-hemisphere) — Add vertex normals and neighbourhood information to this hemisphere.
 - **add_geometry_info** `[fn]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Build complete geometry information for a source space: triangle data, vertex normals, neighbor-triangle lists, neighbor-vertex lists, vertex distances, and center of mass.
 - **add_geometry_info** `[fn]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Convenience overload that adds geometry information with border detection disabled and excess-neighbor checking enabled.
 - **add_geometry_info2** `[fn]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Add geometry information with excess-neighbor checking disabled (warns instead of failing when a vertex has too many neighbors).
@@ -130,7 +130,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **annotationsVisible** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **annotationsVisible** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **annotationsVisibleToggled** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view)
-- **append** `[fn]` in [AcquiredPoints](/docs/api/utils/acquired-points) — Append a new point and emit pointsChanged.
+- **append** `[fn]` in [AcquiredPoints](/docs/api/utils/acquired-points) — Append a new point and emit `UTILSLIB::AcquiredPoints::pointsChanged` "pointsChanged".
 - **append** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **append** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **append** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
@@ -542,7 +542,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **clearAllData** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **clearBem** `[slot]` in `BrainView` — Remove all BEM surfaces from the scene.
 - **clearCameraFocusOverride** `[slot]` in `BrainView` — Remove the camera focus override; revert to auto-computed bounds.
-- **clearData** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Override the per-channel-type amplitude scale.
+- **clearData** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Clear all stored sample data without affecting channel metadata.
 - **clearData** `[fn]` in `RtSensorDataController` — Clear all queued data and reset the worker state.
 - **clearData** `[fn]` in `RtSourceDataController` — Clear all queued data and reset the worker state.
 - **clearDipoles** `[slot]` in `BrainView` — Remove dipole objects from the scene.
@@ -811,7 +811,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **confidence** `[var]` in `IcaLabelResult` — Confidence score in [0, 1].
 - **config** `[fn]` in [PythonRunner](/docs/api/utils/python-runner) — Get the current configuration.
 - **connect** `[fn]` in [MnaGraph](/docs/api/mna/mna-graph) — Connect output port of srcNode to input port of dstNode.
-- **connectedChanged** `[signal]` in [PolhemusConnection](/docs/api/utils/polhemus-connection) — Emitted whenever isConnected changes.
+- **connectedChanged** `[signal]` in [PolhemusConnection](/docs/api/utils/polhemus-connection) — Emitted whenever `UTILSLIB::PolhemusConnection::isConnected` "isConnected" changes.
 - **connection** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
 - **connectionChanged** `[signal]` in `RtClient` — Emitted when connection status changed.
 - **Connectivity** `[fn]` in [Connectivity](/docs/api/connectivity/connectivity-class) — Constructs a [`Connectivity`](/docs/api/connectivity/connectivity-class) object.
@@ -3798,7 +3798,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 
 ## P {#p}
 
-- **packageDir** `[var]` in `PythonRunnerConfig` — Directory containing pyproject.toml for `pip install . `
+- **packageDir** `[var]` in `PythonRunnerConfig` — Directory containing pyproject.toml for `pip install &lt;dir&gt;` (preferred).
 - **paint** `[fn]` in [AverageSceneItem](/docs/api/disp/average-scene-item)
 - **paint** `[fn]` in [FrequencySpectrumDelegate](/docs/api/disp/frequency-spectrum-delegate) — Use the painter and style option to render the item specified by the item index.
 - **paint** `[fn]` in [RtFiffRawViewDelegate](/docs/api/disp/rt-fiff-raw-view-delegate) — Use the painter and style option to render the item specified by the item index.
@@ -4961,9 +4961,9 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **setScaleMap** `[fn]` in [AverageLayoutView](/docs/api/disp/average-layout-view) — Sets the scale map to scaleMap.
 - **setScaleMap** `[fn]` in [AverageScene](/docs/api/disp/average-scene) — Sets the scale map to scaleMap.
 - **setScaleMap** `[fn]` in [ButterflyView](/docs/api/disp/butterfly-view) — Sets the scale map to scaleMap.
-- **setScaleMap** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model)
+- **setScaleMap** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Override the per-channel-type amplitude scale.
 - **setScaleMap** `[fn]` in [ScalingView](/docs/api/disp/scaling-view) — Set the current scaling map.
-- **setScaleMapFromStrings** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model)
+- **setScaleMapFromStrings** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Override the per-channel-type amplitude scale using channel-type names.
 - **setScaleType** `[fn]` in [FrequencySpectrumDelegate](/docs/api/disp/frequency-spectrum-delegate) — Set scale type.
 - **setScaleType** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Sets Scale type.
 - **setScaling** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Set scaling channel scaling.
@@ -5139,7 +5139,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **severity** `[var]` in `MnaVerificationCheck` — "error" (abort), "warning" (log + continue), "info" (always continue)
 - **severity** `[var]` in `MnaVerificationResult` — Echoed from the check definition.
 - **sFilePathDigitzers** `[var]` in `HpiFitResult`
-- **sfreq** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Sampling frequency in Hz; 0 if no FiffInfo attached.
+- **sfreq** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model)
 - **sfreq** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — Sample frequency.
 - **sfreq** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — Sampling frequency (Hz).
 - **sfreq** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Sampling frequency.
@@ -5147,7 +5147,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **sha256** `[var]` in `MnaFileRef` — SHA-256 hash of file contents.
 - **ShaderMode** `[type]` in `BrainRenderer`
 - **shaderMode** `[fn]` in `SurfaceTreeItem`
-- **shaderModeChanged** `[signal]` in `BrainView` — Emitted whenever the active brain shader mode changes — either via `setShaderMode` or after restoring persisted state in loadMultiViewSettings.
+- **shaderModeChanged** `[signal]` in `BrainView` — Emitted whenever the active brain shader mode changes — either via `setShaderMode` or after restoring persisted state in `BrainView::loadMultiViewSettings` "loadMultiViewSettings".
 - **shaderModeForTarget** `[slot]` in `BrainView` — Get configured shader mode name for a target view.
 - **shaftColor** `[var]` in `ElectrodeArray` — Depth only: shaft body color.
 - **shaftIndexCount** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
@@ -5874,7 +5874,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **units** `[fn]` in [FastrakParser](/docs/api/utils/fastrak-parser)
 - **units** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Unit of the source estimates, FIFF_UNIT_AM, FIFF_UNIT_AM_M2 or FIFF_UNIT_AM_M3.
 - **units** `[var]` in `PolhemusSerialConfig`
-- **Units** `[enum]` in [FastrakParser](/docs/api/utils/fastrak-parser)
+- **Units** `[enum]` in [FastrakParser](/docs/api/utils/fastrak-parser) — Linear unit of the positions reported by the device.
 - **unitScale** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
 - **unproject** `[fn]` in `RayPicker` — Unproject a screen position to a world-space ray.
 - **up** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Up vector for 3D viewing.
@@ -6094,7 +6094,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **view** `[var]` in `CameraResult`
 - **view** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor) — Create a non-owning view over external mutable memory.
 - **viewCount** `[slot]` in `BrainView`
-- **viewCountChanged** `[signal]` in `BrainView` — Emitted whenever the number of viewports changes — either via `setViewCount` or after restoring persisted state in loadMultiViewSettings.
+- **viewCountChanged** `[signal]` in `BrainView` — Emitted whenever the number of viewports changes — either via `setViewCount` or after restoring persisted state in `BrainView::loadMultiViewSettings` "loadMultiViewSettings".
 - **ViewMode** `[enum]` in `BrainView` — View mode for single or multi-viewport display.
 - **viewMode** `[slot]` in `BrainView` — Get the current view mode.
 - **viewportCameraPreset** `[slot]` in `BrainView` — Get the camera preset for a specific viewport.
@@ -6163,7 +6163,7 @@ Index of 6237 public class members (functions, variables, typedefs, enums) acros
 - **workingDir** `[var]` in `ProcessingSettings`
 - **workingDir** `[var]` in `PythonRunnerConfig` — Working directory (empty = inherit).
 - **world** `[var]` in `PickResult` — Hit position in world (MRI surface RAS) coordinates.
-- **worldBounds** `[fn]` in [MultimodalScene](/docs/api/disp3-d/multimodal-scene)
+- **worldBounds** `[fn]` in [MultimodalScene](/docs/api/disp3-d/multimodal-scene) — Scene-wide axis-aligned bounding box union of all visible layers, computed by the supplied per-kind extractor.
 - **worldToModel** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
 - **write** `[fn]` in `BidsDatasetDescription` — Write a dataset_description.json file.
 - **write** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Write this dataset to a BIDS-compliant directory.

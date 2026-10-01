@@ -17,7 +17,7 @@
  * regularised noise covariance and the SSP projector. The static
  * @c setup_dipole_fit_data factory reads every input from disk and
  * returns a fully-initialised workspace ready to be passed into the
- * fitting loop. Also declares the @ref dipoleFitFuncsRec / @ref FitDipUserRec
+ * fitting loop. Also declares the @ref INVLIB::dipoleFitFuncsRec / @ref INVLIB::FitDipUserRec
  * helpers used by the per-iteration cost function.
  */
 
@@ -355,7 +355,7 @@ public:
       std::unique_ptr<FWDLIB::FwdCoilSet>        meg_coils;         /**< MEG coil definitions. */
       std::unique_ptr<FWDLIB::FwdCoilSet>        eeg_els;           /**< EEG electrode definitions. */
       Eigen::Vector3f     r0;                /**< Sphere model origin. */
-      QString           bemname;           /**< Using a BEM?. */
+      QString           bemname;           /**< Using a BEM? */
 
       std::unique_ptr<FWDLIB::FwdEegSphereModel> eeg_model;         /**< EEG sphere model definition. */
       std::unique_ptr<FWDLIB::FwdBemModel>       bem_model;         /**< BEM model definition. */
@@ -368,10 +368,10 @@ public:
       int               fixed_noise;        /**< Were fixed noise values used rather than a noise-covariance matrix read from a file. */
       std::unique_ptr<MNELIB::MNECovMatrix>      noise_orig;         /**< Noise covariance matrix (original, currently unused). */
       std::unique_ptr<MNELIB::MNECovMatrix>      noise;              /**< Noise covariance matrix (weighted to take the selection into account). */
-      int               nave;               /**< How many averages does this correspond to?. */
+      int               nave;               /**< How many averages does this correspond to? */
       std::unique_ptr<MNELIB::MNEProjOp>        proj;               /**< The projection operator to use. */
       int               column_norm;        /**< What kind of column normalization to apply to the forward solution. */
-      int               fit_mag_dipoles;    /**< Fit magnetic dipoles?. */
+      int               fit_mag_dipoles;    /**< Fit magnetic dipoles? */
       FitDipUserRec     *user;              /**< Non-owning pointer to dipole fit workspace (set during fit_one). */
 };
 

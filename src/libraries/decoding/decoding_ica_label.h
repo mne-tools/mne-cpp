@@ -26,8 +26,8 @@
  * spectral heuristic estimating the fraction of power above 30 Hz is
  * additionally used to flag muscle components, which dominate the
  * high-frequency end of the EEG spectrum. The output is one
- * @ref IcaLabelResult per component carrying the assigned
- * @ref IcaComponentLabel and a confidence score in @f$[0, 1]@f$ that
+ * @ref DECODINGLIB::IcaLabelResult per component carrying the assigned
+ * @ref DECODINGLIB::IcaComponentLabel "IcaComponentLabel" and a confidence score in @f$[0, 1]@f$ that
  * the higher-level workflow can threshold or visualise. The class is
  * a static-only utility — there is no fitted state and no learned
  * model file — which makes the labelling fully reproducible.

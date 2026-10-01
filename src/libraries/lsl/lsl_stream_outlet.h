@@ -10,10 +10,10 @@
  * @brief    Declares stream_outlet, the server side of an LSL stream that publishes samples over TCP and advertises itself via UDP multicast.
  *
  * A @ref LSLLIB::stream_outlet is the producer counterpart of
- * @ref LSLLIB::stream_inlet: instantiating it immediately binds a
+ * @ref LSLLIB::stream_inlet "stream_inlet": instantiating it immediately binds a
  * @c QTcpServer on an OS-assigned port (which is written back into
  * the contained @ref LSLLIB::stream_info so callers can read it via
- * @ref info), starts a background worker that periodically multicasts
+ * @ref LSLLIB::stream_outlet::info "info"), starts a background worker that periodically multicasts
  * the stream's serialised metadata on the LSL discovery channel, and
  * accepts incoming inlet connections so they can be fed from the
  * outlet's internal sample queue.

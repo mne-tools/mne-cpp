@@ -272,6 +272,7 @@ public:
      * @param[in] el         Electrode positions.
      * @param[in] neeg       Number of electrodes.
      * @param[in] Vval_vec   The potential values Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k; Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k; Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k.
+     * @param[in, out] client The FwdEegSphereModel to evaluate (passed as client data).
      *
      * @return true when successful.
      */
@@ -291,7 +292,7 @@ public:
      * @param[in] rd         Dipole position.
      * @param[in] els        Electrode positions.
      * @param[in] Vval_vec   The potential values; Vval_vec[0][k] potentials given by Q = (1.0,0.0,0.0) at electrode k; Vval_vec[1][k] potentials given by Q = (0.0,1.0,0.0) at electrode k; Vval_vec[2][k] potentials given by Q = (0.0,0.0,1.0) at electrode k.
-     * @param[in] client.
+     * @param[in] client The FwdEegSphereModel to evaluate (passed as client data).
      *
      * @return true when successful.
      */
@@ -336,7 +337,7 @@ public:
      * @param[in] el         Electrode positions.
      * @param[in] neeg       Number of electrodes.
      * @param[in] Vval       The potential values.
-     * @param[in] client.
+     * @param[in] client The FwdEegSphereModel to evaluate (passed as client data).
      *
      * @return true when successful.
      */
@@ -353,7 +354,7 @@ public:
      * @param[in] Q          Dipole moment.
      * @param[in] els        Electrode positions.
      * @param[in] Vval       The potential values.
-     * @param[in] client.
+     * @param[in] client The FwdEegSphereModel to evaluate (passed as client data).
      *
      * @return true when successful.
      */
@@ -365,9 +366,9 @@ public:
      *
      * Setup the EEG sphere model calculations
      *
-     * @param[in] rad.
+     * @param[in] rad Scalp radius in meters.
      * @param[in] fit_berg_scherg    If Fit Berg Scherg should be performed.
-     * @param[in] nfit.
+     * @param[in] nFit Number of Berg-Scherg equivalent dipoles to fit.
      *
      * @return True when setup was successful, false otherwise.
      */
@@ -416,8 +417,8 @@ public:
      *
      * On success, updates the internal mu and lambda member vectors.
      *
-     * @param[in]  nterms     Number of terms in the series expansion.
-     * @param[in]  nfit       Number of equivalent dipoles to fit (must be >= 2).
+     * @param[in]  nTerms     Number of terms in the series expansion.
+     * @param[in]  nFit       Number of equivalent dipoles to fit (must be >= 2).
      * @param[out] rv         Relative variance of the final fit.
      *
      * @return true if fitting succeeded, false otherwise.
@@ -438,12 +439,12 @@ public:
     Eigen::Vector3f             r0;     /**< The origin. */
 
     Eigen::VectorXd fn;                 /**< Coefficients saved to speed up the computations. */
-    int             nterms;             /**< How many?. */
+    int             nterms;             /**< How many? */
 
     Eigen::VectorXf mu;             /**< The Berg-Scherg equivalence parameters. */
     Eigen::VectorXf lambda;
-    int             nfit;           /**< How many?. */
-    int             scale_pos;      /**< Scale the positions to the surface of the sphere?. */
+    int             nfit;           /**< How many? */
+    int             scale_pos;      /**< Scale the positions to the surface of the sphere? */
 };
 
 //=============================================================================================================

@@ -35,6 +35,14 @@ classDiagram
 
 Constructs a [`AverageScene`](/docs/api/disp/average-scene).
 
+**Parameters:**
+
+- **view** : *QGraphicsView **
+  Graphics view that displays this scene.
+
+- **parent** : *QObject **
+  Parent QObject (default 0).
+
 ---
 
 ### setScaleMap(scaleMap)
@@ -114,7 +122,8 @@ Sets the signal color for the items the scene holds.
 
 **Parameters:**
 
-- **signalColor.**
+- **signalColor** : *const QColor &*
+  New signal color.
 
 ---
 

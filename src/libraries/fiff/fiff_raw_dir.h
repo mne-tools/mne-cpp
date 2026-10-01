@@ -14,7 +14,7 @@
  * @brief    One entry of the per-buffer raw-data directory: kind, first sample, number of samples and on-disk position.
  *
  * For every @c FIFF_DATA_BUFFER tag in a continuous recording
- * @ref FiffStream builds one @ref FiffRawDir entry: the kind of buffer
+ * @ref FIFFLIB::FiffStream builds one @ref FIFFLIB::FiffRawDir entry: the kind of buffer
  * (int16 packed, float32, ...), the first sample index of the buffer in
  * the recording's sample timeline, the number of samples it contains, and
  * the on-disk byte position of the underlying tag header. Together those

@@ -10,13 +10,13 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    MATLAB-style line plot for an Eigen vector, built on @ref Graph.
+ * @brief    MATLAB-style line plot for an Eigen vector, built on @ref DISPLIB::Graph.
  *
  * Plot turns an @c Eigen::VectorXd into an axis-labelled 2-D line
  * drawing inside a @c QWidget, mirroring the basic behaviour of
  * MATLAB's @c plot(y) command. It is mainly used by demo applications
  * and quick-look windows where a single-trace preview is sufficient;
- * richer plots that need a real coordinate transform use @ref LinePlot
+ * richer plots that need a real coordinate transform use @ref DISPLIB::LinePlot
  * or the application-side Qt Charts backends instead.
  */
 

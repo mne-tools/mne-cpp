@@ -9,20 +9,20 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     March 2017
- * @brief    Front-end dispatcher that runs the requested connectivity metrics over a @ref ConnectivitySettings batch.
+ * @brief    Front-end dispatcher that runs the requested connectivity metrics over a @ref CONNECTIVITYLIB::ConnectivitySettings batch.
  *
- * @ref Connectivity is the single entry point used by GUI plugins (rtfwd,
+ * @ref CONNECTIVITYLIB::Connectivity is the single entry point used by GUI plugins (rtfwd,
  * connectivity-estimator) and the @c mne_dipole_fit / batch tools to compute
  * one or more functional-connectivity estimates from the same set of trials.
- * The caller fills a @ref ConnectivitySettings object with the trial data,
+ * The caller fills a @ref CONNECTIVITYLIB::ConnectivitySettings object with the trial data,
  * sampling frequency, FFT length, taper window, source/sensor node
  * positions, and the list of method names ("COH", "IMAGCOH", "PLI",
  * "WPLI", "DSWPLI", "USPLI", "PLV", "COR", "XCOR", "GC", "DTF",
- * "PDC"), and @ref Connectivity::calculate dispatches to the corresponding
- * metric implementations and returns one @ref Network per method.
+ * "PDC"), and @ref CONNECTIVITYLIB::Connectivity::calculate "Connectivity::calculate" dispatches to the corresponding
+ * metric implementations and returns one @ref CONNECTIVITYLIB::Network per method.
  *
  * Trial preprocessing (DPSS tapering, FFT, cross- and auto-spectral sums) is
- * cached in the shared @ref ConnectivitySettings::IntermediateSumData so
+ * cached in the shared @ref CONNECTIVITYLIB::ConnectivitySettings::IntermediateSumData so
  * that running several metrics over the same data set does not recompute
  * the FFTs - the dispatcher therefore amortises the spectral cost across
  * all selected estimators in a single pass.
@@ -71,7 +71,7 @@ class Network;
  * Dispatcher that runs one or more functional-connectivity estimators over a
  * batch of pre-processed trials and returns one @ref Network per estimator.
  *
- * The selected methods are read from @ref ConnectivitySettings::getConnectivityMethods
+ * The selected methods are read from @c CONNECTIVITYLIB::ConnectivitySettings::getConnectivityMethods "ConnectivitySettings::getConnectivityMethods"
  * and matched by string against the supported metric set
  * ("COR", "XCOR", "COH", "IMAGCOH", "PLI", "USPLI", "WPLI", "DSWPLI",
  * "PLV", "GC", "DTF", "PDC"). All spectral metrics share the same DPSS
@@ -96,6 +96,8 @@ public:
     //=========================================================================================================
     /**
      * Computes the network based on the current settings.
+     *
+     * @param[in, out] connectivitySettings  Input trials and requested methods; per-trial spectral caches are filled in during computation.
      *
      * @return Returns the list with calculated networks for each provided method.
      */

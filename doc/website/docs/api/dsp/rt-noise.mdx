@@ -69,6 +69,10 @@ Submit incoming data for noise estimation.
 
 Returns whether the worker thread is running.
 
+**Returns:**
+
+- *bool* — True between `start()` and `stop()`, false otherwise.
+
 ---
 
 ### start()
@@ -94,6 +98,15 @@ Stops the worker thread.
 ### wait(time)
 
 Blocks until the worker thread has finished, or until the timeout (ms) expires.
+
+**Parameters:**
+
+- **time** : *unsigned long*
+  Timeout in ms; ULONG_MAX waits indefinitely.
+
+**Returns:**
+
+- *bool* — True if the thread finished, false if the timeout expired.
 
 ---
 

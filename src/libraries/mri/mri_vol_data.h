@@ -11,14 +11,14 @@
  *
  * Two cooperating types live in this header:
  *
- * - @ref MriSlice --- a single 2D slice with its own pixel buffer
+ * - @ref MRILIB::MriSlice --- a single 2D slice with its own pixel buffer
  * (byte / word / float, picked at load time to mirror the
  * on-disk @c FIFFV_MRI_PIXEL_* encoding) and an explicit
  * slice-to-MRI (surface RAS) @ref FIFFLIB::FiffCoordTrans.
  * This is the unit the rendering pipeline and the COR.fif
  * writer consume, so every loader (MGH, NIfTI, raw COR)
  * ultimately decomposes its 3D buffer into a vector of these.
- * - @ref MriVolData --- the full volume bundle: header geometry
+ * - @ref MRILIB::MriVolData --- the full volume bundle: header geometry
  * (width/height/depth, voxel spacing, direction cosines,
  * RAS centre), optional scan parameters (TR / TE / flip-angle
  * / FoV), and the slice vector above. It owns the
@@ -28,7 +28,7 @@
  * source-file reader (e.g. talairach.xfm).
  *
  * The @c read() convenience method dispatches by file suffix to
- * the matching loader (@ref MriMghIO, @ref MriNiftiIO, COR
+ * the matching loader (@ref MRILIB::MriMghIO, @ref MRILIB::MriNiftiIO, COR
  * directory) so application code can stay one-liner clean
  * irrespective of the on-disk format --- the equivalent of
  * @c nibabel.load() on the Python side.

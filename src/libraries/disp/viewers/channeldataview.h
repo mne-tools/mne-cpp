@@ -11,9 +11,9 @@
  * @brief    Composite real-time multi-channel time-series scroller (label panel, table view, time ruler, scrollbars).
  *
  * ChannelDataView assembles the four widgets that make up the rolling
- * raw-data browser: a @ref ChannelLabelPanel column on the left, a
- * central @c QTableView driven by @ref ChannelDataModel and
- * @ref RtFiffRawViewDelegate, a @ref TimeRulerWidget at the bottom
+ * raw-data browser: a @ref DISPLIB::ChannelLabelPanel column on the left, a
+ * central @c QTableView driven by @ref DISPLIB::ChannelDataModel and
+ * @ref DISPLIB::RtFiffRawViewDelegate, a @ref DISPLIB::TimeRulerWidget at the bottom
  * and synchronised vertical / horizontal @c QScrollBars. It exposes
  * playback controls, zoom and channel-selection signals that the
  * hosting Quick-Control panels feed into.
@@ -123,7 +123,7 @@ public:
     /**
      * Replace all buffered data.
      *
-     * @param[in] data         Channels × samples matrix.
+     * @param[in] matData         Channels × samples matrix.
      * @param[in] firstSample  Absolute sample index of column 0.
      */
     void setData(const Eigen::MatrixXd &matData, int firstSample = 0);
@@ -132,7 +132,7 @@ public:
     /**
      * Append new samples (real-time streaming use-case).
      *
-     * @param[in] data  Channels × new-samples matrix.
+     * @param[in] matData  Channels × new-samples matrix.
      */
     void addData(const Eigen::MatrixXd &matData);
 
@@ -159,6 +159,8 @@ public:
     //=========================================================================================================
     /**
      * Get the current visible time window in seconds.
+     *
+     * @return Visible window duration in seconds.
      */
     float windowSize() const;
 
@@ -173,6 +175,8 @@ public:
     //=========================================================================================================
     /**
      * Return the current zoom factor.
+     *
+     * @return Zoom multiplier relative to the default samples-per-pixel (at least 0.001).
      */
     double zoom() const;
 
@@ -293,6 +297,8 @@ public:
     //=========================================================================================================
     /**
      * Enable or disable annotation span selection in the raw browser.
+     *
+     * @param[in] enabled  True to allow selecting annotation spans with the mouse.
      */
     void setAnnotationSelectionEnabled(bool enabled);
 
@@ -316,6 +322,8 @@ public:
     //=========================================================================================================
     /**
      * Enable or disable the crosshair cursor with coordinate readout.
+     *
+     * @param[in] enabled  True to show the crosshair and its time/amplitude readout.
      */
     void setCrosshairEnabled(bool enabled);
     bool crosshairEnabled() const;
@@ -323,6 +331,8 @@ public:
     //=========================================================================================================
     /**
      * Show or hide per-channel-type amplitude scalebars.
+     *
+     * @param[in] visible  True to draw the scalebars.
      */
     void setScalebarsVisible(bool visible);
     bool scalebarsVisible() const;
@@ -330,6 +340,8 @@ public:
     //=========================================================================================================
     /**
      * Toggle butterfly mode (overlay all same-type channels).
+     *
+     * @param[in] enabled  True to overlay channels of the same type in one lane.
      */
     void setButterflyMode(bool enabled);
     bool butterflyMode() const;
@@ -343,6 +355,8 @@ public:
     //=========================================================================================================
     /**
      * Set clock time format on the ruler.
+     *
+     * @param[in] useClock  True for HH:MM:SS clock time, false for float seconds.
      */
     void setClockTimeFormat(bool useClock);
     bool clockTimeFormat() const;
@@ -355,6 +369,8 @@ public:
     //=========================================================================================================
     /**
      * Returns the first currently visible sample.
+     *
+     * @return Absolute index of the first visible sample, or 0 if no render view exists.
      */
     int firstVisibleSample() const;
     int visibleSampleCount() const;
@@ -362,6 +378,8 @@ public:
     //=========================================================================================================
     /**
      * Returns the geometry of the actual QRHI signal viewport in ChannelDataView-local coordinates.
+     *
+     * @return Viewport rectangle, or a null QRect if no render view exists.
      */
     QRect signalViewportRect() const;
 
@@ -387,6 +405,8 @@ public:
     /**
      * Returns the underlying data model (non-owning pointer).
      * Use for advanced configuration such as setMaxStoredSamples().
+     *
+     * @return Non-owning pointer to the ChannelDataModel.
      */
     ChannelDataModel* model() const { return m_pModel.data(); }
 

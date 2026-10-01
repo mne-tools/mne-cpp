@@ -37,8 +37,14 @@ Constructs a [`FilterDesignView`](/docs/api/disp/filter-design-view) dialog whic
 
 **Parameters:**
 
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
 - **parent** : *QWidget **
   pointer to parent widget; If parent is 0, the new [`FilterDesignView`](/docs/api/disp/filter-design-view) becomes a window. If parent is another widget, [`FilterDesignView`](/docs/api/disp/filter-design-view) becomes a child window inside parent. [`FilterDesignView`](/docs/api/disp/filter-design-view) is deleted when its parent is deleted.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
 
 ---
 
@@ -182,6 +188,11 @@ updates the filter plot scene with the newly generated filter
 ### guiStyleChanged(style)
 
 Process the event of style mode change in an upper class.
+
+**Parameters:**
+
+- **style** : *[DISPLIB::AbstractView](/docs/api/disp/abstract-view)::StyleMode*
+  New style mode (unused; the filter plot is simply redrawn).
 
 ---
 

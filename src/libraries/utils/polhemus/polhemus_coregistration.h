@@ -120,6 +120,9 @@ public:
      * is oriented such that its axes are mirrored relative to the
      * expected neuroscience convention, enable the corresponding mirror
      * flags here.
+     *
+     * @param[in] mirrorX True to negate the X coordinate of incoming positions.
+     * @param[in] mirrorY True to negate the Y coordinate of incoming positions.
      */
     void setAxisMirror(bool mirrorX, bool mirrorY) { m_mirrorX = mirrorX; m_mirrorY = mirrorY; }
     bool mirrorX() const { return m_mirrorX; }
@@ -203,7 +206,11 @@ public:
     /** Clear the captured objective center. */
     void clearObjectiveCenter();
 
-    /** Captured objective center in tracker body frame (metres). */
+    /**
+     * Captured objective center in tracker body frame (metres).
+     *
+     * @return Objective center in the tracker body frame in metres; only meaningful if hasObjectiveCenter() is true.
+     */
     QVector3D objectiveCenterLocal() const { return m_objectiveCenterLocal; }
 
     /**
@@ -223,6 +230,8 @@ public:
      * When nonzero, the solver constrains the optical center to lie at this
      * distance from the tracker origin, vastly improving accuracy.
      * Default: 0.200 m (~200 mm for ZEISS Kinevo).  Set to 0 to disable.
+     *
+     * @param[in] metres Tracker-to-objective distance in metres; 0 disables the constraint.
      */
     void setKnownTrackerToObjectiveDistance(float metres) { m_knownTrackerToObjectiveDist = metres; }
     float knownTrackerToObjectiveDistance() const { return m_knownTrackerToObjectiveDist; }
@@ -230,16 +239,32 @@ public:
     /** @return Whether a valid optical calibration has been computed. */
     bool opticalCalibrationValid() const { return m_opticalCalibValid; }
 
-    /** Direction of the optical axis in the tracker body frame (unit vector). */
+    /**
+     * Direction of the optical axis in the tracker body frame (unit vector).
+     *
+     * @return Unit optical-axis direction in the tracker body frame; only meaningful if opticalCalibrationValid() is true.
+     */
     QVector3D opticalAxisLocal() const { return m_opticalAxisLocal; }
 
-    /** Position of the optical center in the tracker body frame (metres). */
+    /**
+     * Position of the optical center in the tracker body frame (metres).
+     *
+     * @return Optical center in the tracker body frame in metres.
+     */
     QVector3D opticalCenterLocal() const { return m_opticalCenterLocal; }
 
-    /** RMS residual of the last optical calibration (mm). */
+    /**
+     * RMS residual of the last optical calibration (mm).
+     *
+     * @return RMS distance of the focus points from the fitted optical axis in millimetres.
+     */
     float opticalCalibResidualMm() const { return m_opticalCalibResidualMm; }
 
-    /** Depth spread of calibration samples along the optical axis (mm). */
+    /**
+     * Depth spread of calibration samples along the optical axis (mm).
+     *
+     * @return Extent of the calibration focus points along the optical axis in millimetres.
+     */
     float opticalCalibDepthSpreadMm() const { return m_opticalCalibDepthSpreadMm; }
 
     /**

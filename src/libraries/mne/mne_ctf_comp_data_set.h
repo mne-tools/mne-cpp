@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Set of CTF compensation matrices plus the currently active grade.
  *
- * @ref MNELIB::MNECTFCompDataSet aggregates the @ref MNECTFCompData
+ * @ref MNELIB::MNECTFCompDataSet aggregates the @ref MNELIB::MNECTFCompData
  * entries shipped with a CTF dataset and produces, given a target
  * compensation grade, the channel-aligned compensator that must be
  * applied to raw or forward data. Mirrors @c make_compensator in the
@@ -113,10 +113,10 @@ public:
      * by locating the matching compensation matrix and constructing
      * pre/post-selection sparse matrices.
      *
-     * @param[in] chs        Channels to compensate (may include non-MEG channels).
-     * @param[in] nch        Number of channels.
+     * @param[in] chList        Channels to compensate (may include non-MEG channels).
+     * @param[in] nChan        Number of channels.
      * @param[in] compchs    Compensation input channels (may include non-reference channels).
-     * @param[in] ncomp      Number of compensation input channels.
+     * @param[in] nCompChan      Number of compensation input channels.
      *
      * @return OK on success, FAIL on error.
      */
@@ -219,7 +219,7 @@ public:
      * build undo and target operators, and update channel coil types accordingly.
      *
      * @param[in]      compensate_to  Desired compensation grade.
-     * @param[in, out] chs            Channels to compensate (coil_type is updated).
+     * @param[in, out] chList            Channels to compensate (coil_type is updated).
      * @param[in]      nchan          Number of channels.
      * @param[in]      comp_chs       Compensation input channels.
      * @param[in]      ncomp_chan     Number of compensation input channels.

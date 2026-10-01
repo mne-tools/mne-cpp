@@ -96,6 +96,8 @@ public:
 
     /**
      * @brief Returns the number of tags in the group.
+     *
+     * @return Number of owned tag entries.
      */
     int ntags() const { return static_cast<int>(tags.size()); }
 };

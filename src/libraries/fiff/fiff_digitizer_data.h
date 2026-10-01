@@ -9,9 +9,9 @@
  * @date     February 2026
  * @brief    High-level digitization data: dig points plus the device→head transform and fitting metadata that together define a coregistration source.
  *
- * Where @ref FiffDigPointSet is a flat point list, @ref FiffDigitizerData
+ * Where @ref FIFFLIB::FiffDigPointSet is a flat point list, @ref FIFFLIB::FiffDigitizerData
  * is the registration-ready view: the dig points themselves, the
- * device→head @ref FiffCoordTrans recovered from HPI fits, the per-coil
+ * device→head @ref FIFFLIB::FiffCoordTrans recovered from HPI fits, the per-coil
  * goodness of fit, and any comments that travelled with the block. It is
  * the structure the coregistration tooling persists into
  * ``-dig.fif`` / ``-fiducials.fif`` files and the structure that the

@@ -21,8 +21,8 @@
  * to their source recording. All four are physically the same record:
  * the legacy @c fiffIdRec.
  *
- * @ref FiffId is the C++ wrapper for that record. It exposes the version
- * word, the 2x32-bit @c machid hardware identifier and a @ref FiffTime
+ * @ref FIFFLIB::FiffId is the C++ wrapper for that record. It exposes the version
+ * word, the 2x32-bit @c machid hardware identifier and a @ref FIFFLIB::FiffTime
  * creation time, plus convenience constructors that synthesize a fresh
  * ID for a newly written file (mirroring @c mne.io.write.write_id in
  * MNE-Python).
@@ -179,12 +179,12 @@ public:
     /**
      * Compares two FiffId instances for equality.
      *
-     * @param[in] f1   First FiffId.
-     * @param[in] f2   Second FiffId.
+     * @param[in] a   First FiffId.
+     * @param[in] b   Second FiffId.
      *
      * @return true if both IDs are equal, false otherwise.
      */
-    friend bool operator== (const FiffId &f1, const FiffId &f2);
+    friend bool operator== (const FiffId &a, const FiffId &b);
 
 public:
     fiff_int_t version;     /**< File version. */

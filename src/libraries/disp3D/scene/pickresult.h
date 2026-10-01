@@ -12,7 +12,7 @@
  * Every renderable that supports picking (BrainSurface triangles,
  * DipoleObject arrow instances, ElectrodeObject contacts,
  * SliceObject voxels) returns a @ref PickResult so the host GUI can
- * react with a single switch on @ref PickResult::kind regardless of
+ * react with a single switch on @ref DISP3DLIB::PickResult::kind "PickResult::kind" regardless of
  * which primitive was hit.
  */
 
@@ -119,6 +119,7 @@ struct DISP3DSHARED_EXPORT PickResult
 
 //=============================================================================================================
 /**
+ * @param[in] r   Pick result to test.
  * @return True iff the pick reports a hit (`kind != None`).
  */
 inline bool isHit(const PickResult& r) noexcept

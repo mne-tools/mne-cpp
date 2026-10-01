@@ -18,7 +18,7 @@
  * the destination file for the resulting forward solution. Centralising
  * these fields keeps ComputeFwd's constructor signature short and lets
  * GUI front-ends (@c mne_forward_gui) and batch scripts share the same
- * validation logic via @ref checkIntegrity.
+ * validation logic via @ref FWDLIB::ComputeFwdSettings::checkIntegrity "checkIntegrity".
  */
 
 #ifndef COMPUTE_FWD_SETTINGS_H
@@ -91,14 +91,14 @@ public:
     QString measname;           /**< Measurement file. */
     QString mriname;            /**< MRI file for head <-> MRI transformation. */
     QString transname;          /**< head2mri transformation file. */
-    bool mri_head_ident;        /**< Are the head and MRI coordinates the same?. */
+    bool mri_head_ident;        /**< Are the head and MRI coordinates the same? */
     QString bemname;            /**< BEM model file. */
     QString solname;            /**< Solution file. */
     QString mindistoutname;     /**< Output file for omitted source space points. */
     bool filter_spaces;         /**< Filter the source space points. */
     Eigen::Vector3f r0;         /**< Sphere model origin . */
     bool accurate;              /**< Use accurate calculations. */
-    bool fixed_ori;             /**< Fixed-orientation dipoles?. */
+    bool fixed_ori;             /**< Fixed-orientation dipoles? */
     bool include_meg;
     bool include_eeg;
     bool compute_grad;
@@ -115,7 +115,7 @@ public:
     float eeg_sphere_rad;   	/**< Scalp radius to use in EEG sphere model. */
     bool scale_eeg_pos;     	/**< Scale the electrode locations to scalp in the sphere model. */
     bool use_equiv_eeg;      	/**< Use the equivalent source approach for the EEG sphere model. */
-    bool use_threads;        	/**< Parallelize?. */
+    bool use_threads;        	/**< Parallelize? */
 
     QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo;    /**< The FiffInfo file from the measurement.*/
     FIFFLIB::FiffCoordTrans meg_head_t;         /**< The meg <-> head transformation.*/

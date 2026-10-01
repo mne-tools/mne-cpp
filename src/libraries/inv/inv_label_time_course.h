@@ -11,7 +11,7 @@
  *
  * @ref INVLIB::InvLabelTimeCourse provides the five standard aggregation
  * modes used by mne-python — @c mean, @c mean_flip, @c pca_flip, @c max
- * and @c auto — to collapse a per-vertex @ref InvSourceEstimate into one
+ * and @c auto — to collapse a per-vertex @ref INVLIB::InvSourceEstimate into one
  * time-course per FreeSurfer label. Sign-flip vectors are derived from
  * the dominant orientation of the vertices in the label so that
  * phase-locked averaging works on signed surface data without

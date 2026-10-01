@@ -14,8 +14,8 @@
  *
  * LayoutScene installs gesture recognisers on the active view and
  * translates pan / pinch / swipe events into the same view-zoom /
- * view-pan operations regardless of input device. @ref SelectionScene,
- * @ref AverageScene and @ref FilterPlotScene derive from it to
+ * view-pan operations regardless of input device. @ref DISPLIB::SelectionScene,
+ * @ref DISPLIB::AverageScene and @ref DISPLIB::FilterPlotScene derive from it to
  * inherit the gesture-driven navigation behaviour.
  */
 
@@ -74,6 +74,9 @@ public:
     //=========================================================================================================
     /**
      * Constructs a LayoutScene.
+     *
+     * @param[in] view    Graphics view that displays this scene and is zoomed/panned by it.
+     * @param[in] parent  Parent QObject (default 0).
      */
     LayoutScene(QGraphicsView* view,
                 QObject *parent = 0);
@@ -82,54 +85,76 @@ protected:
     //=========================================================================================================
     /**
      * Reimplemented wheel event.
+     *
+     * @param[in] event  The wheel event; scales the view by 1.15 per step under the mouse.
      */
     void wheelEvent(QGraphicsSceneWheelEvent* event);
 
     //=========================================================================================================
     /**
      * Reimplemented double mouse press event.
+     *
+     * @param[in] mouseEvent  The mouse event; a left double click fits all items into the view.
      */
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent);
 
     //=========================================================================================================
     /**
      * Reimplemented mouse press event.
+     *
+     * @param[in] mouseEvent  The mouse event; left starts rubber-band selection, right starts panning.
      */
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
     //=========================================================================================================
     /**
      * Reimplemented double mouse move event.
+     *
+     * @param[in] mouseEvent  The mouse event; pans the view while in drag mode.
      */
     void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
     //=========================================================================================================
     /**
      * Reimplemented double mouse release event.
+     *
+     * @param[in] mouseEvent  The mouse event; ends drag mode.
      */
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
     //=========================================================================================================
     /**
      * Reimplemented key press event.
+     *
+     * @param[in] keyEvent  The key event, forwarded to QGraphicsScene.
      */
     void keyPressEvent(QKeyEvent *keyEvent);
 
     //=========================================================================================================
     /**
      * Reimplemented key release event.
+     *
+     * @param[in] keyEvent  The key event, forwarded to QGraphicsScene.
      */
     void keyReleaseEvent(QKeyEvent *keyEvent);
 
     //=========================================================================================================
     /**
      * reimplemented event function - intercepts touch gestures
+     *
+     * @param[in] event  The incoming event.
+     *
+     * @return True if the event was a gesture and was handled, otherwise the QGraphicsScene result.
      */
     bool event(QEvent *event);
 
     //=========================================================================================================
     /**
      * gestureEvent processes gesture events
+     *
+     * @param[in] event  Gesture event whose pan and pinch gestures are dispatched.
+     *
+     * @return Always true.
      */
     bool gestureEvent(QGestureEvent *event);
 
@@ -155,8 +180,10 @@ protected:
     /**
      * Installed event filter.
      *
-     * @param[in] obj the qt object for which the event was intercpeted.
+     * @param[in] object the qt object for which the event was intercpeted.
      * @param[in] event the current event.
+     *
+     * @return True if a gesture event on the view was handled, false otherwise.
      */
     bool eventFilter(QObject *object, QEvent *event);
 

@@ -15,7 +15,7 @@
  * ModalitySelectionView builds one @c QCheckBox per channel-modality
  * present in the active @c FiffInfo and emits a @c modalitiesChanged
  * list whenever the user toggles one. It is consumed primarily by
- * @ref ButterflyView and @ref AverageLayoutView to hide entire
+ * @ref DISPLIB::ButterflyView and @ref DISPLIB::AverageLayoutView to hide entire
  * modalities at once.
  */
 
@@ -78,7 +78,10 @@ public:
     /**
      * Constructs a ModalitySelectionView which is a child of parent.
      *
+     * @param[in] lChannelList Channels whose modalities are offered for selection.
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent        parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     ModalitySelectionView(const QList<FIFFLIB::FiffChInfo> &lChannelList,
                           const QString& sSettingsPath = "",
@@ -151,6 +154,8 @@ protected:
     //=========================================================================================================
     /**
      * Slot called when modality check boxes were changed
+     *
+     * @param[in] state  New check state (unused; all check boxes are re-read).
      */
     void onUpdateModalityCheckbox(Qt::CheckState state);
 

@@ -12,7 +12,7 @@
  * @date     July 2018
  * @brief    QGraphicsScene that draws the magnitude (and optional phase) response of a designed FIR / IIR filter.
  *
- * FilterPlotScene is the canvas used by @ref FilterDesignView to
+ * FilterPlotScene is the canvas used by @ref DISPLIB::FilterDesignView to
  * preview the currently designed filter. It paints axis grids,
  * interpolated magnitude / phase curves and the cut-off frequency
  * markers, and re-renders itself every time the host view edits a
@@ -77,6 +77,7 @@ public:
     /**
      * Constructs a FilterPlotScene dialog which is a child of parent.
      *
+     * @param[in, out] view Graphics view that displays the scene.
      * @param[in] parent pointer to parent widget; If parent is 0, the new FilterPlotScene becomes a window. If parent is another widget, FilterPlotScene becomes a child window inside parent. FilterPlotScene is deleted when its parent is deleted.
      */
     FilterPlotScene(QGraphicsView* view,
@@ -101,8 +102,9 @@ protected:
     /**
      * Draws the diagram to plot the magnitude.
      *
-     * @param[in] holds the current sampling frequency.
-     * @param[in] holds the current name of the filter. Default is an empty QString.
+     * @param[in] samplingFreq Current sampling frequency in Hz.
+     * @param[in] filtername Name of the filter shown in the plot (default: empty).
+     *
      */
     void plotMagnitudeDiagram(int samplingFreq,
                               const QString &filtername = QString());

@@ -13,8 +13,8 @@
  *
  * Every metric in @c CONNECTIVITYLIB (Coherence, Imaginary Coherence, PLI, wPLI,
  * dwPLI, USPLI, PLV, cross-correlation, Granger Causality, DTF, PDC) reads
- * the same global control flags from @ref AbstractMetric so that the
- * dispatcher in @ref Connectivity can decide once - before any FFT runs -
+ * the same global control flags from @ref CONNECTIVITYLIB::AbstractMetric so that the
+ * dispatcher in @ref CONNECTIVITYLIB::Connectivity can decide once - before any FFT runs -
  * whether intermediate per-trial spectra should be cached for reuse
  * (storage mode) and which frequency-bin window the metrics should
  * average over.
@@ -68,10 +68,10 @@ namespace CONNECTIVITYLIB {
  * Static base for every estimator in @c CONNECTIVITYLIB. Holds the two pieces of
  * global state that the dispatcher (@ref Connectivity::calculate) must set
  * before any metric runs:
- *  - @ref m_bStorageModeIsActive enables caching of per-trial tapered
+ *  - @c CONNECTIVITYLIB::AbstractMetric::m_bStorageModeIsActive "m_bStorageModeIsActive" enables caching of per-trial tapered
  *    spectra and CSDs in @ref ConnectivitySettings::IntermediateTrialData,
  *    which lets a second metric reuse the FFT work done by the first.
- *  - @ref m_iNumberBinStart and @ref m_iNumberBinAmount define the
+ *  - @c CONNECTIVITYLIB::AbstractMetric::m_iNumberBinStart "m_iNumberBinStart" and @c CONNECTIVITYLIB::AbstractMetric::m_iNumberBinAmount "m_iNumberBinAmount" define the
  *    frequency-bin window over which each metric averages its spectral
  *    output into the single scalar weight stored on each network edge.
  *

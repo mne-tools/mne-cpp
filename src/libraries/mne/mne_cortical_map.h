@@ -13,7 +13,7 @@
  * FreeSurfer's surface-based morphing: for each target-surface vertex,
  * the small set of source-surface vertices and barycentric coefficients
  * that produce its value. Read from @c .map files and assembled into a
- * sparse linear morph by @ref MNEMorphMap.
+ * sparse linear morph by @ref MNELIB::MNEMorphMap.
  */
 
 #ifndef MNE_CORTICAL_MAP_H

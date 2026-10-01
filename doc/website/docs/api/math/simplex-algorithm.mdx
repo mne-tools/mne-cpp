@@ -72,6 +72,33 @@ Minimization with the simplex algorithm. Modified from Numerical Recipes. Suppor
 
 Overload without report function (no reporting).
 
+**Parameters:**
+
+- **p** : *Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  The initial simplex (npar+1 x npar). On return, row 0 is the best vertex.
+
+- **y** : *Eigen::Matrix&lt; T, Eigen::Dynamic, 1 &gt; &*
+  Function values at the vertices.
+
+- **ftol** : *T*
+  Relative convergence tolerance.
+
+- **stol** : *T*
+  Absolute spatial convergence tolerance (0 to disable).
+
+- **func** : *CostFunc &&*
+  The cost function to be evaluated.
+
+- **max_eval** : *int*
+  Maximum number of function evaluations.
+
+- **neval** : *int &*
+  Number of function evaluations performed.
+
+**Returns:**
+
+- *bool* — True when minimization succeeded, false otherwise.
+
 ---
 
 ## Authors of this file

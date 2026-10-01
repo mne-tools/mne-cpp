@@ -10,7 +10,7 @@
  * @brief    Per-source-space-vertex nearest-cortex-vertex mapping.
  *
  * @ref MNELIB::MNENearest records, for each vertex of an
- * @ref MNESourceSpace, the index of and distance to the closest vertex
+ * @ref MNELIB::MNESourceSpace, the index of and distance to the closest vertex
  * of the full cortical surface. It is the structure stored under
  * @c FIFF_MNE_SOURCE_SPACE_NEAREST / @c _NEAREST_DIST and is used to
  * map decimated source-space values back onto the dense cortex for

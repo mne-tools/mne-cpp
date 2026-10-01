@@ -13,13 +13,13 @@
  * @date     September 2012
  * @brief    FIFF continuous raw recording: FiffInfo plus a directory of FIFF_DATA_BUFFER tags for random-access sample reads.
  *
- * @ref FiffRawData represents a continuous ("raw") Neuromag recording
+ * @ref FIFFLIB::FiffRawData represents a continuous ("raw") Neuromag recording
  * as stored under @c FIFFB_RAW_DATA / @c FIFFB_CONTINUOUS_DATA: a
- * @ref FiffInfo describing the channels and acquisition setup, a list of
- * @ref FiffRawDir entries pointing at each @c FIFF_DATA_BUFFER tag, the
+ * @ref FIFFLIB::FiffInfo describing the channels and acquisition setup, a list of
+ * @ref FIFFLIB::FiffRawDir entries pointing at each @c FIFF_DATA_BUFFER tag, the
  * first and last sample indices, the per-channel calibration vector and a
- * @ref FiffStream handle for on-demand reads. The
- * @ref FiffStream::read_raw_segment family uses that directory to seek
+ * @ref FIFFLIB::FiffStream handle for on-demand reads. The
+ * @c FiffStream::read_raw_segment family uses that directory to seek
  * directly to the buffers that cover a requested sample range, decode
  * them through the channel cals and projectors, and return a contiguous
  * Eigen matrix. Drop-in counterpart of @c mne.io.Raw in MNE-Python.
@@ -163,6 +163,7 @@ public:
      * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional).
      * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional).
      * @param[in] sel        channel selection vector (optional).
+     * @param[in] do_debug Print diagnostic output while reading.
      *
      * @return true if succeeded, false otherwise.
      */
@@ -183,6 +184,7 @@ public:
      * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional).
      * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional).
      * @param[in] sel        channel selection vector (optional).
+     * @param[in] do_debug Print diagnostic output while reading.
      *
      * @return true if succeeded, false otherwise.
      */

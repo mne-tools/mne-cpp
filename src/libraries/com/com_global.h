@@ -83,6 +83,8 @@ namespace COMLIB{
  * Resolved from the @c __DATE__ / @c __TIME__ macros at build time and
  * surfaced through @c utils/buildinfo.h. Used by About dialogs and bug
  * reports to disambiguate identically-versioned builds.
+ *
+ * @return Null-terminated build date/time string with static storage duration.
  */
 COMSHARED_EXPORT const char* buildDateTime();
 
@@ -92,6 +94,8 @@ COMSHARED_EXPORT const char* buildDateTime();
  *
  * Populated by the @c MNE_GIT_HASH_SHORT compile definition set by the
  * top-level CMake project. Returns an empty string for tree-only builds.
+ *
+ * @return Null-terminated abbreviated git hash string with static storage duration.
  */
 COMSHARED_EXPORT const char* buildHash();
 
@@ -101,6 +105,8 @@ COMSHARED_EXPORT const char* buildHash();
  *
  * Populated by the @c MNE_GIT_HASH_LONG compile definition; intended for
  * scripted provenance checks where the abbreviated hash is ambiguous.
+ *
+ * @return Null-terminated full git hash string with static storage duration.
  */
 COMSHARED_EXPORT const char* buildHashLong();
 }

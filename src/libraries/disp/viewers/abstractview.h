@@ -94,6 +94,7 @@ public:
      * Constructs a AbstractView which is a child of parent.
      *
      * @param[in] parent        parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     AbstractView(QWidget *parent = 0,
                  Qt::WindowFlags f = Qt::Widget);

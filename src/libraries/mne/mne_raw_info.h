@@ -10,7 +10,7 @@
  * @brief    Subset of FIFF measurement info needed by the legacy raw-data path.
  *
  * @ref MNELIB::MNERawInfo captures the sampling frequency, channel list,
- * calibration vector and the @ref MNERawBufDef table reconstructed from
+ * calibration vector and the @ref MNELIB::MNERawBufDef table reconstructed from
  * a @c -raw.fif file - effectively the fields that the original MNE C
  * tools stored next to the file handle. Provides quick metadata access
  * without forcing callers to materialise a full @ref FIFFLIB::FiffInfo.
@@ -172,6 +172,18 @@ public:
     /**
      * @overload
      * Overload that does not return the measurement start time.
+     *
+     * @param[in]  stream      Open FIFF stream to read tags from.
+     * @param[in]  node        Starting directory node (typically the raw data node).
+     * @param[out] id          Measurement ID (managed via unique_ptr). Reset if absent.
+     * @param[out] nchan       Number of channels.
+     * @param[out] sfreq       Sampling frequency in Hz.
+     * @param[out] highpass    Highpass filter cutoff frequency in Hz.
+     * @param[out] lowpass     Lowpass filter cutoff frequency in Hz.
+     * @param[out] chp         List of channel information structures, one per channel.
+     * @param[out] trans       Device-to-head coordinate transformation.
+     *
+     * @return 0 on success, -1 on failure.
      */
     static int get_meas_info (FIFFLIB::FiffStream::SPtr& stream,
                               FIFFLIB::FiffDirNode::SPtr& node,

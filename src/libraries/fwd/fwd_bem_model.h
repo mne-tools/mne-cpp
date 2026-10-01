@@ -189,6 +189,12 @@ public:
 
     /**
      * @brief Read an integer tag from a FIFF node.
+     *
+     * @param[in] stream  Open FIFF stream to read from.
+     * @param[in] node    Directory node to search for the tag.
+     * @param[in] what    FIFF tag kind to look up.
+     * @param[out] res    Receives the integer value on success.
+     * @return OK if the tag was found and is of type FIFFT_INT, FAIL otherwise.
      */
     static int get_int( FIFFLIB::FiffStream::SPtr& stream, const FIFFLIB::FiffDirNode::SPtr& node,int what,int *res);
 

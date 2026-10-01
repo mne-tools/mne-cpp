@@ -16,8 +16,8 @@
  * for shader compatibility (model + colour + isSelected), so a
  * single pipeline serves both renderables.
  *
- * @ref setColormap selects the palette (Viridis, Hot, Jet, ...) used
- * to map edge weight to RGBA; @ref setThreshold prunes edges and
+ * @ref NetworkObject::setColormap "setColormap" selects the palette (Viridis, Hot, Jet, ...) used
+ * to map edge weight to RGBA; @ref NetworkObject::setThreshold "setThreshold" prunes edges and
  * nodes below a normalised cut-off and regenerates the instance
  * stream without touching the underlying @ref CONNECTIVITYLIB::Network.
  */

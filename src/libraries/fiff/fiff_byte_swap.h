@@ -10,7 +10,7 @@
  * @brief    Endianness swap helpers for the FIFF binary tag I/O layer (FIFF is always written big-endian on disk).
  *
  * FIFF tags are stored in network (big-endian) byte order on disk while
- * all currently supported host platforms are little-endian. @ref FiffStream
+ * all currently supported host platforms are little-endian. @ref FIFFLIB::FiffStream
  * therefore funnels every scalar / array read or write through one of
  * these tiny inline helpers, which gives both the per-value variants
  * (@c swap_short, @c swap_int, @c swap_long, @c swap_float, @c swap_double)
@@ -42,6 +42,10 @@ namespace FIFFLIB
 //=============================================================================================================
 /**
  * Swap a 16-bit short.
+ *
+ * @param[in] source   Value whose two bytes are to be reversed.
+ *
+ * @return The value with its byte order reversed.
  */
 inline qint16 swap_short(qint16 source)
 {
@@ -56,6 +60,10 @@ inline qint16 swap_short(qint16 source)
 //=============================================================================================================
 /**
  * Swap a 32-bit integer.
+ *
+ * @param[in] source   Value whose four bytes are to be reversed.
+ *
+ * @return The value with its byte order reversed.
  */
 inline qint32 swap_int(qint32 source)
 {
@@ -72,6 +80,8 @@ inline qint32 swap_int(qint32 source)
 //=============================================================================================================
 /**
  * Swap a 32-bit integer in place.
+ *
+ * @param[in, out] source   Pointer to the value whose four bytes are reversed in place.
  */
 inline void swap_intp(qint32 *source)
 {
@@ -84,6 +94,10 @@ inline void swap_intp(qint32 *source)
 //=============================================================================================================
 /**
  * Swap a 64-bit long.
+ *
+ * @param[in] source   Value whose eight bytes are to be reversed.
+ *
+ * @return The value with its byte order reversed.
  */
 inline qint64 swap_long(qint64 source)
 {
@@ -104,6 +118,8 @@ inline qint64 swap_long(qint64 source)
 //=============================================================================================================
 /**
  * Swap a 64-bit long in place.
+ *
+ * @param[in, out] source   Pointer to the value whose eight bytes are reversed in place.
  */
 inline void swap_longp(qint64 *source)
 {
@@ -118,6 +134,10 @@ inline void swap_longp(qint64 *source)
 //=============================================================================================================
 /**
  * Swap a 32-bit float.
+ *
+ * @param[in] source   Value whose four bytes are to be reversed.
+ *
+ * @return The value with its byte order reversed.
  */
 inline float swap_float(float source)
 {
@@ -134,6 +154,8 @@ inline float swap_float(float source)
 //=============================================================================================================
 /**
  * Swap a 32-bit float in place.
+ *
+ * @param[in, out] source   Pointer to the value whose four bytes are reversed in place.
  */
 inline void swap_floatp(float *source)
 {
@@ -146,6 +168,8 @@ inline void swap_floatp(float *source)
 //=============================================================================================================
 /**
  * Swap a 64-bit double in place.
+ *
+ * @param[in, out] source   Pointer to the value whose eight bytes are reversed in place.
  */
 inline void swap_doublep(double *source)
 {

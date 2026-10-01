@@ -139,12 +139,16 @@ public:
     //=========================================================================================================
     /**
      * @brief Return all parsed markers from the .vmrk file.
+     *
+     * @return Markers in file order; empty if no marker file was parsed.
      */
     QVector<BrainVisionMarker> getMarkers() const;
 
     //=========================================================================================================
     /**
      * @brief Return all channel infos.
+     *
+     * @return Channel infos parsed from the .vhdr header, in channel order.
      */
     QVector<BrainVisionChannelInfo> getChannelInfos() const;
 

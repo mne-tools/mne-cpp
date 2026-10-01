@@ -69,12 +69,22 @@ public:
     //=========================================================================================================
     /**
      * Copy Constructs of the MNEMshLight.
+     *
+     * @param[in] p_mneMshLight  Light to copy.
      */
     MNEMshLight(const MNEMshLight &p_mneMshLight);
 
     //=========================================================================================================
     /**
      * Constructs the MNEMshLight.
+     *
+     * @param[in] state  Non-zero to switch the light on.
+     * @param[in] posX   Light position x coordinate.
+     * @param[in] posY   Light position y coordinate.
+     * @param[in] posZ   Light position z coordinate.
+     * @param[in] diffX  Diffuse intensity, red component.
+     * @param[in] diffY  Diffuse intensity, green component.
+     * @param[in] diffZ  Diffuse intensity, blue component.
      */
     MNEMshLight(int state, float posX, float posY,float posZ,float diffX,float diffY,float diffZ);
 

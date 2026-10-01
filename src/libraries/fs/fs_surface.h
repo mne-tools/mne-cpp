@@ -32,7 +32,7 @@
  *
  * The class also accepts the @c subject_id + @c hemi + @c surf shorthand
  * used throughout the MNE-Python and mne-c stack and resolves it against
- * @c $SUBJECTS_DIR/<id>/surf/{lh|rh}.<surf>, so existing analysis scripts
+ * `$SUBJECTS_DIR/<id>/surf/{lh|rh}.<surf>`, so existing analysis scripts
  * port across without path rewrites.
  */
 
@@ -126,8 +126,6 @@ public:
      * @param[in] path               path to surface directory.
      * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
      * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
-     *
-     * @return true if read sucessful, false otherwise.
      */
     explicit FsSurface(const QString &path, qint32 hemi, const QString &surf);
 
@@ -217,6 +215,8 @@ public:
     //=========================================================================================================
     /**
      * reads a binary curvature file into a vector
+     *
+     * @param[in] p_sFileName    Path to the FreeSurfer curvature file (e.g. lh.curv).
      *
      * @return the read curvature.
      */

@@ -20,7 +20,7 @@
  * Because the design is symmetric in frequency, the resulting impulse
  * response is linear-phase (Type I), so any DC group delay can be removed
  * exactly by a forward / time-reverse pass — see
- * @ref FilterKernel::applyFFTFilter and @ref FirFilter::applyZeroPhase.
+ * @c FilterKernel::applyFFTFilter and @ref UTILSLIB::FirFilter::applyZeroPhase "FirFilter::applyZeroPhase".
  * The class produces both the time-domain coefficients (@c m_vecCoeff) and
  * their zero-padded FFT (@c m_vecFftCoeff) ready for overlap-add use.
  */

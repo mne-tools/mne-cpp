@@ -10,7 +10,7 @@
  * @brief    Settings record for the @ref INVLIB::InvCMNE solver (model path, sliding-window length, regularisation, base method).
  *
  * @ref INVLIB::InvCMNESettings collects every knob that
- * @ref InvCMNE::compute and @ref InvCMNE::trainLstm need: the path to
+ * @ref INVLIB::InvCMNE::compute "InvCMNE::compute" and @ref INVLIB::InvCMNE::trainLstm "InvCMNE::trainLstm" need: the path to
  * the trained ONNX LSTM, the look-back window length @c k that defines
  * the temporal context fed into the network, the source-space size
  * (which must match the LSTM's input dimension), the Tikhonov

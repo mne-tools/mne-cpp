@@ -91,6 +91,8 @@ public:
      *
      * @param[in] pArray pointer to an Array which should be apend to the end.
      * @param[in] size number of elements containing the array.
+     *
+     * @return True if all elements were written, false if the buffer is paused or no space freed up within the timeout.
      */
     inline bool push(const T* pArray, unsigned int size);
 
@@ -99,6 +101,8 @@ public:
      * Adds an element at the end of the buffer.
      *
      * @param[in] newElement pointer to an Array which should be apend to the end.
+     *
+     * @return True if the element was written, false if the buffer is paused or no space freed up within the timeout.
      */
     inline bool push(const T& newElement);
 
@@ -106,7 +110,9 @@ public:
     /**
      * Returns the first element (first in first out).
      *
-     * @return the first element.
+     * @param[out] element Receives the first element; left unchanged on failure.
+     *
+     * @return True if an element was popped, false if the buffer is paused or empty within the timeout.
      */
     inline bool pop(T& element);
 
@@ -119,18 +125,24 @@ public:
     //=========================================================================================================
     /**
      * Pauses the buffer. Skpis any incoming matrices and only pops zero matrices.
+     *
+     * @param[in] bPause True to pause the buffer, false to resume it.
      */
     inline void pause(bool);
 
     //=========================================================================================================
     /**
      * Returns the number of free elements for thread safe reading.
+     *
+     * @return Number of elements currently available to pop.
      */
     inline int getFreeElementsRead();
 
     //=========================================================================================================
     /**
      * Returns the number of free elements for thread safe reading.
+     *
+     * @return Number of free slots currently available to push into.
      */
     inline int getFreeElementsWrite();
 

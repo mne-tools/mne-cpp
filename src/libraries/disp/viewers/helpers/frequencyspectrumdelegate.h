@@ -10,13 +10,13 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    QAbstractItemDelegate painting one row of the @ref SpectrumView as a horizontal frequency band.
+ * @brief    QAbstractItemDelegate painting one row of the @ref DISPLIB::SpectrumView as a horizontal frequency band.
  *
  * FrequencySpectrumDelegate reads the per-row FFT amplitudes from
- * @ref FrequencySpectrumModel, maps them through a Hot / Jet colour
+ * @ref DISPLIB::FrequencySpectrumModel, maps them through a Hot / Jet colour
  * table and draws the resulting pixel strip into the row rectangle
  * during @c paint(). It also paints the lower / upper frequency
- * cursors emitted by @ref SpectrumSettingsView.
+ * cursors emitted by @ref DISPLIB::SpectrumSettingsView.
  */
 
 #ifndef FREQUENCYSPECTRUMDELEGATE_H
@@ -75,6 +75,7 @@ public:
     /**
      * Creates a new abstract item delegate with the given parent.
      *
+     * @param[in, out] m_pTableView Table view the delegate paints into.
      * @param[in] parent     Parent of the delegate.
      */
     FrequencySpectrumDelegate(QTableView* m_pTableView,
@@ -84,7 +85,7 @@ public:
     /**
      * Set scale type.
      *
-     * @param[in] ScaleType.
+     * @param[in] ScaleType Frequency axis scale type.
      */
     void setScaleType(qint8 ScaleType);
 
@@ -108,6 +109,8 @@ public:
      *
      * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in] index      Used to locate data in a data model.
+     *
+     * @return 20 pixels wide by the row height for column 0, an invalid QSize otherwise.
      */
     virtual QSize sizeHint(const QStyleOptionViewItem &option,
                            const QModelIndex &index) const;
@@ -133,7 +136,10 @@ private:
      * CapturePoint capture one QPointer .
      *
      * @param[in]       index   QModelIndex for accessing associated data and model object.
+     * @param[in] option Style options of the item being painted.
      * @param[in, out]    path    The QPointerPath to create for the data plot.
+     * @param[in, out] data Spectrum row of the channel.
+     * @param[in, out] painter Painter used to draw the captured point.
      */
     void capturePoint(const QModelIndex &index,
                       const QStyleOptionViewItem &option,
@@ -146,7 +152,9 @@ private:
      * createPlotPath creates the QPointer path for the data plot.
      *
      * @param[in]       index   QModelIndex for accessing associated data and model object.
+     * @param[in] option Style options of the item being painted.
      * @param[in, out]    path    The QPointerPath to create for the data plot.
+     * @param[in, out] data Spectrum row of the channel.
      */
     void createPlotPath(const QModelIndex &index,
                         const QStyleOptionViewItem &option,
@@ -157,6 +165,8 @@ private:
     /**
      * createGridPath Creates the QPointer path for the grid plot.
      *
+     * @param[in] index Model index of the item being painted.
+     * @param[in] option Style options of the item being painted.
      * @param[in, out] path The row vector of the data matrix <1 x nsamples>.
      * @param[in] data The row vector of the data matrix <1 x nsamples>.
      */

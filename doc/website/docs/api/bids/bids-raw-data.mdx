@@ -124,17 +124,38 @@ dataset_description.json
 
 Convenience overload — write with default options.
 
+**Parameters:**
+
+- **bidsPath** : *const [BIDSPath](/docs/api/bids/bids-path) &*
+  Target [`BIDSPath`](/docs/api/bids/bids-path) (root, subject, task, datatype, suffix, extension).
+
+- **sourcePath** : *const QString &*
+  Path to the original raw data file to copy; if empty, it is not copied.
+
+**Returns:**
+
+- *[BIDSPath](/docs/api/bids/bids-path)* — [`BIDSPath`](/docs/api/bids/bids-path) of the written data file, or empty [`BIDSPath`](/docs/api/bids/bids-path) on failure.
+
 ---
 
 ### isValid()
 
 Returns true if the data was loaded successfully.
 
+**Returns:**
+
+- *bool* — True if the data is valid, false otherwise.
+
 ---
 
 ### setValid(bValid)
 
 Marks the data as valid or invalid.
+
+**Parameters:**
+
+- **bValid** : *bool*
+  True to mark the data as valid, false to mark it invalid.
 
 ---
 

@@ -103,6 +103,10 @@ public:
     //=========================================================================================================
     /**
      * Reimplemented virtual functions
+     *
+     * @param[in] parent  Parent index (unused; the model is a flat list).
+     *
+     * @return Number of channels in the attached measurement info.
      */
     virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -117,7 +121,7 @@ public:
     /**
      * Updates the fiff info
      *
-     * @param[in] fiffInfo fiff info variabel.
+     * @param[in] pFiffInfo fiff info variabel.
      */
     void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo);
 

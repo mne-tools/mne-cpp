@@ -37,8 +37,14 @@ Constructs a [`SpectrumView`](/docs/api/disp/spectrum-view) which is a child of 
 
 **Parameters:**
 
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
 - **parent** : *QWidget **
   parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
 
 ---
 
@@ -68,7 +74,7 @@ Adds data to the underlying model.
 
 **Parameters:**
 
-- **data**
+- **matData** : *const Eigen::MatrixXd &*
   The new data.
 
 ---
@@ -93,9 +99,15 @@ The event filter.
 
 **Parameters:**
 
-- **watched.**
+- **watched** : *QObject **
+  Object the event was sent to.
 
-- **event.**
+- **event** : *QEvent **
+  The intercepted event.
+
+**Returns:**
+
+- *bool* — True if a mouse-move event was consumed, otherwise the QWidget result.
 
 ---
 

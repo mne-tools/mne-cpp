@@ -12,9 +12,9 @@
  * @date     July 2018
  * @brief    Floating frameless container hosting the modular Quick-Control settings tabs.
  *
- * QuickControlView is a @ref DraggableFramelessWidget that owns a
+ * QuickControlView is a @ref DISPLIB::DraggableFramelessWidget that owns a
  * @c QTabWidget into which application code can drop arbitrary
- * @ref AbstractView panels grouped by name. It is the floating
+ * @ref DISPLIB::AbstractView panels grouped by name. It is the floating
  * settings sidebar shown next to MNE-Scan plugin widgets, supports
  * opacity, transparency and "pinned" behaviour, and persists the
  * current tab through @c QSettings.
@@ -82,6 +82,7 @@ public:
     /**
      * Constructs a QuickControlView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] name          The name to be displayed on the minimize button.
      * @param[in] flags         The window flags.
      * @param[in] parent        The parent of widget.

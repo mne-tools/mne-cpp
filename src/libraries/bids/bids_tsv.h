@@ -13,11 +13,11 @@
  * mandatory header row defines the column names, values are separated
  * by single literal tabs, missing values are encoded as the three-byte
  * string @c n/a, and the file MUST be UTF-8 encoded with LF (no CR)
- * line terminators. @ref BidsTsv implements that dialect once via
- * @ref BidsTsv::readTsv / @ref BidsTsv::writeTsv so the domain-specific
- * wrappers @ref BidsChannel, @ref BidsElectrode and @ref BidsEvent do
+ * line terminators. @ref BIDSLIB::BidsTsv implements that dialect once via
+ * @ref BIDSLIB::BidsTsv::readTsv "BidsTsv::readTsv" / @ref BIDSLIB::BidsTsv::writeTsv "BidsTsv::writeTsv" so the domain-specific
+ * wrappers @ref BIDSLIB::BidsChannel, @ref BIDSLIB::BidsElectrode and @ref BIDSLIB::BidsEvent do
  * not each re-derive it. Rows are returned as ordered
- * column-name → value maps (@ref BidsTsvRow), preserving the header
+ * column-name → value maps (@ref BIDSLIB::BidsTsvRow "BidsTsvRow"), preserving the header
  * ordering for round-trip-stable writes.
  */
 

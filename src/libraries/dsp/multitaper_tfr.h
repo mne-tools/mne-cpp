@@ -9,11 +9,11 @@
  * @date     April 2026
  * @brief    Sliding-window multitaper time-frequency representation.
  *
- * MultitaperTfr applies the multitaper PSD estimator (@ref MultitaperPsd)
+ * MultitaperTfr applies the multitaper PSD estimator (@ref UTILSLIB::MultitaperPsd)
  * to consecutive overlapping windows of a signal, producing a
  * time-frequency matrix whose columns share the bias–variance properties
  * of Thomson's classical multitaper spectrum. Compared with the
- * complex-Morlet TFR (@ref MorletTfr) the frequency resolution is fixed
+ * complex-Morlet TFR (@ref UTILSLIB::MorletTfr) the frequency resolution is fixed
  * to the time-half-bandwidth product @c NW of the window rather than
  * scaling with frequency, which makes the multitaper TFR the preferred
  * choice when broadband line-noise leakage or non-stationary high-

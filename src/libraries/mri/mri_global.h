@@ -59,18 +59,24 @@ namespace MRILIB {
 //=============================================================================================================
 /**
  * Returns the build date and time.
+ *
+ * @return Static C string with the build timestamp.
  */
 MRISHARED_EXPORT const char* buildDateTime();
 
 //=============================================================================================================
 /**
  * Returns the short git hash.
+ *
+ * @return Static C string with the short git commit hash.
  */
 MRISHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
  * Returns the long git hash.
+ *
+ * @return Static C string with the full git commit hash.
  */
 MRISHARED_EXPORT const char* buildHashLong();
 

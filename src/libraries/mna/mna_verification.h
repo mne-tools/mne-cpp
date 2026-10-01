@@ -7,20 +7,20 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Verification, declarative checks, evaluation results and provenance snapshot attached to every @ref MnaNode for reproducible execution.
+ * @brief    Verification, declarative checks, evaluation results and provenance snapshot attached to every @ref MNALIB::MnaNode for reproducible execution.
  *
  * This header carries the four structs that turn an MNA graph from
- * a black-box runner into a self-auditing pipeline. @ref MnaVerificationCheck
+ * a black-box runner into a self-auditing pipeline. @ref MNALIB::MnaVerificationCheck
  * is a declarative pre- or post-condition (e.g. @c rank(covariance)
- * @c > @c 0) authored alongside the node; @ref MnaVerificationResult
+ * @c > @c 0) authored alongside the node; @ref MNALIB::MnaVerificationResult
  * records each evaluation outcome with the actual value, severity
- * and timestamp; and the parent @ref MnaVerification aggregates an
+ * and timestamp; and the parent @ref MNALIB::MnaVerification aggregates an
  * explanation string, the check list, both result lists and the
- * full @ref MnaProvenance snapshot.
+ * full @ref MNALIB::MnaProvenance snapshot.
  *
- * @ref MnaProvenance captures everything needed to re-run a node
+ * @ref MNALIB::MnaProvenance captures everything needed to re-run a node
  * bit-for-bit later: SHA-256 of every input, the resolved parameter
- * map after @ref MnaParamTree evaluation, MNE-CPP / Qt / compiler /
+ * map after @ref MNALIB::MnaParamTree evaluation, MNE-CPP / Qt / compiler /
  * OS versions, external tool versions for IPC and Script nodes,
  * wall-clock and peak-RSS measurements, and the random seed when
  * stochastic ops are involved. Together these structs are what

@@ -15,7 +15,7 @@
  * @c QDoubleSpinBox so the user can either drag for coarse control
  * or type for precise control. It supports linear and log10 mapping,
  * configurable min / max and the option to invert direction, and is
- * the building block of @ref ScalingView and several settings
+ * the building block of @ref DISPLIB::ScalingView and several settings
  * panels.
  */
 #ifndef SCALECONTROL_H
@@ -183,7 +183,7 @@ private:
     /**
      * Set the text label of the Control.
      *
-     * @param[in] label New label text.
+     * @param[in] charTextLabel New label text.
      */
     void initLabel(const char* charTextLabel);
 
@@ -228,8 +228,8 @@ private:
      * adapting the actual value of the control (the spinbox) with the values of the slider. Not even if there is
      * a need to invert the behavior of the slider since the invertSlider should take care of that.
      *
-     *@param[in] iMin Minimum value for the slider.
-     *@param[in] iMax Maximum value for the slider.
+     * @param[in] min Minimum value for the slider.
+     * @param[in] max Maximum value for the slider.
      */
     void setSliderRange(int min,
                         int max);
@@ -280,7 +280,7 @@ private:
 
     //=========================================================================================================
     /**
-     * @Prompts user to set maximum value
+     * Prompts the user to set the maximum value
      */
     void promptMaxValueChange();
 

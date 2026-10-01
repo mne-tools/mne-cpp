@@ -9,7 +9,7 @@
  * @date     April 2026
  * @brief    Grouping of every file that belongs to one continuous measurement run inside an MNA project.
  *
- * An @ref MnaRecording is the second tier of the
+ * An @ref MNALIB::MnaRecording is the second tier of the
  * subject → session → recording → file hierarchy used by MNA, and
  * corresponds to a single "press record / stop record" interval in
  * the acquisition software: one FIFF raw file plus its derived
@@ -20,7 +20,7 @@
  * The @c id field is opaque to MNALIB but is conventionally the
  * recording's base name (e.g. @c run-01_meg) so the user-facing
  * GUI can render meaningful tree labels. @c files is an ordered
- * @ref MnaFileRef list whose first @c MnaFileRole::Raw entry is
+ * @ref MNALIB::MnaFileRef list whose first @c MnaFileRole::Raw entry is
  * treated as the canonical recording; everything else is derived
  * data. @c extras keeps tool-specific metadata (acquisition notes,
  * BIDS sidecars) attached without forcing schema changes.
@@ -65,24 +65,36 @@ struct MNASHARED_EXPORT MnaRecording
     //=========================================================================================================
     /**
      * Serialize to QJsonObject.
+     *
+     * @return JSON object with the recording id, its file references and preserved extras.
      */
     QJsonObject toJson() const;
 
     //=========================================================================================================
     /**
      * Deserialize from QJsonObject.
+     *
+     * @param[in] json   JSON object as produced by toJson().
+     *
+     * @return The recording; missing keys take default values and unknown keys go to extras.
      */
     static MnaRecording fromJson(const QJsonObject& json);
 
     //=========================================================================================================
     /**
      * Serialize to QCborMap.
+     *
+     * @return CBOR map with the recording id, its file references and preserved extras.
      */
     QCborMap toCbor() const;
 
     //=========================================================================================================
     /**
      * Deserialize from QCborMap.
+     *
+     * @param[in] cbor   CBOR map as produced by toCbor().
+     *
+     * @return The recording; missing keys take default values and unknown keys go to extras.
      */
     static MnaRecording fromCbor(const QCborMap& cbor);
 };

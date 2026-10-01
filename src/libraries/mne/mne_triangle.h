@@ -10,7 +10,7 @@
  * @brief    Triangle descriptor with cached centroid, area and normal vectors.
  *
  * @ref MNELIB::MNETriangle is the per-face record produced by
- * @ref MNESourceSpace and @ref MNEBemSurface readers so downstream code
+ * @ref MNELIB::MNESourceSpace and @ref MNELIB::MNEBemSurface readers so downstream code
  * (forward solver, projection-to-surface, rendering) does not have to
  * recompute these quantities. Carries the three vertex indices, the
  * centroid, the un-normalised and normalised triangle normals and the

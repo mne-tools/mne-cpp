@@ -24,9 +24,9 @@
  * oscillations to behaviorally relevant parameters*, NeuroImage 86,
  * 2014.
  *
- * @ref DecodingSpoc mirrors @c mne.decoding.SPoC and reuses the same
+ * @ref DECODINGLIB::DecodingSpoc mirrors @c mne.decoding.SPoC and reuses the same
  * @c fit / @c transform / @c fitTransform scikit-learn pattern as
- * @ref DecodingCsp, including the @c AveragePower vs @c CspSpace
+ * @ref DECODINGLIB::DecodingCsp, including the @c AveragePower vs @c CspSpace
  * @c TransformMode switch and the optional log / z-score normalisation
  * of the band-power features. Inputs are expected to be already
  * band-passed (SPoC has no spectral component of its own) and the
@@ -132,6 +132,10 @@ public:
     //=========================================================================================================
     /**
      * Fit and transform in one step.
+     *
+     * @param[in] epochs  Vector of epoch matrices, each (n_channels × n_times).
+     * @param[in] y       Continuous target variable (one value per epoch).
+     * @return Feature matrix: (n_epochs × n_components) band powers, or stacked (n_epochs·n_components × n_times) projections in CspSpace mode.
      */
     Eigen::MatrixXd fitTransform(const std::vector<Eigen::MatrixXd>& epochs,
                                  const Eigen::VectorXd& y);

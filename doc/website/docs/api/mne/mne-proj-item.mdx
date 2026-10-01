@@ -39,6 +39,11 @@ Copy constructor.
 
 Deep-copies the projection vectors (unique_ptr member).
 
+**Parameters:**
+
+- **other** : *const MNEProjItem &*
+  Projection item to copy.
+
 ---
 
 ### operator=(other)
@@ -46,6 +51,15 @@ Deep-copies the projection vectors (unique_ptr member).
 Copy assignment operator.
 
 Deep-copies the projection vectors (unique_ptr member).
+
+**Parameters:**
+
+- **other** : *const [MNEProjItem](/docs/api/mne/mne-proj-item) &*
+  Projection item to copy.
+
+**Returns:**
+
+- *[MNEProjItem](/docs/api/mne/mne-proj-item) &* — Reference to this object.
 
 ---
 
@@ -58,6 +72,10 @@ Move constructor (defaulted).
 ### operator=()
 
 Move assignment operator (defaulted).
+
+**Returns:**
+
+- *[MNEProjItem](/docs/api/mne/mne-proj-item) &* — Reference to this object.
 
 ---
 

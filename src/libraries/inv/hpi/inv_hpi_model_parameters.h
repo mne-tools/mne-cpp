@@ -16,8 +16,8 @@
  * acquisition, the local power-line frequency (50 / 60 Hz) and a
  * @c bBasic flag that selects whether the line component is included
  * in the regressor matrix. Value-typed with copy semantics and
- * equality operators so the cache logic in @ref InvHpiDataUpdater and
- * @ref InvSignalModel can detect changes cheaply.
+ * equality operators so the cache logic in @ref INVLIB::InvHpiDataUpdater and
+ * @ref INVLIB::InvSignalModel can detect changes cheaply.
  */
 
 #ifndef INV_HPI_MODEL_PARAMETERS_H
@@ -103,6 +103,8 @@ public:
     //=========================================================================================================
     /**
     * Inline functions to get acces to parameters.
+    *
+    * @return HPI coil frequencies, in Hz.
     */
 
     inline QVector<int> vecHpiFreqs() const;

@@ -12,7 +12,7 @@
  * @ref MNELIB::MNEProjItem corresponds to one @c FIFFB_PROJ_ITEM block:
  * the labelled vector that gets removed from the data when the
  * projection is active. Used both by @ref FIFFLIB::FiffInfo's SSP list
- * and by @ref MNEProjOp when assembling the full projector.
+ * and by @ref MNELIB::MNEProjOp when assembling the full projector.
  */
 
 #ifndef MNEPROJITEM_H
@@ -83,6 +83,8 @@ public:
      * @brief Copy constructor.
      *
      * Deep-copies the projection vectors (unique_ptr member).
+     *
+     * @param[in] other  Projection item to copy.
      */
     MNEProjItem(const MNEProjItem& other);
 
@@ -91,6 +93,10 @@ public:
      * @brief Copy assignment operator.
      *
      * Deep-copies the projection vectors (unique_ptr member).
+     *
+     * @param[in] other  Projection item to copy.
+     *
+     * @return Reference to this object.
      */
     MNEProjItem& operator=(const MNEProjItem& other);
 
@@ -103,6 +109,8 @@ public:
     //=========================================================================================================
     /**
      * @brief Move assignment operator (defaulted).
+     *
+     * @return Reference to this object.
      */
     MNEProjItem& operator=(MNEProjItem&&) noexcept = default;
 

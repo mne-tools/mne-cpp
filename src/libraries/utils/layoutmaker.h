@@ -13,7 +13,7 @@
  * @brief    Generator that projects 3-D electrode positions onto a 2-D @c .lout topographic layout via least-squares sphere fitting.
  *
  * @ref UTILSLIB::LayoutMaker is the counterpart of
- * @ref UTILSLIB::LayoutLoader: given the 3-D coordinates of an
+ * @ref UTILSLIB::LayoutLoader "LayoutLoader": given the 3-D coordinates of an
  * EEG cap (typically captured with the Polhemus digitizer or
  * loaded from a vendor @c .elc file) it produces the 2-D
  * channel layout file used by every topographic widget in
@@ -21,7 +21,7 @@
  * heatmaps in DISPLIB and DISP3DLIB.
  *
  * The projection is done by first fitting a sphere to the
- * supplied head-frame points (helper struct @ref fitUserRec
+ * supplied head-frame points (helper struct @ref UTILSLIB::fitUserRec
  * carries the working set for the non-linear fit), then
  * applying an azimuthal projection of every electrode onto
  * the tangent plane at the sphere apex. Optional mirroring
@@ -94,9 +94,9 @@ public:
      * @param[in] names             The channel names.
      * @param[in] outFile           The outout file.
      * @param[in] do_fit            The flag whether to do a sphere fitting.
-     * @param[in] prad.
-     * @param[in] w.
-     * @param[in] h.
+     * @param[in] prad Radius of the projection disk in layout units.
+     * @param[in] w Width of each channel box in layout units.
+     * @param[in] h Height of each channel box in layout units.
      * @param[in] writeFile         The flag whether to write to file.
      * @param[in] mirrorXAxis       Mirror points at x axis.
      * @param[in] mirrorYAxis       Mirror points at y axis.
@@ -121,11 +121,11 @@ public:
      * @param[in] inputPoints       The input points in 3D space.
      * @param[in, out] outputPoints     The output layout points in 2D space.
      * @param[in] names             The channel names.
-     * @param[in] outFile           The outout file.
+     * @param[in] outFilePath           The outout file.
      * @param[in] do_fit            The flag whether to do a sphere fitting.
-     * @param[in] prad.
-     * @param[in] w.
-     * @param[in] h.
+     * @param[in] prad Radius of the projection disk in layout units.
+     * @param[in] w Width of each channel box in layout units.
+     * @param[in] h Height of each channel box in layout units.
      * @param[in] writeFile         The flag whether to write to file.
      * @param[in] mirrorXAxis       Mirror points at x axis.
      * @param[in] mirrorYAxis       Mirror points at y axis.

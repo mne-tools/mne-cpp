@@ -9,9 +9,9 @@
  * @date     April 2026
  * @brief    Reader and writer for MNA project containers — @c .mna (JSON, human-editable) and @c .mnx (CBOR, compact binary with @c "MNX1" magic).
  *
- * @ref MnaIO is the single dispatch point between an on-disk
- * project file and an in-memory @ref MnaProject. The public
- * @ref MnaIO::read and @ref MnaIO::write helpers pick the right
+ * @ref MNALIB::MnaIO is the single dispatch point between an on-disk
+ * project file and an in-memory @ref MNALIB::MnaProject. The public
+ * @ref MNALIB::MnaIO::read "MnaIO::read" and @ref MNALIB::MnaIO::write "MnaIO::write" helpers pick the right
  * codec by extension so callers never have to branch: @c .mna
  * routes to a UTF-8 JSON serialiser intended for diff-friendly
  * version control and hand editing, while @c .mnx routes to a CBOR
@@ -20,7 +20,7 @@
  *
  * Both codecs are lossless and symmetric: a JSON project written,
  * read back, re-serialised as CBOR and read again must yield the
- * same @ref MnaProject, including unknown keys preserved via
+ * same @ref MNALIB::MnaProject, including unknown keys preserved via
  * @c extras on every nested struct. That guarantee is what lets
  * collaborators on different MNALIB versions exchange projects
  * without silently dropping fields.

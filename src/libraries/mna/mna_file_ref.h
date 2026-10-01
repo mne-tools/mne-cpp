@@ -9,11 +9,11 @@
  * @date     April 2026
  * @brief    Reference to a file inside an MNA project — relative path, semantic role, SHA-256 hash, and optional embedded payload.
  *
- * @ref MnaFileRef is the leaf node of an MNA project tree. Every raw
+ * @ref MNALIB::MnaFileRef is the leaf node of an MNA project tree. Every raw
  * recording, forward/inverse operator, covariance matrix, BEM model
  * or annotation that belongs to a subject is recorded as one of
  * these structures, never as a bare path string, so the container
- * always knows what the file @em is (via @ref MnaFileRole), what
+ * always knows what the file @em is (via @ref MNALIB::MnaFileRole "MnaFileRole"), what
  * format it carries (FIFF, MGH, STC, …), how big it is, and whether
  * its bytes have changed since the project was last saved.
  *
@@ -72,24 +72,36 @@ struct MNASHARED_EXPORT MnaFileRef
     //=========================================================================================================
     /**
      * Serialize to QJsonObject.
+     *
+     * @return JSON object with all fields and preserved extras; embedded data is Base64-encoded.
      */
     QJsonObject toJson() const;
 
     //=========================================================================================================
     /**
      * Deserialize from QJsonObject.
+     *
+     * @param[in] json   JSON object as produced by toJson().
+     *
+     * @return The file reference; missing keys take default values and unknown keys go to extras.
      */
     static MnaFileRef fromJson(const QJsonObject& json);
 
     //=========================================================================================================
     /**
      * Serialize to QCborMap.
+     *
+     * @return CBOR map with all fields and preserved extras; embedded data is stored as a byte string.
      */
     QCborMap toCbor() const;
 
     //=========================================================================================================
     /**
      * Deserialize from QCborMap.
+     *
+     * @param[in] cbor   CBOR map as produced by toCbor().
+     *
+     * @return The file reference; missing keys take default values and unknown keys go to extras.
      */
     static MnaFileRef fromCbor(const QCborMap& cbor);
 };

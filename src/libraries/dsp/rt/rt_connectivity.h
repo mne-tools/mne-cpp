@@ -122,7 +122,7 @@ public:
     /**
      * Slot to receive incoming data.
      *
-     * @param[in] data  Data to estimate the connectivity from.
+     * @param[in] connectivitySettings  Data to estimate the connectivity from.
      */
     void append(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 

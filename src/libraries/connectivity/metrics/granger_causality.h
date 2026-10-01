@@ -20,9 +20,9 @@
  *                        |H_{ij}(f)|^2 ) )
  *
  * with @c H the MVAR transfer function and @c Sigma the innovation
- * covariance, both supplied by @ref MvarModel. The output is non-negative
+ * covariance, both supplied by @ref CONNECTIVITYLIB::MvarModel. The output is non-negative
  * and asymmetric (@c GC_{j->i} != GC_{i->j} in general), so the resulting
- * @ref Network is directional. Spectral GC is the standard reference
+ * @ref CONNECTIVITYLIB::Network is directional. Spectral GC is the standard reference
  * directed measure for stationary linear systems and is the metric most
  * directly comparable to the @c spectral_connectivity_epochs(method='gc')
  * output produced by MNE-Python's mne-connectivity.
@@ -30,7 +30,7 @@
  * Practical caveats are well known (Bressler & Seth, NeuroImage 2011):
  * the estimate is sensitive to MVAR model order, requires reasonably
  * stationary trial segments, and is biased by observation noise. The
- * complementary @ref DirectedTransferFunction and @ref PartialDirectedCoherence
+ * complementary @ref CONNECTIVITYLIB::DirectedTransferFunction and @ref CONNECTIVITYLIB::PartialDirectedCoherence
  * metrics in this library are derived from the same MVAR fit and are
  * usually reported together.
  */

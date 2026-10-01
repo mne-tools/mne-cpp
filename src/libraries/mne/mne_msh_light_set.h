@@ -10,7 +10,7 @@
  * @brief    Collection of @ref MNELIB::MNEMshLight sources making up the viewer lighting rig.
  *
  * @ref MNELIB::MNEMshLightSet aggregates the lights (typically a key /
- * fill / rim trio) and is consumed by @ref MNEMshDisplaySurfaceSet when
+ * fill / rim trio) and is consumed by @ref MNELIB::MNEMshDisplaySurfaceSet when
  * saving or restoring a viewer scene.
  */
 
@@ -96,6 +96,8 @@ public:
 
     /**
      * @brief Returns the number of lights in the set.
+     *
+     * @return Number of owned light objects.
      */
     int nlight() const { return static_cast<int>(lights.size()); }
 };

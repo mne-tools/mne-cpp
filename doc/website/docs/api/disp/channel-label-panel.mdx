@@ -42,11 +42,21 @@ classDiagram
 
 Set the index of the first visible channel row (kept in sync with [`ChannelRhiView`](/docs/api/disp/channel-rhi-view)).
 
+**Parameters:**
+
+- **ch** : *int*
+  Index of the first visible row in the displayed channel list.
+
 ---
 
 ### setVisibleChannelCount(count)
 
 Set how many channel rows are simultaneously visible (kept in sync with [`ChannelRhiView`](/docs/api/disp/channel-rhi-view)).
+
+**Parameters:**
+
+- **count** : *int*
+  Number of simultaneously visible channel rows.
 
 ---
 
@@ -68,6 +78,11 @@ When `indices` is empty all model channels are available (no filter). Must be ke
 Show or hide bad-channel rows.
 
 When `hide` is true, bad channels are removed from the visible row list so the panel stays aligned with the trace view.
+
+**Parameters:**
+
+- **hide** : *bool*
+  True to hide bad-channel rows.
 
 ---
 

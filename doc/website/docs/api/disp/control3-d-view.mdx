@@ -37,13 +37,17 @@ Default constructor.
 
 **Parameters:**
 
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
 - **parent** : *QWidget **
   The parent of the QObject.
 
 - **slFlags** : *const QStringList &*
   The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: "Data", "View", "Light".
 
-- **type.**
+- **type** : *Qt::WindowType*
+  Qt window type passed to the QWidget constructor.
 
 ---
 
@@ -81,11 +85,8 @@ Init the control widget based on the 3D view and data model.
 
 **Parameters:**
 
-- **pData3DTreeModel**
+- **pDataTreeModel** : *QStandardItemModel **
   The 3D data tree model.
-
-- **pView3D**
-  The view3D to bec connected to this widget.
 
 ---
 
@@ -98,6 +99,11 @@ Slot called when tree view header visibilty changed.
 ### onTreeViewRemoveItem(index)
 
 Slot called when an item should be removed.
+
+**Parameters:**
+
+- **index** : *const QModelIndex &*
+  Model index of the tree view row to remove; ignored if invalid.
 
 ---
 

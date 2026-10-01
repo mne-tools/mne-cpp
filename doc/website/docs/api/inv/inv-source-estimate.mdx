@@ -51,13 +51,17 @@ Constructs a source estimation from given data.
 
 **Parameters:**
 
-- **p_sol.**
+- **p_sol** : *const Eigen::MatrixXd &*
+  Source amplitudes (sources x time points).
 
-- **p_vertices.**
+- **p_vertices** : *const Eigen::VectorXi &*
+  Source space vertex numbers of the rows of p_sol.
 
-- **p_tmin.**
+- **p_tmin** : *float*
+  Time of the first sample in seconds.
 
-- **p_tstep.**
+- **p_tstep** : *float*
+  Time between samples in seconds.
 
 ---
 
@@ -101,6 +105,10 @@ Reduces the source estimate to selected samples.
 - **n** : *qint32*
   Number of samples to cut from start index.
 
+**Returns:**
+
+- *[InvSourceEstimate](/docs/api/inv/inv-source-estimate)* — Copy of this estimate restricted to samples [start, start + n), with tmin updated accordingly.
+
 ---
 
 ### write(p_IODevice)
@@ -113,6 +121,10 @@ Writes a stc file
 
 - **p_IODevice** : *QIODevice &*
   IO device to write the stc to.
+
+**Returns:**
+
+- *bool* — True if successful, false if the device could not be opened for writing.
 
 ---
 

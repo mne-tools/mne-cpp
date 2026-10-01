@@ -27,11 +27,25 @@ Process-wide lookup from `opType` to [`MnaOpSchema`](/docs/api/mna/mna-op-schema
 
 Register an operation schema.
 
+**Parameters:**
+
+- **schema** : *const [MnaOpSchema](/docs/api/mna/mna-op-schema) &*
+  Schema to store; replaces any existing schema with the same opType.
+
 ---
 
 ### hasOp(opType)
 
 Check if an operation type is registered.
+
+**Parameters:**
+
+- **opType** : *const QString &*
+  Operation type name to look up.
+
+**Returns:**
+
+- *bool* — true if a schema is registered for opType, false otherwise.
 
 ---
 
@@ -39,11 +53,24 @@ Check if an operation type is registered.
 
 Get the schema for an operation type.
 
+**Parameters:**
+
+- **opType** : *const QString &*
+  Operation type name to look up.
+
+**Returns:**
+
+- *[MnaOpSchema](/docs/api/mna/mna-op-schema)* — The registered schema, or a default-constructed schema if opType is unknown.
+
 ---
 
 ### registeredOps()
 
 List all registered operation types.
+
+**Returns:**
+
+- *QStringList* — Names of all operation types that have a registered schema.
 
 ---
 
@@ -51,11 +78,28 @@ List all registered operation types.
 
 Register an implementation function for an operation type.
 
+**Parameters:**
+
+- **opType** : *const QString &*
+  Operation type name the function implements.
+
+- **func** : *OpFunc*
+  Callback mapping inputs and attributes to outputs; replaces any existing one.
+
 ---
 
 ### opFunc(opType)
 
 Get the implementation function for an operation type.
+
+**Parameters:**
+
+- **opType** : *const QString &*
+  Operation type name to look up.
+
+**Returns:**
+
+- *OpFunc* — The registered callback, or an empty `OpFunc` if none is registered.
 
 ---
 
@@ -77,7 +121,7 @@ Return op types referenced in a project that have no registered schema.
 
 **Parameters:**
 
-- **project**
+- **pipelineTools** : *const QStringList &*
   The MNA project to check.
 
 **Returns:**
@@ -91,6 +135,10 @@ Return op types referenced in a project that have no registered schema.
 ### instance()
 
 Access the singleton instance.
+
+**Returns:**
+
+- *MnaOpRegistry &* — Reference to the process-wide registry.
 
 ---
 

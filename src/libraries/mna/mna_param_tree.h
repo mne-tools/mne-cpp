@@ -9,12 +9,12 @@
  * @date     April 2026
  * @brief    Hierarchical parameter store with formula-driven dynamic bindings shared across an MNA graph.
  *
- * @ref MnaParamTree is the second authoritative source of node
+ * @ref MNALIB::MnaParamTree is the second authoritative source of node
  * attribute values — the first being a node's own @c attributes
  * map. Where the latter holds the literal value typed by the user
  * for a single operation, the param tree expresses values that are
  * either reused across many nodes (e.g. @c subject/fsdir) or
- * computed from other values via @ref MnaParamBinding formulas
+ * computed from other values via @ref MNALIB::MnaParamBinding formulas
  * resolved at execution time.
  *
  * Paths are slash-separated and conventionally namespaced by node
@@ -22,7 +22,7 @@
  * executor merge static defaults from the op schema, static
  * overrides from the project, and dynamically bound values into
  * the final @c resolvedAttributes captured in the
- * @ref MnaProvenance record. @ref evaluate walks all registered
+ * @ref MNALIB::MnaProvenance record. @ref MNALIB::MnaParamTree::evaluate "evaluate" walks all registered
  * bindings whose triggers have fired and returns the list of paths
  * whose values changed, which the executor uses to mark downstream
  * nodes dirty.

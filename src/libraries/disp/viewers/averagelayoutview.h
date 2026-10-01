@@ -13,12 +13,12 @@
  * @brief    2-D sensor-layout view placing per-channel evoked traces at their physical positions.
  *
  * AverageLayoutView embeds a @c QGraphicsView driven by an
- * @ref AverageScene that draws an @ref AverageSceneItem (one mini
+ * @ref DISPLIB::AverageScene that draws an @ref DISPLIB::AverageSceneItem (one mini
  * evoked-trace plot) at each sensor coordinate read from the active
- * @c Layout. It listens to an @ref EvokedSetModel for new averaged
- * responses and to a @ref ChannelInfoModel for channel-type / bad
+ * @c Layout. It listens to an @ref DISPLIB::EvokedSetModel for new averaged
+ * responses and to a @ref DISPLIB::ChannelInfoModel for channel-type / bad
  * flags, and supports per-condition colour selection and selective
- * channel display via @ref SelectionItem groups.
+ * channel display via @ref DISPLIB::SelectionItem groups.
  */
 
 #ifndef AVERAGELAYOUTVIEW_H
@@ -86,7 +86,9 @@ public:
     /**
      * Constructs a AverageLayoutView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent    parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     AverageLayoutView(const QString& sSettingsPath = "",
                       QWidget *parent = 0,
@@ -221,7 +223,7 @@ public:
     /**
      * Sets the currently viewable channels using the corrent name and location parameters
      *
-     * @param[in] data     QVariant containing a SelectionItem object with selected channel information.
+     * @param[in] selectionData     QVariant containing a SelectionItem object with selected channel information.
      */
     void channelSelectionChanged(const QVariant &selectionData);
 

@@ -35,6 +35,14 @@ classDiagram
 
 Constructs a [`SelectionScene`](/docs/api/disp/selection-scene).
 
+**Parameters:**
+
+- **view** : *QGraphicsView **
+  Graphics view that displays this scene.
+
+- **parent** : *QObject **
+  Parent QObject (default 0).
+
 ---
 
 ### repaintItems(layoutMap, badChannels)
@@ -46,8 +54,8 @@ Updates layout data.
 - **layoutMap** : *const QMap&lt; QString, QPointF &gt; &*
   layout data map.
 
-- **bad**
-  channel list.
+- **badChannels** : *QStringList*
+  Names of the bad channels.
 
 ---
 
@@ -57,7 +65,7 @@ Hides all items described in list.
 
 **Parameters:**
 
-- **list**
+- **visibleItems** : *QStringList*
   string list with items name which are to be hidden.
 
 ---

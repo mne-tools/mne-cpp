@@ -14,7 +14,7 @@
  * and draws every visible trace in a single shader invocation. It
  * manages its own pipeline, samplers, resource bindings and a small
  * @c CrosshairOverlay for the time / amplitude cursor, and exposes
- * callbacks for the host @ref ChannelDataView to push new samples,
+ * callbacks for the host @ref DISPLIB::ChannelDataView to push new samples,
  * change scaling or update the visible window.
  */
 
@@ -149,6 +149,8 @@ public:
     /**
      * Enable or disable annotation range selection. When enabled, Shift+drag emits
      * sampleRangeSelected on mouse release instead of acting as a pure measurement tool.
+     *
+     * @param[in] enabled  True to make Shift+drag select annotation ranges.
      */
     void setAnnotationSelectionEnabled(bool enabled);
 
@@ -221,12 +223,16 @@ public:
     /**
      * Returns the absolute sample index currently shown at x = 0 (left edge).
      * (Same as scrollSample rounded to int.)
+     *
+     * @return Absolute sample index at the left viewport edge.
      */
     int visibleFirstSample() const;
 
     //=========================================================================================================
     /**
      * Returns the number of samples currently visible.
+     *
+     * @return Widget width in pixels times samples per pixel, truncated to int.
      */
     int visibleSampleCount() const;
 
@@ -244,6 +250,8 @@ public:
     //=========================================================================================================
     /**
      * Total number of logical channels available for scrolling (respects active filter).
+     *
+     * @return Number of channels after applying the index filter and bad-channel hiding.
      */
     int totalLogicalChannels() const;
 
@@ -269,6 +277,8 @@ public:
     /**
      * Freeze or unfreeze drag-panning (mouse drag and inertia).
      * Wheel scroll and the scrollbar remain active when frozen.
+     *
+     * @param[in] frozen  True to disable drag-panning.
      */
     void setFrozen(bool frozen);
     bool isFrozen() const { return m_frozen; }
@@ -276,6 +286,8 @@ public:
     //=========================================================================================================
     /**
      * Show or hide the time and amplitude grid overlay.
+     *
+     * @param[in] visible  True to draw the grid.
      */
     void setGridVisible(bool visible);
     bool gridVisible() const { return m_gridVisible; }
@@ -284,6 +296,8 @@ public:
     /**
      * Set the sampling frequency (Hz) used to place time-grid tick lines.
      * Call this from ChannelDataView::init() after FiffInfo is available.
+     *
+     * @param[in] sfreq  Sampling frequency in Hz.
      */
     void setSfreq(float sfreq);
 
@@ -340,12 +354,16 @@ public:
      * Enable or disable the crosshair cursor overlay.
      * When enabled, a vertical + horizontal cross follows the mouse and the view
      * continuously emits cursorDataChanged() with the time/amplitude under the cursor.
+     *
+     * @param[in] enabled  True to show the crosshair overlay.
      */
     void setCrosshairEnabled(bool enabled);
     bool crosshairEnabled() const { return m_crosshairEnabled; }
 
     /**
      * Set whether the crosshair label uses clock time (mm:ss.ms) or seconds.
+     *
+     * @param[in] useClock  True for clock time, false for float seconds.
      */
     void setClockTimeFormat(bool useClock) { m_useClockTime = useClock; update(); }
     bool clockTimeFormat() const { return m_useClockTime; }
@@ -355,6 +373,8 @@ public:
     //=========================================================================================================
     /**
      * Show or hide per-channel-type scalebars in the bottom-right corner.
+     *
+     * @param[in] visible  True to draw the scalebars.
      */
     void setScalebarsVisible(bool visible);
     bool scalebarsVisible() const { return m_scalebarsVisible; }
@@ -364,6 +384,8 @@ public:
     //=========================================================================================================
     /**
      * Toggle butterfly mode: all channels of the same type are overlaid in a single lane.
+     *
+     * @param[in] enabled  True to enable butterfly mode.
      */
     void setButterflyMode(bool enabled);
     bool butterflyMode() const { return m_butterflyMode; }

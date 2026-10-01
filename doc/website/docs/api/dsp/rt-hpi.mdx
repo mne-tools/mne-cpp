@@ -36,7 +36,7 @@ Creates the real-time HPIS estimation object.
 
 **Parameters:**
 
-- **p_pFiffInfo**
+- **sensorSet** : *const INVLIB::InvSensorSet*
   Associated Fiff Information.
 
 - **parent** : *QObject **
@@ -67,7 +67,7 @@ Set the coil frequencies.
 
 **Parameters:**
 
-- **vCoilFreqs**
+- **hpiModelParameters** : *INVLIB::InvHpiModelParameters*
   The coil frequencies.
 
 ---
@@ -89,7 +89,7 @@ Set the new projection matrix.
 
 **Parameters:**
 
-- **matProjectors**
+- **matCoilsHead** : *const Eigen::MatrixXd &*
   The new projection matrix.
 
 ---

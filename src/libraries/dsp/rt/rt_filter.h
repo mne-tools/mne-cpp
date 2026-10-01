@@ -12,12 +12,12 @@
  * The functions in this header wrap @ref UTILSLIB::FilterKernel and the
  * design back-ends so an incoming raw data file or live data block can be
  * low-pass, high-pass, band-pass or notch-filtered in place with a single
- * call. @ref filterFile streams a @ref FIFFLIB::FiffRawData source through
+ * call. @ref RTPROCESSINGLIB::filterFile "filterFile" streams a @ref FIFFLIB::FiffRawData source through
  * a user-designed kernel and writes the filtered output to an arbitrary
  * @c QIODevice, optionally parallelising the per-channel overlap-add work
  * with Qt Concurrent.
  *
- * The companion @ref FilterObject struct bundles the FIR coefficients with
+ * The companion @ref RTPROCESSINGLIB::FilterObject struct bundles the FIR coefficients with
  * the per-channel @c iRow and a contiguous @c vecData buffer so independent
  * channels can be filtered in parallel without sharing mutable state. All
  * cutoff and transition values are specified in Hz — normalisation against

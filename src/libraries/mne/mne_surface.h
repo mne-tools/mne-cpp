@@ -17,8 +17,8 @@
  * the cortex-based algorithms in MNELIB and INVERSELIB share: it carries
  * no decimation or patch information and is used wherever only the
  * topology is needed (projection to surface, distance maps, head-shape
- * fitting). Heavier flavours - @ref MNESourceSpace and
- * @ref MNEBemSurface - subclass or wrap it.
+ * fitting). Heavier flavours - @ref MNELIB::MNESourceSpace and
+ * @ref MNELIB::MNEBemSurface - subclass or wrap it.
  */
 
 #ifndef MNE_SURFACE_H
@@ -174,7 +174,7 @@ public:
      * @param[in]      r            Array of np point coordinates.
      * @param[in]      np           Number of points.
      * @param[in,out]  nearest_tri  Best triangle index for each point.
-     * @param[out]     dist         Distance to the surface for each point.
+     * @param[out] distances         Distance to the surface for each point.
      * @param[in]      nstep        Number of neighborhood expansion steps.
      */
     void find_closest_on_surface_approx(const PointsT& r, int np,

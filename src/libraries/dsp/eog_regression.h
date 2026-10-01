@@ -121,6 +121,8 @@ public:
     //=========================================================================================================
     /**
      * @brief Returns true if fit() has been called successfully.
+     *
+     * @return True if regression coefficients are available, false otherwise.
      */
     bool isFitted() const { return m_bFitted; }
 

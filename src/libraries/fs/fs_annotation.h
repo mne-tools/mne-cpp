@@ -20,7 +20,7 @@
  * - @c num_vertices × (@c int32 vertex_index, @c int32 packed_rgba_label)
  * - optional @c TAG_OLD_COLORTABLE / @c TAG_NEW_COLORTABLE block carrying the
  *   embedded colortable (struct names + RGBA), parsed into an
- *   @ref FsColortable
+ *   @ref FSLIB::FsColortable
  *
  * The per-vertex label is the @c int32 obtained by packing
  * @c R + (G ≪ 8) + (B ≪ 16) + (A ≪ 24) of the assigned region’s
@@ -29,7 +29,7 @@
  * in FreeSurfer.
  *
  * This class loads one hemisphere; combine two instances via
- * @ref FsAnnotationSet for whole-brain parcellations.
+ * @ref FSLIB::FsAnnotationSet for whole-brain parcellations.
  */
 
 #ifndef FS_ANNOTATION_H
@@ -106,7 +106,7 @@ public:
      *
      * @param[in] subject_id         Name of subject.
      * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
-     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
+     * @param[in] surf              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
      * @param[in] subjects_dir       Subjects directory.
      */
     explicit FsAnnotation(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
@@ -117,9 +117,7 @@ public:
      *
      * @param[in] path               path to surface directory.
      * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
-     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
-     *
-     * @return true if read sucessful, false otherwise.
+     * @param[in] surf              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
      */
     explicit FsAnnotation(const QString &path, qint32 hemi, const QString &surf);
 

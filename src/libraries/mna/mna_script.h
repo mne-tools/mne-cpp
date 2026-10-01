@@ -9,9 +9,9 @@
  * @date     April 2026
  * @brief    Inline source code carried by a Script-mode graph node — language, interpreter command, code body, optional authoring URI and integrity hash.
  *
- * @ref MnaScript is the payload that turns a generic @ref MnaNode
+ * @ref MNALIB::MnaScript is the payload that turns a generic @ref MNALIB::MnaNode
  * into a one-off custom step without forcing every user-written
- * snippet through the @ref MnaOpRegistry. When the host node's
+ * snippet through the @ref MNALIB::MnaOpRegistry. When the host node's
  * @c execMode is @c MnaNodeExecMode::Script the executor writes
  * @c code to a temporary file, launches @c interpreter (auto-
  * detected from @c language when unset) with @c interpreterArgs

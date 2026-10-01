@@ -37,8 +37,17 @@ Constructs a [`MinimumNormSettingsView`](/docs/api/disp/minimum-norm-settings-vi
 
 **Parameters:**
 
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
+- **sMethod** : *const QString &*
+  Initial inverse method ("MNE", "dSPM" or "sLORETA").
+
 - **parent** : *QWidget **
   parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
 
 ---
 
@@ -73,6 +82,10 @@ Sets the model checkpoint path shown in the read-only line edit.
 ### getModelCheckpoint()
 
 Returns the current model checkpoint path.
+
+**Returns:**
+
+- *QString* — Absolute path to the model checkpoint file, or an empty string if none is set.
 
 ---
 

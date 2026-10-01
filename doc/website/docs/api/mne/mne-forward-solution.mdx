@@ -91,11 +91,25 @@ Copies public data fields only (not computation state).
 
 Move constructs an [`MNEForwardSolution`](/docs/api/mne/mne-forward-solution).
 
+**Parameters:**
+
+- **other** : *MNEForwardSolution &&*
+  Forward solution to move from; left in a valid but unspecified state.
+
 ---
 
 ### operator=(other)
 
 Move assignment operator.
+
+**Parameters:**
+
+- **other** : *[MNEForwardSolution](/docs/api/mne/mne-forward-solution) &&*
+  Forward solution to move from; left in a valid but unspecified state.
+
+**Returns:**
+
+- *[MNEForwardSolution](/docs/api/mne/mne-forward-solution) &* — Reference to this object.
 
 ---
 
@@ -128,9 +142,11 @@ The clustering is done by using the provided annotations
 - **p_D** : *Eigen::MatrixXd &*
   The cluster operator.
 
-- **p_pNoise_cov.**
+- **p_pNoise_cov** : *const [FiffCov](/docs/api/fiff/fiff-cov) &*
+  Noise covariance used to whiten the gain matrix before clustering (optional).
 
-- **p_pInfo.**
+- **p_pInfo** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
+  Measurement info matching the noise covariance (optional).
 
 - **p_sMethod** : *QString*
   "cityblock" or "sqeuclidean".
@@ -262,7 +278,7 @@ Prepare forward for assembling the inverse operator.
 - **p_pca** : *bool*
   Calculate pca or not.
 
-- **ch_names**
+- **p_outFwdInfo** : *[FiffInfo](/docs/api/fiff/fiff-info) &*
   Selected channel names.
 
 - **gain** : *Eigen::MatrixXd &*

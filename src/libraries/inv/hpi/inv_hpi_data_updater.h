@@ -10,11 +10,11 @@
  * @brief    Pre-processing front-end for HPI fitting — re-shapes raw MEG data, projectors and digitised coils into per-fit inputs.
  *
  * @ref INVLIB::InvHpiDataUpdater isolates everything that has to
- * happen before @ref InvHpiFit can run on a new measurement block:
+ * happen before @ref INVLIB::InvHpiFit can run on a new measurement block:
  * re-deriving the good-channel list from the @c FiffInfo, slicing the
  * SSP projector to those channels, projecting the data buffer, lifting
  * the digitised HPI coil positions out of the dig-point list and
- * rebuilding the @ref InvSensorSet whenever the channel layout changes.
+ * rebuilding the @ref INVLIB::InvSensorSet whenever the channel layout changes.
  * The class caches the most recent state so consecutive HPI fits on
  * the same configuration only re-run the steps that actually changed.
  */
@@ -82,6 +82,8 @@ public:
     //=========================================================================================================
     /**
     * Constructs a InvHpiDataUpdater object.
+    *
+    * @param[in] pFiffInfo     Measurement info used to initialize channels, bads, HPI digitizer points and sensors.
     */
     InvHpiDataUpdater(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
@@ -98,6 +100,7 @@ public:
     /**
      * Reduce data to only use good channels.
      *
+     * @param[in] matData Data matrix (channels x samples).
      * @param[in] matProjectors     The projector matrix.
      *
      */
@@ -107,6 +110,7 @@ public:
     /**
      * inline get functions for private member variables.
      *
+     * @return Const reference to the channel list with bad channels excluded.
      */
     inline const QList<FIFFLIB::FiffChInfo>& getChannels();
     inline const Eigen::MatrixXd& getProjectors();
@@ -166,7 +170,7 @@ private:
     /**
      * Reduce data to only use good channels.
      *
-     * @param[in] matProjectors     The projector matrix.
+     * @param[in] matData     The projector matrix.
      *
      */
     void prepareData(const Eigen::MatrixXd& matData);

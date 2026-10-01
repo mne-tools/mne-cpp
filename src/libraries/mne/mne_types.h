@@ -13,8 +13,8 @@
  * original MNE C tooling so ported code can continue to refer to the
  * familiar enumerations (point types, surface ids, BEM coordinate frames,
  * covariance kinds, ...) without dragging the full C header tree into
- * every consumer. Definitions here are pure typedefs / @c enum / @c
- * #define and carry no implementation, keeping the header safe to include
+ * every consumer. Definitions here are pure typedefs / @c enum /
+ * @c \#define and carry no implementation, keeping the header safe to include
  * from any layer of MNELIB.
  */
 

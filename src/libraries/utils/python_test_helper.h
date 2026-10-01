@@ -94,7 +94,7 @@ namespace UTILSLIB
  * - If MNE_REQUIRE_PYTHON is **not** set: QSKIP with a clear message.
  * - If MNE_REQUIRE_PYTHON=true: QFAIL so the skip is never silent in CI.
  *
- * @param helper   A PythonTestHelper (or bool) — must support operator bool / isAvailable().
+ * @param available   A PythonTestHelper (or bool) — must support operator bool / isAvailable().
  * @param reason   Human-readable reason string.
  */
 #define GUARD_PYTHON(available, reason) \

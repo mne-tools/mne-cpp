@@ -18,12 +18,12 @@
  * visible scene object.
  *
  * The renderer packs camera matrices, light direction, viewport,
- * scissor and the active overlay mode into one @ref SceneData uniform
+ * scissor and the active overlay mode into one @ref BrainRenderer::SceneData uniform
  * block per draw, which keeps the WebGL backend happy (Qt RHI on
  * WebGL cannot rebind state mid-pass).
  *
  * All scene objects (@ref BrainSurface, @ref DipoleObject,
- * @ref NetworkObject, @ref VideoOverlay) are accepted through opaque
+ * @ref NetworkObject, @ref DISP3DLIB::VideoOverlay) are accepted through opaque
  * pointers so the renderer never pulls in the heavy headers of the
  * modalities it draws.
  */
@@ -175,6 +175,7 @@ public:
     /**
      * Set uniforms that are shared for the entire frame.
      * 
+     * @param[in, out] rhi QRhi instance that owns the uniform buffers.
      * @param[in] data       Scene uniforms (MVP, light, etc).
      */
     void updateSceneUniforms(QRhi *rhi, const SceneData &data);
@@ -272,6 +273,7 @@ public:
      * @param[in] rhi        QRhi pointer.
      * @param[in] data       Scene uniforms.
      * @param[in] mode       Shader mode.
+     * @param[in] groupName Name of the merged surface group to draw.
      */
     void drawMergedSurfaces(QRhiCommandBuffer *cb, QRhi *rhi,
                             const SceneData &data, ShaderMode mode,

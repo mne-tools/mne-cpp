@@ -13,9 +13,9 @@
  * HPI coil drive frequencies (and, optionally, the line-frequency
  * harmonics) with the sample window length defined by the input data.
  * Inverting the model with a pseudo-inverse projects the MEG buffer
- * onto the per-coil amplitudes that @ref InvHpiFit feeds into the
+ * onto the per-coil amplitudes that @ref INVLIB::InvHpiFit feeds into the
  * dipole search. The model matrix is cached and re-derived only when
- * the @ref InvHpiModelParameters change or the number of samples in
+ * the @ref INVLIB::InvHpiModelParameters change or the number of samples in
  * the buffer changes.
  */
 

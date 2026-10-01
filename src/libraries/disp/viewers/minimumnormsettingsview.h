@@ -76,7 +76,10 @@ public:
     /**
      * Constructs a MinimumNormSettingsView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
+     * @param[in] sMethod Initial inverse method ("MNE", "dSPM" or "sLORETA").
      * @param[in] parent        parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     MinimumNormSettingsView(const QString& sSettingsPath = "",
                             const QString& sMethod = "",
@@ -108,6 +111,8 @@ public:
     //=========================================================================================================
     /**
      * Returns the current model checkpoint path.
+     *
+     * @return Absolute path to the model checkpoint file, or an empty string if none is set.
      */
     QString getModelCheckpoint() const;
 

@@ -12,7 +12,7 @@
  * @brief    Light-weight wrapper describing one MNE pre-processing operator (FIR, SSP, compensation) inside a model.
  *
  * MNEOperator stores the operator type, display name, active flag and
- * the underlying matrix / kernel reference. @ref ChannelInfoModel
+ * the underlying matrix / kernel reference. @ref DISPLIB::ChannelInfoModel
  * uses these wrappers to track which operators a channel is
  * currently subject to so the delegate can render the
  * post-processing version of the signal.

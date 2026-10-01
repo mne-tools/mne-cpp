@@ -37,8 +37,17 @@ Constructs a [`ModalitySelectionView`](/docs/api/disp/modality-selection-view) w
 
 **Parameters:**
 
+- **lChannelList** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
+  Channels whose modalities are offered for selection.
+
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
 - **parent** : *QWidget **
   parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
 
 ---
 

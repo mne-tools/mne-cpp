@@ -12,9 +12,9 @@
  * Centralising the @ref STSLIB::StatsTailType (left / right / both) and
  * @ref STSLIB::StatsCorrection (none, Bonferroni, FDR, cluster
  * permutation) enums in a header with no Qt or Eigen dependency lets
- * lightweight modules - notably @ref sts_ttest and @ref sts_ftest - take
+ * lightweight modules - notably @c sts_ttest and @c sts_ftest - take
  * the same tail argument as the cluster permutation entry points in
- * @ref sts_cluster without dragging the rest of STSLIB into client
+ * @c sts_cluster without dragging the rest of STSLIB into client
  * translation units.
  */
 

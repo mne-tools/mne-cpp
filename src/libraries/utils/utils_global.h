@@ -22,8 +22,8 @@
  * library, a static archive (@c STATICBUILD) or imported by a
  * downstream consumer.
  *
- * The free functions defined here (@ref buildDateTime,
- * @ref buildHash, @ref buildHashLong) are the runtime-callable
+ * The free functions defined here (@ref UTILSLIB::buildDateTime "buildDateTime",
+ * @ref UTILSLIB::buildHash "buildHash", @ref UTILSLIB::buildHashLong "buildHashLong") are the runtime-callable
  * entry points for the compile-time constants in
  * @ref buildinfo.h and are surfaced in the About dialog of the
  * mne-cpp applications and in version banners written by CLI
@@ -63,18 +63,24 @@ namespace UTILSLIB{
 //=============================================================================================================
 /**
  * Returns build date and time.
+ *
+ * @return Null-terminated string with the library build date and time.
  */
 UTILSSHARED_EXPORT const char* buildDateTime();
 
 //=============================================================================================================
 /**
  * Returns abbreviated build git hash.
+ *
+ * @return Null-terminated string with the short git commit hash of the build.
  */
 UTILSSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
  * Returns full build git hash.
+ *
+ * @return Null-terminated string with the full git commit hash of the build.
  */
 UTILSSHARED_EXPORT const char* buildHashLong();
 }

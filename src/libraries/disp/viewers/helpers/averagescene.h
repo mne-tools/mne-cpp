@@ -10,12 +10,12 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    QGraphicsScene that lays @ref AverageSceneItem mini-traces on the active sensor layout.
+ * @brief    QGraphicsScene that lays @ref DISPLIB::AverageSceneItem mini-traces on the active sensor layout.
  *
- * AverageScene extends @ref LayoutScene with the per-condition colour
+ * AverageScene extends @ref DISPLIB::LayoutScene with the per-condition colour
  * table, the cached @c FiffInfo channel map and the dispatcher that
- * creates / refreshes one @ref AverageSceneItem per visible sensor.
- * It is the data backbone of @ref AverageLayoutView.
+ * creates / refreshes one @ref DISPLIB::AverageSceneItem per visible sensor.
+ * It is the data backbone of @ref DISPLIB::AverageLayoutView.
  */
 
 #ifndef AVERAGESCENE_H
@@ -72,6 +72,9 @@ public:
     //=========================================================================================================
     /**
      * Constructs a AverageScene.
+     *
+     * @param[in] view    Graphics view that displays this scene.
+     * @param[in] parent  Parent QObject (default 0).
      */
     explicit AverageScene(QGraphicsView* view, QObject *parent = 0);
 
@@ -133,7 +136,7 @@ public:
     /**
      * Sets the signal color for the items the scene holds
      *
-     * @param[in] signalColor.
+     * @param[in] signalColor New signal color.
      */
     void setSignalItemColor(const QColor &signalColor);
 

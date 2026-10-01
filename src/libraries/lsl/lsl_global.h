@@ -65,18 +65,24 @@ namespace LSLLIB {
 //=============================================================================================================
 /**
  * Returns build date and time.
+ *
+ * @return Null-terminated string with the compile date and time of the library.
  */
 LSLSHARED_EXPORT const char* buildDateTime();
 
 //=============================================================================================================
 /**
  * Returns abbreviated build git hash.
+ *
+ * @return Null-terminated string with the short git commit hash the library was built from.
  */
 LSLSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
  * Returns full build git hash.
+ *
+ * @return Null-terminated string with the full git commit hash the library was built from.
  */
 LSLSHARED_EXPORT const char* buildHashLong();
 

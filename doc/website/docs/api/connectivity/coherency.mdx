@@ -17,7 +17,7 @@ class CONNECTIVITYLIB::Coherency
 
 Shared core of the coherence / imaginary-coherence family.
 
-compute fills the per-trial DPSS spectra and accumulates the cross- and auto-spectral sums in `ConnectivitySettings::IntermediateSumData`. The two public reductions then collapse the complex coherency to a real scalar per channel pair: `calculateAbs` returns |Coh_\{xy\}(f)|^2 (classical magnitude-squared coherence, symmetric, sensitive to zero-lag mixing) and `calculateImag` returns |Im(Coh_\{xy\}(f))|, the volume-conduction-robust imaginary coherence of Nolte et al. (2004).
+`CONNECTIVITYLIB::Coherency::compute` "compute" fills the per-trial DPSS spectra and accumulates the cross- and auto-spectral sums in `ConnectivitySettings::IntermediateSumData`. The two public reductions then collapse the complex coherency to a real scalar per channel pair: `calculateAbs` returns |Coh_\{xy\}(f)|^2 (classical magnitude-squared coherence, symmetric, sensitive to zero-lag mixing) and `calculateImag` returns |Im(Coh_\{xy\}(f))|, the volume-conduction-robust imaginary coherence of Nolte et al. (2004).
 
 Complex coherency core; produces magnitude-squared and imaginary-part reductions for downstream metrics.
 

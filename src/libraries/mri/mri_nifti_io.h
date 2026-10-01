@@ -15,7 +15,7 @@
  * preprocessed structurals produced by any of those pipelines (e.g. BIDS
  * subjects whose anatomicals never pass through @c recon-all) without
  * requiring an external conversion step. The reader stays
- * surface-compatible with @ref MriMghIO so the slicing, rendering and
+ * surface-compatible with @ref MRILIB::MriMghIO so the slicing, rendering and
  * COR.fif export paths downstream do not need to branch on source format.
  *
  * The header is 348 bytes; image data starts at @c vox_offset (typically
@@ -26,11 +26,11 @@
  * MGZ path.
  *
  * Transform extraction follows the NIfTI-1 priority rule used by nibabel
- * and FSL: prefer @c sform (3 affine rows directly in voxel\u2192RAS mm),
+ * and FSL: prefer @c sform (3 affine rows directly in voxel→RAS mm),
  * fall back to @c qform (unit quaternion + offset, expanded into a
  * rotation matrix), and as a last resort build a diagonal transform from
  * @c pixdim centred at the volume origin. This ordering is encoded once
- * in @ref MriNiftiIO::read so every caller gets the same RAS regardless
+ * in @ref MRILIB::MriNiftiIO::read "MriNiftiIO::read" so every caller gets the same RAS regardless
  * of how the source file was authored.
  *
  * Format reference: https://nifti.nimh.nih.gov/nifti-1
@@ -64,7 +64,7 @@ namespace MRILIB {
  *
  * Parses the 348-byte fixed-size header, expands any voxel-type / endianness
  * combination NIfTI-1 supports into the canonical 16-bit unsigned slice
- * buffer produced by @ref MriMghIO, and resolves voxel\u2192RAS via the
+ * buffer produced by @ref MriMghIO, and resolves voxel→RAS via the
  * @c sform/qform/pixdim priority chain. The class is a pure namespace of
  * @c static methods so callers can use it without owning any state; the
  * populated @ref MriVolData carries the result.

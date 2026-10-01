@@ -10,9 +10,9 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    QGraphicsScene of the sensor-layout dots used by @ref ChannelSelectionView for interactive channel picking.
+ * @brief    QGraphicsScene of the sensor-layout dots used by @ref DISPLIB::ChannelSelectionView for interactive channel picking.
  *
- * SelectionScene places one @ref SelectionSceneItem per sensor at the
+ * SelectionScene places one @ref DISPLIB::SelectionSceneItem per sensor at the
  * 2-D position read from the active layout and supports rubber-band
  * selection and lasso-style grouping. Selection changes are emitted
  * as channel-name lists so the host view can store them as named
@@ -71,6 +71,9 @@ public:
     //=========================================================================================================
     /**
      * Constructs a SelectionScene.
+     *
+     * @param[in] view    Graphics view that displays this scene.
+     * @param[in] parent  Parent QObject (default 0).
      */
     explicit SelectionScene(QGraphicsView* view, QObject *parent = 0);
 
@@ -79,7 +82,7 @@ public:
      * Updates layout data.
      *
      * @param[in] layoutMap layout data map.
-     * @param[in] bad channel list.
+     * @param[in] badChannels Names of the bad channels.
      */
     void repaintItems(const QMap<QString, QPointF> &layoutMap,
                       QStringList badChannels);
@@ -88,7 +91,7 @@ public:
     /**
      * Hides all items described in list.
      *
-     * @param[in] list string list with items name which are to be hidden.
+     * @param[in] visibleItems string list with items name which are to be hidden.
      */
     void hideItems(QStringList visibleItems);
 

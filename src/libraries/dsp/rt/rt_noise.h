@@ -19,7 +19,7 @@
  * emits the PSD result back on the GUI thread.
  *
  * This estimate is what feeds the live noise-spectrum display and provides
- * a sanity-check companion to @ref RtCov whenever a quick frequency-domain
+ * a sanity-check companion to @ref RTPROCESSINGLIB::RtCov whenever a quick frequency-domain
  * view of the noise floor is more informative than the full channel–channel
  * covariance matrix.
  */
@@ -152,6 +152,8 @@ public:
     //=========================================================================================================
     /**
      * Returns whether the worker thread is running.
+     *
+     * @return True between start() and stop(), false otherwise.
      */
     bool isRunning() const;
 
@@ -174,6 +176,10 @@ public:
     //=========================================================================================================
     /**
      * Blocks until the worker thread has finished, or until the timeout (ms) expires.
+     *
+     * @param[in] time  Timeout in ms; ULONG_MAX waits indefinitely.
+     *
+     * @return True if the thread finished, false if the timeout expired.
      */
     bool wait(unsigned long time = ULONG_MAX);
 

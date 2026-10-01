@@ -33,6 +33,21 @@ Eigen matrix I/O utilities.
 
 Write Eigen Matrix to file (QString path).
 
+**Parameters:**
+
+- **in** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  Matrix to write as whitespace-separated text, one row per line.
+
+- **sPath** : *const QString &*
+  Path of the output file; an existing file is overwritten.
+
+- **sDescription** : *const QString &*
+  Optional description; if non-empty, a dimensions and description header is written.
+
+**Returns:**
+
+- *bool* — True on success, false if the file could not be opened for writing.
+
 ---
 
 ### write_eigen_matrix(in, sPath, sDescription)
@@ -46,6 +61,21 @@ Write Eigen Matrix to file (QString path).
 ### write_eigen_matrix(in, sPath, sDescription)
 
 Write Eigen Matrix to file (std::string path).
+
+**Parameters:**
+
+- **in** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  Matrix to write as whitespace-separated text, one row per line.
+
+- **sPath** : *const std::string &*
+  Path of the output file; an existing file is overwritten.
+
+- **sDescription** : *const std::string &*
+  Optional description; if non-empty, a dimensions and description header is written.
+
+**Returns:**
+
+- *bool* — True on success, false if the file could not be opened for writing.
 
 ---
 
@@ -61,6 +91,18 @@ Write Eigen Matrix to file (std::string path).
 
 Read Eigen Matrix from file (QString path).
 
+**Parameters:**
+
+- **out** : *Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  Matrix resized and filled with the values read; lines containing '#' are skipped.
+
+- **path** : *const QString &*
+  Path of the whitespace-separated text file to read.
+
+**Returns:**
+
+- *bool* — True on success, false if the file could not be opened.
+
 ---
 
 ### read_eigen_matrix(out, path)
@@ -74,6 +116,18 @@ Read Eigen Matrix from file (QString path).
 ### read_eigen_matrix(out, path)
 
 Read Eigen Matrix from file (std::string path).
+
+**Parameters:**
+
+- **out** : *Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
+  Matrix resized and filled with the values read; lines containing '#' are skipped.
+
+- **path** : *const std::string &*
+  Path of the whitespace-separated text file to read.
+
+**Returns:**
+
+- *bool* — True on success, false if the file could not be opened.
 
 ---
 

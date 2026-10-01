@@ -16,9 +16,9 @@
  * the Neuromag acquisition system splits very long recordings across
  * multiple physical files while keeping a single logical FIFF tree, and
  * how MNE-Python's @c mne.io.Raw chains @c .fif fragments through the
- * @c next_fname mechanism. @ref FiffDataRef is the in-memory representation
- * of that record; @ref FiffDataRef::storageSize matches the on-disk size
- * exactly so @ref FiffStream can stream the data ref directly into a
+ * @c next_fname mechanism. @ref FIFFLIB::FiffDataRef is the in-memory representation
+ * of that record; @ref FIFFLIB::FiffDataRef::storageSize "FiffDataRef::storageSize" matches the on-disk size
+ * exactly so @ref FIFFLIB::FiffStream can stream the data ref directly into a
  * buffer with no per-field marshalling.
  */
 

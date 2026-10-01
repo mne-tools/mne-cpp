@@ -16,7 +16,7 @@
  * @ref MNELIB::MNEEpochData stores the windowed sensor matrix for one
  * event together with the trigger sample, event id, baseline boundaries
  * and any rejection thresholds applied to produce it. Multiple epochs
- * are aggregated into @ref MNEEpochDataList which then feeds covariance
+ * are aggregated into @ref MNELIB::MNEEpochDataList which then feeds covariance
  * estimation, average-by-condition evoked computation and induced-power
  * analyses.
  */

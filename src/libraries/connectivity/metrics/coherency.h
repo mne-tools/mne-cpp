@@ -26,13 +26,13 @@
  * imaginary axis, while instantaneous common-reference / volume-conduction
  * mixing contributes only to the real axis and is rejected.
  *
- * The per-trial workhorse @ref Coherency::compute computes DPSS tapered
+ * The per-trial workhorse @c CONNECTIVITYLIB::Coherency::compute "Coherency::compute" computes DPSS tapered
  * spectra and accumulates the cross-spectral and auto-spectral sums into
- * the shared @ref ConnectivitySettings::IntermediateSumData. The two
- * public reductions, @ref calculateAbs and @ref calculateImag, then divide
+ * the shared @ref CONNECTIVITYLIB::ConnectivitySettings::IntermediateSumData. The two
+ * public reductions, @ref CONNECTIVITYLIB::Coherency::calculateAbs "calculateAbs" and @ref CONNECTIVITYLIB::Coherency::calculateImag "calculateImag", then divide
  * by the running auto-spectral norms and average over the frequency window
- * defined on @ref AbstractMetric to produce the scalar edge weights of the
- * returned @ref Network.
+ * defined on @ref CONNECTIVITYLIB::AbstractMetric to produce the scalar edge weights of the
+ * returned @ref CONNECTIVITYLIB::Network.
  */
 
 #ifndef COHERENCY_H
@@ -80,7 +80,7 @@ class Network;
 /**
  * Shared core of the coherence / imaginary-coherence family.
  *
- * @ref compute fills the per-trial DPSS spectra and accumulates the cross-
+ * @c CONNECTIVITYLIB::Coherency::compute "compute" fills the per-trial DPSS spectra and accumulates the cross-
  * and auto-spectral sums in @ref ConnectivitySettings::IntermediateSumData.
  * The two public reductions then collapse the complex coherency to a real
  * scalar per channel pair: @ref calculateAbs returns |Coh_{xy}(f)|^2

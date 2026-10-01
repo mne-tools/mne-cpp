@@ -17,7 +17,7 @@
  * the @c .mgz suffix and routing the file through zlib's
  * @c MAX_WBITS+16 inflate mode before parsing.
  *
- * Output is materialised into an @ref MriVolData (slice-of-slices
+ * Output is materialised into an @ref MRILIB::MriVolData (slice-of-slices
  * representation) using the same per-slice pixel formats the
  * COR.fif writer expects, so the volume can be re-serialised
  * round-trip without a second conversion pass.

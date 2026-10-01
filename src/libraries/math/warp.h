@@ -23,7 +23,7 @@
  * kernel). Fitting requires one @c (n+4)×(n+4) linear solve
  * (@c Eigen::FullPivLU); evaluation at @c m points is then
  * @c O(m*n + m). The class is also a wrapper around a tiny landmark
- * file reader (@ref readsLm) so calibration data shipped as plain text
+ * file reader (@ref UTILSLIB::Warp::readsLm "readsLm") so calibration data shipped as plain text
  * can be ingested without extra glue.
  *
  * Reference: Bookstein (1989) "Principal Warps: Thin-Plate Splines and
@@ -99,7 +99,7 @@ public:
      *
      * @param[in] sLm       3D Landmarks of the source geometry.
      * @param[in] dLm       3D Landmarks of the destination geometry.
-     * @param[in/out] vertList  List of Vertices of the source geometry that are warped to the destination.
+     * @param[in, out] vertList  List of Vertices of the source geometry that are warped to the destination.
      */
     void calculate(const Eigen::MatrixXf & sLm,
                    const Eigen::MatrixXf &dLm,

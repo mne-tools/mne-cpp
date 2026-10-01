@@ -62,7 +62,7 @@ Create a MEG coil set definition using a database of templates Change the coordi
 
 **Parameters:**
 
-- **ch**
+- **chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   Channel information to use.
 
 - **nch** : *int*
@@ -159,6 +159,10 @@ Checks if a set of templates contains an EEG electrode of a specified type.
 
 Number of coils (convenience accessor).
 
+**Returns:**
+
+- *int* — Number of coils or electrodes in this set.
+
 ---
 
 ## Static Methods
@@ -169,7 +173,7 @@ Create a EEG coil set definition using a channel information Change the coordina
 
 **Parameters:**
 
-- **ch**
+- **chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
   Channel information to use.
 
 - **nch** : *int*

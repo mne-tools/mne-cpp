@@ -14,11 +14,11 @@
  * @brief    Per-hemisphere cortical surface bundle with decimation, patch info and rendering buffers.
  *
  * @ref MNELIB::MNEHemisphere is the visualisation-friendly counterpart
- * of @ref MNESourceSpace: in addition to vertices, triangles and the MNE
+ * of @ref MNELIB::MNESourceSpace "MNESourceSpace": in addition to vertices, triangles and the MNE
  * decimation it carries pre-computed vertex normals, triangle centroids,
  * tri-areas, the patch information used by surface-oriented inverse
  * solvers and a colour table sourced from a FreeSurfer annotation. It is
- * the unit DISP3D draws from and that morphing (@ref MNEMorphMap),
+ * the unit DISP3D draws from and that morphing (@ref MNELIB::MNEMorphMap),
  * labelling and cluster operations operate on.
  */
 
@@ -103,9 +103,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Add vertex normals and neighbourhood information
-     *
-     * @param[in, out] p_pHemisphere   Hemisphere to be completed.
+     * Add vertex normals and neighbourhood information to this hemisphere.
      *
      * @return true if succeeded, false otherwise.
      */
@@ -196,7 +194,8 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param[in] a    The object which should be compared to.
+     * @param[in] b Right-hand hemisphere.
      *
      * @return true if equal, false otherwise.
      */

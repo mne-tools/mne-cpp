@@ -16,12 +16,12 @@
  * After the last tag of a FIFF file the writer appends a @c FIFF_DIR tag
  * whose payload is an array of @c fiffDirEntryRec records, one per tag in
  * the stream, terminated by a sentinel with kind = -1. The directory
- * turns linear FIFF I/O into random-access: @ref FiffStream consults it to
+ * turns linear FIFF I/O into random-access: @ref FIFFLIB::FiffStream consults it to
  * locate any tag by kind without rescanning the file, and
- * @ref FiffDirNode uses it to materialize the block hierarchy
+ * @ref FIFFLIB::FiffDirNode uses it to materialize the block hierarchy
  * (@c FIFFB_BLOCK_START / @c FIFFB_BLOCK_END pairs) into a navigable tree.
  *
- * @ref FiffDirEntry is the in-memory mirror of that 16-byte record. It is
+ * @ref FIFFLIB::FiffDirEntry is the in-memory mirror of that 16-byte record. It is
  * intentionally trivially copyable so the directory can be slurped in as
  * a single Eigen / Qt vector.
  */

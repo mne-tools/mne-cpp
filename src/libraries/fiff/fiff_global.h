@@ -59,25 +59,31 @@
  * the data containers (@ref FiffRawData, @ref FiffEvoked,
  * @ref FiffEvokedSet, @ref FiffCov, @ref FiffProj, @ref FiffCtfComp,
  * @ref FiffNamedMatrix, @ref FiffSparseMatrix) and the convenience facade
- * @ref FIFF. Surface-level parity with @c mne.io.fiff in MNE-Python.
+ * @c FIFF. Surface-level parity with @c mne.io.fiff in MNE-Python.
  */
 namespace FIFFLIB{
 
 //=============================================================================================================
 /**
  * Returns build date and time.
+ *
+ * @return Null-terminated string with the compile date and time of the library.
  */
 FIFFSHARED_EXPORT const char* buildDateTime();
 
 //=============================================================================================================
 /**
  * Returns abbreviated build git hash.
+ *
+ * @return Null-terminated string with the short git commit hash the library was built from.
  */
 FIFFSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
  * Returns full build git hash.
+ *
+ * @return Null-terminated string with the full git commit hash the library was built from.
  */
 FIFFSHARED_EXPORT const char* buildHashLong();
 }

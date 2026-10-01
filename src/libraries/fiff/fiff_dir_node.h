@@ -14,14 +14,14 @@
  * @brief    Recursive node of the parsed FIFF block tree (FIFFB_* hierarchy with directory entries and children).
  *
  * A FIFF file is a flat tag stream bracketed by @c FIFFB_BLOCK_START /
- * @c FIFFB_BLOCK_END markers. @ref FiffDirNode is the tree the stream
+ * @c FIFFB_BLOCK_END markers. @ref FIFFLIB::FiffDirNode is the tree the stream
  * parser produces from those brackets: each node owns its block kind,
- * its @ref FiffId, the list of @ref FiffDirEntry records that live
- * directly inside its block, and a list of child @ref FiffDirNode
+ * its @ref FIFFLIB::FiffId, the list of @ref FIFFLIB::FiffDirEntry records that live
+ * directly inside its block, and a list of child @ref FIFFLIB::FiffDirNode
  * sub-blocks. Together with the random-access directory at the tail of
- * the file this lets every downstream reader (@ref FiffRawData,
- * @ref FiffEvoked, @ref FiffInfo, @ref FiffCov, ...) navigate to its
- * block of interest with one call to @ref FiffDirNode::dir_tree_find
+ * the file this lets every downstream reader (@ref FIFFLIB::FiffRawData,
+ * @ref FIFFLIB::FiffEvoked, @ref FIFFLIB::FiffInfo, @ref FIFFLIB::FiffCov, ...) navigate to its
+ * block of interest with one call to @ref FIFFLIB::FiffDirNode::dir_tree_find "FiffDirNode::dir_tree_find"
  * rather than rescanning the tag stream.
  *
  * Mirrors the @c dir_tree object returned by
@@ -67,7 +67,7 @@ class FiffTag;
  *
  * Each node corresponds to one @c FIFFB_BLOCK_START ... @c FIFFB_BLOCK_END
  * pair in the on-disk tag stream. The full tree is built once by
- * @ref FiffStream::make_dir_tree after the directory tag is parsed, and is
+ * @c FiffStream::make_dir_tree after the directory tag is parsed, and is
  * then traversed by every higher-level reader (@ref FiffInfo,
  * @ref FiffRawData, @ref FiffEvoked, @ref FiffCov, ...) via
  * @ref dir_tree_find. The static @ref copy_tree helper streams an entire
@@ -182,7 +182,7 @@ public:
     /**
      * Checks whether a FiffDirNode has a specific kind
      *
-     * @param[in] findkind kind to find.
+     * @param[in] p_kind kind to find.
      *
      * @return true when fiff_dir_node contains kind.
      */

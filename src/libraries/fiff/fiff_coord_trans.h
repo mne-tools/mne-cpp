@@ -18,14 +18,14 @@
  * The FIFF coordinate-frame world is a small zoo (@c FIFFV_COORD_DEVICE,
  * @c FIFFV_COORD_HEAD, @c FIFFV_COORD_MRI, @c FIFFV_COORD_HPI,
  * @c FIFFV_COORD_RAS, ...) and any forward / inverse computation must
- * move points and orientations between them. @ref FiffCoordTrans wraps one
+ * move points and orientations between them. @ref FIFFLIB::FiffCoordTrans wraps one
  * labelled affine: the 3x3 rotation @c rot, the 3-vector translation
  * @c move, the precomputed inverse, and the integer @c from / @c to frame
  * identifiers from @ref fiff_constants.h.
  *
  * The class also publishes the small algebra needed at the call sites:
  * multiplication, inversion, and the convenience helper that picks the
- * right transform out of a @ref FiffCoordTransSet by (@c from, @c to)
+ * right transform out of a @ref FIFFLIB::FiffCoordTransSet by (@c from, @c to)
  * pair. Surface-compatible with the @c mne.transforms.Transform object
  * in MNE-Python.
  */
@@ -184,24 +184,56 @@ public:
      * @{
      */
 
-    /** Forward rotation (3×3 block of trans). */
+    /**
+     * Forward rotation (3×3 block of trans).
+     *
+     * @return Writable 3×3 block view of the upper-left rotation part of trans.
+     */
     auto rot() { return trans.block<3,3>(0,0); }
-    /** @overload */
+    /**
+     * @overload
+     *
+     * @return Read-only 3×3 block view of the upper-left rotation part of trans.
+     */
     auto rot() const { return trans.block<3,3>(0,0); }
 
-    /** Forward translation (column 3 of trans). */
+    /**
+     * Forward translation (column 3 of trans).
+     *
+     * @return Writable 3×1 block view of the translation column of trans (meters).
+     */
     auto move() { return trans.block<3,1>(0,3); }
-    /** @overload */
+    /**
+     * @overload
+     *
+     * @return Read-only 3×1 block view of the translation column of trans (meters).
+     */
     auto move() const { return trans.block<3,1>(0,3); }
 
-    /** Inverse rotation (3×3 block of invtrans). */
+    /**
+     * Inverse rotation (3×3 block of invtrans).
+     *
+     * @return Writable 3×3 block view of the upper-left rotation part of invtrans.
+     */
     auto invrot() { return invtrans.block<3,3>(0,0); }
-    /** @overload */
+    /**
+     * @overload
+     *
+     * @return Read-only 3×3 block view of the upper-left rotation part of invtrans.
+     */
     auto invrot() const { return invtrans.block<3,3>(0,0); }
 
-    /** Inverse translation (column 3 of invtrans). */
+    /**
+     * Inverse translation (column 3 of invtrans).
+     *
+     * @return Writable 3×1 block view of the translation column of invtrans (meters).
+     */
     auto invmove() { return invtrans.block<3,1>(0,3); }
-    /** @overload */
+    /**
+     * @overload
+     *
+     * @return Read-only 3×1 block view of the translation column of invtrans (meters).
+     */
     auto invmove() const { return invtrans.block<3,1>(0,3); }
     /** @} */
 
@@ -413,7 +445,8 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param[in] a    The object which should be compared to.
+     * @param[in] b Right-hand transform.
      *
      * @return true if equal, false otherwise.
      */

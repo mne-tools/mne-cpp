@@ -9,8 +9,8 @@
  * @date     May 2026
  * @brief    Surface-mesh label manipulation: grow, split into connected components, STC ↔ label conversion.
  *
- * Algorithmic counterpart to @ref FsLabel I/O. Operates on labels in the
- * frame of an accompanying @ref FsSurface, using the surface’s triangle
+ * Algorithmic counterpart to @ref FSLIB::FsLabel I/O. Operates on labels in the
+ * frame of an accompanying @ref FSLIB::FsSurface, using the surface’s triangle
  * connectivity as the vertex adjacency graph (one breadth-first hop per
  * @c step in @c growLabel; connectivity-component flood-fill in
  * @c splitLabel).

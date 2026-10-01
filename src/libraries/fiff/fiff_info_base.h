@@ -13,11 +13,11 @@
  * @date     February 2013
  * @brief    Minimal measurement-info subset (channel list, sampling rate, basic transforms) shared by FIFF readers that do not need the full FiffInfo.
  *
- * @ref FiffInfoBase carries only what every downstream component needs to
+ * @ref FIFFLIB::FiffInfoBase carries only what every downstream component needs to
  * interpret a data matrix: the channel list (@c chs / @c ch_names /
  * @c nchan), the sampling frequency, the @c FIFFV_COORD_DEVICE →
  * @c FIFFV_COORD_HEAD transform recovered from HPI, and the bad-channel
- * list. @ref FiffInfo derives from it and adds the acquisition-specific
+ * list. @ref FIFFLIB::FiffInfo derives from it and adds the acquisition-specific
  * metadata (projectors, CTF compensators, filter setups, subject info,
  * HPI fit details, ...).
  *
@@ -208,7 +208,8 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param[in] a    The object which should be compared to.
+     * @param[in] b Right-hand measurement info.
      *
      * @return true if equal, false otherwise.
      */

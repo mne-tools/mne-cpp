@@ -16,7 +16,7 @@
  * mne-python's @c mne.chpi: per-coil dipole localisation, frequency
  * ordering, large-movement detection and quaternion-formatted position
  * storage. Inputs are the projected sensor data, the SSP projector and
- * an @ref InvHpiModelParameters spec; output is an @ref HpiFitResult
+ * an @ref INVLIB::InvHpiModelParameters spec; output is an @ref INVLIB::HpiFitResult
  * that downstream stages can feed to head-movement-corrected averaging
  * or continuous co-registration.
  */
@@ -145,7 +145,7 @@ public:
     /**
      * Constructs the HPI from a InvSensorSet.
      *
-     * @param[in] InvSensorSet     The MEG sensorSet used for the hpi fitting.
+     * @param[in] sensorSet     The MEG sensorSet used for the hpi fitting.
      */
     explicit InvHpiFit(const InvSensorSet& sensorSet);
 
@@ -153,7 +153,7 @@ public:
     /**
      * Checks if InvSensorSet has changed and updates member InvSensorSet.
      *
-     * @param[in] InvSensorSet     The MEG sensorSet used for the hpi fitting.
+     * @param[in] sensorSet     The MEG sensorSet used for the hpi fitting.
      */
     void checkForUpdate(const InvSensorSet& sensorSet);
 
@@ -165,7 +165,6 @@ public:
      * @param[in]   matProjectors               The projectors to apply.
      * @param[in]   hpiModelParameters          The model parameters to use for the Hpi Fitting, especially to compute the coil amplitudes.
      * @param[in]   matCoilsHead                The hpi coil locations in head space.
-     * @param[in]   bOrderFrequencies           Order Hpi coils yes/no.
      * @param[out]  hpiFitResult                The fitting results.
      */
     void fit(const Eigen::MatrixXd& matProjectedData,
@@ -249,7 +248,7 @@ private:
     /**
      * Fits dipoles for the given coils and a given data set.
      *
-     * @param[in]   coil              The coil parameters.
+     * @param[in] matCoilsSeed              The coil parameters.
      * @param[in]   sensors           The sensor information.
      * @param[in]   matData           The data which used to fit the coils.
      * @param[in]   iNumCoils         The number of coils.
@@ -283,8 +282,6 @@ private:
      * @param[in]   matCoilsDev         The estimated coil positions in device space.
      * @param[in]   matCoilsHead        The hpi coil locations in head space.
      * @return  Returns the dev head transformation matrix.
-     * @param[out]  vecError            The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[out]  fittedPointSet      The final fitted positions in form of a digitizer set.
      *
      */
     FIFFLIB::FiffCoordTrans computeDeviceHeadTransformation(const Eigen::MatrixXd& matCoilsDev,
@@ -317,8 +314,8 @@ private:
     /**
      * Computes the transformation matrix between two sets of 3D points.
      *
-     * @param[in]   matCoilsDev         The estimated coil positions in device space.
-     * @param[in]   matCoilsHead        The hpi coil locations in head space.
+     * @param[in] matNH         The estimated coil positions in device space.
+     * @param[in] matBT        The hpi coil locations in head space.
      *
      * @return Returns the transformation matrix.
      */
@@ -329,8 +326,8 @@ private:
     /**
      * Find the coil ordering.
      *
-     * @param[in] matNH    The first set of input 3D points (row-wise order) - To.
-     * @param[in] matBT    The second set of input 3D points (row-wise order) - From.
+     * @param[in] matCoilsDev    The first set of input 3D points (row-wise order) - To.
+     * @param[in] matCoilsHead    The second set of input 3D points (row-wise order) - From.
      *
      * @return Returns the order of the coils in head space.
      */
@@ -342,7 +339,7 @@ private:
      * Order a vector or matrix.
      *
      * @param[in] vecOrder      The order.
-     * @param[in] ToOrder       The vector/matrix to order.
+     * @param[in] matToOrder       The vector/matrix to order.
      *
      * @return Returns the ordered vector/matrix.
      */
@@ -357,7 +354,7 @@ private:
      * The objective function to measure the goodness of the calculated transform.
      *
      * @param[in] matCoilsDev       The fitted coil positions (device space).
-     * @param[in] matCoilsHead      The digitized coil positions (head space).
+     * @param[in] matHeadCoil      The digitized coil positions (head space).
      * @param[in] matTrans          The dev head transformation matrix.
      *
      * @return Returns the registration error.

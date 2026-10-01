@@ -14,7 +14,7 @@
  * correlation. @ref INVLIB::InvSourceCoupling stores the grid indices,
  * the per-source dipole moments and the @c N×N correlation matrix for one
  * such tuple, plus the time window over which the coupling was evaluated.
- * An @ref InvSourceEstimate may carry many of these (one per iteration of
+ * An @ref INVLIB::InvSourceEstimate may carry many of these (one per iteration of
  * the scan) so multi-dipole solutions remain interpretable downstream.
  */
 

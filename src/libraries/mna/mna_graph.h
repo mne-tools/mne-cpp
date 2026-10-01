@@ -7,24 +7,24 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    In-memory directed acyclic graph of @ref MnaNode operations — connectivity, validation, topological sort and serialization.
+ * @brief    In-memory directed acyclic graph of @ref MNALIB::MnaNode operations — connectivity, validation, topological sort and serialization.
  *
- * @ref MnaGraph is the executable spine of an MNA project: a
- * collection of @ref MnaNode operations wired together through
- * named @ref MnaPort connections, surrounded by graph-level inputs
+ * @ref MNALIB::MnaGraph is the executable spine of an MNA project: a
+ * collection of @ref MNALIB::MnaNode operations wired together through
+ * named @ref MNALIB::MnaPort connections, surrounded by graph-level inputs
  * and outputs that expose the pipeline to its host application,
- * and parametrised by a shared @ref MnaParamTree.
+ * and parametrised by a shared @ref MNALIB::MnaParamTree.
  *
  * The class owns four responsibilities. (1) @em Composition: add /
- * remove nodes, look them up by id, and @ref connect output ports
- * to input ports by name. (2) @em Validation: @ref validate checks
+ * remove nodes, look them up by id, and @ref MNALIB::MnaGraph::connect "connect" output ports
+ * to input ports by name. (2) @em Validation: @ref MNALIB::MnaGraph::validate "validate" checks
  * acyclicity, that every required input is connected, that
- * @ref MnaDataKind matches across each edge, and that every node
- * conforms to its @ref MnaOpSchema. (3) @em Scheduling:
- * @ref topologicalSort, @ref upstreamNodes, @ref downstreamNodes
- * and @ref dirtyNodes feed the executor's incremental re-run
+ * @ref MNALIB::MnaDataKind "MnaDataKind" matches across each edge, and that every node
+ * conforms to its @ref MNALIB::MnaOpSchema. (3) @em Scheduling:
+ * @c MNALIB::MnaGraph::topologicalSort "topologicalSort", @c MNALIB::MnaGraph::upstreamNodes "upstreamNodes", @c MNALIB::MnaGraph::downstreamNodes "downstreamNodes"
+ * and @c MNALIB::MnaGraph::dirtyNodes "dirtyNodes" feed the executor's incremental re-run
  * logic. (4) @em Persistence: lossless JSON and CBOR round-trip
- * mirroring the @ref MnaIO codec choices.
+ * mirroring the @ref MNALIB::MnaIO codec choices.
  */
 
 #ifndef MNA_GRAPH_H
@@ -99,6 +99,10 @@ public:
     /**
      * Connect output port of srcNode to input port of dstNode.
      * Sets the sourceNodeId and sourcePortName on the destination input port.
+     * @param srcNodeId     Id of the node providing the output.
+     * @param srcPortName   Name of the output port on the source node.
+     * @param dstNodeId     Id of the node receiving the input.
+     * @param dstPortName   Name of the input port on the destination node.
      * @return true if connection was made, false if ports not found.
      */
     bool connect(const QString& srcNodeId, const QString& srcPortName,

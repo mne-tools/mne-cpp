@@ -17,7 +17,7 @@
  * giving a denoising / smoothing projector that is the spatial-domain analogue
  * of a low-pass filter.
  *
- * @ref makeSpharaProjector assembles the dense @c (iOperatorDim × iOperatorDim)
+ * @ref UTILSLIB::makeSpharaProjector "makeSpharaProjector" assembles the dense @c (iOperatorDim × iOperatorDim)
  * projection matrix from a stack of pre-computed basis functions. The
  * @c vecIndices argument maps the rows of the basis-function matrix back to
  * channel indices in the full data matrix, and @c iSkip lets a single basis

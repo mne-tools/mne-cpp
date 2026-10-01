@@ -11,8 +11,8 @@
  *
  * @ref INVLIB::InvGuessData generates and stores the regular grid of
  * candidate dipole positions that seeds the Nelder-Mead optimiser used
- * by @ref InvDipoleFit. For every guess location the corresponding
- * forward-field SVD is pre-computed into an @ref InvDipoleForward, so
+ * by @ref INVLIB::InvDipoleFit. For every guess location the corresponding
+ * forward-field SVD is pre-computed into an @ref INVLIB::InvDipoleForward, so
  * the per-iteration evaluation cost reduces to a dense matmul. Replaces
  * the @c guessDataRec record of MNE-C and is built either from a
  * user-supplied guess source space or directly from an inner-skull BEM
@@ -84,7 +84,12 @@ public:
      * Constructs the Guess Data from given Data
      * Refactored: make_guess_data (setup.c)
      *
-     * @param[in] guessname.
+     * @param[in] guessname File with a predefined guess point set (empty = build a grid).
+     * @param[in] guess_surfname Surface file bounding the guess grid (empty = inner skull of the BEM, or a sphere).
+     * @param[in] mindist Minimum distance of guess points from the bounding surface (m).
+     * @param[in] exclude Exclude guess points closer than this to the sphere origin (m).
+     * @param[in] grid Spacing of the guess grid (m).
+     * @param[in, out] f Dipole fit data providing the forward model.
      *
      */
     InvGuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f);
@@ -94,7 +99,13 @@ public:
      * Constructs the Guess Data from given Data
      * Refactored: make_guess_data (dipole_fit_setup.c)
      *
-     * @param[in] guessname.
+     * @param[in] guessname File with a predefined guess point set (empty = build a grid).
+     * @param[in] guess_surfname Surface file bounding the guess grid (empty = inner skull of the BEM, or a sphere).
+     * @param[in] mindist Minimum distance of guess points from the bounding surface (m).
+     * @param[in] exclude Exclude guess points closer than this to the sphere origin (m).
+     * @param[in] grid Spacing of the guess grid (m).
+     * @param[in, out] f Dipole fit data providing the forward model.
+     * @param[in, out] guess_save_name File to save the guess points to (nullptr = do not save; saving is not implemented yet).
      *
      */
     InvGuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, InvDipoleFitData* f, char *guess_save_name);

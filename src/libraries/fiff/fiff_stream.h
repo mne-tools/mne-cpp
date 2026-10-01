@@ -13,19 +13,19 @@
  * @date     October 2012
  * @brief    FIFF binary tag-stream layer: wraps a QIODevice to read and write FIFF tags, directories, blocks and the structured records nested inside them.
  *
- * @ref FiffStream is the workhorse of FIFFLIB. It owns a @c QIODevice
+ * @ref FIFFLIB::FiffStream is the workhorse of FIFFLIB. It owns a @c QIODevice
  * (typically a @c QFile or a @c QTcpSocket for realtime), reads and
  * writes the 16-byte FIFF tag header, decodes payloads through the
  * endian-swap helpers in @ref fiff_byte_swap.h, and assembles the
  * directory and block tree on the way in. The high-level methods then
- * trade tag streams for typed objects: @ref read_meas_info returns a
- * @ref FiffInfo, @ref read_raw_data returns a @ref FiffRawData,
- * @ref read_evoked returns a @ref FiffEvoked, @ref read_cov returns a
- * @ref FiffCov, etc. On the writing side @ref start_writing_raw,
- * @ref write_tag, @ref write_int / @ref write_float /
- * @ref write_float_matrix, @ref start_block / @ref end_block and the
- * record-level writers (@ref write_id, @ref write_ch_info,
- * @ref write_coord_trans, ...) emit a fully spec-compliant FIFF file
+ * trade tag streams for typed objects: @ref FIFFLIB::FiffStream::read_meas_info "read_meas_info" returns a
+ * @ref FIFFLIB::FiffInfo, @c read_raw_data returns a @ref FIFFLIB::FiffRawData,
+ * @ref FIFFLIB::Fiff::read_evoked "read_evoked" returns a @ref FIFFLIB::FiffEvoked, @ref FIFFLIB::FiffStream::read_cov "read_cov" returns a
+ * @ref FIFFLIB::FiffCov, etc. On the writing side @ref FIFFLIB::FiffStream::start_writing_raw "start_writing_raw",
+ * @ref FIFFLIB::FiffStream::write_tag "write_tag", @ref FIFFLIB::FiffStream::write_int "write_int" / @ref FIFFLIB::FiffStream::write_float "write_float" /
+ * @ref FIFFLIB::FiffStream::write_float_matrix "write_float_matrix", @ref FIFFLIB::FiffStream::start_block "start_block" / @ref FIFFLIB::FiffStream::end_block "end_block" and the
+ * record-level writers (@ref FIFFLIB::FiffStream::write_id "write_id", @ref FIFFLIB::FiffStream::write_ch_info "write_ch_info",
+ * @ref FIFFLIB::FiffStream::write_coord_trans "write_coord_trans", ...) emit a fully spec-compliant FIFF file
  * that round-trips through MNE-Python and MNE-C unchanged.
  *
  * Inheriting from @c QDataStream gives the class transparent access to
@@ -444,6 +444,7 @@ public:
      * @param[in] p_IODevice        An fiff IO device like a fiff QFile or QTCPSocket.
      * @param[out] data              The raw data information - contains the opened fiff file.
      * @param[in] allow_maxshield    Accept unprocessed MaxShield data.
+     * @param[in] is_littleEndian The file is stored in little-endian byte order.
      *
      * @return true if succeeded, false otherwise.
      */
@@ -880,7 +881,7 @@ private:
 //    FILE         *fd;           /**< The normal file descriptor. */ -> file descitpion is part of the stream: stream->device()
     FiffId                      m_id;   /**< The file identifier. */
     QList<FiffDirEntry::SPtr>   m_dir;  /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
-//    int         nent;           /**< How many entries?. */ -> Use nent() instead
+//    int         nent;           /**< How many entries? */ -> Use nent() instead
     FiffDirNode::SPtr           m_dirtree; /**< Directory compiled into a tree. */
 //    char        *ext_file_name; /**< Name of the file holding the external data. */
 //    FILE        *ext_fd;        /**< The file descriptor of the above file if open . */

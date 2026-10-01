@@ -10,7 +10,7 @@
  * @brief    InvBeamformer value type — container for pre-computed LCMV / DICS spatial filters and associated metadata.
  *
  * @ref INVLIB::InvBeamformer stores the spatial filter weights produced
- * by @ref InvLCMV::makeLCMV or @ref InvDICS::makeDICS together with the
+ * by @ref INVLIB::InvLCMV::makeLCMV "InvLCMV::makeLCMV" or @ref INVLIB::InvDICS::makeDICS "InvDICS::makeDICS" together with the
  * whitener, SSP projector, source-space vertex list, source normals,
  * weight-normalisation mode (none / unit-noise-gain / NAI), max-power
  * orientations and (for DICS) the per-frequency filter stack. Holding
@@ -83,30 +83,40 @@ public:
     //=========================================================================================================
     /**
      * Returns true if this beamformer contains valid filter weights.
+     *
+     * @return True if filter weights are present, false for a default-constructed beamformer.
      */
     inline bool isValid() const;
 
     //=========================================================================================================
     /**
      * Returns the number of source points.
+     *
+     * @return Number of source points covered by the filter weights.
      */
     inline int nSources() const;
 
     //=========================================================================================================
     /**
      * Returns the number of channels.
+     *
+     * @return Number of sensor channels the filter weights apply to.
      */
     inline int nChannels() const;
 
     //=========================================================================================================
     /**
      * Returns the number of orientations per source (1 or 3).
+     *
+     * @return 1 for fixed or max-power orientation, 3 for free orientation.
      */
     inline int nOrient() const;
 
     //=========================================================================================================
     /**
      * Returns the number of frequency bins (1 for LCMV, >= 1 for DICS).
+     *
+     * @return Number of frequency bins with separate filter weights.
      */
     inline int nFreqs() const;
 

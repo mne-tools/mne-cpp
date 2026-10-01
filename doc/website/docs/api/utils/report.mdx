@@ -38,6 +38,11 @@ report.save("/path/to/report.html");
 
 Construct a report with a title.
 
+**Parameters:**
+
+- **sTitle** : *const QString &*
+  [`Report`](/docs/api/utils/report) title, used for the HTML page title and main heading.
+
 ---
 
 ### addText(sTitle, sContent)
@@ -89,17 +94,33 @@ Add a key-value section.
 
 Add a preformatted code block.
 
+**Parameters:**
+
+- **sTitle** : *const QString &*
+  Section title.
+
+- **sCode** : *const QString &*
+  Code text; it is HTML-escaped and wrapped in a preformatted block.
+
 ---
 
 ### sectionCount()
 
 Get the number of sections.
 
+**Returns:**
+
+- *int* — Number of sections added so far.
+
 ---
 
 ### toHtml()
 
 Generate the full HTML string.
+
+**Returns:**
+
+- *QString* — Self-contained HTML document containing the title and all sections.
 
 ---
 
@@ -121,6 +142,10 @@ Save the report to an HTML file.
 ### title()
 
 Get the report title.
+
+**Returns:**
+
+- *const QString &* — Title passed at construction.
 
 ---
 

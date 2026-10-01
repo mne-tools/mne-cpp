@@ -10,11 +10,11 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    Channel-selection group descriptor (@ref SelectionItem) and the matching @c QGraphicsItem (@ref SelectionSceneItem).
+ * @brief    Channel-selection group descriptor (@ref DISPLIB::SelectionItem) and the matching @c QGraphicsItem (@ref DISPLIB::SelectionSceneItem).
  *
  * SelectionItem is a value type holding a named list of channel names
  * loaded from an MNE @c .sel file. SelectionSceneItem is the visual
- * @c QGraphicsItem drawn for each sensor inside @ref SelectionScene;
+ * @c QGraphicsItem drawn for each sensor inside @ref DISPLIB::SelectionScene;
  * it tracks selection / hover state and paints itself with the
  * modality-specific colour and shape.
  */
@@ -85,6 +85,14 @@ public:
     //=========================================================================================================
     /**
      * Constructs a SelectionSceneItem.
+     *
+     * @param[in] channelName      Name of the channel shown by this item.
+     * @param[in] channelNumber    Index of the channel in the measurement info.
+     * @param[in] channelPosition  2-D layout position (scaled by 10 when painted).
+     * @param[in] channelKind      FIFF channel kind (e.g. FIFFV_MEG_CH).
+     * @param[in] channelUnit      FIFF unit of the channel data.
+     * @param[in] channelColor     Fill colour of the electrode marker (default Qt::blue).
+     * @param[in] bIsBadChannel    True to paint the channel as bad (red) (default false).
      */
     SelectionSceneItem(QString channelName,
                        int channelNumber,
@@ -97,12 +105,18 @@ public:
     //=========================================================================================================
     /**
      * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
+     *
+     * @return Fixed 50 x 50 rectangle with top-left corner at (-25, -30) in item coordinates.
      */
     QRectF boundingRect() const;
 
     //=========================================================================================================
     /**
      * Reimplemented paint function.
+     *
+     * @param[in] painter  Painter used to draw the electrode marker and label.
+     * @param[in] option   Style options (unused).
+     * @param[in] widget   Widget being painted on (unused).
      */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 

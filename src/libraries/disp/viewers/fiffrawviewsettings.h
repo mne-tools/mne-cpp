@@ -13,9 +13,9 @@
  * @brief    Display-style settings for the FIFF raw browser (zoom, time window, signal / background colours).
  *
  * FiffRawViewSettings centralises the visual knobs of
- * @ref RtFiffRawView / @ref ChannelDataView: visible time window in
+ * @ref DISPLIB::RtFiffRawView / @ref DISPLIB::ChannelDataView "ChannelDataView": visible time window in
  * seconds, distance-to-axis spinbox, trigger colour, background and
- * signal pen colour, plus a @ref ApplyToView selector that decides
+ * signal pen colour, plus a @ref DISPLIB::ApplyToView selector that decides
  * whether the scaling change affects all / visible / selected
  * channels.
  */
@@ -80,7 +80,9 @@ public:
     /**
      * Constructs a FiffRawViewSettings which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent        parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     FiffRawViewSettings(const QString& sSettingsPath = "",
                         QWidget *parent = 0,
@@ -219,12 +221,16 @@ protected:
     //=========================================================================================================
     /**
      * Slot called when time window size changes
+     *
+     * @param[in] value  New visible window size in seconds.
      */
     void onTimeWindowChanged(int value);
 
     //=========================================================================================================
     /**
      * Slot called when zoome changes
+     *
+     * @param[in] value  New number of visible channels (row-height zoom).
      */
     void onZoomChanged(double value);
 

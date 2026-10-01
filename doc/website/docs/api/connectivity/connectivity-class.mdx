@@ -21,7 +21,7 @@ class CONNECTIVITYLIB::Connectivity
 
 Dispatcher that runs one or more functional-connectivity estimators over a batch of pre-processed trials and returns one [`Network`](/docs/api/connectivity/network) per estimator.
 
-The selected methods are read from [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)::getConnectivityMethods and matched by string against the supported metric set ("COR", "XCOR", "COH", "IMAGCOH", "PLI", "USPLI", "WPLI", "DSWPLI", "PLV", "GC", "DTF", "PDC"). All spectral metrics share the same DPSS tapered FFT and CSD accumulator inside [`ConnectivitySettings`](/docs/api/connectivity/connectivity-settings), so running e.g. PLI + wPLI + dwPLI in one call costs only one FFT pass.
+The selected methods are read from `CONNECTIVITYLIB::ConnectivitySettings::getConnectivityMethods` "[ConnectivitySettings](/docs/api/connectivity/connectivity-settings)::getConnectivityMethods" and matched by string against the supported metric set ("COR", "XCOR", "COH", "IMAGCOH", "PLI", "USPLI", "WPLI", "DSWPLI", "PLV", "GC", "DTF", "PDC"). All spectral metrics share the same DPSS tapered FFT and CSD accumulator inside [`ConnectivitySettings`](/docs/api/connectivity/connectivity-settings), so running e.g. PLI + wPLI + dwPLI in one call costs only one FFT pass.
 
 Runs the selected functional-connectivity metrics over a [`ConnectivitySettings`](/docs/api/connectivity/connectivity-settings) batch.
 
@@ -40,6 +40,11 @@ Constructs a [`Connectivity`](/docs/api/connectivity/connectivity-class) object.
 ### calculate(connectivitySettings)
 
 Computes the network based on the current settings.
+
+**Parameters:**
+
+- **connectivitySettings** : *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings) &*
+  Input trials and requested methods; per-trial spectral caches are filled in during computation.
 
 **Returns:**
 

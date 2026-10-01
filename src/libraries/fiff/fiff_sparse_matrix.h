@@ -12,7 +12,7 @@
  * The FIFF matrix tag format supports three storage modes encoded in the
  * type word (see @ref fiff_tag.h): dense, column-compressed sparse
  * (@c MATRIX_CODING_CCS) and row-compressed sparse (@c MATRIX_CODING_RCS).
- * @ref FiffSparseMatrix is the in-memory representation of the two sparse
+ * @ref FIFFLIB::FiffSparseMatrix is the in-memory representation of the two sparse
  * forms. It owns the value array, the index array and the pointer array
  * in the layout the FIFF stream produced, and exposes a conversion to
  * @c Eigen::SparseMatrix so downstream linear-algebra code can operate
@@ -95,24 +95,32 @@ public:
     //=========================================================================================================
     /**
      * Default copy constructor.
+     *
+     * @param[in] mat   Sparse matrix to copy.
      */
     FiffSparseMatrix(const FiffSparseMatrix& mat) = default;
 
     //=========================================================================================================
     /**
      * Default move constructor.
+     *
+     * @param[in] mat   Sparse matrix to move from; left in a valid but unspecified state.
      */
     FiffSparseMatrix(FiffSparseMatrix&& mat) = default;
 
     //=========================================================================================================
     /**
      * Default copy-assignment operator.
+     *
+     * @return Reference to this object.
      */
     FiffSparseMatrix& operator=(const FiffSparseMatrix&) = default;
 
     //=========================================================================================================
     /**
      * Default move-assignment operator.
+     *
+     * @return Reference to this object.
      */
     FiffSparseMatrix& operator=(FiffSparseMatrix&&) = default;
 
@@ -143,16 +151,19 @@ public:
 
     /**
      * Number of rows.
+     * @return Row count of the underlying Eigen sparse matrix.
      */
     inline int rows() const { return static_cast<int>(m_eigen.rows()); }
 
     /**
      * Number of columns.
+     * @return Column count of the underlying Eigen sparse matrix.
      */
     inline int cols() const { return static_cast<int>(m_eigen.cols()); }
 
     /**
      * Number of stored non-zero elements.
+     * @return Count of explicitly stored entries in the underlying Eigen sparse matrix.
      */
     inline int nonZeros() const { return static_cast<int>(m_eigen.nonZeros()); }
 

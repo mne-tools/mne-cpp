@@ -269,11 +269,35 @@ Sort rows in ascending order.
 
 Compares two index-value-pairs (greater-than).
 
+**Parameters:**
+
+- **lhs** : *const std::pair&lt; int, T &gt; &*
+  Left index-value pair.
+
+- **rhs** : *const std::pair&lt; int, T &gt; &*
+  Right index-value pair.
+
+**Returns:**
+
+- *bool* — True if the value of lhs is greater than the value of rhs.
+
 ---
 
 ### compareIdxValuePairSmallerThan(lhs, rhs)
 
 Compares two index-value-pairs (less-than).
+
+**Parameters:**
+
+- **lhs** : *const std::pair&lt; int, T &gt; &*
+  Left index-value pair.
+
+- **rhs** : *const std::pair&lt; int, T &gt; &*
+  Right index-value pair.
+
+**Returns:**
+
+- *bool* — True if the value of lhs is less than the value of rhs.
 
 ---
 
@@ -281,11 +305,35 @@ Compares two index-value-pairs (less-than).
 
 Compares triplet first entry (row).
 
+**Parameters:**
+
+- **lhs** : *const Eigen::Triplet&lt; T &gt; &*
+  Left triplet.
+
+- **rhs** : *const Eigen::Triplet&lt; T &gt; &*
+  Right triplet.
+
+**Returns:**
+
+- *bool* — True if the row index of lhs is less than that of rhs.
+
 ---
 
 ### compareTripletSecondEntry(lhs, rhs)
 
 Compares triplet second entry (column).
+
+**Parameters:**
+
+- **lhs** : *const Eigen::Triplet&lt; T &gt; &*
+  Left triplet.
+
+- **rhs** : *const Eigen::Triplet&lt; T &gt; &*
+  Right triplet.
+
+**Returns:**
+
+- *bool* — True if the column index of lhs is less than that of rhs.
 
 ---
 

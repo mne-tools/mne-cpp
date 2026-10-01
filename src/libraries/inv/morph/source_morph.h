@@ -96,12 +96,16 @@ public:
     //=========================================================================================================
     /**
      * @brief Check if the morph has been computed.
+     *
+     * @return True if the morph matrix is available for apply().
      */
     bool isComputed() const { return m_bComputed; }
 
     //=========================================================================================================
     /**
      * @brief Get the number of target vertices.
+     *
+     * @return Number of vertices in the target subject's source space.
      */
     int nVerticesTo() const { return static_cast<int>(m_verticesTo.size()); }
 

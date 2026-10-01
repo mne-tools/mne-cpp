@@ -7,26 +7,26 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Orthogonal-plane resampler that turns a 3D @ref MriVolData into the 2D textures consumed by the slice viewer.
+ * @brief    Orthogonal-plane resampler that turns a 3D @ref MRILIB::MriVolData into the 2D textures consumed by the slice viewer.
  *
  * The slicer is the bridge between the format-specific MRI
- * readers (@ref MriMghIO, @ref MriNiftiIO, @ref MriCorIO) and
+ * readers (@ref MRILIB::MriMghIO, @ref MRILIB::MriNiftiIO, @ref MRILIB::MriCorIO) and
  * the @c MriSlicesPlugin / @c MriSlicesView widgets that
  * render axial / coronal / sagittal cross-sections in
  * @c mne_analyze_studio. Two cooperating types live here:
  *
- * - @ref SliceOrientation --- a strong enum picking the slicing
+ * - @ref MRILIB::SliceOrientation "SliceOrientation" --- a strong enum picking the slicing
  * axis (Axial / Coronal / Sagittal); used both as the user-
  * facing radio-button value in the slice viewer and as the
  * index-permutation key inside the slicer itself.
- * - @ref MriSliceImage --- the result type: a normalised
+ * - @ref MRILIB::MriSliceImage --- the result type: a normalised
  * (0..1) @c Eigen::MatrixXf pixel buffer ready to upload
  * as an OpenGL texture, paired with its own slice-to-RAS
- * 4\u00d74 transform so the viewer can overlay surface meshes,
+ * 4×4 transform so the viewer can overlay surface meshes,
  * source estimates or fiducials in the correct world space
  * without re-deriving the geometry from the volume header.
  *
- * The static @ref MriSlicer::extract() method does the actual
+ * The static @c MriSlicer::extract() method does the actual
  * work: it picks the right axis stride from the volume header,
  * dispatches by on-disk voxel type (UCHAR / SHORT / INT /
  * FLOAT) so quantisation matches the source, normalises by the
@@ -230,18 +230,31 @@ public:
 
     /**
      * Return the voxel axis used as the fixed slicing axis for an anatomical orientation.
+     *
+     * @param[in] vol           Loaded MRI volume whose vox2ras-tkr transform defines the axes.
+     * @param[in] orientation   Slice orientation.
+     * @return Voxel axis index (0, 1 or 2) held fixed for this orientation.
      */
     static int voxelAxisForOrientation(const MriVolData& vol,
                                        SliceOrientation orientation);
 
     /**
      * Return the volume dimension used by an anatomical slice orientation.
+     *
+     * @param[in] vol           Loaded MRI volume.
+     * @param[in] orientation   Slice orientation.
+     * @return Number of voxels along the slicing axis, i.e. the number of available slices.
      */
     static int dimensionForOrientation(const MriVolData& vol,
                                        SliceOrientation orientation);
 
     /**
      * Return the slice index for an anatomical orientation from a voxel coordinate.
+     *
+     * @param[in] vol           Loaded MRI volume.
+     * @param[in] orientation   Slice orientation.
+     * @param[in] voxel         Voxel coordinate (column, row, slice).
+     * @return Component of voxel along the slicing axis for this orientation.
      */
     static int sliceIndexForOrientation(const MriVolData& vol,
                                         SliceOrientation orientation,

@@ -73,7 +73,9 @@ public:
     /**
      * Constructs a TfSettingsView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent        parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     TfSettingsView(const QString& sSettingsPath = "",
                    QWidget *parent = 0,

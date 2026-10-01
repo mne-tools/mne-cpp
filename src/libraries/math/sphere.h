@@ -16,7 +16,7 @@
  * are provided: a closed-form algebraic fit due to Alan Jennings
  * (University of Dayton) that solves a single linear system in
  * @c O(n) and returns the algebraic best fit in one shot, and a
- * Nelder–Mead refinement (@ref fit_sphere_simplex) that minimises the
+ * Nelder–Mead refinement (@ref UTILSLIB::Sphere::fit_sphere_simplex "fit_sphere_simplex") that minimises the
  * geometric residual @f$\sum_i (\|\mathbf{p}_i - \mathbf{c}\| - r)^2@f$
  * via @ref UTILSLIB::SimplexAlgorithm and is more robust on noisy
  * digitiser data where the algebraic fit is biased toward outliers.
@@ -53,7 +53,7 @@ namespace UTILSLIB
 // TYPEDEFS
 //=============================================================================================================
 
-/** @brief Cost-function workspace for @ref Sphere::fit_sphere_simplex: holds the @c nx3 point cloud and a verbose-report flag. */
+/** @brief Cost-function workspace for @ref UTILSLIB::Sphere::fit_sphere_simplex "Sphere::fit_sphere_simplex": holds the @c nx3 point cloud and a verbose-report flag. */
 struct FitUser {
     Eigen::MatrixXf rr;
     bool report;
@@ -174,7 +174,9 @@ private:
      *
      * @param[in] loop       The current iteration loop.
      * @param[in] fitpar     The currently best fitting simplex vertex.
-     * @param[in] fval       The optimization value.
+     * @param[in] fval_lo       The optimization value.
+     * @param[in] fval_hi Highest cost in the current simplex (unused).
+     * @param[in] par_diff Parameter spread of the current simplex (unused).
      *
      * @return true if reporting was successful.
      */

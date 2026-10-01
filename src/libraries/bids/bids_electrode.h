@@ -13,10 +13,10 @@
  * with REQUIRED @c name and @c x / @c y / @c z coordinates plus
  * optional @c size / @c type / @c material / @c impedance metadata.
  * Coordinates are interpreted in the frame named by the sibling
- * @c _coordsystem.json (see @ref BidsCoordinateSystem) using the unit
+ * @c _coordsystem.json (see @ref BIDSLIB::BidsCoordinateSystem) using the unit
  * declared there.
  *
- * @ref BidsElectrode::toFiffDigPoints converts a list of records into a
+ * @ref BIDSLIB::BidsElectrode::toFiffDigPoints "BidsElectrode::toFiffDigPoints" converts a list of records into a
  * @c FIFFLIB::FiffDigPointSet of EEG digitizer points so the rest of
  * MNE-CPP — channel registration, forward modelling, 3-D rendering —
  * can consume BIDS electrodes through the same interface it uses for

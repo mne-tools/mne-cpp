@@ -10,12 +10,12 @@
  * @brief    Tokeniser and de-tokeniser that turn an @ref INVLIB::InvSourceEstimate into a flat sequence consumable by foundation-model architectures.
  *
  * Declares the free functions @ref INVLIB::tokenize and
- * @ref INVLIB::fromTokens that round-trip an @ref InvSourceEstimate
- * through the @ref InvToken vocabulary defined in @c inv_token.h. The
+ * @ref INVLIB::fromTokens that round-trip an @ref INVLIB::InvSourceEstimate
+ * through the @ref INVLIB::InvToken vocabulary defined in @c inv_token.h. The
  * tokeniser walks the estimate's metadata, dense grid, vertex list,
  * focal dipoles, coupling groups and connectivity layers and emits a
  * self-describing sequence framed by @c BOS / @c EOS markers. The
- * @ref InvTokenizeOptions struct enables sub-sampling or layer omission
+ * @ref INVLIB::InvTokenizeOptions struct enables sub-sampling or layer omission
  * for context-limited transformer windows, while the inverse parser
  * silently skips unknown tokens to keep the format forward-compatible.
  */

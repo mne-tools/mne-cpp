@@ -754,7 +754,7 @@ public slots:
      * Push a single source-data vector into the real-time pipeline.
      * The vector should contain source values for all sources (LH + RH concatenated).
      *
-     * @param[in] data       Source activity vector.
+     * @param[in] matData       Source activity vector.
      */
     void pushRealtimeSourceData(const Eigen::VectorXd &matData);
 
@@ -820,7 +820,7 @@ public slots:
      * The vector should contain one value per picked channel
      * (matching the active mapping matrix column count).
      *
-     * @param[in] data       Sensor measurement vector.
+     * @param[in] vecData       Sensor measurement vector.
      */
     void pushRealtimeSensorData(const Eigen::VectorXf &vecData);
 
@@ -1129,7 +1129,7 @@ signals:
     /**
      * Emitted whenever the number of viewports changes — either via
      * @ref setViewCount or after restoring persisted state in
-     * @ref loadMultiViewSettings. UI consumers (e.g. host toolbars)
+     * @c BrainView::loadMultiViewSettings "loadMultiViewSettings". UI consumers (e.g. host toolbars)
      * should connect to this to keep their controls in sync.
      *
      * @param[in] count  Number of viewports (1..kDefaultViewportCount).
@@ -1140,7 +1140,7 @@ signals:
     /**
      * Emitted whenever the active brain shader mode changes — either
      * via @ref setShaderMode or after restoring persisted state in
-     * @ref loadMultiViewSettings.
+     * @c BrainView::loadMultiViewSettings "loadMultiViewSettings".
      *
      * @param[in] modeName  Shader name as accepted by @ref setShaderMode.
      */

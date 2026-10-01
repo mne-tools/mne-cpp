@@ -79,10 +79,6 @@ Construts the surface by reading it of the given file.
 - **surf** : *const QString &*
   Name of the surface to load (eg. inflated, orig ...).
 
-**Returns:**
-
-- true if read sucessful, false otherwise.
-
 ---
 
 ### ~FsSurface()
@@ -298,6 +294,11 @@ Reads a FreeSurfer surface file
 ### read_curv(p_sFileName)
 
 reads a binary curvature file into a vector
+
+**Parameters:**
+
+- **p_sFileName** : *const QString &*
+  Path to the FreeSurfer curvature file (e.g. lh.curv).
 
 **Returns:**
 

@@ -208,16 +208,27 @@ public:
      *
      * Looks for "bem_head" first, then any BEM surface whose tissue type
      * is @c BrainSurface::TissueSkin.
+     *
+     * @param[in] surfaces   Surface map keyed by surface name.
+     * @return Head surface key, else the first BEM key, or an empty string if no BEM surface exists.
      */
     static QString findHeadSurfaceKey(const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces);
 
     /**
      * Find the MEG helmet surface key ("sens_surface_meg") if present.
+     *
+     * @param[in] surfaces   Surface map keyed by surface name.
+     * @return "sens_surface_meg" if present, otherwise an empty string.
      */
     static QString findHelmetSurfaceKey(const QMap<QString, std::shared_ptr<BrainSurface>> &surfaces);
 
     /**
      * Compute a "nice" iso-contour step given a value range and target number of ticks.
+     *
+     * @param[in] minVal        Lower bound of the value range.
+     * @param[in] maxVal        Upper bound of the value range.
+     * @param[in] targetTicks   Desired number of contour intervals.
+     * @return Step of 1, 2, 5 or 10 times a power of ten, or 0 for an empty range or non-positive targetTicks.
      */
     static float contourStep(float minVal, float maxVal, int targetTicks);
 

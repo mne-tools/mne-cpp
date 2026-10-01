@@ -11,11 +11,11 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     August 2016
- * @brief    Node of a connectivity @ref Network; carries a 3D position and the lists of incident (in / out, full / thresholded) edges.
+ * @brief    Node of a connectivity @ref CONNECTIVITYLIB::Network; carries a 3D position and the lists of incident (in / out, full / thresholded) edges.
  *
- * One @ref NetworkNode is created per sensor (in sensor-space connectivity)
+ * One @ref CONNECTIVITYLIB::NetworkNode is created per sensor (in sensor-space connectivity)
  * or per source vertex / ROI centroid (in source-space connectivity). The
- * 3D position is filled by @ref ConnectivitySettings::setNodePositions
+ * 3D position is filled by @c CONNECTIVITYLIB::ConnectivitySettings::setNodePositions "ConnectivitySettings::setNodePositions"
  * from either a @c FiffInfo channel set or from a forward solution + a
  * @c FsSurfaceSet pair, and is used by disp3D to draw the node at the
  * correct anatomical location.
@@ -24,7 +24,7 @@
  * full unthresholded graph and for the thresholded view, and separately
  * for ingoing and outgoing directions - so that graph-theoretic measures
  * (degree, hub-ness, in/out strength) can be computed in O(1) per node
- * once the corresponding @ref Network has been assembled.
+ * once the corresponding @ref CONNECTIVITYLIB::Network has been assembled.
  */
 
 #ifndef NETWORKNODE_H

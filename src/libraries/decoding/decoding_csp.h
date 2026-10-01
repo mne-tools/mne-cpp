@@ -22,7 +22,7 @@
  * Filters for Robust EEG Single-Trial Analysis*, IEEE Signal Processing
  * Magazine 25(1), 2008.
  *
- * @ref DecodingCsp mirrors the public surface of @c mne.decoding.CSP
+ * @ref DECODINGLIB::DecodingCsp mirrors the public surface of @c mne.decoding.CSP
  * but implements the GED inline with Eigen so no LAPACK dependency is
  * required, which matters for the WebAssembly target. Beyond the
  * upstream algorithm it provides the @c TransformMode switch

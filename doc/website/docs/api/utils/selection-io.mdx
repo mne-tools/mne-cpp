@@ -43,6 +43,10 @@ Reads the specified [MNE](/docs/api/mne/mne-class) sel file.
 - **selectionMap** : *QMultiMap&lt; QString, QStringList &gt; &*
   holds the map to which the read selection groups are stored.
 
+**Returns:**
+
+- *bool* — True on success, false if the path lacks a .sel extension or the file cannot be opened.
+
 ---
 
 ### readMNESelFile(path, selectionMap)
@@ -56,6 +60,10 @@ Reads the specified [MNE](/docs/api/mne/mne-class) sel file.
 
 - **selectionMap** : *std::multimap&lt; std::string, std::vector&lt; std::string &gt; &gt; &*
   holds the map to which the read selection groups are stored.
+
+**Returns:**
+
+- *bool* — True on success, false if the path lacks a .sel extension or the file cannot be opened.
 
 ---
 
@@ -71,6 +79,10 @@ Reads the specified Brainstorm montage file.
 - **selectionMap** : *QMultiMap&lt; QString, QStringList &gt; &*
   holds the map to which the read selection groups are stored.
 
+**Returns:**
+
+- *bool* — True on success, false if the path lacks a .mon extension or the file cannot be opened.
+
 ---
 
 ### readBrainstormMonFile(path, selectionMap)
@@ -85,6 +97,10 @@ Reads the specified Brainstorm montage file.
 - **selectionMap** : *std::multimap&lt; std::string, std::vector&lt; std::string &gt; &gt; &*
   holds the map to which the read selection groups are stored.
 
+**Returns:**
+
+- *bool* — True on success, false if the path lacks a .mon extension or the file cannot be opened.
+
 ---
 
 ### writeMNESelFile(path, selectionMap)
@@ -99,6 +115,10 @@ Writes the specified selection groups to a single [MNE](/docs/api/mne/mne-class)
 - **selectionMap** : *const QMultiMap&lt; QString, QStringList &gt; &*
   holds the map to which the read selection groups are stored.
 
+**Returns:**
+
+- *bool* — True on success, false if the path lacks a .sel extension or the file cannot be opened for writing.
+
 ---
 
 ### writeMNESelFile(path, selectionMap)
@@ -112,6 +132,10 @@ Writes the specified selection groups to a single [MNE](/docs/api/mne/mne-class)
 
 - **selectionMap** : *const std::map&lt; std::string, std::vector&lt; std::string &gt; &gt; &*
   holds the map to which the read selection groups are stored.
+
+**Returns:**
+
+- *bool* — True on success, false if the path lacks a .sel extension or the file cannot be opened for writing.
 
 ---
 
@@ -129,6 +153,10 @@ The amount of written files depend on the number of selection groups in selectio
 - **selectionMap** : *const QMultiMap&lt; QString, QStringList &gt; &*
   holds the map to which the read selection groups are stored.
 
+**Returns:**
+
+- *bool* — True if all .mon files were written, false if any file could not be opened for writing.
+
 ---
 
 ### writeBrainstormMonFiles(path, selectionMap)
@@ -144,6 +172,10 @@ The amount of written files depend on the number of selection groups in selectio
 
 - **selectionMap** : *const std::map&lt; std::string, std::vector&lt; std::string &gt; &gt; &*
   holds the map to which the read selection groups are stored.
+
+**Returns:**
+
+- *bool* — True if all .mon files were written, false if any file could not be opened for writing.
 
 ---
 

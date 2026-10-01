@@ -37,8 +37,14 @@ Constructs a [`AverageLayoutView`](/docs/api/disp/average-layout-view) which is 
 
 **Parameters:**
 
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
 - **parent** : *QWidget **
   parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
 
 ---
 
@@ -214,7 +220,7 @@ Sets the currently viewable channels using the corrent name and location paramet
 
 **Parameters:**
 
-- **data**
+- **selectionData** : *const QVariant &*
   QVariant containing a [`SelectionItem`](/docs/api/disp/selection-item) object with selected channel information.
 
 ---

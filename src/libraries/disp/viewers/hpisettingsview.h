@@ -80,8 +80,9 @@ public:
     /**
      * Constructs a HpiSettingsView object.
      *
-     * @param[in] pFiffInfo      The FiffInfo.
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent         The parent widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     HpiSettingsView(const QString& sSettingsPath = "",
                     QWidget *parent = 0,
@@ -258,6 +259,10 @@ protected:
     //=========================================================================================================
     /**
      * Read Polhemus data from fif file.
+     *
+     * @param[in] fileName  Path to the FIFF file containing the digitizer points.
+     *
+     * @return Digitizer points read from the file; empty if none could be read.
      */
     QList<FIFFLIB::FiffDigPoint> readDigitizersFromFile(const QString& fileName);
 
@@ -402,7 +407,7 @@ signals:
     /**
      * Emit this signal whenever the allowed head movement threshold changed.
      *
-     * @param[in] dAllowedMeanErrorDist    Allowed movement threshold.
+     * @param[in] dAllowedMovement    Allowed movement threshold.
      */
     void allowedMovementChanged(double dAllowedMovement);
 
@@ -410,7 +415,7 @@ signals:
     /**
      * Emit this signal whenever the allowed head rotation threshold changed.
      *
-     * @param[in] dAllowedMeanErrorDist    Allowed rotation in degree.
+     * @param[in] dAllowedRotation    Allowed rotation in degree.
      */
     void allowedRotationChanged(double dAllowedRotation);
 };

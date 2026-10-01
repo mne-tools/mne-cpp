@@ -13,8 +13,8 @@
  * ChannelDataModel keeps a per-channel @c Eigen::MatrixXd ring buffer
  * of the most recent N seconds of data and translates Qt's
  * @c QAbstractTableModel API into the view-friendly per-row /
- * per-time slice access that @ref ChannelDataView and
- * @ref RtFiffRawViewDelegate need. It also tracks bad-channel flags,
+ * per-time slice access that @ref DISPLIB::ChannelDataView and
+ * @ref DISPLIB::RtFiffRawViewDelegate need. It also tracks bad-channel flags,
  * trigger annotations and the currently-active SSP / compensation /
  * filter operators so the delegate can render the pre-processed
  * signal without touching the raw buffer.
@@ -138,16 +138,23 @@ public:
      *
      * @param[in] scaleMap  Map from FIFF kind to amplitude max.
      */
-    //=========================================================================================================
+    void setScaleMap(const QMap<qint32, float> &scaleMap);
+
+    //=============================================================================================================
+    /**
+     * Override the per-channel-type amplitude scale using channel-type names.
+     *
+     * @param[in] scaleMap  Map from channel-type name (e.g. "MEG_grad") to amplitude max.
+     */
+    void setScaleMapFromStrings(const QMap<QString, double> &scaleMap);
+
+    //=============================================================================================================
     /**
      * Clear all stored sample data without affecting channel metadata.
      * After this call totalSamples() == 0 and firstSample() == 0.
      * Emits dataChanged().
      */
     void clearData();
-
-    void setScaleMap(const QMap<qint32, float> &scaleMap);
-    void setScaleMapFromStrings(const QMap<QString, double> &scaleMap);
 
     //=========================================================================================================
     /**
@@ -203,7 +210,10 @@ public:
     int     channelCount()  const;
     int     firstSample()   const;
     int     totalSamples()  const;
-    float   sfreq()         const; /**< Sampling frequency in Hz; 0 if no FiffInfo attached. */
+    /**
+     * @return Sampling frequency in Hz; 0 if no FiffInfo attached.
+     */
+    float   sfreq()         const;
 
     //=========================================================================================================
     /**

@@ -586,7 +586,7 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
  */
 #define FIFF_EVENT_CHANNELS    600	/**< Event channel numbers. */
 #define FIFF_EVENT_LIST        601      /**< List of events (integers:
-					 * <sample before after> */
+					 * (sample, before, after) triplets). */
 /*
  * Event spec tags
  */
@@ -618,9 +618,9 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
  * Processing history tags
  */
 #define FIFFB_PROCESSING_HISTORY 900     /**< Processing history block. */
-#define FIFFB_PROCESSING_RECORD  901     /**<  .. can contain several processing records. */
+#define FIFFB_PROCESSING_RECORD  901     /**< Can contain several processing records. */
 
-/**<
+/*
  * Aspect values used to save characteristic curves of SQUIDs.
  */
 #define FIFFV_ASPECT_IFII_LOW  1100
@@ -716,7 +716,7 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_COND_MODEL_BEM         3      /**< Multilayer BEM model. */
 
 #define FIFF_SPHERE_ORIGIN          3001
-#define FIFF_SPHERE_COORD_FRAME     3002    /**< Which coordinate frame are we using?. */
+#define FIFF_SPHERE_COORD_FRAME     3002    /**< Which coordinate frame are we using? */
 #define FIFF_SPHERE_LAYERS          3003    /**< Array of layer structures. */
 /*
  * Surfaces for BEM (3100...)

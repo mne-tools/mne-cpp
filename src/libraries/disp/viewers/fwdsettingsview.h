@@ -80,6 +80,10 @@ public:
     //=========================================================================================================
     /**
     * Constructs a FwdSettingsView object.
+    *
+    * @param[in] sSettingsPath  QSettings key prefix used to persist view settings (default empty).
+    * @param[in] parent         Parent widget (default 0).
+    * @param[in] f              Window flags passed to the widget (default Qt::Widget).
     */
     explicit FwdSettingsView(const QString& sSettingsPath = "",
                              QWidget *parent = 0,

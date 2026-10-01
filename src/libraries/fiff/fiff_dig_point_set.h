@@ -14,12 +14,12 @@
  * @date     July 2016
  * @brief    Container for the FIFF_DIG_POINT records of a measurement (a parsed FIFFB_ISOTRAK block).
  *
- * @ref FiffDigPointSet holds the head-coordinate point cloud associated
+ * @ref FIFFLIB::FiffDigPointSet holds the head-coordinate point cloud associated
  * with one recording: cardinal fiducials, HPI coil positions, EEG
  * electrodes and the extra head-shape samples. It is what
- * @ref FiffStream returns when asked for the contents of an
+ * @ref FIFFLIB::FiffStream returns when asked for the contents of an
  * @c FIFFB_ISOTRAK / @c FIFFB_HPI_MEAS block, and what
- * @ref FiffDigitizerData consumes when constructing a digitization
+ * @ref FIFFLIB::FiffDigitizerData consumes when constructing a digitization
  * view for the registration GUIs. Round-trips with the @c info['dig']
  * list in MNE-Python.
  */

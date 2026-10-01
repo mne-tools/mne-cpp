@@ -17,8 +17,8 @@
  * using iteratively-reweighted least squares; the @c L21 group penalty
  * zeros out entire source rows that do not contribute to the residual,
  * producing a focal solution with a small list of active vertices.
- * Outputs the sparse @ref InvSourceEstimate, the active-vertex list,
- * iteration count and final residual norm in an @ref InvMxneResult.
+ * Outputs the sparse @ref INVLIB::InvSourceEstimate, the active-vertex list,
+ * iteration count and final residual norm in an @ref INVLIB::InvMxneResult.
  */
 
 #ifndef INV_MXNE_H

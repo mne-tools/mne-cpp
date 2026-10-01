@@ -10,11 +10,11 @@
  * @brief    Container pairing the left and right cortical source spaces of a subject.
  *
  * @ref MNELIB::MNESourceSpaces wraps the @c QList of
- * @ref MNESourceSpace objects that form a complete cortical source space
+ * @ref MNELIB::MNESourceSpace objects that form a complete cortical source space
  * as written by @c mne_setup_source_space (one entry per hemisphere, or
  * additional entries for discrete / volume source spaces). It is the
- * natural input to @ref MNEForwardSolution and @ref MNEInverseOperator
- * and feeds the 3D rendering pipeline via @ref MNEHemisphere. Provides
+ * natural input to @ref MNELIB::MNEForwardSolution and @ref MNELIB::MNEInverseOperator
+ * and feeds the 3D rendering pipeline via @ref MNELIB::MNEHemisphere. Provides
  * FIFF read/write at the file level so callers do not have to walk the
  * block tree by hand.
  */
@@ -136,7 +136,7 @@ public:
      *
      * Returns the hemisphere id ( FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
      *
-     * @param[in] p_Hemisphere the hemisphere to investigate.
+     * @param[in] p_SourceSpace the hemisphere to investigate.
      *
      * @return the deduced hemisphere id.
      */
@@ -154,7 +154,7 @@ public:
     /**
      * Find vertex numbers and indices from label
      *
-     * @param[in] label      Source space label.
+     * @param[in] p_label      Source space label.
      * @param[out] src_sel   array of int (idx.size() = vertno[0].size() + vertno[1].size()).
      *                       Indices of the selected vertices in sourse space
      *
@@ -328,7 +328,8 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param[in] a    The object which should be compared to.
+     * @param[in] b Right-hand source space set.
      *
      * @return true if equal, false otherwise.
      */
@@ -342,7 +343,7 @@ private:
      *
      * Completes triangulation info
      *
-     * @param[in, out] p_pHemisphere   Hemisphere to be completed.
+     * @param[in, out] p_Hemisphere   Hemisphere to be completed.
      *
      * @return true if succeeded, false otherwise.
      */
@@ -356,7 +357,7 @@ private:
      *
      * @param[in] p_pStream         The opened fif file.
      * @param[in] p_Tree            Search for the source space here.
-     * @param[in, out] p_pHemisphere    The read source space (hemisphere).
+     * @param[in, out] p_Hemisphere    The read source space (hemisphere).
      *
      * @return true if succeeded, false otherwise.
      */

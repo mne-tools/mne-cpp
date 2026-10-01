@@ -109,6 +109,11 @@ Enable or disable annotation range selection.
 
 When enabled, Shift+drag emits sampleRangeSelected on mouse release instead of acting as a pure measurement tool.
 
+**Parameters:**
+
+- **enabled** : *bool*
+  True to make Shift+drag select annotation ranges.
+
 ---
 
 ### setEventsVisible(visible)
@@ -223,11 +228,19 @@ Returns the absolute sample index currently shown at x = 0 (left edge).
 
 (Same as scrollSample rounded to int.)
 
+**Returns:**
+
+- *int* — Absolute sample index at the left viewport edge.
+
 ---
 
 ### visibleSampleCount()
 
 Returns the number of samples currently visible.
+
+**Returns:**
+
+- *int* — Widget width in pixels times samples per pixel, truncated to int.
 
 ---
 
@@ -247,6 +260,10 @@ When `indices` is empty all channels in the model are shown (no filter). When se
 ### totalLogicalChannels()
 
 Total number of logical channels available for scrolling (respects active filter).
+
+**Returns:**
+
+- *int* — Number of channels after applying the index filter and bad-channel hiding.
 
 ---
 
@@ -286,6 +303,11 @@ Freeze or unfreeze drag-panning (mouse drag and inertia).
 
 Wheel scroll and the scrollbar remain active when frozen.
 
+**Parameters:**
+
+- **frozen** : *bool*
+  True to disable drag-panning.
+
 ---
 
 ### isFrozen()
@@ -295,6 +317,11 @@ Wheel scroll and the scrollbar remain active when frozen.
 ### setGridVisible(visible)
 
 Show or hide the time and amplitude grid overlay.
+
+**Parameters:**
+
+- **visible** : *bool*
+  True to draw the grid.
 
 ---
 
@@ -307,6 +334,11 @@ Show or hide the time and amplitude grid overlay.
 Set the sampling frequency (Hz) used to place time-grid tick lines.
 
 Call this from `ChannelDataView::init()` after [FiffInfo](/docs/api/fiff/fiff-info) is available.
+
+**Parameters:**
+
+- **sfreq** : *float*
+  Sampling frequency in Hz.
 
 ---
 
@@ -388,6 +420,11 @@ Enable or disable the crosshair cursor overlay.
 
 When enabled, a vertical + horizontal cross follows the mouse and the view continuously emits `cursorDataChanged()` with the time/amplitude under the cursor.
 
+**Parameters:**
+
+- **enabled** : *bool*
+  True to show the crosshair overlay.
+
 ---
 
 ### crosshairEnabled()
@@ -397,6 +434,11 @@ When enabled, a vertical + horizontal cross follows the mouse and the view conti
 ### setClockTimeFormat(useClock)
 
 Set whether the crosshair label uses clock time (mm:ss.ms) or seconds.
+
+**Parameters:**
+
+- **useClock** : *bool*
+  True for clock time, false for float seconds.
 
 ---
 
@@ -408,6 +450,11 @@ Set whether the crosshair label uses clock time (mm:ss.ms) or seconds.
 
 Show or hide per-channel-type scalebars in the bottom-right corner.
 
+**Parameters:**
+
+- **visible** : *bool*
+  True to draw the scalebars.
+
 ---
 
 ### scalebarsVisible()
@@ -417,6 +464,11 @@ Show or hide per-channel-type scalebars in the bottom-right corner.
 ### setButterflyMode(enabled)
 
 Toggle butterfly mode: all channels of the same type are overlaid in a single lane.
+
+**Parameters:**
+
+- **enabled** : *bool*
+  True to enable butterfly mode.
 
 ---
 

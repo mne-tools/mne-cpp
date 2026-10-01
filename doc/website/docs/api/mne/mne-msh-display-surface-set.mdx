@@ -29,6 +29,11 @@ The [`MNE`](/docs/api/mne/mne-class) Msh Display [FsSurface](/docs/api/fs/fs-sur
 
 Constructs the [`MNEMshDisplaySurfaceSet`](/docs/api/mne/mne-msh-display-surface-set).
 
+**Parameters:**
+
+- **nsurf** : *int*
+  Number of surface slots to allocate (all initially inactive and drawable).
+
 ---
 
 ### ~MNEMshDisplaySurfaceSet()
@@ -76,7 +81,7 @@ Add a new surface to the set, or replace an existing surface with the same ID if
 - **replace** : *bool*
   If true, replace an existing surface with matching ID.
 
-- **drawable**
+- **isDrawable** : *bool*
   Whether the surface should be marked as drawable.
 
 ---

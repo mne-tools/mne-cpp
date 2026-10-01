@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    Real-time source-estimate streaming controller that owns the data worker and the per-hemisphere interpolation workers.
  *
- * RtSourceDataController bundles a @ref RtSourceDataWorker (queue,
+ * RtSourceDataController bundles a @ref DISP3DLIB::RtSourceDataWorker (queue,
  * averaging, sparse mat-vec per hemisphere, colormap packing) with
- * two @ref RtSourceInterpolationMatWorker instances (one per
+ * two @ref DISP3DLIB::RtSourceInterpolationMatWorker instances (one per
  * hemisphere) that recompute the sparse vertex-to-source weight
  * matrix when surfaces, source vertices or the interpolation
  * function change.

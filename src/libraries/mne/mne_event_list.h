@@ -70,6 +70,8 @@ public:
     //=========================================================================================================
     /**
      * @brief Returns the number of events in the list.
+     *
+     * @return Number of owned events.
      */
     int nevent() const { return static_cast<int>(events.size()); }
 

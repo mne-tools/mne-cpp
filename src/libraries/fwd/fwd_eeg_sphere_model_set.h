@@ -142,7 +142,11 @@ public:
      */
     void fwd_list_eeg_sphere_models();
 
-    /** Number of models in this set. */
+    /**
+     * Number of models in this set.
+     *
+     * @return Number of EEG sphere models stored in this set.
+     */
     int nmodel() const
     {
         return static_cast<int>(models.size());

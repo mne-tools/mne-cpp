@@ -162,24 +162,35 @@ struct DISP3DSHARED_EXPORT SubView
     /**
      * True when @p key identifies a brain-tissue surface (lh_/rh_) as opposed
      * to BEM, sensor, digitizer, or source-space geometry.
+     *
+     * @param[in] key   Surface map key to classify.
+     * @return True if the key is non-empty and has no bem_, sens_, srcsp_ or dig_ prefix.
      */
     static bool isBrainSurfaceKey(const QString &key);
 
     /**
      * True when the brain-surface @p key matches this view's surfaceType
      * (e.g. "lh_pial" matches surfaceType "pial").
+     *
+     * @param[in] key   Surface map key to test.
+     * @return True if the key is a brain surface key ending with surfaceType.
      */
     bool matchesSurfaceType(const QString &key) const;
 
     /**
      * True when the surface identified by @p key should be rendered
      * according to this view's visibility profile.
+     *
+     * @param[in] key   Surface map key to test.
+     * @return True if the visibility profile enables this surface; unknown keys return true.
      */
     bool shouldRenderSurface(const QString &key) const;
 
     /**
      * Apply this view's overlayMode to every brain surface whose key
      * matches surfaceType.  Non-brain surfaces are never touched.
+     *
+     * @param[in, out] surfaces  Surface map keyed by surface name; matching surfaces get their visualization mode updated.
      */
     void applyOverlayToSurfaces(
         QMap<QString, std::shared_ptr<BrainSurface>> &surfaces) const;
@@ -212,6 +223,9 @@ struct DISP3DSHARED_EXPORT SubView
      * The preset cycles through the 7 camera orientations (Top, Perspective,
      * Front, Left, Bottom, Back, Right) and the shader cycles through
      * Anatomical → Standard → Holographic.
+     *
+     * @param[in] index  Zero-based viewport index.
+     * @return Enabled SubView with preset index % 7 and the cycled brain shader.
      */
     static SubView defaultForIndex(int index);
 };
@@ -222,22 +236,33 @@ struct DISP3DSHARED_EXPORT SubView
 
 /**
  * Default perspective rotation quaternion used for the "Perspective" camera.
+ *
+ * @return Rotation built from Euler angles (-45, -40, -130) degrees.
  */
 DISP3DSHARED_EXPORT QQuaternion perspectivePresetRotation();
 
 /**
  * Human-readable name for a multi-view preset index (0–6).
+ *
+ * @param[in] preset  Preset index (0=Top, 1=Perspective, ..., 6=Right).
+ * @return Preset name such as "Front"; out-of-range indices return "Top".
  */
 DISP3DSHARED_EXPORT QString multiViewPresetName(int preset);
 
 /**
  * Camera rotation quaternion for a multi-view preset index (0–6).
+ *
+ * @param[in] preset  Preset index (0=Top, 1=Perspective, ..., 6=Right).
+ * @return Camera rotation for the preset; out-of-range indices return the Top rotation.
  */
 DISP3DSHARED_EXPORT QQuaternion multiViewPresetOffset(int preset);
 
 /**
  * Whether a preset is a perspective (free-rotate) camera rather than an
  * orthographic-style fixed camera.
+ *
+ * @param[in] preset  Preset index (0=Top, 1=Perspective, ..., 6=Right).
+ * @return True only for preset 1 (Perspective).
  */
 DISP3DSHARED_EXPORT bool multiViewPresetIsPerspective(int preset);
 
@@ -251,19 +276,40 @@ DISP3DSHARED_EXPORT bool multiViewPresetIsPerspective(int preset);
  * @param[in] target   Raw target index (-1 = single view, 0+ = multi pane).
  * @param[in] maxIndex Upper bound (inclusive).  Defaults to 3 for backwards
  *                     compatibility, but callers should pass viewportCount-1.
+ * @return Target index clamped to [-1, maxIndex].
  */
 DISP3DSHARED_EXPORT int normalizedVisualizationTarget(int target, int maxIndex = 3);
 
-/** Convert a shader name ("Standard", "Holographic", "Anatomical") to enum. */
+/**
+ * Convert a shader name ("Standard", "Holographic", "Anatomical") to enum.
+ *
+ * @param[in] name  Shader name; "XRay" is also recognised.
+ * @return Matching ShaderMode, or Standard for unknown names.
+ */
 DISP3DSHARED_EXPORT ShaderMode shaderModeFromName(const QString &name);
 
-/** Convert a ShaderMode enum to display string. */
+/**
+ * Convert a ShaderMode enum to display string.
+ *
+ * @param[in] mode  Shader mode to convert.
+ * @return "Holographic", "Anatomical", or "Standard" for all other modes.
+ */
 DISP3DSHARED_EXPORT QString shaderModeName(ShaderMode mode);
 
-/** Convert a visualization mode name to enum. */
+/**
+ * Convert a visualization mode name to enum.
+ *
+ * @param[in] name  Mode name ("Annotation", "Scientific", "Source Estimate").
+ * @return Matching VisualizationMode, or ModeSurface for unknown names.
+ */
 DISP3DSHARED_EXPORT VisualizationMode visualizationModeFromName(const QString &name);
 
-/** Convert a VisualizationMode enum to display string. */
+/**
+ * Convert a VisualizationMode enum to display string.
+ *
+ * @param[in] mode  Visualization mode to convert.
+ * @return "Annotation", "Scientific", "Source Estimate", or "Surface".
+ */
 DISP3DSHARED_EXPORT QString visualizationModeName(VisualizationMode mode);
 
 //=============================================================================================================
@@ -287,6 +333,10 @@ DISP3DSHARED_EXPORT QRgb mneAnalyzeColor(double v);
 
 /**
  * Read a boolean from QSettings with a default fallback.
+ *
+ * @param[in] value     Value read from QSettings.
+ * @param[in] fallback  Result to use when the value is invalid (key missing).
+ * @return The value converted to bool, or fallback if the value is invalid.
  */
 inline bool isTrue(const QVariant &value, bool fallback)
 {

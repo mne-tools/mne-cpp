@@ -34,11 +34,35 @@ classDiagram
 
 Constructs a [`AverageSceneItem`](/docs/api/disp/average-scene-item).
 
+**Parameters:**
+
+- **channelName** : *const QString &*
+  Name of the channel shown by this item.
+
+- **channelNumber** : *int*
+  Index of the channel in the measurement info.
+
+- **channelPosition** : *const QPointF &*
+  Position of the item in the 2-D layout scene.
+
+- **channelKind** : *int*
+  FIFF channel kind (e.g. FIFFV_MEG_CH).
+
+- **channelUnit** : *int*
+  FIFF unit of the channel data.
+
+- **color** : *const QColor &*
+  Default signal colour (default Qt::yellow).
+
 ---
 
 ### boundingRect()
 
 Reimplemented virtual functions.
+
+**Returns:**
+
+- *QRectF* — Fixed 120 x 60 bounding rectangle centred on the item origin.
 
 ---
 

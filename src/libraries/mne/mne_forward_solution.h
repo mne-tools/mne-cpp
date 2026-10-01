@@ -13,7 +13,7 @@
  * @c -fwd.fif file: the leadfield matrix, the source spaces it was
  * computed on, the sensor coordinate transforms, the projection vectors
  * and the source-orientation flags. It is the central input to inverse
- * modelling (@ref MNEInverseOperator), to cluster-based dimensionality
+ * modelling (@ref MNELIB::MNEInverseOperator), to cluster-based dimensionality
  * reduction (@c cluster_forward_solution) and to simulation routines.
  * FIFF tags involved: @c FIFFB_MNE_FORWARD_SOLUTION,
  * @c FIFF_MNE_FORWARD_SOLUTION_GRAD, @c FIFF_MNE_SOURCE_ORIENTATION,
@@ -209,12 +209,18 @@ public:
     //=========================================================================================================
     /**
      * Move constructs an MNEForwardSolution.
+     *
+     * @param[in, out] other   Forward solution to move from; left in a valid but unspecified state.
      */
     MNEForwardSolution(MNEForwardSolution &&other) = default;
 
     //=========================================================================================================
     /**
      * Move assignment operator.
+     *
+     * @param[in, out] other   Forward solution to move from; left in a valid but unspecified state.
+     *
+     * @return Reference to this object.
      */
     MNEForwardSolution& operator=(MNEForwardSolution &&other) = default;
 
@@ -238,8 +244,8 @@ public:
      * @param[in]   p_AnnotationSet     FsAnnotation set containing the annotation of left & right hemisphere.
      * @param[in]   p_iClusterSize      Maximal cluster size per roi.
      * @param[out]   p_D                 The cluster operator.
-     * @param[in]   p_pNoise_cov.
-     * @param[in]   p_pInfo.
+     * @param[in] p_pNoise_cov Noise covariance used to whiten the gain matrix before clustering (optional).
+     * @param[in] p_pInfo Measurement info matching the noise covariance (optional).
      * @param[in]   p_sMethod           "cityblock" or "sqeuclidean".
      *
      * @return clustered MNE forward solution.
@@ -356,7 +362,7 @@ public:
      * @param[in] p_info             The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
      * @param[in] p_noise_cov        The noise covariance matrix.
      * @param[in] p_pca              Calculate pca or not.
-     * @param[out] ch_names          Selected channel names.
+     * @param[out] p_outFwdInfo          Selected channel names.
      * @param[out] gain              Gain matrix.
      * @param[out] p_outNoiseCov     noise covariance matrix.
      * @param[out] p_outWhitener     Whitener.
@@ -466,7 +472,8 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param[in] a    The object which should be compared to.
+     * @param[in] b Right-hand forward solution.
      *
      * @return true if equal, false otherwise.
      */

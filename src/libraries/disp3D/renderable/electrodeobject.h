@@ -10,8 +10,8 @@
  * @brief    ECoG / sEEG electrode model: shaft cylinders, contact spheres and grid layouts mapped to a colour-bar overlay.
  *
  * ElectrodeObject describes one or more electrode arrays in three
- * topologies (@ref ElectrodeLayout::Depth stereotactic shaft,
- * @ref ElectrodeLayout::Strip 1xN ECoG, @ref ElectrodeLayout::Grid
+ * topologies (@c ElectrodeLayout::Depth stereotactic shaft,
+ * @c ElectrodeLayout::Strip 1xN ECoG, @c ElectrodeLayout::Grid
  * rows x cols ECoG) and generates CPU-side geometry that the
  * renderer uploads as a cylinder mesh (shafts) plus a per-contact
  * instance buffer (spheres with position, radius, RGBA colour,
@@ -19,7 +19,7 @@
  *
  * Per-contact scalar values (e.g. spectral power, evoked amplitude)
  * are mapped to a min / max colour gradient by
- * @ref ElectrodeObject::setContactValues so the same primitive can
+ * @ref DISP3DLIB::ElectrodeObject::setContactValues "ElectrodeObject::setContactValues" so the same primitive can
  * show static placement and live activity. Bounding-box accessors
  * include the contact radius so the camera framing keeps every
  * contact visible.
@@ -78,13 +78,13 @@ struct DISP3DSHARED_EXPORT ElectrodeContact
  *
  * Added in v2.3.0 to extend the original sEEG-only ElectrodeObject
  * with ECoG strip and grid topologies. The renderer interprets the layout
- * field on @ref ElectrodeArray:
+ * field on @ref DISP3DLIB::ElectrodeArray "ElectrodeArray":
  *
  *   - Depth — render the cylindrical shaft + sphere instances per contact
  *             (the only mode supported in v2.2.0).
  *   - Strip — render sphere instances only, no shaft (a 1×N ECoG strip).
- *   - Grid  — render sphere instances on a regular @ref gridRows × @ref
- *             gridCols lattice, optionally with a translucent quad mesh
+ *   - Grid  — render sphere instances on a regular @ref DISP3DLIB::ElectrodeArray::gridRows "gridRows" × @ref
+ *             DISP3DLIB::ElectrodeArray::gridCols "gridCols" lattice, optionally with a translucent quad mesh
  *             linking the contacts as a visual reference.
  */
 enum class ElectrodeLayout {
@@ -99,7 +99,7 @@ enum class ElectrodeLayout {
  *
  * The Depth-only fields (@ref shaftRadius, @ref shaftColor) are ignored
  * for Strip and Grid layouts. The Grid-only fields (@ref gridRows,
- * @ref gridCols) default to 1 and so describe a degenerate single
+ * @ref DISP3DLIB::ElectrodeArray::gridCols "gridCols") default to 1 and so describe a degenerate single
  * contact for the other layouts.
  */
 struct DISP3DSHARED_EXPORT ElectrodeArray

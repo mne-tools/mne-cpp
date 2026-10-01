@@ -14,7 +14,7 @@
  * @brief    QGraphicsObject painting one channel's averaged evoked trace at its sensor position.
  *
  * AverageSceneItem is a fixed-size mini-plot drawn for every channel
- * by @ref AverageScene. It stores the per-condition data vectors,
+ * by @ref DISPLIB::AverageScene. It stores the per-condition data vectors,
  * their @c QColor mapping and the y-scale settings, then paints the
  * overlaid traces, the t = 0 marker and the baseline inside its
  * bounding rect during @c paint().
@@ -73,6 +73,13 @@ public:
     //=========================================================================================================
     /**
      * Constructs a AverageSceneItem.
+     *
+     * @param[in] channelName      Name of the channel shown by this item.
+     * @param[in] channelNumber    Index of the channel in the measurement info.
+     * @param[in] channelPosition  Position of the item in the 2-D layout scene.
+     * @param[in] channelKind      FIFF channel kind (e.g. FIFFV_MEG_CH).
+     * @param[in] channelUnit      FIFF unit of the channel data.
+     * @param[in] color            Default signal colour (default Qt::yellow).
      */
     AverageSceneItem(const QString& channelName,
                      int channelNumber,
@@ -84,6 +91,8 @@ public:
     //=========================================================================================================
     /**
      * Reimplemented virtual functions
+     *
+     * @return Fixed 120 x 60 bounding rectangle centred on the item origin.
      */
     QRectF boundingRect() const;
     void mousePressEvent(QGraphicsSceneMouseEvent *event);

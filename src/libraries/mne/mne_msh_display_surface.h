@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    One renderable surface (cortex / pial / inflated / BEM) inside an MSH display set.
  *
- * @ref MNELIB::MNEMshDisplaySurface attaches an @ref MNESurface to a
+ * @ref MNELIB::MNEMshDisplaySurface attaches an @ref MNELIB::MNESurface to a
  * shading state - per-vertex colours, scalar overlays, current
- * @ref MNEMshColorScaleDef and visibility flags - producing the
+ * @ref MNELIB::MNEMshColorScaleDef and visibility flags - producing the
  * self-contained record that the MSH renderer (and its mne-cpp DISP3D
  * successor) draws.
  */
@@ -150,7 +150,6 @@ public:
      *
      * @param[in, out] head_dig    MEG digitizer data (transformed in-place).
      * @param[in]      mri_dig     MRI digitizer data with fiducial locations.
-     * @param[in]      head_surf   The scalp surface used for ICP.
      * @param[in]      niter       Number of ICP iterations.
      * @param[in]      scale_head  If non-zero, scale the head surface to match digitizer.
      * @param[in]      omit_dist   Discard digitizer points farther than this from the surface (m).
@@ -167,6 +166,10 @@ public:
 
     /**
      * Compute a uniform head scale factor by fitting spheres.
+     *
+     * @param[in]  dig      Digitizer data; points with positive z are used for the sphere fit.
+     * @param[in]  mri_fid  MRI fiducial locations (LPA, nasion, RPA rows), in m.
+     * @param[out] scales   Receives the per-axis scale factors (all set to 1 if a sphere fit fails).
      */
     void get_head_scale(FIFFLIB::FiffDigitizerData& dig,
                        const Eigen::Matrix<float, 3, 3, Eigen::RowMajor>& mri_fid,
@@ -174,18 +177,34 @@ public:
 
     /**
      * Mark digitizer points whose distance to the head surface exceeds maxdist.
+     *
+     * @param[in, out] d        Digitizer data; its discard flags and distances are updated.
+     * @param[in]      maxdist  Maximum allowed distance to the surface, in m; cardinal and HPI points are never discarded.
+     *
+     * @return Number of points discarded.
      */
     int discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerData& d,
                                        float maxdist) const;
 
     /**
      * Compute the distance from each active digitizer point to the head surface.
+     *
+     * @param[in, out] dig        Digitizer data; dist, closest and closest_point are updated.
+     * @param[in]      do_all     If true, include inactive and discarded points.
+     * @param[in]      do_approx  If true, start the closest-point search from the previously found triangles.
      */
     void calculate_digitizer_distances(FIFFLIB::FiffDigitizerData& dig,
                                      bool do_all, bool do_approx) const;
 
     /**
      * Perform one iteration of ICP-like alignment.
+     *
+     * @param[in, out] dig            Digitizer data; head_mri_t_adj and distances are updated.
+     * @param[in]      nasion_weight  Weight of the nasion point in the Procrustes fit.
+     * @param[in]      nasion_mri     Optional fixed MRI location of the nasion, in m.
+     * @param[in]      last_step      Non-zero if this is the final iteration (enables exact distances).
+     *
+     * @return OK on success, FAIL if no adjustable transform exists, fewer than 3 points are active, or the fit fails.
      */
     int iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig,
                              int nasion_weight,
@@ -194,11 +213,17 @@ public:
 
     /**
      * Compute the RMS distance from active digitizer points to the head surface.
+     *
+     * @param[in, out] dig  Digitizer data; distances are recomputed if not valid.
+     *
+     * @return RMS distance of the active, non-discarded points, in m.
      */
     float rms_digitizer_distance(FIFFLIB::FiffDigitizerData& dig) const;
 
     /**
      * Scale a display surface's bounding box and all vertex positions.
+     *
+     * @param[in] scales  Per-axis scale factors (x, y, z).
      */
     void scale(const Eigen::Vector3f& scales);
 

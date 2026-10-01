@@ -45,18 +45,24 @@ public:
     //=========================================================================================================
     /**
      * Set the coil orientation matrix (3x3 rotation from coil_trans).
+     *
+     * @param[in] orient   Coil rotation stored in the upper-left 3x3 of a 4x4 matrix.
      */
     void setOrientation(const QMatrix4x4 &orient);
 
     //=========================================================================================================
     /**
      * Returns the coil orientation (identity if not set).
+     *
+     * @return Reference to the stored coil orientation matrix.
      */
     const QMatrix4x4& orientation() const;
 
     //=========================================================================================================
     /**
      * Returns true if an explicit orientation was set.
+     *
+     * @return True once setOrientation() has been called.
      */
     bool hasOrientation() const;
 

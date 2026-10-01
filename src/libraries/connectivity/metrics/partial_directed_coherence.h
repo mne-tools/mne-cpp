@@ -21,13 +21,13 @@
  * introduced PDC explicitly to separate direct from indirect causal
  * pathways: a relay @c j -> k -> i contributes 0 to @c PDC_{ij} because
  * the direct coefficient @c A_{ij}(f) is zero, in contrast to
- * @ref DirectedTransferFunction which would still flag the indirect
+ * @ref CONNECTIVITYLIB::DirectedTransferFunction which would still flag the indirect
  * route.
  *
  * PDC therefore plays the role that partial correlation plays in static
  * Gaussian models: it removes the influence of all other channels in the
  * MVAR system before measuring the @c j -> i interaction. Like DTF and
- * @ref GrangerCausality, PDC reuses the @ref MvarModel fit, so requesting
+ * @ref CONNECTIVITYLIB::GrangerCausality, PDC reuses the @ref CONNECTIVITYLIB::MvarModel fit, so requesting
  * all three metrics in one batch costs only one Levinson-Durbin solve.
  */
 

@@ -9,9 +9,9 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     February 2020
- * @brief    QDockWidget wrapper used as the building block of @ref MultiView layouts.
+ * @brief    QDockWidget wrapper used as the building block of @ref DISPLIB::MultiView layouts.
  *
- * MultiViewWindow exposes the small amount of state @ref MultiView
+ * MultiViewWindow exposes the small amount of state @ref DISPLIB::MultiView
  * needs to manage its docks (the wrapped widget, a stable name, a
  * tabbed/floating flag) and applies the disp-library default dock
  * styling (title-bar buttons, movable / floatable features) so all
@@ -69,6 +69,9 @@ public:
     //=========================================================================================================
     /**
      * Constructs an MultiViewWindow.
+     *
+     * @param[in] parent  Parent widget (default Q_NULLPTR).
+     * @param[in] flags   Window flags passed to the dock widget (default none).
      */
     explicit MultiViewWindow(QWidget *parent = Q_NULLPTR,
                              Qt::WindowFlags flags = Qt::WindowFlags());

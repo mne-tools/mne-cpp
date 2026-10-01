@@ -9,24 +9,24 @@
  * @date     April 2026
  * @brief    One operation in an MNA graph — opType, typed I/O ports, attributes, execution mode (Batch / Stream / IPC / Script) and provenance.
  *
- * @ref MnaNode is the executable counterpart to a @ref MnaFileRef:
+ * @ref MNALIB::MnaNode is the executable counterpart to a @ref MNALIB::MnaFileRef "MnaFileRef":
  * where the latter records a derived artefact, the node records
  * @em how that artefact is produced. The @c opType string is
- * resolved against @ref MnaOpRegistry to obtain the
- * @ref MnaOpSchema (and, for built-in ops, the implementation
- * function) used by @ref MnaGraphExecutor; @c attributes provides
+ * resolved against @ref MNALIB::MnaOpRegistry to obtain the
+ * @ref MNALIB::MnaOpSchema (and, for built-in ops, the implementation
+ * function) used by @ref MNALIB::MnaGraphExecutor; @c attributes provides
  * the per-call parameter values validated against that schema.
  *
  * The @c execMode field selects one of four executors:
  * @c Batch (default, file-in/file-out), @c Stream (live MNE Scan
  * plugin), @c Ipc (delegates to an external binary via
  * @c ipcCommand / @c ipcArgs / @c ipcTransport), or @c Script
- * (inline @ref MnaScript run by an interpreter). Each mode reuses
+ * (inline @ref MNALIB::MnaScript run by an interpreter). Each mode reuses
  * the same node fields, so a pipeline can mix all four without
  * structural changes.
  *
  * @c verification carries pre/post checks, explanation text and the
- * full @ref MnaProvenance snapshot captured at execution time;
+ * full @ref MNALIB::MnaProvenance snapshot captured at execution time;
  * combined with @c toolVersion, @c executedAt and the @c dirty flag
  * this is what makes MNA pipelines reproducible and supports
  * incremental re-execution after a parameter edit.

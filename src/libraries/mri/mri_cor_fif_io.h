@@ -14,15 +14,15 @@
  * coregistration, BEM surface generation, forward-model assembly,
  * and the @c mne_analyze inverse pipeline all consume the same
  * tag structure. Producing it here lets mne-cpp loaders
- * (@ref MriMghIO, @ref MriNiftiIO, @ref MriCorIO) feed any
+ * (@ref MRILIB::MriMghIO, @ref MRILIB::MriNiftiIO, @ref MRILIB::MriCorIO) feed any
  * legacy FIFF-driven workflow without requiring callers to detour
  * through the MNE-Python @c mri.fif writer.
  *
- * The writer takes an in-memory @ref MriVolData, materialises
+ * The writer takes an in-memory @ref MRILIB::MriVolData, materialises
  * one @c FIFFB_MRI_SLICE block per slice (carrying the slice's
  * geometry and pixel buffer in the source's native encoding ---
  * byte / word / float, no quantisation), bundles them inside a
- * single @c FIFFB_MRI_SET, and prefixes the head\u2192MRI identity
+ * single @c FIFFB_MRI_SET, and prefixes the head→MRI identity
  * plus any extra transforms the volume carries (e.g. Talairach).
  *
  * Block structure:

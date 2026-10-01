@@ -37,8 +37,14 @@ Constructs a [`TriggerDetectionView`](/docs/api/disp/trigger-detection-view) whi
 
 **Parameters:**
 
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
 - **parent** : *QWidget **
   parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
 
 ---
 
@@ -51,6 +57,11 @@ Destroys the [`TriggerDetectionView`](/docs/api/disp/trigger-detection-view).
 ### init(pFiffInfo)
 
 Init the view.
+
+**Parameters:**
+
+- **pFiffInfo** : *const QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt;*
+  Measurement info whose STIM channels populate the trigger channel list; ignored if null.
 
 ---
 

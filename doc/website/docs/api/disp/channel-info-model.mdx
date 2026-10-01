@@ -42,6 +42,15 @@ classDiagram
 
 Reimplemented virtual functions.
 
+**Parameters:**
+
+- **parent** : *const QModelIndex &*
+  Parent index (unused; the model is a flat list).
+
+**Returns:**
+
+- *int* — Number of channels in the attached measurement info.
+
 ---
 
 ### columnCount(parent)
@@ -78,7 +87,7 @@ Updates the fiff info.
 
 **Parameters:**
 
-- **fiffInfo**
+- **pFiffInfo** : *QSharedPointer&lt;[FiffInfo](/docs/api/fiff/fiff-info)&gt; &*
   fiff info variabel.
 
 ---

@@ -18,7 +18,7 @@
  * frequencies, the transition bandwidth and the number of taps,
  * preserves the resulting @c FilterKernel in a @c QSettings path and
  * renders the magnitude (and optional group-delay / phase) response
- * in a @ref FilterPlotScene that updates while the user drags the
+ * in a @ref DISPLIB::FilterPlotScene that updates while the user drags the
  * spinboxes. Designed filters are emitted as @c filterChanged signals
  * consumed by the @c rtprocessing filter chain.
  */
@@ -90,9 +90,11 @@ public:
     /**
      * Constructs a FilterDesignView dialog which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent pointer to parent widget; If parent is 0, the new FilterDesignView becomes a window.
      *             If parent is another widget, FilterDesignView becomes a child window inside parent. FilterDesignView
      *             is deleted when its parent is deleted.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     FilterDesignView(const QString& sSettingsPath,
                      QWidget *parent = 0,
@@ -212,6 +214,8 @@ public:
     //=========================================================================================================
     /**
      * Process the event of style mode change in an upper class.
+     *
+     * @param[in] style  New style mode (unused; the filter plot is simply redrawn).
      */
     void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
 
@@ -259,12 +263,16 @@ protected:
     //=========================================================================================================
     /**
      * resizeEvent reimplemented virtual function to handle resize events of the filter window
+     *
+     * @param[in] event  The resize event (unused; the plot is refitted to the view).
      */
     void resizeEvent(QResizeEvent * event);
 
     //=========================================================================================================
     /**
      * keyPressEvent reimplemented virtual function to handle key events
+     *
+     * @param[in] event  The key event; Enter/Return, Ctrl+Z and Delete re-emit the filter channel type.
      */
     virtual void keyPressEvent(QKeyEvent * event);
 

@@ -83,6 +83,8 @@ public:
     //=========================================================================================================
     /**
      * Returns the path of the current log file, empty if file logging is off.
+     *
+     * @return Path of the active log file, or an empty string if file logging is disabled.
      */
     static QString logFile();
 

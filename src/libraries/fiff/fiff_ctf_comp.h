@@ -18,13 +18,13 @@
  * signals from each gradiometer. The compensation state is stored as a
  * list of named matrices under @c FIFFB_MNE_CTF_COMP /
  * @c FIFFB_MNE_CTF_COMP_DATA, one matrix per supported compensation
- * grade. @ref FiffCtfComp is the C++ wrapper for one of those matrices: a
+ * grade. @ref FIFFLIB::FiffCtfComp is the C++ wrapper for one of those matrices: a
  * kind tag selecting the grade, save-as-calibrated flag, and a
- * @ref FiffNamedMatrix whose rows are the gradiometer channel names and
+ * @ref FIFFLIB::FiffNamedMatrix whose rows are the gradiometer channel names and
  * columns the reference channels.
  *
  * Combined with the source / destination grade fields tracked in
- * @ref FiffInfo this lets @c FiffRawData::compensate move continuously
+ * @ref FIFFLIB::FiffInfo this lets @c FiffRawData::compensate move continuously
  * recorded data between compensation grades on demand, matching the
  * @c mne.io.ctf.RawCTF._comp behaviour in MNE-Python.
  */

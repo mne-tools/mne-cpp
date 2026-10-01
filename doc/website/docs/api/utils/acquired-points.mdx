@@ -40,13 +40,23 @@ classDiagram
 
 ### append(p)
 
-Append a new point and emit pointsChanged.
+Append a new point and emit `UTILSLIB::AcquiredPoints::pointsChanged` "pointsChanged".
+
+**Parameters:**
+
+- **p** : *const DigitizedPoint &*
+  Captured point to append.
 
 ---
 
 ### undoLast(kind)
 
 Remove the most recently captured point matching `kind`, if any.
+
+**Parameters:**
+
+- **kind** : *PointKind*
+  Point kind whose most recent entry is removed.
 
 ---
 
@@ -60,11 +70,29 @@ Drop every captured point.
 
 Convenience accessor: returns the captured fiducial position for `id`, or a default-constructed `QVector3D` if not yet captured.
 
+**Parameters:**
+
+- **id** : *FiducialId*
+  Fiducial to look up.
+
+**Returns:**
+
+- *QVector3D* — Captured fiducial position, or a zero vector if not yet captured.
+
 ---
 
 ### hasFiducial(id)
 
 True iff a fiducial of the given id has been captured.
+
+**Parameters:**
+
+- **id** : *FiducialId*
+  Fiducial to check.
+
+**Returns:**
+
+- *bool* — True if the fiducial has been captured, false otherwise.
 
 ---
 
@@ -72,11 +100,20 @@ True iff a fiducial of the given id has been captured.
 
 Remove a previously captured fiducial so it can be re-recorded.
 
+**Parameters:**
+
+- **id** : *FiducialId*
+  Fiducial whose captured points are all removed.
+
 ---
 
 ### hasAllFiducials()
 
 True iff all three cardinal fiducials have been captured.
+
+**Returns:**
+
+- *bool* — True if NAS, LPA, and RPA have all been captured.
 
 ---
 

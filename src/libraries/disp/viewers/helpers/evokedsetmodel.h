@@ -14,8 +14,8 @@
  *
  * EvokedSetModel exposes one row per FIFF channel and one column per
  * condition; each cell yields the underlying time-series view
- * (plus colour / visibility) needed by @ref ButterflyView and
- * @ref AverageLayoutView. It also propagates baseline-correction,
+ * (plus colour / visibility) needed by @ref DISPLIB::ButterflyView and
+ * @ref DISPLIB::AverageLayoutView. It also propagates baseline-correction,
  * SSP-projection and bad-channel updates so the visualisations stay
  * in sync with the latest pre-processing settings.
  */
@@ -355,6 +355,8 @@ public:
     //=========================================================================================================
     /**
      * Update projections
+     *
+     * @param[in] projs  SSP projectors to store in the evoked set info and build the projection matrix from.
      */
     void updateProjection(const QList<FIFFLIB::FiffProj>& projs);
 

@@ -12,7 +12,7 @@
  * @brief    QStandardItemModel mirroring the BIDS dataset hierarchy (subjects / sessions / runs / derivatives).
  *
  * BidsViewModel rebuilds itself from a top-level dataset path and
- * exposes the BIDS tree to @ref BidsView. Item roles carry the
+ * exposes the BIDS tree to @ref DISPLIB::BidsView. Item roles carry the
  * absolute path, the BIDS entity type and the loadable-by-this-app
  * flag so the surrounding plugin can react to double-clicks (load
  * raw, attach derivative, …) without re-walking the file system.
@@ -103,6 +103,8 @@ public:
     //=========================================================================================================
     /**
      * Constructs the Analyze Data Model.
+     *
+     * @param[in] pParent  Parent QObject (default Q_NULLPTR).
      */
     BidsViewModel(QObject* pParent = Q_NULLPTR);
 
@@ -117,8 +119,10 @@ public slots:
     /**
      * Adds data to the item model.
      *
-     * @param[in] sSubjectName          The subject name to store the data under.
-     * @param[in] pItem                 The item to be added.
+     * @param[in] selectedItem Model index of the item the data is added under.
+     * @param[in, out] pNewItem The item to be added.
+     * @param[in] iDataType BIDS data type of the new item.
+     *
      */
     void addData(QModelIndex selectedItem,
                  QStandardItem *pNewItem,

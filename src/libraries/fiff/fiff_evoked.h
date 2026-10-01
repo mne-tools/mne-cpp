@@ -13,14 +13,14 @@
  * @date     March 2013
  * @brief    Single averaged evoked response: time axis, samples, baseline, channel info and processing history.
  *
- * @ref FiffEvoked is one averaged response as written under a
+ * @ref FIFFLIB::FiffEvoked is one averaged response as written under a
  * @c FIFFB_EVOKED block: the time axis (@c times, @c first, @c last),
  * the (nchan × nsamples) data matrix, the baseline interval, the
  * averaging kind (@c FIFFV_ASPECT_AVERAGE,
  * @c FIFFV_ASPECT_STD_ERR, ...), the trigger comment, the number of
- * averaged epochs (@c nave) and the associated @ref FiffInfo. Multiple
- * @ref FiffEvoked objects belonging to the same recording (one per
- * condition) make up a @ref FiffEvokedSet.
+ * averaged epochs (@c nave) and the associated @ref FIFFLIB::FiffInfo. Multiple
+ * @ref FIFFLIB::FiffEvoked objects belonging to the same recording (one per
+ * condition) make up a @ref FIFFLIB::FiffEvokedSet.
  *
  * Drop-in counterpart of @c mne.Evoked in MNE-Python: the same kind /
  * nave / comment / baseline semantics and the same channel-picking,
@@ -209,7 +209,7 @@ public:
      * Set a new fiff measurement info
      *
      * @param[in] p_info     Info to set.
-     * @param[in] proj       Apply SSP projection vectors (optional, default = true).
+     * @param[in] applyProj       Apply SSP projection vectors (optional, default = true).
      */
     void setInfo(const FiffInfo &p_info,
                  bool applyProj = true);

@@ -10,7 +10,7 @@
  * @brief    Real-time recomputation of the linear inverse operator from updated noise covariance.
  *
  * RtInvOp recomputes a regularised @ref MNELIB::MNEInverseOperator whenever
- * a new noise-covariance estimate is published by @ref RtCov, so a live
+ * a new noise-covariance estimate is published by @ref RTPROCESSINGLIB::RtCov, so a live
  * source-localisation pipeline can adapt to changes in the sensor noise
  * floor (subject movement, ambient electromagnetic noise, channel removal)
  * without dropping a sample. The forward solution, source-orientation
@@ -166,6 +166,8 @@ protected:
     //=========================================================================================================
     /**
      * Handles the result
+     *
+     * @param[in] invOp  Inverse operator computed by the worker, re-emitted via invOperatorCalculated().
      */
     void handleResults(const MNELIB::MNEInverseOperator& invOp);
 

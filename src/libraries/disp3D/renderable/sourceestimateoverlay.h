@@ -11,8 +11,8 @@
  *
  * SourceEstimateOverlay loads a pair of @c .stc files (one per
  * hemisphere), holds the source-time-course matrix and the sparse
- * vertex interpolation matrix produced by @ref GeometryInfo /
- * @ref Interpolation, and for any given time index multiplies the
+ * vertex interpolation matrix produced by @ref DISP3DLIB::GeometryInfo /
+ * @ref DISP3DLIB::Interpolation, and for any given time index multiplies the
  * two to obtain a per-vertex activation vector.
  *
  * The vector is then mapped through a configurable colormap (Hot,
@@ -137,6 +137,8 @@ public:
     //=========================================================================================================
     /**
      * Get the current threshold values.
+     *
+     * @return Minimum threshold; values below it are rendered transparent.
      */
     float thresholdMin() const { return m_threshMin; }
     float thresholdMid() const { return m_threshMid; }

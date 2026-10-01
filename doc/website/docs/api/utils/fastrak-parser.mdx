@@ -31,6 +31,11 @@ Thread-affine: the caller is responsible for serialising calls. No heap allocati
 
 Configure the linear unit reported by the device.
 
+**Parameters:**
+
+- **units** : *Units*
+  Unit of incoming positions; samples are converted to metres.
+
 ---
 
 ### units()
@@ -41,11 +46,21 @@ Configure the linear unit reported by the device.
 
 Append raw bytes received from the serial port.
 
+**Parameters:**
+
+- **chunk** : *const QByteArray &*
+  Raw bytes to append to the internal buffer; may contain partial records.
+
 ---
 
 ### nextSample(out)
 
 Pop the next fully-decoded sample, if any.
+
+**Parameters:**
+
+- **out** : *FastrakSample &*
+  Receives the decoded sample; malformed lines are skipped.
 
 **Returns:**
 
@@ -64,6 +79,17 @@ Reset accumulated buffer state.
 ### parseRecord(record, units, out)
 
 Parse one record line (without trailing CR/LF) — exposed for unit tests and for callers that pre-frame their data.
+
+**Parameters:**
+
+- **record** : *const QByteArray &*
+  One ASCII record: station, x, y, z, and optional Euler angles or quaternion.
+
+- **units** : *Units*
+  Unit of the positions in `record`.
+
+- **out** : *FastrakSample &*
+  Receives the decoded sample with the position in metres.
 
 **Returns:**
 

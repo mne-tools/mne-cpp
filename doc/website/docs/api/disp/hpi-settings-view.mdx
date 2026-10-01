@@ -37,11 +37,14 @@ Constructs a [`HpiSettingsView`](/docs/api/disp/hpi-settings-view) object.
 
 **Parameters:**
 
-- **pFiffInfo**
-  The FiffInfo.
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
 
 - **parent** : *QWidget **
   The parent widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
 
 ---
 

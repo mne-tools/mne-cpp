@@ -16,7 +16,7 @@
  * related averages from a continuous FIFF stream: stimulus channel,
  * trigger types of interest, pre- and post-stimulus window in
  * milliseconds, baseline-correction interval and an embedded artefact
- * threshold table backed by @ref ArtifactSettingsView. Edits propagate
+ * threshold table backed by @ref DISPLIB::ArtifactSettingsView. Edits propagate
  * as Qt signals that the @c rtprocessing averaging job consumes.
  */
 

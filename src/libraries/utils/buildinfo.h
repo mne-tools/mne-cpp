@@ -15,7 +15,7 @@
  * @c __DATE__ / @c __TIME__ macros and the @c MNE_GIT_HASH_*
  * defines (injected by CMake at configure time) are evaluated
  * in the translation unit that invokes them. The values are
- * picked up by @ref utils_global.cpp exactly once so every
+ * picked up by @c utils_global.cpp exactly once so every
  * mne-cpp binary reports a single, stable build identifier in
  * its About dialog, CLI @c --version banner, and crash logs.
  *
@@ -38,6 +38,8 @@ namespace UTILSLIB{
 //=============================================================================================================
 /**
  * Returns build time (time preprocessor was run). Must be called in compiled function to return correctly.
+ *
+ * @return Build time string in "hh:mm:ss" format (value of __TIME__).
  */
 constexpr auto timeNowNow()
 {
@@ -47,6 +49,8 @@ constexpr auto timeNowNow()
 //=============================================================================================================
 /**
  * Returns build date (time preprocessor was run). Must be called in compiled function to return correctly.
+ *
+ * @return Build date string in "Mmm dd yyyy" format (value of __DATE__).
  */
 constexpr auto dateToday()
 {
@@ -57,6 +61,8 @@ constexpr auto dateToday()
 /**
  * Returns build date and time (time preprocessor was run). Must be called in compiled function to return
  * correctly.
+ *
+ * @return Build date and time string, __DATE__ and __TIME__ separated by a space.
  */
 constexpr auto dateTimeNow()
 {
@@ -66,6 +72,8 @@ constexpr auto dateTimeNow()
 //=============================================================================================================
 /**
  * Returns short version of the hash of the current git commit
+ *
+ * @return Short git commit hash, or a placeholder message if MNE_GIT_HASH_SHORT is not defined.
  */
 constexpr auto gitHash()
 {
@@ -79,6 +87,8 @@ constexpr auto gitHash()
 //=============================================================================================================
 /**
  * Returns entire hash of the current git commit
+ *
+ * @return Full git commit hash, or a placeholder message if MNE_GIT_HASH_LONG is not defined.
  */
 constexpr auto gitHashLong()
 {

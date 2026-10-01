@@ -10,19 +10,19 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     August 2016
- * @brief    Weighted edge between two @ref NetworkNode instances; stores the full per-frequency weight matrix and the scalar band-averaged weight.
+ * @brief    Weighted edge between two @ref CONNECTIVITYLIB::NetworkNode instances; stores the full per-frequency weight matrix and the scalar band-averaged weight.
  *
  * Every functional-connectivity estimator in @c CONNECTIVITYLIB produces one
- * @ref NetworkEdge per ordered channel pair (or per unordered pair for
- * symmetric metrics) and attaches it to the @ref Network. The edge owns
+ * @ref CONNECTIVITYLIB::NetworkEdge per ordered channel pair (or per unordered pair for
+ * symmetric metrics) and attaches it to the @ref CONNECTIVITYLIB::Network. The edge owns
  * the full weight matrix returned by the metric - typically one row per
  * frequency bin and one or more columns per estimator-specific output -
  * and a configurable @c [iStartWeightBin, iEndWeightBin) reduction window
- * that defines the single scalar @ref weight used by the visualisation
+ * that defines the single scalar @c weight used by the visualisation
  * and thresholding paths.
  *
  * The active/inactive flag and the threshold-aware comparison operators
- * are read by @ref Network::getThresholdedEdges so that GUI plugins can
+ * are read by @ref CONNECTIVITYLIB::Network::getThresholdedEdges "Network::getThresholdedEdges" so that GUI plugins can
  * toggle the displayed edge density without rebuilding the underlying
  * connectivity result.
  */

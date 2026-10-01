@@ -9,7 +9,7 @@
  * @date     April 2026
  * @brief    Container for all recordings collected within a single experimental session for one subject.
  *
- * @ref MnaSession sits between @ref MnaSubject and @ref MnaRecording
+ * @ref MNALIB::MnaSession sits between @ref MNALIB::MnaSubject and @ref MNALIB::MnaRecording
  * in the MNA project tree and mirrors the BIDS @c ses-XX directory
  * level. It captures the natural grouping that occurs when a
  * subject visits the scanner more than once — e.g. baseline,
@@ -18,7 +18,7 @@
  *
  * The structure is intentionally thin: an opaque @c id (typically
  * @c ses-01, @c ses-pre, @c ses-post), an ordered list of
- * @ref MnaRecording instances, and an @c extras bag for
+ * @ref MNALIB::MnaRecording instances, and an @c extras bag for
  * session-level sidecar metadata (date, scanner head-coil swap,
  * paradigm version) that should round-trip losslessly even when
  * unknown to the current MNALIB build.
@@ -63,24 +63,36 @@ struct MNASHARED_EXPORT MnaSession
     //=========================================================================================================
     /**
      * Serialize to QJsonObject.
+     *
+     * @return JSON object with the session id, its recordings and preserved extras.
      */
     QJsonObject toJson() const;
 
     //=========================================================================================================
     /**
      * Deserialize from QJsonObject.
+     *
+     * @param[in] json   JSON object as produced by toJson().
+     *
+     * @return The session; missing keys take default values and unknown keys go to extras.
      */
     static MnaSession fromJson(const QJsonObject& json);
 
     //=========================================================================================================
     /**
      * Serialize to QCborMap.
+     *
+     * @return CBOR map with the session id, its recordings and preserved extras.
      */
     QCborMap toCbor() const;
 
     //=========================================================================================================
     /**
      * Deserialize from QCborMap.
+     *
+     * @param[in] cbor   CBOR map as produced by toCbor().
+     *
+     * @return The session; missing keys take default values and unknown keys go to extras.
      */
     static MnaSession fromCbor(const QCborMap& cbor);
 };

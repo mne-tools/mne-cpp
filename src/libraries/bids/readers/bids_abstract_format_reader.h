@@ -14,16 +14,16 @@
  * for iEEG; @c .set and @c .nwb are also permitted). @ref
  * BIDSLIB::AbstractFormatReader is the polymorphic interface every
  * concrete reader implements so @ref BIDSLIB::BidsRawData can drive
- * them uniformly: @ref open parses the format-specific header,
- * @ref getInfo emits a populated @c FIFFLIB::FiffInfo, @ref
- * readRawSegment returns a calibrated @c (n_channels × n_samples)
- * matrix in physical units, and @ref toFiffRawData assembles the whole
+ * them uniformly: @ref BIDSLIB::AbstractFormatReader::open "open" parses the format-specific header,
+ * @ref BIDSLIB::AbstractFormatReader::getInfo "getInfo" emits a populated @c FIFFLIB::FiffInfo, @ref
+ * BIDSLIB::AbstractFormatReader::readRawSegment "readRawSegment" returns a calibrated @c (n_channels × n_samples)
+ * matrix in physical units, and @ref BIDSLIB::AbstractFormatReader::toFiffRawData "toFiffRawData" assembles the whole
  * recording into a @c FIFFLIB::FiffRawData ready to hand to MNE-CPP's
- * filtering / source-localisation stack. @ref formatName and
- * @ref supportsExtension power the dispatch implemented by @ref
+ * filtering / source-localisation stack. @ref BIDSLIB::AbstractFormatReader::formatName "formatName" and
+ * @ref BIDSLIB::AbstractFormatReader::supportsExtension "supportsExtension" power the dispatch implemented by @ref
  * BIDSLIB::BidsRawData::createReader.
  *
- * Ownership is via @ref UPtr (@c std::unique_ptr) because the concrete
+ * Ownership is via @c BIDSLIB::AbstractFormatReader::UPtr "UPtr" (@c std::unique_ptr) because the concrete
  * readers keep the underlying file open for lazy segment reads.
  */
 
@@ -109,18 +109,24 @@ public:
     //=========================================================================================================
     /**
      * @brief Return total number of samples across the recording.
+     *
+     * @return Number of samples per channel in the whole recording.
      */
     virtual long getSampleCount() const = 0;
 
     //=========================================================================================================
     /**
      * @brief Return the sampling frequency in Hz.
+     *
+     * @return Sampling frequency in Hz.
      */
     virtual float getFrequency() const = 0;
 
     //=========================================================================================================
     /**
      * @brief Return the number of measurement channels.
+     *
+     * @return Number of measurement channels (rows returned by readRawSegment).
      */
     virtual int getChannelCount() const = 0;
 
@@ -135,6 +141,8 @@ public:
     //=========================================================================================================
     /**
      * @brief Return a descriptive name for the format (e.g. "EDF", "BrainVision").
+     *
+     * @return Human-readable format name.
      */
     virtual QString formatName() const = 0;
 

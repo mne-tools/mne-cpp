@@ -15,7 +15,7 @@
  * AverageSelectionView shows a row per evoked condition (active flag,
  * label, colour swatch) and re-emits the resulting visibility +
  * colour map so any plot listening to it — typically
- * @ref ButterflyView and @ref AverageLayoutView — can update its
+ * @ref DISPLIB::ButterflyView and @ref DISPLIB::AverageLayoutView — can update its
  * rendering accordingly.
  */
 
@@ -74,7 +74,9 @@ public:
     /**
      * Constructs a AverageSelectionView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent        parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     AverageSelectionView(const QString &sSettingsPath="",
                          QWidget *parent = 0,

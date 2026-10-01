@@ -15,7 +15,7 @@
  * @c mne_dipole_fit (measurement, BEM, noise covariance, mri trans,
  * time window, baseline, channel selection) and shows the fitted
  * dipole position, orientation, magnitude and goodness-of-fit in a
- * result table once the underlying @ref INVERSELIB::DipoleFit job has
+ * result table once the underlying @c INVERSELIB::DipoleFit job has
  * finished.
  */
 
@@ -88,7 +88,7 @@ public:
     /**
      * Updates GUI to show selected BEM file
      *
-     * @param[in] sFileName.
+     * @param[in] sFileName Path of the BEM file.
      */
     void addBem(const QString& sFileName);
 
@@ -96,7 +96,7 @@ public:
     /**
      * Updates GUI to show selected MRI file
      *
-     * @param[in] sFileName.
+     * @param[in] sFileName Path of the MRI file.
      */
     void addMri(const QString& sFileName);
 
@@ -104,7 +104,7 @@ public:
     /**
      * Updates GUI to show selecte Noise file
      *
-     * @param[in] sFileName.
+     * @param[in] sFileName Path of the noise covariance file.
      */
     void addNoise(const QString& sFileName);
 
@@ -112,7 +112,7 @@ public:
     /**
      * Updates GUI to show selected measurement file
      *
-     * @param[in] sFileName.
+     * @param[in] sFileName Path of the measurement file.
      */
     void addMeas(const QString& sFileName);
 
@@ -231,10 +231,9 @@ signals:
     /**
      * Set new regularization parameters
      *
-     * @param[in] iReg         overall regularization parameter.
-     * @param[in] iRegGrad     gradiatometer regularizaation parameter.
-     * @param[in] iRegMag      magnetometer regularization parameter.
-     * @param[in] iRegEeg      eeg regularization parameter.
+     * @param[in] dRegGrad     gradiatometer regularizaation parameter.
+     * @param[in] dRegMag      magnetometer regularization parameter.
+     * @param[in] dRegEeg      eeg regularization parameter.
      */
     void regChanged(double dRegGrad,
                     double dRegMag,
@@ -244,7 +243,7 @@ signals:
     /**
      * Select set from measurement to use
      *
-     * @param[in] iSet.
+     * @param[in] iSet Index of the data set in the measurement file.
      */
     void setChanged(int iSet);
 

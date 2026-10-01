@@ -7,12 +7,12 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Discoverable design / apply façade over the @ref FilterKernel FIR engine.
+ * @brief    Discoverable design / apply façade over the @ref UTILSLIB::FilterKernel FIR engine.
  *
- * FirFilter mirrors the @ref IirFilter API surface (design, apply,
+ * FirFilter mirrors the @ref UTILSLIB::IirFilter API surface (design, apply,
  * applyZeroPhase, applyZeroPhaseMatrix) so callers see one consistent
  * way of building and running FIR or IIR filters in mne-cpp. Internally
- * every call delegates to @ref FilterKernel, which executes the actual
+ * every call delegates to @ref UTILSLIB::FilterKernel, which executes the actual
  * frequency-domain overlap-add convolution against the precomputed FFT
  * of the impulse response.
  *

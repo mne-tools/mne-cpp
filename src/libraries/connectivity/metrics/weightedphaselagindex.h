@@ -13,7 +13,7 @@
  * @date     April 2018
  * @brief    Weighted Phase Lag Index (Vinck, Oostenveld, van Wingerden, Battaglia & Pennartz 2011) between every channel pair.
  *
- * The weighted PLI replaces the unweighted sign average used by @ref PhaseLagIndex
+ * The weighted PLI replaces the unweighted sign average used by @ref CONNECTIVITYLIB::PhaseLagIndex
  * with an imaginary-part-magnitude-weighted version,
  *
  *   wPLI_{xy}(f) = | E[ Im(S_{xy}(f)) ] | / E[ |Im(S_{xy}(f))| ]
@@ -29,7 +29,7 @@
  *
  * The output is bounded in @c [0, 1] and is still positively biased for
  * small numbers of trials. The squared, debiased variant
- * @ref DebiasedSquaredWeightedPhaseLagIndex - also from Vinck et al.
+ * @ref CONNECTIVITYLIB::DebiasedSquaredWeightedPhaseLagIndex - also from Vinck et al.
  * (2011) - removes that small-sample bias analytically and should be
  * preferred when the trial count is low.
  */
@@ -120,8 +120,8 @@ protected:
      * Computes the WPLI values. This function gets called in parallel.
      *
      * @param[in] inputData              The input data.
-     * @param[out]vecPairCsdSum          The sum of all CSD matrices for each trial.
-     * @param[out]vecPairCsdImagAbsSum   The sum of all imag abs CSD matrices for each trial.
+     * @param[out] vecPairCsdSum          The sum of all CSD matrices for each trial.
+     * @param[out] vecPairCsdImagAbsSum   The sum of all imag abs CSD matrices for each trial.
      * @param[in] mutex                  The mutex used to safely access vecPairCsdSum.
      * @param[in] iNRows                 The number of rows.
      * @param[in] iNFreqs                The number of frequenciy bins.

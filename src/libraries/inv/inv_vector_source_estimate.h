@@ -10,12 +10,12 @@
  * @brief    Free-orientation surface source estimate carrying a 3-component vector per vertex.
  *
  * @ref INVLIB::InvVectorSourceEstimate extends
- * @ref InvSourceEstimate so that the data matrix holds an interleaved
+ * @ref INVLIB::InvSourceEstimate so that the data matrix holds an interleaved
  * @c (x,y,z) triplet per surface vertex — the output of free- or loose-
  * orientation MNE / dSPM solutions before any orientation pooling. The
- * class adds the @ref magnitude collapse to scalar magnitude, the
- * @ref projectToNormals signed-projection helper and per-vertex
- * @ref vertexData access, mirroring mne-python's
+ * class adds the @ref INVLIB::InvVectorSourceEstimate::magnitude "magnitude" collapse to scalar magnitude, the
+ * @ref INVLIB::InvVectorSourceEstimate::projectToNormals "projectToNormals" signed-projection helper and per-vertex
+ * @ref INVLIB::InvVectorSourceEstimate::vertexData "vertexData" access, mirroring mne-python's
  * @c VectorSourceEstimate.
  */
 
@@ -67,6 +67,8 @@ public:
     //=========================================================================================================
     /**
      * Number of source vertices (data.rows() / 3).
+     *
+     * @return Number of vertices, each carrying an x/y/z component row.
      */
     int nVertices() const;
 

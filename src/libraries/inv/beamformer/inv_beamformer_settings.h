@@ -10,11 +10,11 @@
  * @brief    Strongly-typed enumerations shared by the LCMV and DICS beamformer pipelines.
  *
  * Defines @ref INVLIB::BeamformerWeightNorm (none / unit-noise-gain /
- * NAI / rotation-invariant unit-noise-gain), @ref BeamformerPickOri
+ * NAI / rotation-invariant unit-noise-gain), @ref INVLIB::BeamformerPickOri "BeamformerPickOri"
  * (keep-all / surface-normal / max-power / 3-vector) and
- * @ref BeamformerInversion (full-matrix vs. scalar denominator
+ * @ref INVLIB::BeamformerInversion "BeamformerInversion" (full-matrix vs. scalar denominator
  * inversion). These knobs are the user-facing API surface that
- * @ref InvLCMV / @ref InvDICS expose to control how the spatial-filter
+ * @ref INVLIB::InvLCMV / @ref INVLIB::InvDICS expose to control how the spatial-filter
  * weights are derived from the leadfield and data covariance / CSD.
  * The normalisation choices follow Sekihara &amp; Nagarajan,
  * @em Adaptive Spatial Filters for Electromagnetic Brain Imaging,

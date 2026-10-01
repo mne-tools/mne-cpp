@@ -12,15 +12,15 @@
  * Whole-brain parcellation analyses load one annotation file per
  * hemisphere — typically @c lh.aparc.annot and @c rh.aparc.annot — that
  * share an atlas-specific colortable but assign labels independently per
- * hemisphere. @ref FsAnnotationSet bundles both into a single container so
+ * hemisphere. @ref FSLIB::FsAnnotationSet bundles both into a single container so
  * downstream code can iterate over hemispheres uniformly and pair the
- * result with a matching @ref FsSurfaceSet of the same subject.
+ * result with a matching @ref FSLIB::FsSurfaceSet of the same subject.
  *
  * The class accepts the standard FreeSurfer atlas names exposed by
  * @c recon-all (@c aparc, @c aparc.a2009s, @c aparc.DKTatlas40,
  * @c BA, @c BA.thresh, custom atlases produced by
  * @c mris_ca_label…) and resolves them against
- * @c $SUBJECTS_DIR/<id>/label/{lh|rh}.<atlas>.annot, mirroring the path
+ * `$SUBJECTS_DIR/<id>/label/{lh|rh}.<atlas>.annot`, mirroring the path
  * convention used by @c mne.read_labels_from_annot in MNE-Python.
  */
 

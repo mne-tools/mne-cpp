@@ -169,7 +169,7 @@ public:
      * affect().
      *
      * @param[in] chs   Channel information list.
-     * @param[in] nch   Number of channels.
+     * @param[in] nChan   Number of channels.
      *
      * @return Number of affecting projection vectors (0 if none or nch == 0).
      */

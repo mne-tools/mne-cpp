@@ -36,6 +36,9 @@ Creates a new abstract item delegate with the given parent.
 
 **Parameters:**
 
+- **m_pTableView** : *QTableView **
+  Table view the delegate paints into.
+
 - **parent** : *QObject **
   Parent of the delegate.
 
@@ -47,7 +50,8 @@ Set scale type.
 
 **Parameters:**
 
-- **ScaleType.**
+- **ScaleType** : *qint8*
+  Frequency axis scale type.
 
 ---
 
@@ -81,6 +85,10 @@ Item size.
 
 - **index** : *const QModelIndex &*
   Used to locate data in a data model.
+
+**Returns:**
+
+- *QSize* — 20 pixels wide by the row height for column 0, an invalid QSize otherwise.
 
 ---
 

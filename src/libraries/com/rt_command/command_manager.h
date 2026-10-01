@@ -133,7 +133,9 @@ public:
      * Inserts a single command.
      * Attention existing items are overwritten.
      *
-     * @param p_jsonDocument    JSON document containing commands.
+     * @param[in] p_sKey Command name used as the key.
+     * @param[in] p_sDescription Human-readable description of the command.
+     *
      */
     void insert(const QString &p_sKey, const QString &p_sDescription);
 

@@ -13,10 +13,10 @@
  * @brief    Per-channel frequency-spectrum heat-map TableView (rows = channels, columns = frequencies).
  *
  * SpectrumView wraps a @c QTableView around a
- * @ref FrequencySpectrumModel and paints each row with
- * @ref FrequencySpectrumDelegate so the live FFT amplitudes appear as
+ * @ref DISPLIB::FrequencySpectrumModel and paints each row with
+ * @ref DISPLIB::FrequencySpectrumDelegate so the live FFT amplitudes appear as
  * a rolling colour band per channel. The visible frequency range is
- * controlled by @ref SpectrumSettingsView.
+ * controlled by @ref DISPLIB::SpectrumSettingsView.
  */
 
 #ifndef SPECTRUMVIEW_H
@@ -85,7 +85,9 @@ public:
     /**
      * Constructs a SpectrumView which is a child of parent.
      *
+     * @param[in] sSettingsPath Settings path under which the widget persists its state (empty = no persistence).
      * @param[in] parent    parent of widget.
+     * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     SpectrumView(const QString& sSettingsPath = "",
                  QWidget* parent = 0,
@@ -111,7 +113,7 @@ public:
     /**
      * Adds data to the underlying model.
      *
-     * @param[in] data          The new data.
+     * @param[in] matData          The new data.
      */
     void addData(const Eigen::MatrixXd &matData);
 
@@ -129,8 +131,10 @@ public:
     /**
      * The event filter
      *
-     * @param[in] watched.
-     * @param[in] event.
+     * @param[in] watched Object the event was sent to.
+     * @param[in] event The intercepted event.
+     *
+     * @return True if a mouse-move event was consumed, otherwise the QWidget result.
      */
     virtual bool eventFilter(QObject* watched,
                              QEvent* event);

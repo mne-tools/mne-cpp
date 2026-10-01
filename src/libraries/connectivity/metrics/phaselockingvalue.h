@@ -33,7 +33,7 @@
  * choice for source-space analyses (where volume conduction is largely
  * absorbed into the inverse operator) and for paradigms in which zero-lag
  * locking is a hypothesis of interest; in sensor-space EEG/MEG it should
- * be reported alongside @ref ImagCoherence or @ref WeightedPhaseLagIndex.
+ * be reported alongside @ref CONNECTIVITYLIB::ImagCoherence or @ref CONNECTIVITYLIB::WeightedPhaseLagIndex.
  */
 
 #ifndef PHASELOCKINGVALUE_H
@@ -120,8 +120,8 @@ protected:
      * Computes the PLV values. This function gets called in parallel.
      *
      * @param[in] inputData                  The input data.
-     * @param[out]vecPairCsdSum              The sum of all CSD matrices for each trial.
-     * @param[out]vecPairCsdNormalizedSum    The sum of all normalized CSD matrices for each trial.
+     * @param[out] vecPairCsdSum              The sum of all CSD matrices for each trial.
+     * @param[out] vecPairCsdNormalizedSum    The sum of all normalized CSD matrices for each trial.
      * @param[in] mutex                      The mutex used to safely access vecPairCsdSum.
      * @param[in] iNRows                     The number of rows.
      * @param[in] iNFreqs                    The number of frequenciy bins.

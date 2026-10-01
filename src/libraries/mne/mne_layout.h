@@ -64,6 +64,8 @@ public:
 
     /**
      * @brief Returns the number of channels (rows in match matrix).
+     *
+     * @return Number of rows of the channel-to-port matching matrix.
      */
     int nmatch() const { return match.rows(); }
 };

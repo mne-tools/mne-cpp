@@ -14,8 +14,8 @@
  * the ECD dipole-fit pipeline or of a max-power beamformer. Position is in
  * head-coordinate metres, moment is in Am, and the goodness, chi-squared
  * and degrees-of-freedom fields propagate fit diagnostics to downstream
- * viewers and report writers. A list of @ref InvFocalDipole instances is
- * attached to @ref InvSourceEstimate to carry sparse focal results alongside
+ * viewers and report writers. A list of @ref INVLIB::InvFocalDipole instances is
+ * attached to @ref INVLIB::InvSourceEstimate to carry sparse focal results alongside
  * dense grid estimates.
  */
 

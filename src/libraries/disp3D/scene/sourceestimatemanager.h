@@ -130,7 +130,10 @@ public:
     /** @return number of time points, or 0. */
     int numTimePoints() const;
 
-    /** @return index closest to @p timeSec, or -1. */
+    /**
+     * @param[in] timeSec   Time in seconds.
+     * @return index closest to @p timeSec, or -1.
+     */
     int closestIndex(float timeSec) const;
 
     // ── Colormap / thresholds ──────────────────────────────────────────
@@ -171,13 +174,25 @@ public:
     /** @return true while real-time streaming is active. */
     bool isStreaming() const { return m_isStreaming; }
 
-    /** Push a single column of source data into the streaming queue. */
+    /**
+     * Push a single column of source data into the streaming queue.
+     *
+     * @param[in] data   Source amplitudes for one time point; ignored if no controller exists.
+     */
     void pushData(const Eigen::VectorXd &data);
 
-    /** Set the streaming playback interval in milliseconds. */
+    /**
+     * Set the streaming playback interval in milliseconds.
+     *
+     * @param[in] msec   Interval between streamed time points in milliseconds.
+     */
     void setInterval(int msec);
 
-    /** Enable or disable looping of the streaming queue. */
+    /**
+     * Enable or disable looping of the streaming queue.
+     *
+     * @param[in] enabled   True to replay the queue from the start when it ends.
+     */
     void setLooping(bool enabled);
 
     // ── Accessors ──────────────────────────────────────────────────────

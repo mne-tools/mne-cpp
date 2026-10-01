@@ -13,9 +13,9 @@
  * @c mneStcDataRec record and carries the full output of an inverse
  * solution: an @c (n_sources × n_times) data matrix plus the vertex
  * indices, time origin and sample step. Beyond the dense grid it also
- * holds the optional focal-dipole list (@ref InvFocalDipole), coupling
- * groups (@ref InvSourceCoupling) and pairwise connectivity layers
- * (@ref InvConnectivity), so a single value can represent the output of
+ * holds the optional focal-dipole list (@ref INVLIB::InvFocalDipole), coupling
+ * groups (@ref INVLIB::InvSourceCoupling) and pairwise connectivity layers
+ * (@ref INVLIB::InvConnectivity), so a single value can represent the output of
  * MNE / dSPM / sLORETA, RAP-MUSIC, MxNE or DICS without losing
  * algorithm-specific by-products. The class implements STC / W binary
  * I/O (round-trip compatible with MNE-Python and MNE-C), label-based
@@ -100,10 +100,10 @@ public:
     /**
      * Constructs a source estimation from given data
      *
-     * @param[in] p_sol.
-     * @param[in] p_vertices.
-     * @param[in] p_tmin.
-     * @param[in] p_tstep.
+     * @param[in] p_sol Source amplitudes (sources x time points).
+     * @param[in] p_vertices Source space vertex numbers of the rows of p_sol.
+     * @param[in] p_tmin Time of the first sample in seconds.
+     * @param[in] p_tstep Time between samples in seconds.
      */
     InvSourceEstimate(const Eigen::MatrixXd &p_sol, const Eigen::VectorXi &p_vertices, float p_tmin, float p_tstep);
 
@@ -136,6 +136,8 @@ public:
      *
      * @param[in] start  The start index to cut the estimate from.
      * @param[in] n      Number of samples to cut from start index.
+     *
+     * @return Copy of this estimate restricted to samples [start, start + n), with tmin updated accordingly.
      */
     InvSourceEstimate reduce(qint32 start, qint32 n);
 
@@ -159,6 +161,8 @@ public:
      * Writes a stc file
      *
      * @param[in] p_IODevice   IO device to write the stc to.
+     *
+     * @return True if successful, false if the device could not be opened for writing.
      */
     bool write(QIODevice &p_IODevice);
 

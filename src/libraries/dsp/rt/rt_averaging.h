@@ -186,12 +186,17 @@ protected:
     //=========================================================================================================
     /**
      * do the actual averaging here.
+     *
+     * @param[in] rawSegment    Incoming data block (n_channels × n_samples) scanned for triggers and averaged.
      */
     void doAveraging(const Eigen::MatrixXd& rawSegment);
 
     //=========================================================================================================
     /**
      * Prepends incoming data to front/pre stim buffer.
+     *
+     * @param[in] data            Incoming data block (n_channels × n_samples).
+     * @param[in] dTriggerType    Trigger type whose pre-stimulus buffer is updated (-1.0 for the shared buffer).
      */
     void fillFrontBuffer(const Eigen::MatrixXd& data,
                          double dTriggerType);
@@ -202,6 +207,9 @@ protected:
     //=========================================================================================================
     /**
      * Prepends incoming data to back/post stim buffer.
+     *
+     * @param[in] data            Incoming data block (n_channels × n_samples); excess columns beyond the post-stimulus length are dropped.
+     * @param[in] dTriggerType    Trigger type whose post-stimulus buffer is filled.
      */
     void fillBackBuffer(const Eigen::MatrixXd& data,
                         double dTriggerType);
@@ -209,18 +217,24 @@ protected:
     //=========================================================================================================
     /**
      * Packs the buffers togehter as one and calcualtes the current running average and emits the result if number of averages has been reached.
+     *
+     * @param[in] dTriggerType    Trigger type whose pre- and post-stimulus buffers are merged.
      */
     void mergeData(double dTriggerType);
 
     //=========================================================================================================
     /**
      * Generates the final evoke variable.
+     *
+     * @param[in] dTriggerType    Trigger type whose stored epochs are averaged into the evoked response.
      */
     void generateEvoked(double dTriggerType);
 
     //=========================================================================================================
     /**
      * Check if control values have been changed
+     *
+     * @return True if pre-stimulus samples, post-stimulus samples or trigger channel index differ from their pending new values.
      */
     inline bool controlValuesChanged();
 
@@ -288,7 +302,7 @@ public:
      * @param[in] iPreStimSamples      Number of samples averaged before the stimulus.
      * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus).
      * @param[in] iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs.
-     * @param[in] iBaselineToSSecs     End of baseline area which was/is used for correction in msecs.
+     * @param[in] iBaselineToSecs     End of baseline area which was/is used for correction in msecs.
      * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers.
      * @param[in] pFiffInfo            Associated Fiff Information.
      * @param[in] parent     Parent QObject (optional).
@@ -324,7 +338,7 @@ public:
      * @param[in] iPreStimSamples      Number of samples averaged before the stimulus.
      * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus).
      * @param[in] iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs.
-     * @param[in] iBaselineToSSecs     End of baseline area which was/is used for correction in msecs.
+     * @param[in] iBaselineToSecs     End of baseline area which was/is used for correction in msecs.
      * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers.
      * @param[in] pFiffInfo            Associated Fiff Information.
      */
@@ -424,6 +438,9 @@ protected:
     //=========================================================================================================
     /**
      * Handles the results.
+     *
+     * @param[in] evokedStimSet             Evoked set produced by the worker, re-emitted via evokedStim().
+     * @param[in] lResponsibleTriggerTypes  Trigger types that contributed to this update.
      */
     void handleResults(const FIFFLIB::FiffEvokedSet& evokedStimSet,
                        const QStringList& lResponsibleTriggerTypes);

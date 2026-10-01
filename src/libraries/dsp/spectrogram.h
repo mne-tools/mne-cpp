@@ -18,11 +18,11 @@
  * narrower windows do the opposite.
  *
  * The implementation parallelises across windowed segments via Qt Concurrent's
- * map–reduce pattern; @ref SpectogramInputData carries the per-window
- * parameters and @ref Spectrogram::reduce sums the partial spectrograms back
+ * map–reduce pattern; @ref UTILSLIB::SpectogramInputData carries the per-window
+ * parameters and @c UTILSLIB::Spectrogram::reduce "Spectrogram::reduce" sums the partial spectrograms back
  * into the final matrix. Use this when a single global STFT view is
  * sufficient — for multitaper or wavelet representations see
- * @ref MultitaperTfr and @ref MorletTfr.
+ * @ref UTILSLIB::MultitaperTfr and @ref UTILSLIB::MorletTfr.
  */
 
 #ifndef SPECTROGRAM_H

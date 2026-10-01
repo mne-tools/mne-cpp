@@ -12,12 +12,12 @@
  * @date     July 2018
  * @brief    Abstract base widget providing title, axis labels and resize handling for the in-house 2-D plots.
  *
- * Graph centralises the boilerplate shared by @ref Plot, @ref ImageSc
+ * Graph centralises the boilerplate shared by @ref DISPLIB::Plot, @ref DISPLIB::ImageSc
  * and any other small @c QPainter-based plot widget in DISPLIB:
  * storing the plot title and x/y axis label strings, performing the
  * minimal resize bookkeeping that keeps tick spacing readable, and
  * drawing the label band around the actual plot area. Concrete
- * subclasses paint inside the content rectangle that @ref Graph leaves
+ * subclasses paint inside the content rectangle that @ref DISPLIB::Graph leaves
  * free after the labels and title.
  */
 
@@ -109,7 +109,7 @@ public:
     /**
      * Sets the label of the y axes
      *
-     * @param[in] p_sXLabel   The y axes label.
+     * @param[in] p_sYLabel   The y axes label.
      */
     void setYLabel(const QString &p_sYLabel);
 

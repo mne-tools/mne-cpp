@@ -15,8 +15,8 @@
  * contextual MNE (CMNE), ECD dipole fitting and continuous head-position
  * estimation. This header defines the @c INVSHARED_EXPORT macro that
  * controls symbol visibility for the shared/static build variants, declares
- * the @c INVLIB namespace, and exposes @ref buildDateTime and
- * @ref buildHash so applications can stamp the linked INVLIB version into
+ * the @c INVLIB namespace, and exposes @ref INVLIB::buildDateTime "buildDateTime" and
+ * @ref INVLIB::buildHash "buildHash" so applications can stamp the linked INVLIB version into
  * log files and reports.
  */
 
@@ -52,18 +52,24 @@ namespace INVLIB{
 //=============================================================================================================
 /**
  * Returns build date and time.
+ *
+ * @return Static C string with the compile date and time, e.g. "Sep 30 2026 14:05:12".
  */
 INVSHARED_EXPORT const char* buildDateTime();
 
 //=============================================================================================================
 /**
  * Returns abbreviated build git hash.
+ *
+ * @return Static C string with the short git commit hash, or a "not defined" notice if unavailable at build time.
  */
 INVSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
  * Returns full build git hash.
+ *
+ * @return Static C string with the full git commit hash, or a "not defined" notice if unavailable at build time.
  */
 INVSHARED_EXPORT const char* buildHashLong();
 

@@ -37,8 +37,14 @@ Constructs a [`FilterSettingsView`](/docs/api/disp/filter-settings-view) which i
 
 **Parameters:**
 
+- **sSettingsPath** : *const QString &*
+  Settings path under which the widget persists its state (empty = no persistence).
+
 - **parent** : *QWidget **
   parent of widget.
+
+- **f** : *Qt::WindowFlags*
+  Qt window flags passed to the QWidget constructor.
 
 ---
 
@@ -52,11 +58,19 @@ Destroys the [`FilterSettingsView`](/docs/api/disp/filter-settings-view).
 
 Returns the filter design view used to design filters.
 
+**Returns:**
+
+- *QSharedPointer&lt;[FilterDesignView](/docs/api/disp/filter-design-view)&gt;* — Shared pointer to the owned [`FilterDesignView`](/docs/api/disp/filter-design-view).
+
 ---
 
 ### getFilterActive()
 
 Returns true if the filters a set as active.
+
+**Returns:**
+
+- *bool* — True if the activate-filter check box is checked.
 
 ---
 

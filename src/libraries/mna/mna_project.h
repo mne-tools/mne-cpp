@@ -9,19 +9,19 @@
  * @date     April 2026
  * @brief    Top-level MNA container binding subjects, processing pipeline, schema version and project metadata.
  *
- * @ref MnaProject is the in-memory representation of one @c .mna
+ * @ref MNALIB::MnaProject is the in-memory representation of one @c .mna
  * (JSON) or @c .mnx (CBOR) file and the entry point for every other
- * MNALIB type: it owns the @ref MnaSubject list (subject → session
- * → recording → file) plus the @ref MnaNode pipeline that describes
+ * MNALIB type: it owns the @ref MNALIB::MnaSubject list (subject → session
+ * → recording → file) plus the @ref MNALIB::MnaNode pipeline that describes
  * how derivatives are produced from raw inputs. Reading or writing
- * a project is a single @ref MnaIO call away — @ref read and
- * @ref write are thin façades that dispatch on extension.
+ * a project is a single @ref MNALIB::MnaIO call away — @ref MNALIB::MnaProject::read "read" and
+ * @ref MNALIB::MnaProject::write "write" are thin façades that dispatch on extension.
  *
  * The container is intentionally @em declarative: it records what
  * should be computed (operations, parameters, file references and
  * hashes) rather than embedding executable code, so collaborators
  * on different platforms can reproduce the analysis using their
- * own MNE-CPP build. @c mnaVersion / @ref CURRENT_SCHEMA_VERSION
+ * own MNE-CPP build. @c mnaVersion / @ref MNALIB::MnaProject::CURRENT_SCHEMA_VERSION "CURRENT_SCHEMA_VERSION"
  * are bumped on breaking schema changes, while @c extras preserves
  * forward-compatible additions so projects written by a newer
  * version round-trip losslessly through an older one.
@@ -87,24 +87,36 @@ public:
     //=========================================================================================================
     /**
      * Serialize to QJsonObject.
+     *
+     * @return JSON object with all project fields, subjects, pipeline nodes and preserved extras.
      */
     QJsonObject toJson() const;
 
     //=========================================================================================================
     /**
      * Deserialize from QJsonObject.
+     *
+     * @param[in] json   JSON object as produced by toJson().
+     *
+     * @return The project; missing keys take default values and unknown keys go to extras.
      */
     static MnaProject fromJson(const QJsonObject& json);
 
     //=========================================================================================================
     /**
      * Serialize to QCborMap.
+     *
+     * @return CBOR map with all project fields, subjects, pipeline nodes and preserved extras.
      */
     QCborMap toCbor() const;
 
     //=========================================================================================================
     /**
      * Deserialize from QCborMap.
+     *
+     * @param[in] cbor   CBOR map as produced by toCbor().
+     *
+     * @return The project; missing keys take default values and unknown keys go to extras.
      */
     static MnaProject fromCbor(const QCborMap& cbor);
 

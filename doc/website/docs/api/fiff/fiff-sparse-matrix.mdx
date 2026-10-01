@@ -47,11 +47,21 @@ Constructs a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) wrapping an
 
 Default copy constructor.
 
+**Parameters:**
+
+- **mat** : *const FiffSparseMatrix &*
+  Sparse matrix to copy.
+
 ---
 
 ### FiffSparseMatrix(mat)
 
 Default move constructor.
+
+**Parameters:**
+
+- **mat** : *FiffSparseMatrix &&*
+  Sparse matrix to move from; left in a valid but unspecified state.
 
 ---
 
@@ -59,11 +69,19 @@ Default move constructor.
 
 Default copy-assignment operator.
 
+**Returns:**
+
+- *[FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) &* — Reference to this object.
+
 ---
 
 ### operator=()
 
 Default move-assignment operator.
+
+**Returns:**
+
+- *[FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) &* — Reference to this object.
 
 ---
 
@@ -103,17 +121,29 @@ Implicit conversion to const Eigen::SparseMatrix&lt;float&gt;&.
 
 Number of rows.
 
+**Returns:**
+
+- *int* — Row count of the underlying Eigen sparse matrix.
+
 ---
 
 ### cols()
 
 Number of columns.
 
+**Returns:**
+
+- *int* — Column count of the underlying Eigen sparse matrix.
+
 ---
 
 ### nonZeros()
 
 Number of stored non-zero elements.
+
+**Returns:**
+
+- *int* — Count of explicitly stored entries in the underlying Eigen sparse matrix.
 
 ---
 

@@ -18,7 +18,7 @@
  * on-disk records preserve the exact byte layout documented by the FIFF
  * specification regardless of host platform. It also publishes a handful
  * of Eigen typedefs (@c MatrixDau16, @c MatrixShort) used by the matrix
- * tag readers in @ref FiffStream and a small set of empty-default
+ * tag readers in @ref FIFFLIB::FiffStream and a small set of empty-default
  * sentinel objects (@c defaultMatrixXd, @c defaultQStringList, ...) that
  * let callers express "no value provided" on optional arguments without
  * relying on @c std::optional, matching the historical MATLAB-style
@@ -27,7 +27,7 @@
  * Note: the leftover "Old fiff_type declarations - replace them"
  * heading on the previous header line reflects an in-progress cleanup
  * toward strongly typed C++ replacements; new code should prefer the
- * class wrappers (@ref FiffId, @ref FiffChInfo, ...) over the legacy
+ * class wrappers (@ref FIFFLIB::FiffId, @ref FIFFLIB::FiffChInfo, ...) over the legacy
  * "Rec" struct aliases re-exported for backwards compatibility.
  */
 

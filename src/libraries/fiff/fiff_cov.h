@@ -13,14 +13,14 @@
  * @date     October 2012
  * @brief    Noise / data covariance matrix as stored under FIFFB_MNE_COV, with channel names, kind, projector list and rank info.
  *
- * @ref FiffCov is the C++ counterpart of MNE-Python's @c mne.Covariance.
+ * @ref FIFFLIB::FiffCov is the C++ counterpart of MNE-Python's @c mne.Covariance.
  * It holds the (typically channel × channel) covariance matrix, the
  * channel-name list it is indexed by, the kind tag
  * (@c FIFFV_MNE_NOISE_COV / @c FIFFV_MNE_SOURCE_COV / ...), the diagonal
  * flag, the projector list that was active when the covariance was
- * estimated (@ref FiffProj), the bad-channel list, the nfree degrees of
+ * estimated (@ref FIFFLIB::FiffProj), the bad-channel list, the nfree degrees of
  * freedom and an optional pre-whitening eigendecomposition. The class is
- * what @ref FiffStream reads from / writes to ``*-cov.fif`` files and
+ * what @ref FIFFLIB::FiffStream reads from / writes to ``*-cov.fif`` files and
  * what the source-localization pipeline consumes to whiten the forward
  * gain matrix and the measurement data.
  */

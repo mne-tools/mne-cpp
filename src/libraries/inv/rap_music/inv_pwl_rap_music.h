@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Powell-accelerated RAP-MUSIC variant — replaces the exhaustive pair scan with a Powell line-search refinement.
  *
- * @ref INVLIB::InvPwlRapMusic derives from @ref InvRapMusic and
+ * @ref INVLIB::InvPwlRapMusic derives from @ref INVLIB::InvRapMusic and
  * overrides the pair-scanning step with a Powell direction-set
  * optimiser, drastically reducing the number of leadfield evaluations
  * per iteration on dense grids. All other behaviour — signal-subspace
@@ -78,7 +78,7 @@ public:
     /**
      * Constructor which initializes the POWELL RAP MUSIC algorithm with the given model.
      *
-     * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding grid matrix.
+     * @param[in] p_pFwd          The model which contains the gain matrix and its corresponding grid matrix.
      * @param[in] p_bSparsed     True when sparse matrices should be used.
      * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with.
      *                           the strongest.
@@ -94,8 +94,8 @@ public:
      * Note: Since they are virtual they have to be implemented to be called. Even so the base class RAP MUSIC
      *       implementation is called.
      *
-     * @param[in] p_fiffEvoked.
-     * @param[in] pick_normal.
+     * @param[in] p_fiffEvoked Evoked data to localize.
+     * @param[in] pick_normal Keep only the component normal to the cortex.
      *
      * @return
      */
@@ -107,9 +107,10 @@ public:
      * Note: Since they are virtual they have to be implemented to be called. Even so the base class RAP MUSIC
      *       implementation is called.
      *
-     * @param[in] data.
-     * @param[in] tmin.
-     * @param[in] tstep.
+     * @param[in] data Measurement data (channels x samples).
+     * @param[in] tmin Time of the first sample in seconds.
+     * @param[in] tstep Time between samples in seconds.
+     * @param[in] pick_normal Keep only the component normal to the cortex.
      *
      * @return
      */

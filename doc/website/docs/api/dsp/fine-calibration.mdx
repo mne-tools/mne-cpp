@@ -56,17 +56,29 @@ Write fine calibration to a .dat file.
 
 Get the calibration entries.
 
+**Returns:**
+
+- *const QList&lt; FineCalEntry &gt; &* — Const reference to the list of per-channel calibration entries.
+
 ---
 
 ### size()
 
 Get the number of entries.
 
+**Returns:**
+
+- *int* — Number of calibration entries (one per MEG channel).
+
 ---
 
 ### isEmpty()
 
 Check if empty.
+
+**Returns:**
+
+- *bool* — True if no calibration entries are stored.
 
 ---
 
@@ -92,6 +104,11 @@ Find entry by channel number.
 
 Add an entry.
 
+**Parameters:**
+
+- **entry** : *const FineCalEntry &*
+  Calibration entry appended to the end of the list.
+
 ---
 
 ### gainVector()
@@ -111,6 +128,10 @@ Returns a diagonal matrix where each diagonal element is the gain factor for the
 Build imbalance matrix.
 
 Returns a matrix of cross-talk imbalance vectors (n_entries × 3).
+
+**Returns:**
+
+- *Eigen::MatrixXd* — Imbalance matrix (n_entries × 3), one x/y/z row per entry.
 
 ---
 

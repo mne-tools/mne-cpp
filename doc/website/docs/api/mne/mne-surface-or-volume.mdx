@@ -73,32 +73,17 @@ Populate the [`MNETriangle`](/docs/api/mne/mne-triangle) structures for both the
 
 Accumulates the total surface area into tot_area.
 
-**Parameters:**
-
-- **s**
-  The source space whose triangle data is filled in.
-
 ---
 
 ### compute_surface_cm()
 
 Compute and store the center of mass of a surface's vertices.
 
-**Parameters:**
-
-- **s**
-  The surface whose cm field is set.
-
 ---
 
 ### calculate_vertex_distances()
 
 Compute the Euclidean distances from each vertex to its topological neighbors and store them in the vert_dist array.
-
-**Parameters:**
-
-- **s**
-  The source space with neighbor_vert already set.
 
 ---
 
@@ -107,11 +92,6 @@ Compute the Euclidean distances from each vertex to its topological neighbors an
 Compute vertex normals by area-weighted accumulation of triangle normals, then normalize to unit length.
 
 Also calls `add_triangle_data()` and `compute_surface_cm()`.
-
-**Parameters:**
-
-- **s**
-  The source space to update.
 
 **Returns:**
 
@@ -126,9 +106,6 @@ Build complete geometry information for a source space: triangle data, vertex no
 Optionally checks for topological defects (excessive number of neighbors).
 
 **Parameters:**
-
-- **s**
-  The source space to augment.
 
 - **do_normals** : *bool*
   If non-zero, compute vertex normals.
@@ -148,9 +125,6 @@ Convenience overload that adds geometry information with border detection disabl
 
 **Parameters:**
 
-- **s**
-  The source space to augment.
-
 - **do_normals** : *bool*
   If non-zero, compute vertex normals.
 
@@ -165,9 +139,6 @@ Convenience overload that adds geometry information with border detection disabl
 Add geometry information with excess-neighbor checking disabled (warns instead of failing when a vertex has too many neighbors).
 
 **Parameters:**
-
-- **s**
-  The source space to augment.
 
 - **do_normals** : *bool*
   If non-zero, compute vertex normals.
@@ -222,17 +193,44 @@ Sets vert = i, patch = nullptr for each entry.
 
 Return a read-only map to the k-th vertex position (3 contiguous floats).
 
+**Parameters:**
+
+- **k** : *int*
+  Vertex index (0 to np - 1).
+
+**Returns:**
+
+- *Eigen::Map&lt; const Eigen::Vector3f &gt;* — Read-only view of row k of rr, in m.
+
 ---
 
 ### point(k)
 
 Return a mutable map to the k-th vertex position.
 
+**Parameters:**
+
+- **k** : *int*
+  Vertex index (0 to np - 1).
+
+**Returns:**
+
+- *Eigen::Map&lt; Eigen::Vector3f &gt;* — Writable view of row k of rr, in m.
+
 ---
 
 ### normal(k)
 
 Return a read-only map to the k-th vertex normal (3 contiguous floats).
+
+**Parameters:**
+
+- **k** : *int*
+  Vertex index (0 to np - 1).
+
+**Returns:**
+
+- *Eigen::Map&lt; const Eigen::Vector3f &gt;* — Read-only view of row k of nn (unit normal).
 
 ---
 

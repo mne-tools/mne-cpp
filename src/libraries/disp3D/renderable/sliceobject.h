@@ -10,7 +10,7 @@
  * @brief    Single MRI volume slice rendered as a textured quad with adjustable axis, position, contrast and colormap.
  *
  * SliceObject mounts one orthogonal slice (axial, sagittal or
- * coronal) of an @ref MriVolume on a screen-aligned quad and uploads
+ * coronal) of an @c MriVolume on a screen-aligned quad and uploads
  * the slice texture as @c R8 (grayscale) or @c RGBA8 (colour-mapped)
  * to the GPU. The slice index can be scrolled at interactive rates;
  * only the texture data is re-uploaded, the quad geometry is

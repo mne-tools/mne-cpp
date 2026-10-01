@@ -10,7 +10,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    QAbstractTableModel storing per-channel FFT magnitudes for @ref SpectrumView.
+ * @brief    QAbstractTableModel storing per-channel FFT magnitudes for @ref DISPLIB::SpectrumView.
  *
  * FrequencySpectrumModel maintains an @c Eigen::MatrixXd of channels
  * × frequency bins together with the active @c FiffInfo. New blocks
@@ -135,7 +135,7 @@ public:
     /**
      * Sets corresponding fiff info
      *
-     * @param[in] inf       The corresponding fiff information object.
+     * @param[in] info       The corresponding fiff information object.
      */
     void setInfo(QSharedPointer<FIFFLIB::FiffInfo> &info);
 

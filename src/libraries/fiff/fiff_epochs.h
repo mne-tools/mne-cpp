@@ -10,12 +10,12 @@
  * @brief    Static epoching utilities: cut a FiffRawData stream into fixed-length, event-aligned epochs.
  *
  * Implements the equivalent of @c mne.Epochs construction from a
- * continuous recording: given a @ref FiffRawData, an event list (or a
+ * continuous recording: given a @ref FIFFLIB::FiffRawData, an event list (or a
  * fixed step), and a time window (@c tmin, @c tmax), it returns a
  * 3D (nepoch × nchan × nsamples) stack along with the associated
- * @ref FiffInfo. Bad-segment rejection (via @ref FiffAnnotation
+ * @ref FIFFLIB::FiffInfo. Bad-segment rejection (via @ref FIFFLIB::FiffAnnotation
  * "BAD_*" entries) and peak-to-peak / flatness rejection
- * (via @ref RejectionParams in @ref fiff_evoked_set.h) are applied as
+ * (via @ref FIFFLIB::RejectionParams in @ref fiff_evoked_set.h) are applied as
  * the epochs are cut.
  */
 
@@ -53,7 +53,7 @@ namespace FIFFLIB
 /**
  * @brief Fixed-length epoching result: the (nepoch × nchan × nsamples) data stack plus the matching @ref FiffInfo.
  *
- * Returned by the static epoch-cutting helpers in @ref FiffEpochsUtils.
+ * Returned by the static epoch-cutting helpers in @c FiffEpochsUtils.
  * Mirrors the @c mne.EpochsArray construction return value in
  * MNE-Python.
  */

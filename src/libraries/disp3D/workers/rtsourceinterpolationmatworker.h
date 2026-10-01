@@ -9,10 +9,10 @@
  * @date     March 2026
  * @brief    Background worker that builds the sparse source-to-vertex interpolation matrix for one hemisphere.
  *
- * Encapsulates the heavy-weight @ref GeometryInfo::scdc (geodesic
- * distance Dijkstra) and @ref Interpolation::createInterpolationMat
+ * Encapsulates the heavy-weight @ref DISP3DLIB::GeometryInfo::scdc "GeometryInfo::scdc" (geodesic
+ * distance Dijkstra) and @ref DISP3DLIB::Interpolation::createInterpolationMat "Interpolation::createInterpolationMat"
  * (distance-based sparse weight build) calls. It supports two
- * @ref VisualizationType modes: @c InterpolationBased uses the
+ * @ref DISP3DLIB::RtSourceInterpolationMatWorker::VisualizationType "VisualizationType" modes: @c InterpolationBased uses the
  * smooth distance kernel, @c AnnotationBased uses a per-parcel
  * uniform colouring derived from the FreeSurfer annotation so the
  * cortex lights up parcel-by-parcel.

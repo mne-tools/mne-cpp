@@ -10,8 +10,8 @@
  * @brief    Set of @ref MNELIB::MNEMshDisplaySurface objects sharing a camera, lights and selection.
  *
  * @ref MNELIB::MNEMshDisplaySurfaceSet aggregates one or more renderable
- * surfaces with the @ref MNEMshEyes camera, the
- * @ref MNEMshLightSet lighting rig and the @ref MNEMshPicked vertex
+ * surfaces with the @ref MNELIB::MNEMshEyes camera, the
+ * @ref MNELIB::MNEMshLightSet lighting rig and the @ref MNELIB::MNEMshPicked vertex
  * selection so the legacy viewer state can be saved and restored as a
  * single object.
  */
@@ -77,6 +77,8 @@ public:
     //=========================================================================================================
     /**
      * Constructs the MNEMshDisplaySurfaceSet.
+     *
+     * @param[in] nsurf  Number of surface slots to allocate (all initially inactive and drawable).
      */
     MNEMshDisplaySurfaceSet(int nsurf = 0);
 
@@ -124,7 +126,7 @@ public:
      *
      * @param[in] newSurf    The surface to add or use as replacement.
      * @param[in] replace    If true, replace an existing surface with matching ID.
-     * @param[in] drawable   Whether the surface should be marked as drawable.
+     * @param[in] isDrawable   Whether the surface should be marked as drawable.
      */
     void add_replace_surface(std::unique_ptr<MNEMshDisplaySurface> newSurf,
                              bool                  replace,

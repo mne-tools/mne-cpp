@@ -86,6 +86,12 @@ public:
     //=========================================================================================================
     /**
      * Write Eigen Matrix to file (QString path).
+     *
+     * @param[in] in           Matrix to write as whitespace-separated text, one row per line.
+     * @param[in] sPath        Path of the output file; an existing file is overwritten.
+     * @param[in] sDescription Optional description; if non-empty, a dimensions and description header is written.
+     *
+     * @return True on success, false if the file could not be opened for writing.
      */
     template<typename T>
     static bool write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& in, const QString& sPath, const QString& sDescription = QString());
@@ -97,6 +103,12 @@ public:
     //=========================================================================================================
     /**
      * Write Eigen Matrix to file (std::string path).
+     *
+     * @param[in] in           Matrix to write as whitespace-separated text, one row per line.
+     * @param[in] sPath        Path of the output file; an existing file is overwritten.
+     * @param[in] sDescription Optional description; if non-empty, a dimensions and description header is written.
+     *
+     * @return True on success, false if the file could not be opened for writing.
      */
     template<typename T>
     static bool write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& in, const std::string& sPath, const std::string& sDescription = std::string());
@@ -108,6 +120,11 @@ public:
     //=========================================================================================================
     /**
      * Read Eigen Matrix from file (QString path).
+     *
+     * @param[out] out  Matrix resized and filled with the values read; lines containing '#' are skipped.
+     * @param[in]  path Path of the whitespace-separated text file to read.
+     *
+     * @return True on success, false if the file could not be opened.
      */
     template<typename T>
     static bool read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& out, const QString& path);
@@ -119,6 +136,11 @@ public:
     //=========================================================================================================
     /**
      * Read Eigen Matrix from file (std::string path).
+     *
+     * @param[out] out  Matrix resized and filled with the values read; lines containing '#' are skipped.
+     * @param[in]  path Path of the whitespace-separated text file to read.
+     *
+     * @return True on success, false if the file could not be opened.
      */
     template<typename T>
     static bool read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& out, const std::string& path);

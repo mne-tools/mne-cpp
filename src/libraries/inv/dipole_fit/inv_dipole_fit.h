@@ -11,10 +11,10 @@
  *
  * @ref INVLIB::InvDipoleFit orchestrates the full mne-c
  * @c mne_dipole_fit pipeline: it consumes a populated
- * @ref InvDipoleFitSettings, builds the forward-model workspace via
- * @ref InvDipoleFitData, generates the initial-guess grid via
- * @ref InvGuessData, and then fits one ECD per requested time bin
- * returning the result as an @ref InvEcdSet. Refactored from
+ * @ref INVLIB::InvDipoleFitSettings, builds the forward-model workspace via
+ * @ref INVLIB::InvDipoleFitData, generates the initial-guess grid via
+ * @ref INVLIB::InvGuessData, and then fits one ECD per requested time bin
+ * returning the result as an @ref INVLIB::InvEcdSet. Refactored from
  * @c fit_dipoles.c / @c dipole_fit_setup.c (MNE-C) while preserving the
  * sphere-model and BEM forward-model code paths used by the original
  * mne-c tooling.

@@ -10,8 +10,8 @@
  * @brief    Real-time MEG / EEG sensor streaming controller that orchestrates the data and field-mapping workers.
  *
  * RtSensorDataController spins up a background @ref
- * RtSensorDataWorker (queue, averaging, dense mat-vec mapping,
- * ABGR packing) and an optional @ref RtSensorInterpolationMatWorker
+ * DISP3DLIB::RtSensorDataWorker (queue, averaging, dense mat-vec mapping,
+ * ABGR packing) and an optional @ref DISP3DLIB::RtSensorInterpolationMatWorker
  * (asynchronous recomputation of the dense mapping matrix when the
  * sensor configuration, projectors or target surface change) and
  * ties them together with a timer that paces the streaming.

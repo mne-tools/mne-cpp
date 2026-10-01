@@ -11,13 +11,13 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     November 2019
- * @brief    QAbstractItemDelegate painting one FIFF channel's signal trace inside @ref RtFiffRawView.
+ * @brief    QAbstractItemDelegate painting one FIFF channel's signal trace inside @ref DISPLIB::RtFiffRawView.
  *
  * RtFiffRawViewDelegate transforms each visible row of the
- * @ref RtFiffRawViewModel into a polyline drawn inside the cell
+ * @ref DISPLIB::RtFiffRawViewModel into a polyline drawn inside the cell
  * rectangle. It applies the active y-scaling, the SSP / compensation
  * operators, the trigger overlays and the bad-channel greying, and
- * is shared by @ref ChannelDataView and the rolling raw browser.
+ * is shared by @ref DISPLIB::ChannelDataView and the rolling raw browser.
  */
 
 #ifndef RTFIFFRAWVIEWDELEGATE_H
@@ -120,6 +120,8 @@ public:
      *
      * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in] index      Used to locate data in a data model.
+     *
+     * @return 20 pixels wide by the row height for column 0, the option rectangle size otherwise.
      */
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
@@ -153,7 +155,7 @@ public:
      * Set the new upper item index color. This is used to only plot the background for the upper, visible item in the QTableView.
      * This is a rather ugly hack in order to cope with QOpenGLWidget's/QtableView's problem when setting a background color.
      *
-     * @param[in] iUpperItem  The new upper item index color.
+     * @param[in] iUpperItemIndex  The new upper item index color.
      */
     void setUpperItemIndex(int iUpperItemIndex);
 
@@ -232,6 +234,7 @@ private:
     /**
      * createMarkerPath Creates the QPointer path for the marker plot.
      *
+     * @param[in] index Model index of the channel being painted.
      * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in, out] path   The QPointerPath to create for the data plot.
      */
@@ -245,7 +248,7 @@ private:
      * @param[in] dx    The X increment.
      * @param[in] y     The new y value to plot.
      * @param[in] ybase   The y offset to apply.
-     * @param[in] yscale   The y scaling factor to apply.
+     * @param[in] yScale   The y scaling factor to apply.
      */
     inline QPointF calcPoint(QPainterPath& path, const double dx, const double y, const double ybase, const double yScale) const;
 

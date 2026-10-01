@@ -11,7 +11,7 @@
  *
  * @ref MNELIB::MNEMneData ports the @c mneMneDataRec struct and is the
  * scratchpad shared between @c prepare_inverse_operator and the
- * per-tstep solver inside @ref MNELIB::MinimumNorm. It stores the
+ * per-tstep solver inside @c MNELIB::MinimumNorm. It stores the
  * whitened data, the SVD-rotated residuals and the resulting source
  * time courses without allocating per call, which matters for raw-data
  * inverse application over long recordings.

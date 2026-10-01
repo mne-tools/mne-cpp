@@ -71,6 +71,7 @@ struct UTILSSHARED_EXPORT FastrakSample
 class UTILSSHARED_EXPORT FastrakParser
 {
 public:
+    /** Linear unit of the positions reported by the device. */
     enum class Units {
         Inches,           ///< Fastrak factory default.
         Centimetres       ///< FastSCAN / G4 default.
@@ -78,16 +79,26 @@ public:
 
     FastrakParser() = default;
 
-    /** Configure the linear unit reported by the device. */
+    /**
+     * Configure the linear unit reported by the device.
+     *
+     * @param[in] units Unit of incoming positions; samples are converted to metres.
+     */
     void setUnits(Units units) { m_units = units; }
 
     Units units() const { return m_units; }
 
-    /** Append raw bytes received from the serial port. */
+    /**
+     * Append raw bytes received from the serial port.
+     *
+     * @param[in] chunk Raw bytes to append to the internal buffer; may contain partial records.
+     */
     void append(const QByteArray& chunk) { m_buffer.append(chunk); }
 
     /**
      * Pop the next fully-decoded sample, if any.
+     *
+     * @param[out] out Receives the decoded sample; malformed lines are skipped.
      *
      * @return true when @p out was populated; false when the buffer does
      *         not yet contain a complete record.
@@ -100,6 +111,10 @@ public:
     /**
      * Parse one record line (without trailing CR/LF) — exposed for unit
      * tests and for callers that pre-frame their data.
+     *
+     * @param[in]  record One ASCII record: station, x, y, z, and optional Euler angles or quaternion.
+     * @param[in]  units  Unit of the positions in @p record.
+     * @param[out] out    Receives the decoded sample with the position in metres.
      *
      * @return true on success; false on malformed input.
      */

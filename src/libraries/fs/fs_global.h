@@ -60,18 +60,24 @@ namespace FSLIB{
 //=============================================================================================================
 /**
  * Returns build date and time.
+ *
+ * @return Null-terminated build date/time string with static storage duration.
  */
 FSSHARED_EXPORT const char* buildDateTime();
 
 //=============================================================================================================
 /**
  * Returns abbreviated build git hash.
+ *
+ * @return Null-terminated abbreviated git hash string with static storage duration.
  */
 FSSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
  * Returns full build git hash.
+ *
+ * @return Null-terminated full git hash string with static storage duration.
  */
 FSSHARED_EXPORT const char* buildHashLong();
 }

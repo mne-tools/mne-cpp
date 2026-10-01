@@ -103,7 +103,7 @@ public:
      * Create a MEG coil set definition using a database of templates
      * Change the coordinate frame if so desired
      *
-     * @param[in] ch     Channel information to use.
+     * @param[in] chs     Channel information to use.
      * @param[in] nch    Number of channels.
      * @param[in] acc    Required accuracy.
      * @param[in] t      Transform the points using this.
@@ -120,7 +120,7 @@ public:
      * Create a EEG coil set definition using a channel information
      * Change the coordinate frame if so desired
      *
-     * @param[in] ch     Channel information to use.
+     * @param[in] chs     Channel information to use.
      * @param[in] nch    Number of channels.
      * @param[in] t      Transform the points using this.
      *
@@ -212,7 +212,11 @@ public:
     int     coord_frame;            /**< Common coordinate frame. */
     std::unique_ptr<FwdBemSolution> user_data;  /**< Coil-specific BEM solution. */
 
-    /** Number of coils (convenience accessor). */
+    /**
+     * Number of coils (convenience accessor).
+     *
+     * @return Number of coils or electrodes in this set.
+     */
     inline int ncoil() const { return static_cast<int>(coils.size()); }
 };
 

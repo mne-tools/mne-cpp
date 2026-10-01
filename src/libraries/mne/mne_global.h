@@ -54,18 +54,24 @@ namespace MNELIB{
 //=============================================================================================================
 /**
  * Returns build date and time.
+ *
+ * @return Static C string with the compile date and time, e.g. "Sep 30 2026 14:05:12".
  */
 MNESHARED_EXPORT const char* buildDateTime();
 
 //=============================================================================================================
 /**
  * Returns abbreviated build git hash.
+ *
+ * @return Static C string with the short git commit hash, or a "not defined" notice if unavailable at build time.
  */
 MNESHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
  * Returns full build git hash.
+ *
+ * @return Static C string with the full git commit hash, or a "not defined" notice if unavailable at build time.
  */
 MNESHARED_EXPORT const char* buildHashLong();
 }

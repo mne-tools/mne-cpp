@@ -18,11 +18,11 @@
  * stores the noise covariance, the source covariance, the orientation
  * priors and the left/right singular vectors needed to assemble the
  * Tikhonov-regularised inverse for a given SNR and method (MNE, dSPM,
- * sLORETA). It composes the forward solution (@ref MNEForwardSolution),
+ * sLORETA). It composes the forward solution (@ref MNELIB::MNEForwardSolution),
  * covariance (@ref FIFFLIB::FiffCov) and source space
- * (@ref MNESourceSpaces) into a single object that
- * @ref MNELIB::MinimumNorm in INVERSELIB consumes to produce
- * @ref MNESourceEstimate time courses.
+ * (@ref MNELIB::MNESourceSpaces) into a single object that
+ * @c MNELIB::MinimumNorm in INVERSELIB consumes to produce
+ * @c MNESourceEstimate time courses.
  */
 
 #ifndef MNE_INVERSE_OPERATOR_H

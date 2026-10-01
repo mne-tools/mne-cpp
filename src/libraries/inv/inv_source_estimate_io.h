@@ -11,7 +11,7 @@
  *
  * @ref INVLIB::InvSourceEstimateIO adds CSV and tab-separated matrix
  * export (and matching CSV import) on top of the built-in STC / W binary
- * I/O of @ref InvSourceEstimate. CSV output is intended for downstream
+ * I/O of @ref INVLIB::InvSourceEstimate. CSV output is intended for downstream
  * spreadsheet, Python or R analysis where consumers cannot read the
  * FreeSurfer-style STC blob, while the bare-matrix variant feeds plotting
  * tools that only need the numeric grid. The file-row layout is one time

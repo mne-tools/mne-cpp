@@ -14,12 +14,12 @@
  * generation and pipeline glue without linking against
  * @c libpython: interpreter discovery, @c -u unbuffered launch
  * for real-time streaming, line-level stdout/stderr callbacks,
- * a tiny @c [progress] <pct>% protocol parsed into structured
+ * a tiny @c "[progress] <pct>%" protocol parsed into structured
  * progress events, optional virtual-environment activation,
  * and one-shot @c pip install of a pyproject directory or
  * @c requirements.txt before the actual run.
  *
- * The runner is the foundation under @ref PythonTestHelper
+ * The runner is the foundation under @c UTILSLIB::PythonTestHelper
  * (used by every cross-language unit test) and under the
  * mne-cpp applications that call MNE-Python utilities such as
  * @c mne.coreg or @c mne.gui.report directly.
@@ -82,7 +82,7 @@ struct UTILSSHARED_EXPORT PythonRunnerConfig
     int           timeoutMsec = -1;                       /**< Wall-clock timeout (-1 = no limit). */
     bool          unbuffered  = true;                     /**< Pass -u to Python for unbuffered I/O. */
     QString       venvDir;                                /**< Virtual-env directory (empty = no venv). */
-    QString       packageDir;                             /**< Directory containing pyproject.toml for `pip install .` (preferred). */
+    QString       packageDir;                             /**< Directory containing pyproject.toml for `pip install <dir>` (preferred). */
     QString       requirementsFile;                       /**< Fallback: path to requirements.txt for `pip install -r`. */
 };
 

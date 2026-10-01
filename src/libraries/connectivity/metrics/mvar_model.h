@@ -19,13 +19,13 @@
  *
  *   H(f) = ( I - sum_{k=1}^{p} A_k * exp(-2*pi*i*f*k) )^{-1}
  *
- * and spectral matrix @c S(f) = H(f) * Sigma * H(f)^H. @ref H and @ref S
+ * and spectral matrix @c S(f) = H(f) * Sigma * H(f)^H. @c H and @c S
  * are the only two quantities the directed-connectivity metrics in this
- * library actually need: spectral Granger Causality (@ref GrangerCausality)
+ * library actually need: spectral Granger Causality (@ref CONNECTIVITYLIB::GrangerCausality)
  * is a ratio of diagonal entries of @c S before and after conditioning,
- * the Directed Transfer Function (@ref DirectedTransferFunction) is a row-
+ * the Directed Transfer Function (@ref CONNECTIVITYLIB::DirectedTransferFunction) is a row-
  * normalised @c |H_{ij}(f)|^2, and Partial Directed Coherence
- * (@ref PartialDirectedCoherence) is a column-normalised @c |A_{ij}(f)|.
+ * (@ref CONNECTIVITYLIB::PartialDirectedCoherence) is a column-normalised @c |A_{ij}(f)|.
  *
  * The coefficient matrices @c A_1..A_p and the innovation covariance
  * @c Sigma are estimated from the Yule-Walker equations via Levinson-

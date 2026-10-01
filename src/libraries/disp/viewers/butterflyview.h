@@ -14,13 +14,13 @@
  * @brief    QRhi-accelerated butterfly plot overlaying every channel of one or more averaged conditions.
  *
  * ButterflyView is a @c QRhiWidget that pushes all averaged traces of
- * the active @ref EvokedSetModel through a single vertex/fragment
+ * the active @ref DISPLIB::EvokedSetModel through a single vertex/fragment
  * shader pair, giving a smooth zoomable rendering even with hundreds
  * of channels. Per-modality visibility (@c MAG / @c GRAD / @c EEG) is
- * toggled through @ref ModalitySelectionView and the colour /
- * selection of conditions through @ref AverageSelectionView. The
+ * toggled through @ref DISPLIB::ModalitySelectionView and the colour /
+ * selection of conditions through @ref DISPLIB::AverageSelectionView. The
  * widget is the workhorse evoked viewer in MNE-Scan and is intended
- * to live as a tab inside a @ref MultiView dock.
+ * to live as a tab inside a @ref DISPLIB::MultiView dock.
  */
 
 #ifndef BUTTERFLYVIEW_H
@@ -83,6 +83,10 @@ public:
     //=========================================================================================================
     /**
      * The constructor.
+     *
+     * @param[in] sSettingsPath  QSettings key prefix used to persist view settings (default empty).
+     * @param[in] parent         Parent widget (default 0).
+     * @param[in] f              Window flags passed to the widget (default Qt::Widget).
      */
     explicit ButterflyView(const QString& sSettingsPath = "",
                            QWidget *parent = 0,
@@ -287,7 +291,9 @@ protected:
     /**
      * createPlotPath creates the QPointer path for the data plot.
      *
-     * @param[in] index QModelIndex for accessing associated data and model object.
+     * @param[in] row Model row of the channel to plot.
+     * @param[in, out] painter Painter the channel path is drawn with.
+     *
      */
     void createPlotPath(qint32 row, QPainter& painter) const;
 

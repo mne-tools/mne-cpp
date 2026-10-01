@@ -15,8 +15,8 @@
  * inverse FIFF file. It holds the dense surface (vertices, triangles,
  * normals, neighbouring relations) plus the subset selected by the MNE
  * decimation (@c inuse / @c nuse / @c vertno) used to index the leadfield
- * columns of @ref MNEForwardSolution. The structure is consumed by
- * @ref MNESourceSpaces (left+right pair), @ref MNEHemisphere, the BEM
+ * columns of @ref MNELIB::MNEForwardSolution. The structure is consumed by
+ * @ref MNELIB::MNESourceSpaces (left+right pair), @ref MNELIB::MNEHemisphere, the BEM
  * tools and every clustering or morphing step in the inverse pipeline.
  */
 
@@ -71,6 +71,8 @@ public:
     //=========================================================================================================
     /**
      * Constructs the MNE Source Space
+     *
+     * @param[in] np  Number of vertices; positions, normals and in-use flags are zero-initialized to this size.
      */
     MNESourceSpace(int np = 0);
 

@@ -12,13 +12,13 @@
  * Free functions in this header glue together the lower-level INVLIB
  * classes so users can match the MNE-Python ergonomics:
  * @ref INVLIB::applyInverseEpochs applies a precomputed inverse operator
- * across an epoch list, @ref applyInverseRaw streams raw data through
- * the kernel in blocks, @ref estimateSnr returns the source-space SNR
- * trace from an evoked + inverse pair, @ref computeWhitener produces the
+ * across an epoch list, @ref INVLIB::applyInverseRaw "applyInverseRaw" streams raw data through
+ * the kernel in blocks, @ref INVLIB::estimateSnr "estimateSnr" returns the source-space SNR
+ * trace from an evoked + inverse pair, @ref INVLIB::computeWhitener "computeWhitener" produces the
  * diagonal whitener from a noise covariance, and
- * @ref computeSourcePsd / @ref computeSourceBandPower run Welch-based
- * spectral analysis directly on @ref InvSourceEstimate output. All
- * methods are headers-only orchestration on top of @ref InvMinimumNorm
+ * @ref INVLIB::computeSourcePsd "computeSourcePsd" / @ref INVLIB::computeSourceBandPower "computeSourceBandPower" run Welch-based
+ * spectral analysis directly on @ref INVLIB::InvSourceEstimate output. All
+ * methods are headers-only orchestration on top of @ref INVLIB::InvMinimumNorm
  * and the underlying FIFF / MNE primitives.
  */
 
