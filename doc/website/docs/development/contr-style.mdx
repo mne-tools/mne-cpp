@@ -45,6 +45,33 @@ FileLoader(int iOpenMode,
            const QString& sCommentIdentifier = "");
 ```
 
+## Formatting
+
+All C/C++ sources under `src/` (except `src/external/`) are formatted with
+**clang-format 21.1.8** using the repository's
+[`.clang-format`](https://github.com/mne-tools/mne-cpp/blob/main/.clang-format).
+CI fails if any file deviates, so format before you push:
+
+```bash
+pip install clang-format==21.1.8
+python3 tools/quality/check_format.py          # check files changed since origin/staging
+python3 tools/quality/check_format.py --fix    # reformat them in place
+python3 tools/quality/check_format.py --all    # check the whole tree, as CI does
+```
+
+Use exactly this version: other clang-format releases lay out some constructs
+differently and the check would fail. Most IDEs can run clang-format on save;
+point them at the pinned binary (`which clang-format` after the `pip install`).
+
+The whole tree was reformatted in a single commit. To keep `git blame` pointing
+at the real author of each line rather than at that commit, run once per clone:
+
+```bash
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
+GitHub's blame view reads `.git-blame-ignore-revs` automatically.
+
 ## Documentation Scope: Public API vs. Application Code
 
 MNE-CPP draws a deliberate line between the **reusable library contract** and
@@ -106,13 +133,13 @@ void FileLoader::loadTxtFile(const QString& sPath)
 {
     qInfo() << "[FileLoader::loadTxtFile] Working on file" << sPath;
 
-    if(!sPath.contains(".txt")) {
-        qWarning() << "[FileLoader::loadTxtFile] The file does not end with .txt."
+    if (!sPath.contains(".txt")) {
+        qWarning() << "[FileLoader::loadTxtFile] The file does not end with .txt.";
     }
 
     QFile file(sPath);
     if (!file.open(QIODevice::ReadOnly)) {
-        qCritical() << "[FileLoader::loadTxtFile] Unable to open file."
+        qCritical() << "[FileLoader::loadTxtFile] Unable to open file.";
         return;
     }
     // ...

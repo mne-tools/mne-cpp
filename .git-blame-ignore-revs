@@ -1,0 +1,6 @@
+# Commits that only reformat code. git blame skips them when configured with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+# GitHub's blame view applies this file automatically.
+
+# MAINT: reformat all C/C++ sources with clang-format 21.1.8 (T6.2)
+9266f5ce0213a8dc217974609ceae9a0b627fd8f

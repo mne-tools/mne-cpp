@@ -166,6 +166,13 @@ jobs:
     - name: Validate API registry
       run: python3 tools/validate_api_registry.py --repo-root "$GITHUB_WORKSPACE"
 
+    # Gate T6.2: the tree was reformatted once with the pinned clang-format, so
+    # every C/C++ file under src/ (minus src/external) must stay formatted.
+    - name: Check C/C++ formatting
+      run: |
+        python3 -m pip install --quiet clang-format==21.1.8
+        python3 tools/quality/check_format.py --all
+
     # Gate G1: a test that is built but not registered runs nowhere and is
     # counted nowhere. This catches that statically, before a build exists.
     - name: Validate test inventory
